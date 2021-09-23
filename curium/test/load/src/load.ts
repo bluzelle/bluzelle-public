@@ -27,10 +27,9 @@ function weightedRandom(max: number) {
 function doNftUploadCheck() {
     return Promise.resolve({
         data: getLargePayload(20 + weightedRandom(100)),
-        //bluzelle1da4s5vxxhs4cxfcqzmwf5clymyqqpfcygzgm3z
         bz: bluzelle({
-            mnemonic: 'fence observe ship indicate elephant fatigue maze choice toast range repeat matrix warfare satisfy hope track tonight legal hire promote dove over retire mimic',
-            endpoint: 'https://client.sentry.testnet.public.bluzelle.com:1317',
+            mnemonic: 'trophy cool plastic flavor until involve fence orchard economy large month left robot luxury crater term abuse beach dawn dolphin boil seat garden refuse',
+            endpoint: 'https://client.sentry.bluzellenet.bluzelle.com:1317',
             uuid: ''
         })
     })
@@ -68,9 +67,9 @@ const log = (text: string) =>
 const checkReplication = (bz: API, hash: string, id: string, mime: string, vendor: string, content: Uint8Array): Promise<unknown> =>
     Promise.all(['a', 'b', 'c'].map(x =>
         Promise.all([
-            waitUntilHttpAvailable(`https://${x}.client.sentry.testnet.public.bluzelle.com:1317/nft/${hash}`, LOOP_TIMEOUT)
+            waitUntilHttpAvailable(`https://${x}.client.sentry.bluzellenet.bluzelle.com:1317/nft/${hash}`, LOOP_TIMEOUT)
                 .then(passThroughAwait(checkHttpContent(content))),
-            waitUntilHttpAvailable(`https://${x}.client.sentry.testnet.public.bluzelle.com:1317/nft/${vendor}/${id}`, LOOP_TIMEOUT)
+            waitUntilHttpAvailable(`https://${x}.client.sentry.bluzellenet.bluzelle.com:1317/nft/${vendor}/${id}`, LOOP_TIMEOUT)
                 .then(passThroughAwait(checkHttpContent(content)))
         ])
     ))
