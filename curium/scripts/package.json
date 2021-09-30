@@ -13,6 +13,6 @@
     "promise-passthrough": "^1.0.5",
     "ts-node": "^10.2.1",
     "typescript": "^4.3.5",
-    "zx": "^3.0.0"
+    "zx": "^4.2.0"
   }
 }

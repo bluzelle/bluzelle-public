@@ -1,10 +1,11 @@
 #!/usr/bin/env zx
-import {$, fs, ProcessPromise} from 'zx'
+import {$, fs, ProcessPromise, cd} from 'zx'
 import {passThrough, passThroughAwait} from "promise-passthrough";
 import {ChildProcess, spawn} from "child_process";
 import delay from "delay";
 import {entropyToMnemonic} from 'bip39'
 import path from "path";
+import {homedir} from "os";
 const {toPairs, reduce} = require("lodash/fp");
 
 const {times} = require('lodash');
@@ -34,7 +35,8 @@ interface Context {
 
 const COUNT = 4
 
-initBlzd(COUNT)
+compileCurium()
+    .then(() => initBlzd(COUNT))
     .then(passThroughAwait(updateConfigToml))
     .then(passThroughAwait(updateGenesisJson))
     .then(passThroughAwait(updateAppToml))
@@ -63,6 +65,13 @@ initBlzd(COUNT)
         ))
     )
 
+
+function compileCurium(): Promise<void> {
+    process.env.GOPATH=`${homedir()}/go`
+    cd('..')
+    return $`make testnet`
+        .then(() => cd('.'))
+}
 
 function waitForValidatorUp(): Promise<unknown> {
     return $`${getBlzcli()} status`
@@ -160,7 +169,7 @@ function updateBlzcli(): Promise<unknown> {
         'keyring-backend': 'test'
     })
         .then(toPairs)
-        .then(reduce((p, [key, val]) =>
+        .then(reduce((p: any, [key, val]: [string, unknown]) =>
             p.then(() => $`${getBlzcli()} config ${key} ${val}`)
         , Promise.resolve() as Promise<unknown>))
 }
@@ -226,7 +235,7 @@ function initBlzd(count: number): Promise<Context> {
     return Promise.all<Node>(times(count).map((n: number) =>
         fs.rm(getHomeDir(n), {recursive: true, force: true})
             .then(() =>
-                exec<any>(() => $`${getBlzd()} init curium00 --chain-id bluzelle --home ${getHomeDir(n)}`)
+                exec<any>(() => $`${getBlzd()} init blzd-${n} --chain-id bluzelle --home ${getHomeDir(n)}`)
                     .then(x => ({
                         nodeId: x.node_id,
                         home: getHomeDir(n),
@@ -246,6 +255,7 @@ function initBlzd(count: number): Promise<Context> {
 function exec<T>(fn: () => ProcessPromise<any>): Promise<T> {
     return fn()
         .then(passThrough((x: ProcessPromise<any>) => {
+            //@ts-ignore
             if (x.exitCode) {
                 throw('error')
             }
