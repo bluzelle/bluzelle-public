@@ -2,8 +2,6 @@ import {bluzelle, uploadNft} from "bluzelle";
 import {sha256} from "js-sha256";
 import {readFile} from 'fs/promises'
 
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = '0';
-
 readFile(`${__dirname}/image.jpg`)
     .then(data => ({
         bz: bluzelle({
@@ -12,15 +10,15 @@ readFile(`${__dirname}/image.jpg`)
             uuid: ''
         }),
         data,
-        id: 'any-id-1'
+        id: 'ANY-ID-1'
     }))
     .then(ctx => ({...ctx, hash: sha256(ctx.data)}))
     .then(ctx =>
         ctx.bz.createNft({
             id: ctx.id,
             hash: ctx.hash,
-            vendor: 'provided_by_bluzelle',  // replace with your id provided to you by Bluzelle
-            userId: 'user-id',
+            vendor: 'VENDOR_CODE_PROVIDED_BY_BLUZELLE',  // replace with your id provided to you by Bluzelle
+            userId: 'ANY-USER-ID',
             mime: 'image/jpeg',
             meta: 'meta',
             size: ctx.data.byteLength,
@@ -28,8 +26,10 @@ readFile(`${__dirname}/image.jpg`)
         })
             .then(resp => ({...ctx, token: resp.token}))
     )
+
+    // This part down here can be run in the end users browser to upload the file to Bluzelle
     .then(
-        ctx => uploadNft(ctx.bz.url, ctx.data, ctx.token, 'provided_by_bluzelle')
+        ctx => uploadNft(ctx.bz.url, ctx.data, ctx.token, 'VENDOR_CODE_PROVIDED_BY_BLUZELLE')
             .then(() => ctx)
     ).then(ctx => console.log('HASH:',ctx.hash))
     .catch(e => console.log('ERROR:', e))
@@ -38,6 +38,7 @@ readFile(`${__dirname}/image.jpg`)
  * To use this code
  *
  * 1) obtain a mnemonic from Bluzelle and insert into the mnemonic field above
+ * 2) Set the fields that are upper case accordingly
  * 3) run this code
  * 4) open https://client.sentry.testnet.public.bluzelle.com:1317/nft/customer/any-id-3 in a browser to see the result
  * 5) to verify replication go to https://[x].client.sentry.bluzellenet.bluzelle.com:1317/nft/[customer]/any-id-1
