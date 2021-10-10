@@ -4,7 +4,7 @@ import {passThroughAwait} from "promise-passthrough";
 import {expect} from 'chai'
 import {addOracleSource} from 'oracle-js'
 
-describe('Ante handler tests', () => {
+describe.skip('Ante handler tests', () => {
     it("should charge for regular transactions", async () => {
         await shouldCharge(
             (bz) => bz.upsert('foo', 'bar', {gas_price: 0.002, max_gas: 10000000})

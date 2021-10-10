@@ -13,7 +13,6 @@ import {getSwarmAndClient} from "../../helpers/bluzelle-client";
 import {sha256} from "js-sha256";
 import {TruthyValue, waitUntil} from 'async-wait-until'
 import {Some} from "monet";
-import delay from "delay";
 
 const cksum = require('cksum');
 
@@ -88,29 +87,29 @@ describe("Store and retrieve a NFT", function () {
             return Promise.all(
                 times(COUNT).map(n =>
 //                    delay(n * 100)
-                    Promise.resolve()
-                        .then(() => getLargePayload(100))
-                        .then(data => ({
-                            id: Date.now().toString(),
-                            data,
-                            hash: sha256(data)
-                        }))
-                        .then(passThroughAwait(ctx =>
-                            bz.createNft({
-                                id: ctx.id,
-                                hash: ctx.hash,
-                                vendor: 'mintable',
-                                userId: 'user-id',
-                                mime: 'text/plain',
-                                meta: 'meta',
-                                size: ctx.data.byteLength,
-                                gasInfo: defaultGasParams()
-                            })
-                        ))
-                        .then(passThroughAwait(ctx =>
-                            uploadNft(getSentryUrl(swarm), ctx.data, ctx.hash, 'mintable')
-                        ))
-                        .then(ctx => checkReplication(swarm, ctx.hash, ctx.id, 'text/plain', 'mintable', ctx.data))
+                        Promise.resolve()
+                            .then(() => getLargePayload(100))
+                            .then(data => ({
+                                id: Date.now().toString(),
+                                data,
+                                hash: sha256(data)
+                            }))
+                            .then(passThroughAwait(ctx =>
+                                bz.createNft({
+                                    id: ctx.id,
+                                    hash: ctx.hash,
+                                    vendor: 'mintable',
+                                    userId: 'user-id',
+                                    mime: 'text/plain',
+                                    meta: 'meta',
+                                    size: ctx.data.byteLength,
+                                    gasInfo: defaultGasParams()
+                                })
+                            ))
+                            .then(passThroughAwait(ctx =>
+                                uploadNft(getSentryUrl(swarm), ctx.data, ctx.hash, 'mintable')
+                            ))
+                            .then(ctx => checkReplication(swarm, ctx.hash, ctx.id, 'text/plain', 'mintable', ctx.data))
                 )
             )
         });
@@ -185,7 +184,7 @@ const checkMimeType2 = (mime: string, name: string, hash: string) => (resp: Resp
         .map(passThrough(mimeType => console.log('checkMimeType:', name, hash, mimeType, mime)))
         .map(mimeType => expect(mimeType).to.equal(mime))
 
-const checkHttpContent = (content: Uint8Array, name:string, hash: string) => (resp: Response) =>
+const checkHttpContent = (content: Uint8Array, name: string, hash: string) => (resp: Response) =>
     resp.arrayBuffer()
         .then(buf => Buffer.from(buf).compare(content))
         .then(passThrough(() => console.log('checkHttpContent:', name, hash)))
