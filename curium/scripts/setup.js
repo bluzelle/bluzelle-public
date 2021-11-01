@@ -7,47 +7,55 @@ const child_process_1 = require("child_process");
 const delay_1 = require("delay");
 const bip39_1 = require("bip39");
 const path_1 = require("path");
+const os_1 = require("os");
 const { toPairs, reduce } = require("lodash/fp");
 const { times } = require('lodash');
 const COUNT = 4;
-initBlzd(COUNT)
-    .then(promise_passthrough_1.passThroughAwait(updateConfigToml))
-    .then(promise_passthrough_1.passThroughAwait(updateGenesisJson))
-    .then(promise_passthrough_1.passThroughAwait(updateAppToml))
-    .then(promise_passthrough_1.passThroughAwait(updateBlzcli))
-    .then(promise_passthrough_1.passThroughAwait(addVuser))
-    .then(promise_passthrough_1.passThroughAwait(addGenesisAccount))
-    .then(promise_passthrough_1.passThroughAwait(genTx))
-    .then(promise_passthrough_1.passThroughAwait(collectGenTx))
-    .then(promise_passthrough_1.passThroughAwait(copyGenesisJson))
-    .then(promise_passthrough_1.passThroughAwait(updatePersistentPeers))
-    .then(promise_passthrough_1.passThroughAwait(startValidator))
-    .then(promise_passthrough_1.passThroughAwait(waitForValidatorUp))
-    .then(promise_passthrough_1.passThroughAwait(() => delay_1.default(5000)))
-    .then(promise_passthrough_1.passThroughAwait(createNftUsers))
-    .then(promise_passthrough_1.passThroughAwait(createTestUsers))
-    .then(promise_passthrough_1.passThroughAwait(ctx => ctx.blzd.kill()))
+compileCurium()
+    .then(() => initBlzd(COUNT))
+    .then((0, promise_passthrough_1.passThroughAwait)(updateConfigToml))
+    .then((0, promise_passthrough_1.passThroughAwait)(updateGenesisJson))
+    .then((0, promise_passthrough_1.passThroughAwait)(updateAppToml))
+    .then((0, promise_passthrough_1.passThroughAwait)(updateBlzcli))
+    .then((0, promise_passthrough_1.passThroughAwait)(addVuser))
+    .then((0, promise_passthrough_1.passThroughAwait)(addGenesisAccount))
+    .then((0, promise_passthrough_1.passThroughAwait)(genTx))
+    .then((0, promise_passthrough_1.passThroughAwait)(collectGenTx))
+    .then((0, promise_passthrough_1.passThroughAwait)(copyGenesisJson))
+    .then((0, promise_passthrough_1.passThroughAwait)(updatePersistentPeers))
+    .then((0, promise_passthrough_1.passThroughAwait)(startValidator))
+    .then((0, promise_passthrough_1.passThroughAwait)(waitForValidatorUp))
+    .then((0, promise_passthrough_1.passThroughAwait)(() => (0, delay_1.default)(5000)))
+    .then((0, promise_passthrough_1.passThroughAwait)(createNftUsers))
+    .then((0, promise_passthrough_1.passThroughAwait)(createTestUsers))
+    .then((0, promise_passthrough_1.passThroughAwait)(ctx => ctx.blzd.kill()))
     .then(ctx => console.log('\n\n*********************\n', JSON.stringify({
     vuser: ctx.vuser,
     nodes: ctx.nodes,
     testUsers: ctx.testUsers
 }, null, '    ')));
+function compileCurium() {
+    process.env.GOPATH = `${(0, os_1.homedir)()}/go`;
+    (0, zx_1.cd)('..');
+    return (0, zx_1.$) `make testnet`
+        .then(() => (0, zx_1.cd)('.'));
+}
 function waitForValidatorUp() {
-    return zx_1.$ `${getBlzcli()} status`
-        .catch(e => delay_1.default(1000).then(waitForValidatorUp));
+    return (0, zx_1.$) `${getBlzcli()} status`
+        .catch(e => (0, delay_1.default)(1000).then(waitForValidatorUp));
 }
 function createNftUsers(ctx) {
-    return times(COUNT).reduce((p, n) => p.then(() => createUser(`nft-${n}`, bip39_1.entropyToMnemonic((n + 1).toString().repeat(32)))
+    return times(COUNT).reduce((p, n) => p.then(() => createUser(`nft-${n}`, (0, bip39_1.entropyToMnemonic)((n + 1).toString().repeat(32)))
         .then(user => ctx.nodes[n].nftUser = user)
         .then(fundUser)), Promise.resolve());
 }
 function createTestUsers(ctx) {
-    return times(4).reduce((p, n) => p.then(() => createUser(`test-${n}`, bip39_1.entropyToMnemonic((n + 1).toString().repeat(30) + 'aa'))
-        .then(promise_passthrough_1.passThroughAwait(user => ctx.testUsers = (ctx.testUsers || []).concat([user])))
+    return times(4).reduce((p, n) => p.then(() => createUser(`test-${n}`, (0, bip39_1.entropyToMnemonic)((n + 1).toString().repeat(30) + 'aa'))
+        .then((0, promise_passthrough_1.passThroughAwait)(user => ctx.testUsers = (ctx.testUsers || []).concat([user])))
         .then(fundUser)), Promise.resolve());
 }
 function fundUser(user) {
-    return zx_1.$ `${getBlzcli()} tx send vuser ${user.address} ${10_000_000_000_000}ubnt --from vuser --gas auto --gas-adjustment 3 --gas-prices 0.002ubnt --broadcast-mode block -y`;
+    return (0, zx_1.$) `${getBlzcli()} tx send vuser ${user.address} ${10_000_000_000_000}ubnt --from vuser --gas auto --gas-adjustment 3 --gas-prices 0.002ubnt --broadcast-mode block -y`;
 }
 function copyGenesisJson(ctx) {
     return Promise.all(ctx.nodes.slice(1).map(n => zx_1.fs.copy(`${ctx.nodes[0].home}/config/genesis.json`, `${n.home}/config/genesis.json`, { overwrite: true })));
@@ -59,12 +67,12 @@ function getBlzcli() {
     return `${process.env.GOPATH}/bin/blzcli`;
 }
 function startValidator(ctx) {
-    return zx_1.$ `killall blzd`
+    return (0, zx_1.$) `killall blzd`
         .catch(e => e)
         .then(() => zx_1.fs.rm('../test-swarm/blzd.log'))
         .catch(e => e)
-        .then(() => zx_1.cd(ctx.nodes[0].home))
-        .then(() => ctx.blzd = child_process_1.spawn(getBlzd(), ['start', '--home', ctx.nodes[0].home]))
+        .then(() => (0, zx_1.cd)(ctx.nodes[0].home))
+        .then(() => ctx.blzd = (0, child_process_1.spawn)(getBlzd(), ['start', '--home', ctx.nodes[0].home]))
         .then(cp => {
         const logStream = zx_1.fs.createWriteStream('../test-swarm/blzd.log', { flags: 'a' });
         cp.stdout.pipe(logStream);
@@ -72,10 +80,10 @@ function startValidator(ctx) {
     });
 }
 function collectGenTx(ctx) {
-    return zx_1.$ `${getBlzd()} collect-gentxs --home ${ctx.nodes[0].home}`;
+    return (0, zx_1.$) `${getBlzd()} collect-gentxs --home ${ctx.nodes[0].home}`;
 }
 function genTx(ctx) {
-    return exec(() => zx_1.$ `${getBlzd()} gentx --name vuser --amount ${100_000_000_000_000_000}ubnt --keyring-backend test --home ${ctx.nodes[0].home}`)
+    return exec(() => (0, zx_1.$) `${getBlzd()} gentx --name vuser --amount ${100_000_000_000_000_000}ubnt --keyring-backend test --home ${ctx.nodes[0].home}`)
         .then(x => x.replace(/.*"(.*)"/, '$1').trim())
         .then(filename => zx_1.fs.readFile(filename))
         .then(buf => buf.toString())
@@ -83,16 +91,16 @@ function genTx(ctx) {
         .then(valoper => ctx.nodes[0].valoper = valoper.trim());
 }
 function addGenesisAccount(ctx) {
-    return zx_1.$ `${getBlzd()} add-genesis-account ${ctx.vuser.address} ${5_000_000_000_000_000_000}ubnt --home ${ctx.nodes[0].home}`;
+    return (0, zx_1.$) `${getBlzd()} add-genesis-account ${ctx.vuser.address} ${5_000_000_000_000_000_000}ubnt --home ${ctx.nodes[0].home}`;
 }
 function addVuser(ctx) {
     return createUser('vuser', 'claim public hen differ neither disease toe size banner bargain flip snow write obey gravity weather ginger brick order drive syrup anchor owner pig')
         .then(vuser => ctx.vuser = vuser);
 }
 function createUser(name, mnemonic) {
-    return exec(() => zx_1.$ `${getBlzcli()} keys delete ${name}`)
+    return exec(() => (0, zx_1.$) `${getBlzcli()} keys delete ${name}`)
         .catch(e => e)
-        .then(() => exec(() => zx_1.$ `echo ${mnemonic} | ${getBlzcli()} keys add ${name} --recover`))
+        .then(() => exec(() => (0, zx_1.$) `echo ${mnemonic} | ${getBlzcli()} keys add ${name} --recover`))
         .then(user => ({ ...user, mnemonic }));
 }
 function updateBlzcli() {
@@ -104,7 +112,7 @@ function updateBlzcli() {
         'keyring-backend': 'test'
     })
         .then(toPairs)
-        .then(reduce((p, [key, val]) => p.then(() => zx_1.$ `${getBlzcli()} config ${key} ${val}`), Promise.resolve()));
+        .then(reduce((p, [key, val]) => p.then(() => (0, zx_1.$) `${getBlzcli()} config ${key} ${val}`), Promise.resolve()));
 }
 function updateGenesisJson(ctx) {
     editFile(ctx.nodes[0], 'genesis.json', text => text.replace(/"stake"/g, '"ubnt"'));
@@ -142,7 +150,7 @@ function editFile(node, filename, fn) {
 }
 function initBlzd(count) {
     return Promise.all(times(count).map((n) => zx_1.fs.rm(getHomeDir(n), { recursive: true, force: true })
-        .then(() => exec(() => zx_1.$ `${getBlzd()} init curium00 --chain-id bluzelle --home ${getHomeDir(n)}`)
+        .then(() => exec(() => (0, zx_1.$) `${getBlzd()} init blzd-${n} --chain-id bluzelle --home ${getHomeDir(n)}`)
         .then(x => ({
         nodeId: x.node_id,
         home: getHomeDir(n),
@@ -156,7 +164,7 @@ function initBlzd(count) {
 }
 function exec(fn) {
     return fn()
-        .then(promise_passthrough_1.passThrough((x) => {
+        .then((0, promise_passthrough_1.passThrough)((x) => {
         //@ts-ignore
         if (x.exitCode) {
             throw ('error');
