@@ -3,6 +3,8 @@ import {sha256} from "js-sha256";
 import {readFile} from 'fs/promises'
 
 readFile(`${__dirname}/image.jpg`)
+
+    // On the server - send a transaction to register the upload
     .then(data => ({
         bz: bluzelle({
             mnemonic: "mnemonic provided by bluzelle",
