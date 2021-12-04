@@ -1,0 +1,160 @@
+{
+  "Identity": {
+    "PeerID": "QmSbxn6UH1vnW3XCwKRErCCQRu96sQYoMHPBzdPQN5uHru",
+    "PrivKey": "CAASpwkwggSjAgEAAoIBAQDIBylQ2SHHELFhBo1Qrb0RGPODcXwc4dLl+g9UOZyta28tUywYD/65w6yAghcd2wLlRbAVrxI4vad/HSgTl2T+g6l9MiW8dcUzkYpsHndMHqSGBpx+veRgJJ9+xtR6WcGxfsnsKpd5B34JUnKpwtHgN6F57kn+7QvVoUc9u4lVcRlIGf5jeBjv5RXELL2KM3y88fiL1b7702orFtLwY7NHJCne7YjOHTGwRR+2qXM9u2mYDZLbUvVEy5FOB1UttTDjTEGxEdjUmPVxIz+dLzTp9e58HB+aYmmSjwYx2HugjnoKfdwtzXiCF2nqMt8PO7Emxp0MADd6C3Legdhy2KJTAgMBAAECggEAW6vEiJPqQgPpdvD8xLPLCVHpEB1rZwUrlVBDxDLfFi89dYU/mQuDjvkZTo/QLlOYASEt8NIaRLzOTZg8LLZeh7IpdAIOf09uABM8YA6aV91XQ0E2aXN3fYRrQDu5VxVZipHz0nM2ljYT0gviFuD9NIfqTioh6V4T5WUTdDxFVU0/AzBTvQ7iN2/NG9YbucpSiaeksx8v754MuA36pqgDbsFvRxwYR7ULoGsRlwNdakSLELS5XXS+FsaBcFDX0gG6Wl5kZ4YOTdX1ZOHeEvpRCdNFSyhZ8s3KUMhCDr2s6gXKEHnS26tToiUvgrV+kwVHa6U8ZTIHeyVn74Pc4m4nkQKBgQDTOLY8V69egNUi/uB2eyoD4FKPEcds51oZTni1JPZ537NB/qi7d5R1zCNirWDdpNrEQXm3EByN5YoG5fN6RmJrX7SXIXt6zIv5/c/LWICI85//ZlavBqw4qWZseVK7vzykjgQpN/eq//oDjJLx9NsMm7E+mCXxJ+4+iPm5SMIfawKBgQDybvWlGxhnDijkQinsbABOgmAhoGmDCjzHpsCc8O6zyOyWoF/PNNJDK6DqdOrSzFnCqBJNbRRMDNr35kfujSH2queMpP6EHWh4Z5zVGGZkq+GY4DaamJJ+fFx1SIcDkSSF2ZX6ERU21ha8zWRR2FkatCTA2fWPkbvOlSKNujFKuQKBgH40+baukgu+oRvK/WXuC9nLFKmF7wokZpKOb9OU5W1G+/4n4rw5JE0Kj+4rOKDXGxx/HvICP32NtN6QUd4y5iXQRsCy8ewbAlx6ismu9QZfw69Af/UO4KLunVOdXpDuIJcWgGf8mBDl6IZsXXUTYDt1X//Nu4YP3Owivkw2rD9HAoGBAMihAzEsBzniAf1EtCUwC+DtDFlHw4nqgvpHCcfXq/OlKAZPmnqEIC3ugTEGqP7ilrX9GYhx6QY27U+Sh5znt1/Hd/Bw6yCypa5fMO85TiOqCvzVMNsnwLRkfq+g4fsVtr/+nZthX8kNy6tb3tXM0ZDD3FatCgdSd7YyvXHE0N4hAoGASta7UZmIVo7iGWBrp3AqSRvqaq/Y/hUsXbw4+lRL5UUzaPWctnmlH9dh5cFeoBKNVY05Aaf/WT/+xzEFDpV1PMIwMXCri0msKmo9pXN9ZOactyAcuGX27mLgX/4bXO3Y2ZFU3nQQRMvLYouM7doGIUtKXKjl0j6ODxILPZrxVlY="
+  },
+  "Datastore": {
+    "StorageMax": "10GB",
+    "StorageGCWatermark": 90,
+    "GCPeriod": "1h",
+    "Spec": {
+      "mounts": [
+        {
+          "child": {
+            "path": "blocks",
+            "shardFunc": "/repo/flatfs/shard/v1/next-to-last/2",
+            "sync": true,
+            "type": "flatfs"
+          },
+          "mountpoint": "/blocks",
+          "prefix": "flatfs.datastore",
+          "type": "measure"
+        },
+        {
+          "child": {
+            "compression": "none",
+            "path": "datastore",
+            "type": "levelds"
+          },
+          "mountpoint": "/",
+          "prefix": "leveldb.datastore",
+          "type": "measure"
+        }
+      ],
+      "type": "mount"
+    },
+    "HashOnRead": false,
+    "BloomFilterSize": 0
+  },
+  "Addresses": {
+    "Swarm": [
+      "/ip4/0.0.0.0/tcp/4001",
+      "/ip6/::/tcp/4001",
+      "/ip4/0.0.0.0/udp/4001/quic",
+      "/ip6/::/udp/4001/quic"
+    ],
+    "Announce": [],
+    "NoAnnounce": [],
+    "API": "/ip4/127.0.0.1/tcp/5001",
+    "Gateway": "/ip4/127.0.0.1/tcp/8080"
+  },
+  "Mounts": {
+    "IPFS": "/ipfs",
+    "IPNS": "/ipns",
+    "FuseAllowOther": false
+  },
+  "Discovery": {
+    "MDNS": {
+      "Enabled": true,
+      "Interval": 10
+    }
+  },
+  "Routing": {
+    "Type": "dht"
+  },
+  "Ipns": {
+    "RepublishPeriod": "",
+    "RecordLifetime": "",
+    "ResolveCacheSize": 128
+  },
+  "Bootstrap": [
+    "/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN",
+    "/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa",
+    "/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb",
+    "/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt",
+    "/ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ",
+    "/ip4/104.131.131.82/udp/4001/quic/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
+  ],
+  "Gateway": {
+    "HTTPHeaders": {
+      "Access-Control-Allow-Headers": [
+        "X-Requested-With",
+        "Range",
+        "User-Agent"
+      ],
+      "Access-Control-Allow-Methods": [
+        "GET"
+      ],
+      "Access-Control-Allow-Origin": [
+        "*"
+      ]
+    },
+    "RootRedirect": "",
+    "Writable": false,
+    "PathPrefixes": [],
+    "APICommands": [],
+    "NoFetch": false,
+    "NoDNSLink": false,
+    "PublicGateways": null
+  },
+  "API": {
+    "HTTPHeaders": {}
+  },
+  "Swarm": {
+    "AddrFilters": null,
+    "DisableBandwidthMetrics": false,
+    "DisableNatPortMap": false,
+    "EnableRelayHop": false,
+    "EnableAutoRelay": false,
+    "Transports": {
+      "Network": {},
+      "Security": {},
+      "Multiplexers": {}
+    },
+    "ConnMgr": {
+      "Type": "basic",
+      "LowWater": 600,
+      "HighWater": 900,
+      "GracePeriod": "20s"
+    }
+  },
+  "AutoNAT": {},
+  "Pubsub": {
+    "Router": "",
+    "DisableSigning": false
+  },
+  "Peering": {
+    "Peers": null
+  },
+  "DNS": {
+    "Resolvers": {}
+  },
+  "Migration": {
+    "DownloadSources": [],
+    "Keep": ""
+  },
+  "Provider": {
+    "Strategy": ""
+  },
+  "Reprovider": {
+    "Interval": "12h",
+    "Strategy": "all"
+  },
+  "Experimental": {
+    "FilestoreEnabled": false,
+    "UrlstoreEnabled": false,
+    "ShardingEnabled": false,
+    "GraphsyncEnabled": false,
+    "Libp2pStreamMounting": false,
+    "P2pHttpProxy": false,
+    "StrategicProviding": false,
+    "AcceleratedDHTClient": false
+  },
+  "Plugins": {
+    "Plugins": null
+  },
+  "Pinning": {
+    "RemoteServices": {}
+  },
+  "Internal": {}
+}
