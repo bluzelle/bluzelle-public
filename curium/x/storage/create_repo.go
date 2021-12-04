@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"time"
 
 	config "github.com/ipfs/go-ipfs-config"
 	files "github.com/ipfs/go-ipfs-files"
@@ -47,14 +46,12 @@ func setupPlugins(externalPluginsPath string) error {
 	return nil
 }
 
-func createRepo(repoPath string) (string, error) {
-
-	fmt.Println("****** repo dir", repoPath)
+func createTempRepo(repoPath string) error {
 
 	// Create a config with default options and a 2048 bit key
 	cfg, err := config.Init(ioutil.Discard, 2048)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// When creating the repository, you can define custom settings on the repository, such as enabling experimental
@@ -76,10 +73,10 @@ func createRepo(repoPath string) (string, error) {
 	// Create the repo with the config
 	err = fsrepo.Init(repoPath, cfg)
 	if err != nil {
-		return "", fmt.Errorf("failed to init ephemeral node: %s", err)
+		return fmt.Errorf("failed to init ephemeral node: %s", err)
 	}
 
-	return repoPath, nil
+	return nil
 }
 
 /// ------ Spawning the node
@@ -110,15 +107,23 @@ func createNode(ctx context.Context, repoPath string) (icore.CoreAPI, error) {
 	return coreapi.NewCoreAPI(node)
 }
 
-// Spawns a node on the default repo location, if the repo exists
-func spawnNode(ctx context.Context, repoPath string) (icore.CoreAPI, error) {
-	if err := setupPlugins(repoPath); err != nil {
-		return nil, err
 
+// Spawns a node to be used just for this run (i.e. creates a tmp repo)
+func spawnIpfsNode(ctx context.Context, repoPath string) (icore.CoreAPI, error) {
+	if err := setupPlugins(""); err != nil {
+		return nil, err
 	}
 
+	// Create a Temporary Repo
+	err := createTempRepo(repoPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create temp repo: %s", err)
+	}
+
+	// Spawning an ephemeral IPFS node
 	return createNode(ctx, repoPath)
 }
+
 
 
 func connectToPeers(ctx context.Context, ipfs icore.CoreAPI, peers []string) error {
@@ -194,7 +199,6 @@ func getUnixfsNode(path string) (files.Node, error) {
 var flagExp = flag.Bool("experimental", false, "enable experimental features")
 
 func main() {
-
 	flag.Parse()
 
 	/// --- Part I: Getting a IPFS node running
@@ -204,22 +208,11 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	createRepo("./testrepo")
-
-		// Spawn a node using the default path (~/.ipfs), assuming that a repo exists there already
-		fmt.Println("Spawning node on default repo")
-		ipfs, err := spawnNode(ctx, "./testrepo")
-		if err != nil {
-			panic(fmt.Errorf("failed to spawnNode node: %s", err))
-		}
-
-
-	//// Spawn a node using a temporary path, creating a temporary repo for the run
-	//fmt.Println("Spawning node on a temporary repo")
-	//ipfs, err := spawnEphemeral(ctx)
-	//if err != nil {
-	//	panic(fmt.Errorf("failed to spawn ephemeral node: %s", err))
-	//}
+	fmt.Println("Spawning node")
+	ipfs, err := spawnIpfsNode(ctx, "./testrepo")
+	if err != nil {
+		panic(fmt.Errorf("failed to spawn ephemeral node: %s", err))
+	}
 
 	fmt.Println("IPFS node is running")
 
@@ -227,9 +220,9 @@ func main() {
 
 	fmt.Println("\n-- Adding and getting back files & directories --")
 
-	inputBasePath := "./x/storage"
-	inputPathFile := inputBasePath + "/test.txt"
-	inputPathDirectory := inputBasePath + "/test-dir"
+	inputBasePath := "./x/storage/"
+	inputPathFile := inputBasePath + "test.txt"
+	inputPathDirectory := inputBasePath + "test-dir"
 
 	someFile, err := getUnixfsNode(inputPathFile)
 	if err != nil {
@@ -341,7 +334,4 @@ func main() {
 	fmt.Printf("Wrote the file to %s\n", outputPath)
 
 	fmt.Println("\nAll done! You just finalized your first tutorial on how to use go-ipfs as a library")
-
-	time.Sleep(time.Hour * 24)
-
 }
