@@ -25,40 +25,36 @@ func Test(t *testing.T) {
 	t.Run("should replicate between nodes", func(t *testing.T) {
 		err := withIpfsNodes(func(ctx context.Context, nodes []*curiumipfs.StorageIpfsNode) error {
 
-			path, err := uploadFile(ctx, "./testfile.txt", nodes[0])
+			cidPath, err := uploadFile(ctx, "./testfile.txt", nodes[0])
 			if err != nil {
 				return err
 			}
 
-			isLocal, err := nodes[0].HasLocal(path.Cid())
+			isLocal, err := nodes[0].HasLocal(cidPath.Cid())
 			if err != nil {
 				return err
 			}
 			assert.True(t, isLocal)
 
-			isLocal, err = nodes[1].HasLocal(path.Cid())
-			if err != nil {
+			if isLocal, err = nodes[1].HasLocal(cidPath.Cid()); err != nil {
 				return err
 			}
 			assert.False(t, isLocal)
 
-			err = nodes[1].AddPin(path)
-			if err != nil {
+			if err = nodes[1].AddPin(cidPath.String()); err != nil {
 				return err
 			}
 
-			err = nodes[0].Stop()
-			if err != nil {
+			if err = nodes[0].Stop(); err != nil {
 				return err
 			}
 
-			isLocal, err = nodes[1].HasLocal(path.Cid())
-			if err != nil {
+			if isLocal, err = nodes[1].HasLocal(cidPath.Cid()); err != nil {
 				return err
 			}
 			assert.True(t, isLocal)
 
-			content, err := getFile(ctx, nodes[1], path)
+			content, err := getFile(ctx, nodes[1], cidPath)
 			if err != nil {
 				return err
 			}

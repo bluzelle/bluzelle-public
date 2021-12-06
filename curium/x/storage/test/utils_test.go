@@ -81,18 +81,15 @@ func withIpfsNodes(fn func(context.Context, []*curiumipfs.StorageIpfsNode) error
 		return err
 	}
 
-	err = fn(ctx, []*curiumipfs.StorageIpfsNode{node1, node2})
-	if err != nil {
+	if err = fn(ctx, []*curiumipfs.StorageIpfsNode{node1, node2}); err != nil {
 		return err
 	}
 
-	err = node1.Stop()
-	if err != nil {
+	if err = node1.Stop(); err != nil {
 		return err
 	}
 
-	err = node2.Stop()
-	if err != nil {
+	if err = node2.Stop(); err != nil {
 		return err
 	}
 

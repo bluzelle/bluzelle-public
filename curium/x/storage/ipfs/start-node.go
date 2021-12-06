@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/ipfs/go-cid"
+	config "github.com/ipfs/go-ipfs-config"
+	"github.com/ipfs/go-ipfs/commands"
 	"github.com/ipfs/go-ipfs/core"
 	"github.com/ipfs/go-ipfs/core/coreapi"
+	"github.com/ipfs/go-ipfs/core/corehttp"
 	"github.com/ipfs/go-ipfs/core/node/libp2p"
 	"github.com/ipfs/go-ipfs/plugin/loader"
 	"github.com/ipfs/go-ipfs/repo"
@@ -64,10 +67,11 @@ type StorageIpfsNode struct {
 	Context  context.Context
 	Repo     repo.Repo
 	IpfsNode *core.IpfsNode
+	RepoPath string
 }
 
-func (storageNode *StorageIpfsNode) AddPin(cid path.Path) error {
-	return storageNode.IpfsApi.Pin().Add(storageNode.Context, cid)
+func (storageNode *StorageIpfsNode) AddPin(pathString string) error {
+	return storageNode.IpfsApi.Pin().Add(storageNode.Context, path.New(pathString))
 }
 
 func (storageNode *StorageIpfsNode) Stop() error {
@@ -81,6 +85,21 @@ func (storageNode *StorageIpfsNode) Stop() error {
 
 func (storageNode *StorageIpfsNode) HasLocal(cid cid.Cid) (bool, error) {
 	return storageNode.IpfsNode.Blockstore.Has(cid)
+}
+
+func cmdCtx(node *StorageIpfsNode) commands.Context {
+	return commands.Context{
+		ConfigRoot: node.RepoPath,
+		LoadConfig: func(path string) (*config.Config, error) {
+			return node.Repo.Config()
+		},
+		ConstructNode: func() (*core.IpfsNode, error) {
+			return node.IpfsNode, nil
+		},
+		ReqLog: &commands.ReqLog{
+			Requests: []*commands.ReqLogEntry{},
+		},
+	}
 }
 
 func SpawnStorageIpfsNode(ctx context.Context, repoPath string) (*StorageIpfsNode, error) {
@@ -129,12 +148,42 @@ func SpawnStorageIpfsNode(ctx context.Context, repoPath string) (*StorageIpfsNod
 		}
 	}()
 
-	return &StorageIpfsNode{
+	storageNode := &StorageIpfsNode{
 		IpfsApi:  api,
 		Context:  ctx,
 		Repo:     ipfsRepo,
 		IpfsNode: node,
-	}, nil
+		RepoPath: repoPath,
+	}
+
+	go func() {
+		if err = startApiServer(storageNode); err != nil {
+			fmt.Println("error starting api server", storageNode.RepoPath)
+			fmt.Println(err)
+		}
+	}()
+
+	return storageNode, nil
+}
+
+func startApiServer(node *StorageIpfsNode) error {
+
+	repoConfig, err := node.Repo.Config()
+	if err != nil {
+		return err
+	}
+
+	addr := repoConfig.Addresses.API[0]
+	var opts = []corehttp.ServeOption{
+		corehttp.GatewayOption(true, "/ipfs", "/ipns"),
+		corehttp.WebUIOption,
+		corehttp.CommandsOption(cmdCtx(node)),
+	}
+
+	if err := corehttp.ListenAndServe(node.IpfsNode, addr, opts...); err != nil {
+		fmt.Println("***** Error starting api server", err)
+	}
+	return nil
 }
 
 func connectToPeers(ctx context.Context, ipfs iface.CoreAPI, peers []string) error {
