@@ -1,0 +1,22 @@
+=============== Dec 7, 2021 (PST) ===============
+11:37:50.739239 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+11:37:50.760543 db@open opening
+11:37:50.761047 version@stat F·[] S·0B[] Sc·[]
+11:37:50.787049 db@janitor F·2 G·0
+11:37:50.787103 db@open done T·26.522025ms
+11:46:55.508053 memdb@flush N·6424 S·3MiB
+11:46:55.560054 memdb@flush created L0@3 N·6424 S·875KiB "abc..y:1,v6":"val..999,v3991"
+11:46:55.560151 version@stat F·[1] S·875KiB[875KiB] Sc·[0.25]
+11:46:55.570454 memdb@flush committed F·1 T·62.208399ms
+11:46:55.571268 journal@remove removed @1
+12:15:42.873046 memdb@flush N·6421 S·3MiB
+12:15:42.941064 memdb@flush created L0@5 N·6421 S·873KiB "abc..606,v6426":"val..212,v12843"
+12:15:42.941164 version@stat F·[2] S·1MiB[1MiB] Sc·[0.50]
+12:15:42.963950 memdb@flush committed F·1 T·90.524008ms
+12:15:42.967408 journal@remove removed @2
+12:17:30.235096 table@compaction L0·2 -> L1·0 S·1MiB Q·13237
+12:17:30.309132 table@build created L1@6 N·9635 S·1MiB "abc..y:1,v6":"val..999,v3991"
+12:17:30.309218 version@stat F·[0 1] S·1MiB[0B 1MiB] Sc·[0.00 0.01]
+12:17:30.320736 table@compaction committed F-1 S-589KiB Ke·0 D·3210 T·84.271211ms
+12:17:30.321354 table@remove removed @5
+12:17:30.321687 table@remove removed @3

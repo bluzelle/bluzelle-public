@@ -1,0 +1,11 @@
+=============== Dec 7, 2021 (PST) ===============
+11:37:50.690261 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+11:37:50.709948 db@open opening
+11:37:50.710648 version@stat F·[] S·0B[] Sc·[]
+11:37:50.738777 db@janitor F·2 G·0
+11:37:50.738834 db@open done T·28.818016ms
+12:04:11.094663 memdb@flush N·15427 S·3MiB
+12:04:11.164161 memdb@flush created L0@3 N·15427 S·2MiB "BH:..4ac,v8211":"blo..ore,v6"
+12:04:11.164329 version@stat F·[1] S·2MiB[2MiB] Sc·[0.25]
+12:04:11.174887 memdb@flush committed F·1 T·78.749141ms
+12:04:11.175785 journal@remove removed @1

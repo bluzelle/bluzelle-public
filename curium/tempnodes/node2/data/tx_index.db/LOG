@@ -1,0 +1,21 @@
+=============== Dec 7, 2021 (PST) ===============
+11:37:50.798661 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+11:37:50.824885 db@open opening
+11:37:50.825655 version@stat F·[] S·0B[] Sc·[]
+11:37:50.846426 db@janitor F·2 G·0
+11:37:50.846540 db@open done T·21.581612ms
+11:42:43.541024 memdb@flush N·47862 S·3MiB
+11:42:43.593776 memdb@flush created L0@3 N·47862 S·680KiB "blo..\x00\x01\x81,v1":"blo..k\x00\x01,v47838"
+11:42:43.593864 version@stat F·[1] S·680KiB[680KiB] Sc·[0.25]
+11:42:43.611740 memdb@flush committed F·1 T·70.182873ms
+11:42:43.613078 journal@remove removed @1
+12:07:06.513110 memdb@flush N·47810 S·3MiB
+12:07:06.550678 memdb@flush created L0@5 N·47810 S·680KiB "blo..\x01\xc5Y,v47863":"blo..k\x00\x01,v95648"
+12:07:06.550781 version@stat F·[2] S·1MiB[1MiB] Sc·[0.50]
+12:07:06.564909 memdb@flush committed F·1 T·50.777607ms
+12:07:06.565777 journal@remove removed @2
+12:31:50.796280 memdb@flush N·47810 S·3MiB
+12:31:50.834304 memdb@flush created L0@7 N·47810 S·680KiB "blo..\x01ʯ,v95673":"blo..k\x00\x01,v143458"
+12:31:50.834430 version@stat F·[3] S·1MiB[1MiB] Sc·[0.75]
+12:31:50.866832 memdb@flush committed F·1 T·69.983642ms
+12:31:50.868968 journal@remove removed @4
