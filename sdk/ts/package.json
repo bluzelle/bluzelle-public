@@ -1,0 +1,15 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@cosmjs/launchpad": "^0.26.5",
+    "@cosmjs/proto-signing": "^0.26.5",
+    "@cosmjs/stargate": "^0.26.5",
+    "@types/node": "^16.11.11",
+    "monet": "^0.9.3",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  }
+}

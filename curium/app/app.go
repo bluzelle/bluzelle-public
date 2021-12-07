@@ -1,10 +1,12 @@
 package app
 
 import (
+	curiumipfs "github.com/bluzelle/curium/x/storage-ipfs/ipfs"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -91,11 +93,14 @@ import (
 	curiummodule "github.com/bluzelle/curium/x/curium"
 	curiummodulekeeper "github.com/bluzelle/curium/x/curium/keeper"
 	curiummoduletypes "github.com/bluzelle/curium/x/curium/types"
+	storagemodule "github.com/bluzelle/curium/x/storage"
+	storagemodulekeeper "github.com/bluzelle/curium/x/storage/keeper"
+	storagemoduletypes "github.com/bluzelle/curium/x/storage/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
 const (
-	AccountAddressPrefix = "cosmos"
+	AccountAddressPrefix = "bluzelle"
 	Name                 = "curium"
 )
 
@@ -142,6 +147,7 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		curiummodule.AppModuleBasic{},
+		storagemodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -211,6 +217,8 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
 	CuriumKeeper curiummodulekeeper.Keeper
+
+	StorageKeeper storagemodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// the module manager
@@ -245,6 +253,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		curiummoduletypes.StoreKey,
+		storagemoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -350,6 +359,18 @@ func New(
 	)
 	curiumModule := curiummodule.NewAppModule(appCodec, app.CuriumKeeper)
 
+	storageDir := appOpts.Get("storage-dir").(string)
+	storageNode, err := startupStorageNode(storageDir)
+
+	app.StorageKeeper = *storagemodulekeeper.NewKeeper(
+		appCodec,
+		keys[storagemoduletypes.StoreKey],
+		keys[storagemoduletypes.MemStoreKey],
+		appOpts.Get("storage-dir").(string),
+		storageNode,
+	)
+	storageModule := storagemodule.NewAppModule(appCodec, app.StorageKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it
@@ -389,6 +410,7 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		curiumModule,
+		storageModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -424,6 +446,7 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		curiummoduletypes.ModuleName,
+		storagemoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -467,6 +490,22 @@ func New(
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 
 	return app
+}
+
+func startupStorageNode(storageDir string) (*curiumipfs.StorageIpfsNode, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+	storageDir = strings.ReplaceAll(storageDir, "~", homeDir)
+
+	err = storagemodulekeeper.CreateRepoIfNotExist(storageDir, curiumipfs.CreateRepoOptions{})
+	if err != nil {
+		return nil, err
+	}
+	node, err := storagemodulekeeper.StartStorageNode(storageDir)
+	return node, err
+
 }
 
 // Name returns the name of the App
@@ -612,6 +651,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(curiummoduletypes.ModuleName)
+	paramsKeeper.Subspace(storagemoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper

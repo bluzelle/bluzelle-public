@@ -10,7 +10,10 @@ client:
   openapi:
     path: "docs/static/openapi.yml"
   vuex:
-    path: "../clients/ts/src"
+    path: "../sdk/ts/src"
 faucet:
   name: bob
   coins: ["5token", "100000stake"]
+init:
+  app:
+    storage-dir: "~/.curium/storage"
