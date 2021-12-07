@@ -10,7 +10,7 @@ client:
   openapi:
     path: "docs/static/openapi.yml"
   vuex:
-    path: "vue/src/store"
+    path: "../clients/ts/src"
 faucet:
   name: bob
   coins: ["5token", "100000stake"]
