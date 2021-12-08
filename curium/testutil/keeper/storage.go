@@ -31,6 +31,8 @@ func StorageKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 		codec.NewProtoCodec(registry),
 		storeKey,
 		memStoreKey,
+		"",
+		nil,
 	)
 
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())

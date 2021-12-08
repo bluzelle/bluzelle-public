@@ -22,8 +22,6 @@ export const bluzelle = (config: BluzelleConfig) =>
             wallet, storage: client
         }))
 
-
-
 bluzelle({
     url: 'localhost:26657',
     mnemonic: 'key merit cross zoo rally eternal stuff chapter match rally eye cement critic old shell renew staff swim trend black slam adjust frost spot'
