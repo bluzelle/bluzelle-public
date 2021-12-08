@@ -1,11 +1,11 @@
 accounts:
-  - name: alice
-    coins: ["20000token", "200000000stake"]
+  - name: vuser
+    coins: ["20000000000ubnt"]
   - name: bob
-    coins: ["10000token", "100000000stake"]
+    coins: ["10000ubnt"]
 validator:
-  name: alice
-  staked: "100000000stake"
+  name: vuser
+  staked: "100000000ubnt"
 client:
   openapi:
     path: "docs/static/openapi.yml"
@@ -13,7 +13,32 @@ client:
     path: "../sdk/ts/src"
 faucet:
   name: bob
-  coins: ["5token", "100000stake"]
+  coins: ["100000ubnt"]
 init:
   app:
     storage-dir: "~/.curium/storage"
+    minimum-gas-prices: "0ubnt"
+  client:
+    output: "json"
+  config:
+    consensus:
+      timeout_commit: "5s"
+genesis:
+  app_state:
+    staking:
+      params:
+        bond_denom: "denom"
+    crisis:
+      constant_fee:
+        denom: "ubnt"
+
+    gov:
+      deposit_params:
+        min_deposit:
+          - denom: "ubnt"
+            amount: "1000000"
+
+    mint:
+      params:
+        mint_denom: "ubnt"
+
