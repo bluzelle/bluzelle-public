@@ -27,7 +27,7 @@ genesis:
   app_state:
     staking:
       params:
-        bond_denom: "denom"
+        bond_denom: "ubnt"
     crisis:
       constant_fee:
         denom: "ubnt"
