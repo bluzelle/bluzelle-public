@@ -1,6 +1,5 @@
 import {DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
 import {queryClient, txClient} from "./generated/bluzelle/curium/bluzelle.curium.storage/module";
-import {Some} from 'monet'
 
 export interface BluzelleConfig {
     url: string
@@ -36,19 +35,5 @@ export const storageClient = (wallet: BluzelleWallet) =>
                 q
             })
         );
-
-
-const client = bluzelleWallet({
-    url: 'localhost:26657',
-    mnemonic: 'key merit cross zoo rally eternal stuff chapter match rally eye cement critic old shell renew staff swim trend black slam adjust frost spot',
-}).then(storageClient)
-    .then(client => Promise.all([
-            client.tx.signAndBroadcast([
-                client.tx.msgPin({cid: 'QmQiDiArzCFcMYZKkePM4gTfZZsL22GfDQwf9vjryhGUDB', creator: client.wallet.address}),
-                client.tx.msgPin({cid: 'QmQiDiArzCFcMYZKkePM4gTfZZsL22GfDQwf9vjryhGUDB', creator: client.wallet.address})
-            ]),
-        ])
-    )
-    .then(x => x)
 
 

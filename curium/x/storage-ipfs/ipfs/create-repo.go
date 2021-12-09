@@ -51,6 +51,8 @@ func CreateRepo(repoPath string, configOptions CreateRepoOptions) error {
 		configOptions.GatewayPort = 8080
 	}
 
+	cfg.API.HTTPHeaders["Access-Control-Allow-Origin"] = []string{"*"}
+
 	cfg.Addresses.Swarm = []string{
 		fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", configOptions.SwarmPort),
 		fmt.Sprintf("/ip6/::/tcp/%d", configOptions.SwarmPort),
