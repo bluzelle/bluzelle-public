@@ -5,5 +5,8 @@
   "license": "MIT",
   "scripts": {
     "test-ci": "go test ./..."
+  },
+  "dependencies": {
+    "@bluzelle/testing": "^1.0.0"
   }
 }
