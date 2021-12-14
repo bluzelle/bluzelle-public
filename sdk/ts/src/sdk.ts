@@ -1,39 +1,40 @@
 import {DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
-import {queryClient, txClient} from "./generated/bluzelle/curium/bluzelle.curium.storage/module";
+import {SigningStargateClient} from "@cosmjs/stargate";
+import {txClient} from "./generated/bluzelle/curium/bluzelle.curium.storage/module/index";
 
 export interface BluzelleConfig {
-    url: string
-    mnemonic: string
+    url: string;
+    wallet: DirectSecp256k1HdWallet;
 }
 
-export interface BluzelleWallet {
-    hdWallet: DirectSecp256k1HdWallet;
+export interface BluzelleClient {
+    url: string;
     address: string;
-    config: BluzelleConfig;
+    chainId: string;
+    sgClient: SigningStargateClient;
+    wallet: DirectSecp256k1HdWallet;
 }
 
-export const bluzelleWallet = (config: BluzelleConfig): Promise<BluzelleWallet> =>
-    DirectSecp256k1HdWallet.fromMnemonic(config.mnemonic, {prefix: 'bluzelle'})
-        .then(hdWallet =>
-            hdWallet.getAccounts()
-                .then(accounts => ({
-                    hdWallet,
-                    address: accounts[0].address,
-                    config
-                }))
-        )
+export const newBluzelleClient = (config: BluzelleConfig) =>
+    txClient(config.wallet, {addr: config.url})
+        .then(sgClient => Promise.all([
+            sgClient,
+            config.wallet.getAccounts().then(acc => acc[0].address),
+            'chain-id'
+        ]))
+        .then(([sgClient, address, chainId]) => ({
+               url: config.url,
+            sgClient,
+            chainId,
+            address,
+            wallet: config.wallet
+            }));
 
-export const storageClient = (wallet: BluzelleWallet) =>
-    Promise.all([
-        txClient(wallet.hdWallet, {addr: wallet.config.url}),
-        queryClient({addr: wallet.config.url})
-    ])
-        .then(([tx, q]) =>
-            ({
-                wallet,
-                tx,
-                q
-            })
-        );
+
+
+
+
+
+
 
 
