@@ -1,7 +1,8 @@
-import {DirectSecp256k1HdWallet, Registry} from "@cosmjs/proto-signing";
+import {DirectSecp256k1HdWallet, EncodeObject, Registry} from "@cosmjs/proto-signing";
 import {SigningStargateClient} from "@cosmjs/stargate";
 import {MsgPin} from "./generated/bluzelle/curium/bluzelle.curium.storage/module/types/storage/tx";
 import {OfflineDirectSigner} from "@cosmjs/proto-signing/build/signer";
+import {Subject} from "rxjs";
 
 export interface BluzelleConfig {
     url: string;
@@ -31,16 +32,36 @@ export const newBluzelleClient = (config: BluzelleConfig) =>
         .then(([sgClient, address]) => ({
             url: config.url,
             sgClient,
-            address
+            address,
         }));
 
-export const pinCid = (client: BluzelleClient, cid: string) => {
-    const msg = {
-        typeUrl: "/bluzelle.curium.storage.MsgPin", value: {
-            cid,
-            creator: client.address
-        } as MsgPin
-    }
-    return client.sgClient.signAndBroadcast(client.address, [msg], {gas: "2000000", amount: [{amount: '2000000', denom: 'ubnt'}]})
+
+export interface BroadcastOptions {
+    gasPrice: number,
+    maxGas: number,
+    memo?: string
 }
+
+export const pinCid = (client: BluzelleClient, cid: string, options: BroadcastOptions) =>
+    sendTx(client, 'storage.MsgPin', {cid, creator: client.address}, options);
+
+const sendTx = <T>(client: BluzelleClient, type: string, msg: T, options: BroadcastOptions) =>
+    Promise.resolve(msg)
+        .then(msg => ({
+            typeUrl: `/bluzelle.curium.${type}`,
+            value: msg
+        }))
+        .then(msg => client.sgClient.signAndBroadcast(
+            client.address,
+            [msg],
+            {
+                gas: options.maxGas.toFixed(0), amount: [{
+                    denom: 'ubnt',
+                    amount: (options.gasPrice * options.maxGas).toFixed(0)
+                }]
+            },
+            options.memo,
+        ))
+
+
 
