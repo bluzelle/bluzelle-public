@@ -60,8 +60,8 @@ func CreateRepo(repoPath string, configOptions CreateRepoOptions) error {
 		fmt.Sprintf("/ip6/::/udp/%d/quic", configOptions.SwarmPort),
 	}
 
-	cfg.Addresses.API = []string{fmt.Sprintf("/ip4/127.0.0.1/tcp/%d", configOptions.ApiPort)}
-	cfg.Addresses.Gateway = []string{fmt.Sprintf("/ip4/127.0.0.1/tcp/%d", configOptions.GatewayPort)}
+	cfg.Addresses.API = []string{fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", configOptions.ApiPort)}
+	cfg.Addresses.Gateway = []string{fmt.Sprintf("/ip4/0.0.0.0/tcp/%d", configOptions.GatewayPort)}
 
 	// When creating the repository, you can define custom settings on the repository, such as enabling experimental
 	// features (See experimental-features.md) or customizing the gateway endpoint.
