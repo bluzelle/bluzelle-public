@@ -1,12 +1,12 @@
-import {DirectSecp256k1HdWallet, EncodeObject, Registry} from "@cosmjs/proto-signing";
-import {SigningStargateClient} from "@cosmjs/stargate";
-import {MsgPin} from "./generated/bluzelle/curium/bluzelle.curium.storage/module/types/storage/tx";
+import {SequenceResponse, SigningStargateClient} from "@cosmjs/stargate";
 import {OfflineDirectSigner} from "@cosmjs/proto-signing/build/signer";
-import {Subject} from "rxjs";
+import {getRegistry} from "./registry";
+import {SigningStargateClientOptions} from "@cosmjs/stargate/build/signingstargateclient";
+import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 
 export interface BluzelleConfig {
     url: string;
-    wallet: () => Promise<OfflineDirectSigner>;
+    wallet: () => Promise<BluzelleWallet>;
 }
 
 export interface BluzelleClient {
@@ -15,16 +15,14 @@ export interface BluzelleClient {
     sgClient: SigningStargateClient;
 }
 
-const registry = new Registry([
-    ["/bluzelle.curium.storage.MsgPin", MsgPin]
-]);
+export interface BluzelleWallet extends OfflineDirectSigner {
+    getSequence: (client: SigningBluzelleClient,signerAddress: string) => Promise<SequenceResponse>
+}
 
-export const newLocalWallet = (mnemonic: string) => () => DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {prefix: 'bluzelle'});
-
-export const newBluzelleClient = (config: BluzelleConfig) =>
+export const newBluzelleClient = (config: { wallet: () => Promise<BluzelleWallet>; url: string }) =>
     config.wallet()
         .then(wallet =>
-            SigningStargateClient.connectWithSigner(config.url, wallet, {prefix: 'bluzelle', registry})
+            SigningBluzelleClient.connectWithSigner(config.url, wallet, {prefix: 'bluzelle', registry: getRegistry()})
                 .then(sgClient => Promise.all([
                     sgClient,
                     wallet.getAccounts().then(acc => acc[0].address),
@@ -36,32 +34,28 @@ export const newBluzelleClient = (config: BluzelleConfig) =>
         }));
 
 
-export interface BroadcastOptions {
-    gasPrice: number,
-    maxGas: number,
-    memo?: string
+export class SigningBluzelleClient extends SigningStargateClient {
+
+    private wallet: BluzelleWallet
+
+    protected constructor(tmClient: Tendermint34Client | undefined, signer: BluzelleWallet, options: SigningStargateClientOptions) {
+        super(tmClient, signer, options);
+        this.wallet = signer
+    }
+
+    getSequenceFromNetwork(address: string): Promise<SequenceResponse> {
+        return super.getSequence(address)
+    }
+
+
+    getSequence(address: string): Promise<SequenceResponse> {
+        return this.wallet.getSequence(this, address)
+    }
+
+    static async connectWithSigner(endpoint: string, signer: BluzelleWallet, options = {}) {
+        return Tendermint34Client.connect(endpoint)
+            .then(tmClient => new SigningBluzelleClient(tmClient, signer, options))
+    }
 }
-
-export const pinCid = (client: BluzelleClient, cid: string, options: BroadcastOptions) =>
-    sendTx(client, 'storage.MsgPin', {cid, creator: client.address}, options);
-
-const sendTx = <T>(client: BluzelleClient, type: string, msg: T, options: BroadcastOptions) =>
-    Promise.resolve(msg)
-        .then(msg => ({
-            typeUrl: `/bluzelle.curium.${type}`,
-            value: msg
-        }))
-        .then(msg => client.sgClient.signAndBroadcast(
-            client.address,
-            [msg],
-            {
-                gas: options.maxGas.toFixed(0), amount: [{
-                    denom: 'ubnt',
-                    amount: (options.gasPrice * options.maxGas).toFixed(0)
-                }]
-            },
-            options.memo,
-        ))
-
 
 

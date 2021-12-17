@@ -5,11 +5,16 @@
   "license": "MIT",
   "dependencies": {
     "@bluzelle/testing": "^1.0.0",
+    "@cosmjs/crypto": "^0.26.5",
     "@cosmjs/launchpad": "^0.26.5",
     "@cosmjs/proto-signing": "^0.26.5",
     "@cosmjs/stargate": "^0.26.5",
+    "@cosmjs/tendermint-rpc": "^0.26.5",
+    "@types/lodash": "^4.14.178",
     "@types/node": "^16.11.11",
+    "lodash": "^4.17.21",
     "monet": "^0.9.3",
+    "promise-passthrough": "^1.0.5",
     "rxjs": "^7.4.0",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2"

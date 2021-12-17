@@ -1,12 +1,24 @@
-import {newLocalWallet, newBluzelleClient, pinCid} from "./sdk";
+import {newBluzelleClient} from "./sdk";
+import {pinCid} from "./tx";
+import {newLocalWallet} from "./wallets/localWallet";
 
 
 newBluzelleClient({
     url: 'localhost:26657',
-    wallet: newLocalWallet('shop devote actress where cave torch airport knife tiny scissors tool vapor maid bid once river mean taste fold slide clown butter language later')
+    wallet: newLocalWallet('prevent desert dawn vast debris discover accident crumble case design craft morning eight produce liar diesel enact jump drop vast curtain parrot option depart')
 })
-    .then(client => pinCid(client, 'cid2', {gasPrice: 1, maxGas: 200000}))
-    .then(x => x)
+    .then(client => Promise.all([
+        pinCid(client, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0, maxGas: 200000}),
+        pinCid(client, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0, maxGas: 200000}),
+        pinCid(client, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0, maxGas: 200000}),
+        pinCid(client, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0, maxGas: 200000}),
+        pinCid(client, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0, maxGas: 200000}),
+        pinCid(client, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0, maxGas: 200000}),
+        pinCid(client, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0, maxGas: 200000}),
+        pinCid(client, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0, maxGas: 200000}),
+    ]))
+    .then(x => console.log('good', x))
+    .catch(e => console.log('evil', e))
 
 
 
