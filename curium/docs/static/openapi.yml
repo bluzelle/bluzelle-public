@@ -4,6 +4,38 @@ info:
   name: ''
   description: ''
 paths:
+  /bluzelle/curium/storage/hasContent:
+    get:
+      summary: Queries a list of hasContent items.
+      operationId: BluzelleCuriumStorageHasContent
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              hasContent:
+                type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
   /cosmos/authz/v1beta1/grants:
     get:
       summary: 'Returns list of `Authorization`, granted to the grantee by the granter.'
@@ -12504,6 +12536,11 @@ paths:
 definitions:
   bluzelle.curium.storage.MsgPinResponse:
     type: object
+  bluzelle.curium.storage.QueryHasContentResponse:
+    type: object
+    properties:
+      hasContent:
+        type: string
   google.protobuf.Any:
     type: object
     properties:

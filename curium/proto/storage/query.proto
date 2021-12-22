@@ -9,7 +9,19 @@ option go_package = "github.com/bluzelle/curium/x/storage/types";
 
 // Query defines the gRPC querier service.
 service Query {
-    // this line is used by starport scaffolding # 2
+	rpc HasContent(QueryHasContentRequest) returns (QueryHasContentResponse) {
+		option (google.api.http).get = "/bluzelle/curium/storage/hasContent";
+	}
+
+// this line is used by starport scaffolding # 2
+}
+
+message QueryHasContentRequest {
+	string cid = 1;
+}
+
+message QueryHasContentResponse {
+  bool hasContent = 1;
 }
 
 // this line is used by starport scaffolding # 3

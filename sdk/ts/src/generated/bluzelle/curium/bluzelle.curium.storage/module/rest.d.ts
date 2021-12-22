@@ -8,6 +8,9 @@ export interface RpcStatus {
     details?: ProtobufAny[];
 }
 export declare type StorageMsgPinResponse = object;
+export interface StorageQueryHasContentResponse {
+    hasContent?: boolean;
+}
 export declare type QueryParamsType = Record<string | number, any>;
 export declare type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 export interface FullRequestParams extends Omit<RequestInit, "body"> {
@@ -66,5 +69,15 @@ export declare class HttpClient<SecurityDataType = unknown> {
  * @version version not set
  */
 export declare class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+    /**
+     * No description
+     *
+     * @tags Query
+     * @name QueryHasContent
+     * @request GET:/bluzelle/curium/storage/hasContent
+     */
+    queryHasContent: (query?: {
+        cid?: string;
+    }, params?: RequestParams) => Promise<HttpResponse<StorageQueryHasContentResponse, RpcStatus>>;
 }
 export {};

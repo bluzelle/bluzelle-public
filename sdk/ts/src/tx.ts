@@ -6,6 +6,7 @@ import {Left, Right, Some} from "monet";
 import {passThrough} from "promise-passthrough";
 import {identity} from "lodash";
 import {BroadcastTxResponse} from "@cosmjs/stargate/build/stargateclient";
+import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 
 interface MsgQueueItem<T> {
     msg: EncodeObject;

@@ -13,6 +13,7 @@ export interface BluzelleClient {
     url: string;
     address: string;
     sgClient: SigningStargateClient;
+    queryClient: Tendermint34Client;
 }
 
 export interface BluzelleWallet extends OfflineDirectSigner {
@@ -24,14 +25,18 @@ export const newBluzelleClient = (config: { wallet: () => Promise<BluzelleWallet
         .then(wallet =>
             SigningBluzelleClient.connectWithSigner(config.url, wallet, {prefix: 'bluzelle', registry: getRegistry()})
                 .then(sgClient => Promise.all([
+                    Tendermint34Client.connect(config.url),
                     sgClient,
                     wallet.getAccounts().then(acc => acc[0].address),
                 ])))
-        .then(([sgClient, address]) => ({
+        .then(([queryClient, sgClient, address]) => ({
             url: config.url,
+            queryClient,
             sgClient,
             address,
         }));
+
+
 
 
 export class SigningBluzelleClient extends SigningStargateClient {

@@ -22,6 +22,10 @@ export interface RpcStatus {
 
 export type StorageMsgPinResponse = object;
 
+export interface StorageQueryHasContentResponse {
+  hasContent?: boolean;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -217,4 +221,20 @@ export class HttpClient<SecurityDataType = unknown> {
  * @title storage/genesis.proto
  * @version version not set
  */
-export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {}
+export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryHasContent
+   * @request GET:/bluzelle/curium/storage/hasContent
+   */
+  queryHasContent = (query?: { cid?: string }, params: RequestParams = {}) =>
+    this.request<StorageQueryHasContentResponse, RpcStatus>({
+      path: `/bluzelle/curium/storage/hasContent`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+}
