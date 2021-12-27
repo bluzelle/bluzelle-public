@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test-ci": "go test ./..."
+    "test-ci": "go test -v ./... 2>&1 | go-junit-report > report.xml"
   },
   "dependencies": {
     "@bluzelle/testing": "^1.0.0"
