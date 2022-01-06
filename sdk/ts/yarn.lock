@@ -951,6 +951,11 @@ promise-passthrough@^1.0.5:
   dependencies:
     es6-promise "^4.1.1"
 
+promise.defer@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/promise.defer/-/promise.defer-2.0.0.tgz#3b1dbd896824ac14f3fcf40248b7e720503af316"
+  integrity sha512-7T9TPDmRF8Zb5eLx7+OqnXUyaBs7nTKj63seeW3mTAce+IMf9yoSZf/1iT5dAYRtO4fqxfKUuRasBWY/5a2wlw==
+
 protobufjs@^6.8.8, protobufjs@~6.11.2:
   version "6.11.2"
   resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.11.2.tgz#de39fabd4ed32beaa08e9bb1e30d08544c1edf8b"

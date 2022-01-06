@@ -1,6 +1,48 @@
 import {BluzelleClient} from "./sdk";
 import {MsgPin} from "./generated/bluzelle/curium/bluzelle.curium.storage/module/types/storage/tx";
-import {Registry} from "@cosmjs/proto-signing";
+import {EncodeObject, Registry} from "@cosmjs/proto-signing";
+import {Deferred, newDeferred} from 'deferred/src/Deferred'
+import {Left, Right, Some} from "monet";
+import {passThrough} from "promise-passthrough";
+import {identity} from "lodash";
+import {BroadcastTxResponse} from "@cosmjs/stargate/build/stargateclient";
+
+interface MsgQueueItem<T> {
+    msg: EncodeObject;
+    options: BroadcastOptions;
+    deferred: Deferred<T>;
+}
+
+type MsgQueue = MsgQueueItem<unknown>[] | undefined;
+
+let msgQueue: MsgQueue;
+
+export const withTransaction = (client: BluzelleClient, fn: () => unknown) => {
+    startTransaction();
+    fn();
+    const queue: MsgQueue = msgQueue || [];
+    msgQueue = undefined;
+    return endTransaction(queue, client)
+        .then(passThrough(response => queue.map((it, idx) =>
+            it.deferred.resolve({...response, rawLog: response.rawLog?.[idx]})
+        )))
+
+}
+
+const startTransaction = () => msgQueue = [];
+const endTransaction = (queue: MsgQueue, client: BluzelleClient) => {
+    return broadcastTx(client, (queue || []).map(it => it.msg), combineOptions(queue))
+
+
+    function combineOptions(queue: MsgQueue) {
+        return (queue || []).reduce((options, item) => ({
+            ...options,
+            maxGas: options.maxGas + item.options.maxGas,
+            gasPrice: item.options.gasPrice
+        }), {maxGas: 0} as BroadcastOptions)
+    }
+}
+
 
 export const registerMessages = (registry: Registry) => {
     registry.register('/bluzelle.curium.storage.MsgPin', MsgPin);
@@ -13,18 +55,32 @@ export interface BroadcastOptions {
     memo?: string
 }
 
+const queueMessage = (msg: EncodeObject, options: BroadcastOptions) =>
+    Some<MsgQueueItem<unknown>>({
+        msg, options, deferred: newDeferred()
+    })
+        .map(passThrough(item => msgQueue?.push(item)))
+
+
 export const pinCid = (client: BluzelleClient, cid: string, options: BroadcastOptions) =>
     sendTx(client, 'storage.MsgPin', {cid, creator: client.address}, options);
 
+
 const sendTx = <T>(client: BluzelleClient, type: string, msg: T, options: BroadcastOptions) =>
-    Promise.resolve(msg)
-        .then(msg => ({
+    Right(msg)
+        .map(msg => ({
             typeUrl: `/bluzelle.curium.${type}`,
             value: msg
-        }))
-        .then(msg => client.sgClient.signAndBroadcast(
+        } as EncodeObject))
+        .bind(msg => msgQueue ? Left(msg) : Right(msg))
+        .map(msg => broadcastTx(client, [msg as EncodeObject], options))
+        .leftMap(msg => queueMessage(msg as EncodeObject, options))
+        .cata(identity, identity);
+
+const broadcastTx = <T>(client: BluzelleClient, msgs: EncodeObject[], options: BroadcastOptions): Promise<BroadcastTxResponse> =>
+        client.sgClient.signAndBroadcast(
             client.address,
-            [msg],
+            msgs,
             {
                 gas: options.maxGas.toFixed(0), amount: [{
                     denom: 'ubnt',
@@ -32,4 +88,4 @@ const sendTx = <T>(client: BluzelleClient, type: string, msg: T, options: Broadc
                 }]
             },
             options.memo,
-        ))
+        ).then(response => ({...response, rawLog: JSON.parse(response.rawLog || '[]')}))

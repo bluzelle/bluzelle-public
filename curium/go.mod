@@ -14,7 +14,6 @@ require (
 	github.com/ipfs/go-ipfs-config v0.16.0
 	github.com/ipfs/go-ipfs-files v0.0.8
 	github.com/ipfs/interface-go-ipfs-core v0.5.1
-	github.com/jstemmer/go-junit-report v0.9.1 // indirect
 	github.com/libp2p/go-libp2p-core v0.9.0
 	github.com/multiformats/go-multiaddr v0.4.0
 	github.com/spf13/cast v1.3.1
