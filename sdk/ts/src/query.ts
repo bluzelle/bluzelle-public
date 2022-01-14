@@ -18,34 +18,34 @@ const ipfsClient = create({host: '127.0.0.1', port: 5009, protocol: 'http'})
 const curiumUrl = 'localhost:26657';
 const mnemonic = 'media betray inquiry marble wish hurry scrap quick submit section ozone suffer rhythm crack medal inflict birth cable engine hotel dose fan globe smile';
 
-times(20).map(() =>
-    Promise.resolve({content: generateContentSlow(0.01)})
-        .then(withCtxAwait('addResult', ctx => ipfsClient.add(ctx.content)))
-        .then(withCtxAwait(('client'), () => getBlzClient(curiumUrl, mnemonic)))
-        .then(passThroughAwait((ctx) => pinCid(ctx.client, ctx.addResult.path, {maxGas: 200000, gasPrice: 0.002})))
-        .then((ctx) => waitForContent(ctx.client, ctx.addResult.path))
-        .then((a) => console.log(a))
-)
+// times(20).map(() =>
+//     Promise.resolve({content: generateContentSlow(0.01)})
+//         .then(withCtxAwait('addResult', ctx => ipfsClient.add(ctx.content)))
+//         .then(withCtxAwait(('client'), () => getBlzClient(curiumUrl, mnemonic)))
+//         .then(passThroughAwait((ctx) => pinCid(ctx.client, ctx.addResult.path, {maxGas: 200000, gasPrice: 0.002})))
+//         .then((ctx) => waitForContent(ctx.client, ctx.addResult.path))
+//         .then((a) => console.log(a))
+// )
 
-export const waitForContent = (client: BluzelleClient, path: string) => {
-    return waitUntil(() => hasContent(client, path))
-}
+export const waitForContent = (client: BluzelleClient, path: string) =>
+    waitUntil(() => hasContent(client, path));
+
 
 export const hasContent = (client: BluzelleClient, cid: string) =>
     getRpcClient('http://localhost:26657')
         .then(queryClient => queryClient.HasContent({cid}))
-        .then(x => x.hasContent)
+        .then(x => x.hasContent);
 
-const getRpcClient = (url: string): Promise<QueryClientImpl> => {
-    return Tendermint34Client.connect(url)
+const getRpcClient = (url: string): Promise<QueryClientImpl> =>
+    Tendermint34Client.connect(url)
         .then(tendermintClient => new QueryClient(tendermintClient))
         .then(createProtobufRpcClient)
-        .then(rpcClient => new QueryClientImpl(rpcClient))
-}
+        .then(rpcClient => new QueryClientImpl(rpcClient));
 
-const getBlzClient = memoize((curiumUrl: string, mnemonic: string) =>
-    newBluzelleClient({
-        url: curiumUrl,
-        wallet: newLocalWallet(mnemonic)
-    })
-)
+
+// const getBlzClient = memoize((curiumUrl: string, mnemonic: string) =>
+//     newBluzelleClient({
+//         url: curiumUrl,
+//         wallet: newLocalWallet(mnemonic)
+//     })
+// )
