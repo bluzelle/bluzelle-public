@@ -18,12 +18,13 @@ func (k Keeper) HasContent(goCtx context.Context, req *types.QueryHasContentRequ
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	cidString, err := multihash.FromHexString(req.Cid)
+	mh, err := multihash.FromB58String(req.Cid)
 	if err != nil {
 		return nil, err
 	}
 
-	has, err := k.storageNode.IpfsNode.Filestore.Has(cid.NewCidV0(cidString))
+	c := cid.NewCidV0(mh)
+	has, err := k.storageNode.IpfsNode.Blockstore.Has(c)
 	if err != nil {
 		return nil, err
 	}
