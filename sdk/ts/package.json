@@ -15,6 +15,7 @@
     "async-wait-until": "^2.0.12",
     "cids": "^1.1.9",
     "deferred": "^1.0.0",
+    "delay": "^5.0.0",
     "ipfs-http-client": "^55.0.0",
     "lodash": "^4.17.21",
     "monet": "^0.9.3",
