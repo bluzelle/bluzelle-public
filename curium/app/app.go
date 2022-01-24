@@ -2,6 +2,7 @@ package app
 
 import (
 	appAnte "github.com/bluzelle/curium/app/ante"
+	"github.com/bluzelle/curium/app/ante/gasmeter"
 	curiumipfs "github.com/bluzelle/curium/x/storage-ipfs/ipfs"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"io"
@@ -212,6 +213,7 @@ type App struct {
 	EvidenceKeeper   evidencekeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
+	GasMeterKeeper   *gasmeter.GasMeterKeeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -353,10 +355,13 @@ func New(
 		&stakingKeeper, govRouter,
 	)
 
+	app.GasMeterKeeper = gasmeter.NewGasMeterKeeper()
+
 	app.CuriumKeeper = *curiummodulekeeper.NewKeeper(
 		appCodec,
 		keys[curiummoduletypes.StoreKey],
 		keys[curiummoduletypes.MemStoreKey],
+		*app.GasMeterKeeper,
 	)
 	curiumModule := curiummodule.NewAppModule(appCodec, app.CuriumKeeper)
 

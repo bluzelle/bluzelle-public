@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"github.com/bluzelle/curium/app/ante/gasmeter"
 	"testing"
 
 	"github.com/bluzelle/curium/x/curium/keeper"
@@ -26,11 +27,14 @@ func CuriumKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 	stateStore.MountStoreWithDB(memStoreKey, sdk.StoreTypeMemory, nil)
 	require.NoError(t, stateStore.LoadLatestVersion())
 
+	gasMeterKeeper := gasmeter.NewGasMeterKeeper()
+
 	registry := codectypes.NewInterfaceRegistry()
 	k := keeper.NewKeeper(
 		codec.NewProtoCodec(registry),
 		storeKey,
 		memStoreKey,
+		*gasMeterKeeper,
 	)
 
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())

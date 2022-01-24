@@ -8,26 +8,30 @@ import (
 	"github.com/bluzelle/curium/x/curium/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/bluzelle/curium/app/ante/gasmeter"
 )
 
 type (
 	Keeper struct {
-		cdc      codec.BinaryCodec
-		storeKey sdk.StoreKey
-		memKey   sdk.StoreKey
+		cdc       codec.BinaryCodec
+		storeKey  sdk.StoreKey
+		memKey    sdk.StoreKey
+		newKeeper gasmeter.GasMeterKeeper
 	}
 )
 
 func NewKeeper(
 	cdc codec.BinaryCodec,
-	storeKey,
+	storeKey sdk.StoreKey,
 	memKey sdk.StoreKey,
-
+	newKeeper gasmeter.GasMeterKeeper,
 ) *Keeper {
 	return &Keeper{
-		cdc:      cdc,
-		storeKey: storeKey,
-		memKey:   memKey,
+		cdc:       cdc,
+		storeKey:  storeKey,
+		memKey:    memKey,
+		newKeeper: newKeeper,
 	}
 }
 
