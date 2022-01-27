@@ -2,7 +2,6 @@ package gasmeter
 
 import (
 	"fmt"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -12,15 +11,15 @@ import (
 )
 
 type ChargingGasMeter struct {
-	limit         storetypes.Gas
-	consumed      storetypes.Gas
+	limit         sdk.Gas
+	consumed      sdk.Gas
 	PayerAccount  sdk.AccAddress
 	gasPrice      sdk.DecCoins
 	bankKeeper    bankkeeper.BaseKeeper
 	accountKeeper acctypes.AccountKeeper
 }
 
-func NewChargingGasMeter(bankKeeper bankkeeper.BaseKeeper, accountKeeper acctypes.AccountKeeper, limit storetypes.Gas, payerAccount sdk.AccAddress, gasPrice sdk.DecCoins) *ChargingGasMeter {
+func NewChargingGasMeter(bankKeeper bankkeeper.BaseKeeper, accountKeeper acctypes.AccountKeeper, limit sdk.Gas, payerAccount sdk.AccAddress, gasPrice sdk.DecCoins) *ChargingGasMeter {
 	return &ChargingGasMeter{
 		limit:         limit,
 		consumed:      0,
@@ -31,31 +30,31 @@ func NewChargingGasMeter(bankKeeper bankkeeper.BaseKeeper, accountKeeper acctype
 	}
 }
 
-func (g *ChargingGasMeter) GasConsumed() storetypes.Gas {
+func (g *ChargingGasMeter) GasConsumed() sdk.Gas {
 	return g.consumed
 }
 
-func (g *ChargingGasMeter) Limit() storetypes.Gas {
+func (g *ChargingGasMeter) Limit() sdk.Gas {
 	return g.limit
 }
 
-func (g *ChargingGasMeter) GasConsumedToLimit() storetypes.Gas {
+func (g *ChargingGasMeter) GasConsumedToLimit() sdk.Gas {
 	if g.IsPastLimit() {
 		return g.limit
 	}
 	return g.consumed
 }
 
-func (g *ChargingGasMeter) ConsumeGas(amount storetypes.Gas, descriptor string) {
+func (g *ChargingGasMeter) ConsumeGas(amount sdk.Gas, descriptor string) {
 	var overflow bool
 	// TODO: Should we set the consumed field after overflow checking?
 	g.consumed, overflow = addUint64Overflow(g.consumed, amount)
 	if overflow && g.limit != 0 {
-		panic(storetypes.ErrorGasOverflow{descriptor})
+		panic(sdk.ErrorGasOverflow{descriptor})
 	}
 
 	if g.consumed > g.limit && g.limit != 0 {
-		panic(storetypes.ErrorOutOfGas{descriptor})
+		panic(sdk.ErrorOutOfGas{descriptor})
 	}
 
 }
@@ -70,8 +69,7 @@ func addUint64Overflow(a, b uint64) (uint64, bool) {
 	return a + b, false
 }
 
-func (g *ChargingGasMeter) RefundGas(amount storetypes.Gas, descriptor string) {
-
+func (g *ChargingGasMeter) RefundGas(_ sdk.Gas, _ string) {
 }
 
 func (g *ChargingGasMeter) IsPastLimit() bool {

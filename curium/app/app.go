@@ -361,7 +361,6 @@ func New(
 		appCodec,
 		keys[curiummoduletypes.StoreKey],
 		keys[curiummoduletypes.MemStoreKey],
-		*app.GasMeterKeeper,
 	)
 	curiumModule := curiummodule.NewAppModule(appCodec, app.CuriumKeeper)
 

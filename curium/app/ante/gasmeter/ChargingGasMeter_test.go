@@ -83,7 +83,7 @@ func TestChargingGasMeter(t *testing.T) {
 			require.Equal(t, true, isOverflown)
 		})
 
-		t.Run("should returns correct sum if not overflow", func(t *testing.T) {
+		t.Run("should return correct sum if not overflow", func(t *testing.T) {
 			sum, isOverflown := addUint64Overflow(10, 10)
 			require.Equal(t, sum, uint64(20))
 			require.Equal(t, false, isOverflown)
@@ -97,7 +97,7 @@ func TestChargingGasMeter(t *testing.T) {
 		require.Equal(t, false, gasMeter.IsPastLimit())
 		gasMeter.ConsumeGas(10, "consume 10 gas")
 		require.Equal(t, false, gasMeter.IsPastLimit())
-		require.Panicsf(t, func() {
+		require.Panics(t, func() {
 			gasMeter.ConsumeGas(10, "consume 10 gas")
 		}, "failed: must not consume past limit")
 	})
