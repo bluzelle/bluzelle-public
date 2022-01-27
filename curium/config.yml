@@ -1,7 +1,7 @@
 accounts:
   - name: vuser
     coins: ["20000000000ubnt"]
-  - name: bob
+  - name: minter
     coins: ["10000ubnt"]
 validator:
   name: vuser
@@ -11,15 +11,14 @@ client:
     path: "docs/static/openapi.yml"
   vuex:
     path: "../sdk/ts/src"
-faucet:
-  name: bob
-  coins: ["100000ubnt"]
 init:
   app:
     storage-dir: "~/.curium/storage"
     minimum-gas-prices: "0ubnt"
   client:
     output: "json"
+    keyring-backend: "test"
+
   config:
     consensus:
       timeout_commit: "5s"
