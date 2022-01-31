@@ -4,17 +4,17 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type GasMeterKeeper struct {
+type Keeper struct {
 	gasMeters []*ChargingGasMeter
 }
 
-func NewGasMeterKeeper() *GasMeterKeeper {
-	return &GasMeterKeeper{
+func NewGasMeterKeeper() *Keeper {
+	return &Keeper{
 		gasMeters: make([]*ChargingGasMeter, 0),
 	}
 }
 
-func (gk *GasMeterKeeper) ChargeAll(ctx sdk.Context) []error {
+func (gk *Keeper) ChargeAll(ctx sdk.Context) []error {
 	errors := make([]error, 0)
 	for _, gasMeter := range gk.gasMeters {
 		gm := *gasMeter
@@ -26,14 +26,14 @@ func (gk *GasMeterKeeper) ChargeAll(ctx sdk.Context) []error {
 	return errors
 }
 
-func (gk *GasMeterKeeper) GetAllGasMeters() []*ChargingGasMeter {
+func (gk *Keeper) GetAllGasMeters() []*ChargingGasMeter {
 	return gk.gasMeters
 }
 
-func (gk *GasMeterKeeper) AddGasMeter(gasMeter *ChargingGasMeter) {
+func (gk *Keeper) AddGasMeter(gasMeter *ChargingGasMeter) {
 	gk.gasMeters = append(gk.gasMeters, gasMeter)
 }
 
-func (gk *GasMeterKeeper) ClearAll() {
+func (gk *Keeper) ClearAll() {
 	gk.gasMeters = make([]*ChargingGasMeter, 0)
 }

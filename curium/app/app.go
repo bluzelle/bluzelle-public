@@ -3,6 +3,7 @@ package app
 import (
 	appAnte "github.com/bluzelle/curium/app/ante"
 	"github.com/bluzelle/curium/app/ante/gasmeter"
+	appTypes "github.com/bluzelle/curium/app/types"
 	curiumipfs "github.com/bluzelle/curium/x/storage-ipfs/ipfs"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"io"
@@ -95,18 +96,13 @@ import (
 	curiummodule "github.com/bluzelle/curium/x/curium"
 	curiummodulekeeper "github.com/bluzelle/curium/x/curium/keeper"
 	curiummoduletypes "github.com/bluzelle/curium/x/curium/types"
+	faucetmodule "github.com/bluzelle/curium/x/faucet"
+	faucetmodulekeeper "github.com/bluzelle/curium/x/faucet/keeper"
+	faucetmoduletypes "github.com/bluzelle/curium/x/faucet/types"
 	storagemodule "github.com/bluzelle/curium/x/storage"
 	storagemodulekeeper "github.com/bluzelle/curium/x/storage/keeper"
 	storagemoduletypes "github.com/bluzelle/curium/x/storage/types"
-	faucetmodule "github.com/bluzelle/curium/x/faucet"
-		faucetmodulekeeper "github.com/bluzelle/curium/x/faucet/keeper"
-		faucetmoduletypes "github.com/bluzelle/curium/x/faucet/types"
-// this line is used by starport scaffolding # stargate/app/moduleImport
-)
-
-const (
-	AccountAddressPrefix = "bluzelle"
-	Name                 = "curium"
+	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
@@ -154,7 +150,7 @@ var (
 		curiummodule.AppModuleBasic{},
 		storagemodule.AppModuleBasic{},
 		faucetmodule.AppModuleBasic{},
-// this line is used by starport scaffolding # stargate/app/moduleBasic
+		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
 	// module account permissions
@@ -166,8 +162,8 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		faucetmoduletypes.ModuleName: {authtypes.Minter, authtypes.Burner, authtypes.Staking},
-// this line is used by starport scaffolding # stargate/app/maccPerms
+		faucetmoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
 
@@ -182,7 +178,7 @@ func init() {
 		panic(err)
 	}
 
-	DefaultNodeHome = filepath.Join(userHomeDir, "."+Name)
+	DefaultNodeHome = filepath.Join(userHomeDir, "."+appTypes.Name)
 }
 
 // App extends an ABCI application, but with most of its parameters exported.
@@ -218,7 +214,7 @@ type App struct {
 	EvidenceKeeper   evidencekeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
-	GasMeterKeeper   *gasmeter.GasMeterKeeper
+	GasMeterKeeper   *gasmeter.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -227,9 +223,9 @@ type App struct {
 	CuriumKeeper curiummodulekeeper.Keeper
 
 	StorageKeeper storagemodulekeeper.Keeper
-	
-		FaucetKeeper faucetmodulekeeper.Keeper
-// this line is used by starport scaffolding # stargate/app/keeperDeclaration
+
+	FaucetKeeper faucetmodulekeeper.Keeper
+	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// the module manager
 	mm *module.Manager
@@ -252,7 +248,7 @@ func New(
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
-	bApp := baseapp.NewBaseApp(Name, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
+	bApp := baseapp.NewBaseApp(appTypes.Name, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
@@ -265,7 +261,7 @@ func New(
 		curiummoduletypes.StoreKey,
 		storagemoduletypes.StoreKey,
 		faucetmoduletypes.StoreKey,
-// this line is used by starport scaffolding # stargate/app/storeKey
+		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -384,18 +380,17 @@ func New(
 	)
 	storageModule := storagemodule.NewAppModule(appCodec, app.StorageKeeper)
 
-	
-		app.FaucetKeeper = *faucetmodulekeeper.NewKeeper(
-			appCodec,
-			keys[faucetmoduletypes.StoreKey],
-			keys[faucetmoduletypes.MemStoreKey],
-			app.GetSubspace(faucetmoduletypes.ModuleName),
-			
-			app.BankKeeper,
-)
-		faucetModule := faucetmodule.NewAppModule(appCodec, app.FaucetKeeper, app.AccountKeeper, app.BankKeeper)
+	app.FaucetKeeper = *faucetmodulekeeper.NewKeeper(
+		appCodec,
+		keys[faucetmoduletypes.StoreKey],
+		keys[faucetmoduletypes.MemStoreKey],
+		app.GetSubspace(faucetmoduletypes.ModuleName),
 
-		// this line is used by starport scaffolding # stargate/app/keeperDefinition
+		app.BankKeeper,
+	)
+	faucetModule := faucetmodule.NewAppModule(appCodec, app.FaucetKeeper, app.AccountKeeper, app.BankKeeper)
+
+	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
@@ -436,7 +431,7 @@ func New(
 		curiumModule,
 		storageModule,
 		faucetModule,
-// this line is used by starport scaffolding # stargate/app/appModule
+		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -473,7 +468,7 @@ func New(
 		curiummoduletypes.ModuleName,
 		storagemoduletypes.ModuleName,
 		faucetmoduletypes.ModuleName,
-// this line is used by starport scaffolding # stargate/app/initGenesis
+		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -490,9 +485,9 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 
 	anteHandler, err := appAnte.NewAnteHandler(
-		ante.HandlerOptions{
+		appTypes.AnteHandlerOptions{
 			AccountKeeper:   app.AccountKeeper,
-			BankKeeper:      app.BankKeeper,
+			BankKeeper:      app.BankKeeper.(bankkeeper.BaseKeeper),
 			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 			FeegrantKeeper:  app.FeeGrantKeeper,
 			SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
@@ -640,7 +635,7 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 
 	// register app's OpenAPI routes.
 	apiSvr.Router.Handle("/static/openapi.yml", http.FileServer(http.FS(docs.Docs)))
-	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(Name, "/static/openapi.yml"))
+	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(appTypes.Name, "/static/openapi.yml"))
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
@@ -679,7 +674,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(curiummoduletypes.ModuleName)
 	paramsKeeper.Subspace(storagemoduletypes.ModuleName)
 	paramsKeeper.Subspace(faucetmoduletypes.ModuleName)
-// this line is used by starport scaffolding # stargate/app/paramSubspace
+	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
 }

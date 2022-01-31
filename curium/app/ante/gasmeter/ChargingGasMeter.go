@@ -2,6 +2,7 @@ package gasmeter
 
 import (
 	"fmt"
+	appTypes "github.com/bluzelle/curium/app/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -50,13 +51,12 @@ func (g *ChargingGasMeter) ConsumeGas(amount sdk.Gas, descriptor string) {
 	// TODO: Should we set the consumed field after overflow checking?
 	g.consumed, overflow = addUint64Overflow(g.consumed, amount)
 	if overflow && g.limit != 0 {
-		panic(sdk.ErrorGasOverflow{descriptor})
+		panic(sdk.ErrorGasOverflow{Descriptor: descriptor})
 	}
 
 	if g.consumed > g.limit && g.limit != 0 {
-		panic(sdk.ErrorOutOfGas{descriptor})
+		panic(sdk.ErrorOutOfGas{Descriptor: descriptor})
 	}
-
 }
 
 // addUint64Overflow performs the addition operation on two uint64 integers and
@@ -96,7 +96,6 @@ func (g *ChargingGasMeter) Charge(ctx sdk.Context) error {
 	}
 
 	return nil
-
 }
 
 func (g *ChargingGasMeter) GetGasPrice() sdk.DecCoins {
@@ -121,10 +120,10 @@ func calculateGasFee(gm *ChargingGasMeter) sdk.Coins {
 
 	gasPrice := gm.gasPrice
 
-	gasPriceAmount := gasPrice.AmountOf("ubnt")
+	gasPriceAmount := gasPrice.AmountOf(appTypes.Denom)
 
 	gasConsumed := gm.GasConsumed()
 
 	gasFee := gasPriceAmount.MulInt64(int64(gasConsumed)).RoundInt64()
-	return sdk.NewCoins(sdk.NewCoin("ubnt", sdk.NewInt(gasFee)))
+	return sdk.NewCoins(sdk.NewCoin(appTypes.Denom, sdk.NewInt(gasFee)))
 }

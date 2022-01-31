@@ -1,6 +1,7 @@
 package gasmeter
 
 import (
+	appTypes "github.com/bluzelle/curium/app/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -11,8 +12,6 @@ import (
 	"math"
 	"testing"
 )
-
-const DENOM string = "ubnt"
 
 func TestChargingGasMeter(t *testing.T) {
 
@@ -28,7 +27,7 @@ func TestChargingGasMeter(t *testing.T) {
 		accountKeeper,
 		app.GetSubspace(banktypes.ModuleName),
 		app.ModuleAccountAddrs())
-	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(DENOM, sdk.NewInt(2)))
+	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(appTypes.Denom, sdk.NewInt(2)))
 
 	t.Run("NewChargingGasMeter() should create a gas meter", func(t *testing.T) {
 		gasMeter := NewChargingGasMeter(bankKeeper, accountKeeper, 0, addr, decCoins)
@@ -110,11 +109,11 @@ func TestChargingGasMeter(t *testing.T) {
 	t.Run("calculateGasFee() should return correct gas fee", func(t *testing.T) {
 		gasMeter := NewChargingGasMeter(bankKeeper, accountKeeper, 100, addr, decCoins)
 
-		expectedGasFee1 := sdk.NewCoins(sdk.NewCoin(DENOM, sdk.NewInt(0)))
+		expectedGasFee1 := sdk.NewCoins(sdk.NewCoin(appTypes.Denom, sdk.NewInt(0)))
 		require.Equal(t, expectedGasFee1, calculateGasFee(gasMeter))
 
 		gasMeter.ConsumeGas(10, "Consume 10 gas when gas price is 2 ubnt")
-		expectedGasFee2 := sdk.NewCoins(sdk.NewCoin(DENOM, sdk.NewInt(20)))
+		expectedGasFee2 := sdk.NewCoins(sdk.NewCoin(appTypes.Denom, sdk.NewInt(20)))
 		require.Equal(t, expectedGasFee2, calculateGasFee(gasMeter))
 	})
 
@@ -126,22 +125,23 @@ func TestChargingGasMeter(t *testing.T) {
 			err1 := deductFees(ctx, bankKeeper, addr, fees)
 			require.Nil(t, err1)
 
-			fees.Add(sdk.NewCoin("ubnt", sdk.NewInt(1)))
+			fees.Add(sdk.NewCoin(appTypes.Denom, sdk.NewInt(1)))
 
 			err2 := deductFees(ctx, bankKeeper, addr, fees)
 			require.Nil(t, err2)
 		})
 
 		t.Run("should make no deduction when address has balance of 0", func(t *testing.T) {
-			fees := sdk.NewCoins().Add(sdk.NewCoin(DENOM, sdk.NewInt(10)))
-			expectedBalance := sdk.NewCoin(DENOM, sdk.NewInt(0))
+			fees := sdk.NewCoins().Add(sdk.NewCoin(appTypes.Denom, sdk.NewInt(10)))
+			expectedBalance := sdk.NewCoin(appTypes.Denom, sdk.NewInt(0))
 
-			balanceBefore := bankKeeper.BaseViewKeeper.GetBalance(ctx, addr, DENOM)
+			balanceBefore := bankKeeper.BaseViewKeeper.GetBalance(ctx, addr, appTypes.Denom)
 			require.Equal(t, expectedBalance, balanceBefore)
 
-			deductFees(ctx, bankKeeper, addr, fees)
+			err := deductFees(ctx, bankKeeper, addr, fees)
+			require.NotNil(t, err)
 
-			balanceAfter := bankKeeper.BaseViewKeeper.GetBalance(ctx, addr, DENOM)
+			balanceAfter := bankKeeper.BaseViewKeeper.GetBalance(ctx, addr, appTypes.Denom)
 			require.Equal(t, expectedBalance, balanceAfter)
 		})
 

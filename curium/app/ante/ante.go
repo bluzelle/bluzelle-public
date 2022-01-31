@@ -1,20 +1,14 @@
 package ante
 
 import (
+	"github.com/bluzelle/curium/app/ante/gasmeter"
+	appTypes "github.com/bluzelle/curium/app/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 )
 
-func NewAnteHandler(options ante.HandlerOptions) (sdk.AnteHandler, error) {
-	if options.AccountKeeper == nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "account keeper is required for ante builder")
-	}
-
-	if options.BankKeeper == nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "bank keeper is required for ante builder")
-	}
-
+func NewAnteHandler(options appTypes.AnteHandlerOptions) (sdk.AnteHandler, error) {
 	if options.SignModeHandler == nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
 	}
@@ -24,8 +18,11 @@ func NewAnteHandler(options ante.HandlerOptions) (sdk.AnteHandler, error) {
 		sigGasConsumer = ante.DefaultSigVerificationGasConsumer
 	}
 
+	gasMeterKeeper := gasmeter.NewGasMeterKeeper()
+	minGasPriceCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(appTypes.Denom, sdk.NewInt(1)))
+
 	anteDecorators := []sdk.AnteDecorator{
-		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
+		NewSetUpContextDecorator(gasMeterKeeper, options.BankKeeper, options.AccountKeeper, minGasPriceCoins), // outermost AnteDecorator. SetUpContext must be called first
 		ante.NewRejectExtensionOptionsDecorator(),
 		ante.NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),

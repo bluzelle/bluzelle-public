@@ -1,6 +1,7 @@
 package main
 
 import (
+	appTypes "github.com/bluzelle/curium/app/types"
 	"os"
 
 	"github.com/bluzelle/curium/app"
@@ -10,10 +11,10 @@ import (
 
 func main() {
 	rootCmd, _ := cosmoscmd.NewRootCmd(
-		app.Name,
-		app.AccountAddressPrefix,
+		appTypes.Name,
+		appTypes.AccountAddressPrefix,
 		app.DefaultNodeHome,
-		app.Name,
+		appTypes.Name,
 		app.ModuleBasics,
 		app.New,
 		// this line is used by starport scaffolding # root/arguments

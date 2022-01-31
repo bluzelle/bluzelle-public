@@ -1,6 +1,9 @@
 package simapp
 
 import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -46,4 +49,13 @@ var defaultConsensusParams = &abci.ConsensusParams{
 			tmtypes.ABCIPubKeyTypeEd25519,
 		},
 	},
+}
+
+func CreateTestApp(isCheckTx bool) (*simapp.SimApp, sdk.Context, keeper.AccountKeeper) {
+	app := simapp.Setup(isCheckTx)
+	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
+	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
+	accountKeeper := app.AccountKeeper
+
+	return app, ctx, accountKeeper
 }
