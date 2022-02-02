@@ -98,7 +98,10 @@ import (
 	storagemodule "github.com/bluzelle/curium/x/storage"
 	storagemodulekeeper "github.com/bluzelle/curium/x/storage/keeper"
 	storagemoduletypes "github.com/bluzelle/curium/x/storage/types"
-	// this line is used by starport scaffolding # stargate/app/moduleImport
+	faucetmodule "github.com/bluzelle/curium/x/faucet"
+		faucetmodulekeeper "github.com/bluzelle/curium/x/faucet/keeper"
+		faucetmoduletypes "github.com/bluzelle/curium/x/faucet/types"
+// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
 const (
@@ -150,7 +153,8 @@ var (
 		vesting.AppModuleBasic{},
 		curiummodule.AppModuleBasic{},
 		storagemodule.AppModuleBasic{},
-		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		faucetmodule.AppModuleBasic{},
+// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
 	// module account permissions
@@ -162,7 +166,8 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		// this line is used by starport scaffolding # stargate/app/maccPerms
+		faucetmoduletypes.ModuleName: {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
 
@@ -222,7 +227,9 @@ type App struct {
 	CuriumKeeper curiummodulekeeper.Keeper
 
 	StorageKeeper storagemodulekeeper.Keeper
-	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
+	
+		FaucetKeeper faucetmodulekeeper.Keeper
+// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// the module manager
 	mm *module.Manager
@@ -257,7 +264,8 @@ func New(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		curiummoduletypes.StoreKey,
 		storagemoduletypes.StoreKey,
-		// this line is used by starport scaffolding # stargate/app/storeKey
+		faucetmoduletypes.StoreKey,
+// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -376,7 +384,18 @@ func New(
 	)
 	storageModule := storagemodule.NewAppModule(appCodec, app.StorageKeeper)
 
-	// this line is used by starport scaffolding # stargate/app/keeperDefinition
+	
+		app.FaucetKeeper = *faucetmodulekeeper.NewKeeper(
+			appCodec,
+			keys[faucetmoduletypes.StoreKey],
+			keys[faucetmoduletypes.MemStoreKey],
+			app.GetSubspace(faucetmoduletypes.ModuleName),
+			
+			app.BankKeeper,
+)
+		faucetModule := faucetmodule.NewAppModule(appCodec, app.FaucetKeeper, app.AccountKeeper, app.BankKeeper)
+
+		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
@@ -416,7 +435,8 @@ func New(
 		transferModule,
 		curiumModule,
 		storageModule,
-		// this line is used by starport scaffolding # stargate/app/appModule
+		faucetModule,
+// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -452,7 +472,8 @@ func New(
 		ibctransfertypes.ModuleName,
 		curiummoduletypes.ModuleName,
 		storagemoduletypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/initGenesis
+		faucetmoduletypes.ModuleName,
+// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -657,7 +678,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(curiummoduletypes.ModuleName)
 	paramsKeeper.Subspace(storagemoduletypes.ModuleName)
-	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(faucetmoduletypes.ModuleName)
+// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
 }

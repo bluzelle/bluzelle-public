@@ -6,7 +6,6 @@ info:
 paths:
   /bluzelle/curium/storage/hasContent:
     get:
-      summary: Queries a list of hasContent items.
       operationId: BluzelleCuriumStorageHasContent
       responses:
         '200':
@@ -15,7 +14,7 @@ paths:
             type: object
             properties:
               hasContent:
-                type: string
+                type: boolean
         default:
           description: An unexpected error response.
           schema:
@@ -34,6 +33,11 @@ paths:
                     '@type':
                       type: string
                   additionalProperties: {}
+      parameters:
+        - name: cid
+          in: query
+          required: false
+          type: string
       tags:
         - Query
   /cosmos/authz/v1beta1/grants:
@@ -12540,7 +12544,7 @@ definitions:
     type: object
     properties:
       hasContent:
-        type: string
+        type: boolean
   google.protobuf.Any:
     type: object
     properties:
