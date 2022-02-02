@@ -1,7 +1,7 @@
 import {getBlzClient, restartIpfsServerAndSwarm} from "@bluzelle/testing/src/commonUtils";
 import {generateContent} from "@bluzelle/testing/src/fileUtils";
-import {hasContent} from "./query";
-import {pinCid} from "./tx";
+import {hasContent, getAccountBalance} from "./query";
+import {pinCid, withTransaction} from "./tx";
 import {BehaviorSubject} from "rxjs";
 import {times} from "lodash";
 import {passThroughAwait} from "promise-passthrough";
@@ -35,7 +35,7 @@ describe('query', function () {
                 ))
             ))
             .then(ctx => Promise.all(ctx.addResults.map(addResult =>
-                hasContent(ctx.client, `${curiumUrl}`, addResult.path)
+                hasContent(`${curiumUrl}`, addResult.path)
                     .then((confirm) => expect(confirm).to.be.true)
             )))
     )
@@ -46,11 +46,26 @@ describe('query', function () {
                 .then((content) => ipfsClient.add(content))
         ))
             .then((addResults) => createCtx('addResults', () => addResults))
-            .then(withCtxAwait('client', () => getBlzClient(curiumUrl, mnemonic.getValue())))
+            .then(passThroughAwait(() => getBlzClient(curiumUrl, mnemonic.getValue())))
             .then(ctx => Promise.all(ctx.addResults.map(addResult =>
-                hasContent(ctx.client, `${curiumUrl}`, addResult.path)
+                hasContent(`${curiumUrl}`, addResult.path)
                     .then((confirm) => expect(confirm).to.be.false)
             )))
+    )
+
+    it('getAccountBalance should return account balance', () =>
+        Promise.all(times(5).map(() =>
+            Promise.resolve({content: generateContent(0.01)})
+                .then(ctx => ipfsClient.add(ctx.content)
+                    .then((addResult) => ({content: ctx.content, cid: addResult.path})))
+        ))
+            .then((contents) => createCtx('contents',() => contents))
+            .then(withCtxAwait('client', () => getBlzClient(curiumUrl, mnemonic.getValue())))
+            .then(passThroughAwait(ctx => withTransaction(ctx.client, () =>
+                ctx.contents.forEach((contentObj) => pinCid(ctx.client, contentObj.cid, {maxGas: 200000, gasPrice: 0.002}))
+            )))
+            .then(ctx => getAccountBalance(curiumUrl, ctx.client.address))
+            .then(res => expect(res.balance).to.not.be.undefined)
     )
 
 })

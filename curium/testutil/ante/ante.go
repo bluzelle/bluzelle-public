@@ -1,7 +1,7 @@
 package ante
 
 import (
-	"github.com/bluzelle/curium/app/ante"
+	appTypes "github.com/bluzelle/curium/app/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkante "github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -23,7 +23,7 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
-func NewAnteHandlerOptions() *ante.HandlerOptions {
+func NewAnteHandlerOptions() *appTypes.AnteHandlerOptions {
 	app := simapp.Setup(false)
 	appCodec := simapp.MakeTestEncodingConfig().Marshaler
 	keys := sdk.NewKVStoreKeys(
@@ -45,7 +45,7 @@ func NewAnteHandlerOptions() *ante.HandlerOptions {
 
 	encodingConfig := simapp.MakeTestEncodingConfig()
 
-	return &ante.HandlerOptions{
+	return &appTypes.AnteHandlerOptions{
 		AccountKeeper:   app.AccountKeeper,
 		BankKeeper:      bankKeeper,
 		FeegrantKeeper:  app.FeeGrantKeeper,

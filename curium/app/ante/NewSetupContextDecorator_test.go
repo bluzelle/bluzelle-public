@@ -133,30 +133,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 
 	t.Run("SetUpContextDecorator AnteHandle", func(t *testing.T) {
 
-		t.Run("should return an error if tx is not a GasTx", func(t *testing.T) {
-			app, ctx, accountKeeper := testutil.CreateTestApp(false)
-			acc := accountKeeper.NewAccountWithAddress(ctx, addr)
-			accountKeeper.SetAccount(ctx, acc)
-			bankKeeper := bankkeeper.NewBaseKeeper(
-				app.AppCodec(),
-				app.GetKey(banktypes.StoreKey),
-				accountKeeper,
-				app.GetSubspace(banktypes.ModuleName),
-				app.ModuleAccountAddrs())
-			setUpContextDecorator := ante.NewSetUpContextDecorator(gasMeterKeeper, bankKeeper, accountKeeper, minGasPriceCoins)
-
-			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(appTypes.Denom, 20))
-			txBuilder.SetFeeAmount(feeAmount)
-			txBuilder.SetFeePayer(addr)
-			newTx := txBuilder.GetTx()
-			nextAnteHandler, _ := ante.NewAnteHandler(*testutilante.NewAnteHandlerOptions())
-
-			_, err := setUpContextDecorator.AnteHandle(ctx, newTx, true, nextAnteHandler)
-
-			require.NotNil(t, err)
-		})
-
-		t.Run("should return context with a gas meter if tx is a GasTx", func(t *testing.T) {
+		t.Run("should return context with a gas meter", func(t *testing.T) {
 			app, ctx, accountKeeper := testutil.CreateTestApp(false)
 			acc := accountKeeper.NewAccountWithAddress(ctx, addr)
 			accountKeeper.SetAccount(ctx, acc)
@@ -173,13 +150,13 @@ func TestNewSetupContextDecorator(t *testing.T) {
 			txBuilder.SetFeePayer(addr)
 			newTx := txBuilder.GetTx()
 			gasTx := sdkante.GasTx(newTx)
-			nextAnteHandler, err := ante.NewAnteHandler(*testutilante.NewAnteHandlerOptions())
+			nextAnteHandler, _ := ante.NewAnteHandler(*testutilante.NewAnteHandlerOptions())
 
 			newCtx, _ := setUpContextDecorator.AnteHandle(ctx, gasTx, true, nextAnteHandler)
 
-			require.Nil(t, err)
 			require.NotNil(t, newCtx)
 			require.IsType(t, sdk.Context{}, newCtx)
+			require.NotNil(t, newCtx.GasMeter())
 		})
 
 	})
