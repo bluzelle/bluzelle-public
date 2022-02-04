@@ -8,6 +8,11 @@ import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 import {createProtobufRpcClient, QueryClient} from "@cosmjs/stargate";
 import waitUntil from "async-wait-until";
 
+type QueryClientImpl = {
+    storage: StorageQueryClientImpl;
+    bank: BankQueryClientImpl;
+}
+
 export const waitForContent = (curiumUrl: string, path: string, waitTime: number = 5000) =>
     waitUntil(
         () => hasContent(curiumUrl, path),
@@ -15,22 +20,19 @@ export const waitForContent = (curiumUrl: string, path: string, waitTime: number
     );
 
 export const hasContent = (curiumUrl: string, cid: string) =>
-    getStorageRpcClient(curiumUrl)
-        .then(queryClient => queryClient.HasContent({cid}))
+    getRpcClient(curiumUrl)
+        .then(queryClient => queryClient.storage.HasContent({cid}))
         .then(x => x.hasContent);
 
 export const getAccountBalance = (curiumUrl: string, address: string) =>
-    getBankRpcClient(curiumUrl)
-        .then(queryClient => queryClient.Balance({address: address, denom: "ubnt"}))
+    getRpcClient(curiumUrl)
+        .then(queryClient => queryClient.bank.Balance({address: address, denom: "ubnt"}))
 
-const getStorageRpcClient = (url: string): Promise<StorageQueryClientImpl> =>
+const getRpcClient = (url: string): Promise<QueryClientImpl> =>
     Tendermint34Client.connect(url)
         .then(tendermintClient => new QueryClient(tendermintClient))
         .then(createProtobufRpcClient)
-        .then(rpcClient => new StorageQueryClientImpl(rpcClient));
-
-const getBankRpcClient = (url: string): Promise<BankQueryClientImpl> =>
-    Tendermint34Client.connect(url)
-        .then(tendermintClient => new QueryClient(tendermintClient))
-        .then(createProtobufRpcClient)
-        .then(rpcClient => new BankQueryClientImpl(rpcClient));
+        .then(rpcClient => Promise.resolve({
+            storage: new StorageQueryClientImpl(rpcClient),
+            bank: new BankQueryClientImpl(rpcClient),
+        }));
