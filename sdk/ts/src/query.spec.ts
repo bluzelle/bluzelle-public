@@ -51,7 +51,7 @@ describe('query', function () {
                 hasContent(`${curiumUrl}`, addResult.path)
                     .then((confirm) => expect(confirm).to.be.false)
             )))
-    )
+    );
 
     it('getAccountBalance should return account balance', () =>
         Promise.all(times(5).map(() =>
@@ -66,6 +66,6 @@ describe('query', function () {
             )))
             .then(ctx => getAccountBalance(curiumUrl, ctx.client.address))
             .then(res => expect(res.balance).to.not.be.undefined)
-    )
+    );
 
 })
