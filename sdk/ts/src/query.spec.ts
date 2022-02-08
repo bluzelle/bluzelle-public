@@ -35,7 +35,7 @@ describe('query', function () {
                 ))
             ))
             .then(ctx => Promise.all(ctx.addResults.map(addResult =>
-                hasContent(`${curiumUrl}`, addResult.path)
+                hasContent(ctx.client, addResult.path)
                     .then((confirm) => expect(confirm).to.be.true)
             )))
     )
@@ -46,9 +46,9 @@ describe('query', function () {
                 .then((content) => ipfsClient.add(content))
         ))
             .then((addResults) => createCtx('addResults', () => addResults))
-            .then(passThroughAwait(() => getBlzClient(curiumUrl, mnemonic.getValue())))
+            .then(withCtxAwait('client', () => getBlzClient(curiumUrl, mnemonic.getValue())))
             .then(ctx => Promise.all(ctx.addResults.map(addResult =>
-                hasContent(`${curiumUrl}`, addResult.path)
+                hasContent(ctx.client, addResult.path)
                     .then((confirm) => expect(confirm).to.be.false)
             )))
     );
@@ -64,8 +64,8 @@ describe('query', function () {
             .then(passThroughAwait(ctx => withTransaction(ctx.client, () =>
                 ctx.contents.forEach((contentObj) => pinCid(ctx.client, contentObj.cid, {maxGas: 200000, gasPrice: 0.002}))
             )))
-            .then(ctx => getAccountBalance(curiumUrl, ctx.client.address))
-            .then(res => expect(res.balance).to.not.be.undefined)
+            .then(ctx => getAccountBalance(ctx.client, ctx.client.address))
+            .then(res => typeof(res) === "number")
     );
 
 })

@@ -1,8 +1,19 @@
-import {SequenceResponse, SigningStargateClient} from "@cosmjs/stargate";
+import {createProtobufRpcClient, QueryClient, SequenceResponse, SigningStargateClient} from "@cosmjs/stargate";
 import {OfflineDirectSigner} from "@cosmjs/proto-signing/build/signer";
 import {getRegistry} from "./registry";
 import {SigningStargateClientOptions} from "@cosmjs/stargate/build/signingstargateclient";
 import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
+import {
+    QueryClientImpl as StorageQueryClientImpl
+} from "./generated/bluzelle/curium/bluzelle.curium.storage/module/types/storage/query";
+import {
+    QueryClientImpl as BankQueryClientImpl
+} from "./generated/cosmos/cosmos-sdk/cosmos.bank.v1beta1/module/types/cosmos/bank/v1beta1/query";
+
+type QueryClientImpl = {
+    storage: StorageQueryClientImpl;
+    bank: BankQueryClientImpl;
+}
 
 export interface BluzelleConfig {
     url: string;
@@ -13,19 +24,19 @@ export interface BluzelleClient {
     url: string;
     address: string;
     sgClient: SigningStargateClient;
-    queryClient: Tendermint34Client;
+    queryClient: QueryClientImpl;
 }
 
 export interface BluzelleWallet extends OfflineDirectSigner {
     getSequence: (client: SigningBluzelleClient,signerAddress: string) => Promise<SequenceResponse>
 }
 
-export const newBluzelleClient = (config: { wallet: () => Promise<BluzelleWallet>; url: string }) =>
+export const newBluzelleClient = (config: { wallet: () => Promise<BluzelleWallet>; url: string }): Promise<BluzelleClient> =>
     config.wallet()
         .then(wallet =>
             SigningBluzelleClient.connectWithSigner(config.url, wallet, {prefix: 'bluzelle', registry: getRegistry()})
                 .then(sgClient => Promise.all([
-                    Tendermint34Client.connect(config.url),
+                    getRpcClient(config.url),
                     sgClient,
                     wallet.getAccounts().then(acc => acc[0].address),
                 ])))
@@ -36,8 +47,14 @@ export const newBluzelleClient = (config: { wallet: () => Promise<BluzelleWallet
             address,
         }));
 
-
-
+const getRpcClient = (url: string): Promise<QueryClientImpl> =>
+    Tendermint34Client.connect(url)
+        .then(tendermintClient => new QueryClient(tendermintClient))
+        .then(createProtobufRpcClient)
+        .then(rpcClient => Promise.resolve({
+            storage: new StorageQueryClientImpl(rpcClient),
+            bank: new BankQueryClientImpl(rpcClient),
+        }));
 
 export class SigningBluzelleClient extends SigningStargateClient {
 
