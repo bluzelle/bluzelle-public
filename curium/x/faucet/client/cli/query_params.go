@@ -3,10 +3,10 @@ package cli
 import (
 	"context"
 
+	"github.com/bluzelle/curium/x/faucet/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
-	"github.com/bluzelle/curium/x/faucet/types"
 )
 
 func CmdQueryParams() *cobra.Command {

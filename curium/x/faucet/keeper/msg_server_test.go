@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
+	keepertest "github.com/bluzelle/curium/testutil/keeper"
+	"github.com/bluzelle/curium/x/faucet/keeper"
+	"github.com/bluzelle/curium/x/faucet/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-    "github.com/bluzelle/curium/x/faucet/types"
-    "github.com/bluzelle/curium/x/faucet/keeper"
-    keepertest "github.com/bluzelle/curium/testutil/keeper"
 )
 
 func setupMsgServer(t testing.TB) (types.MsgServer, context.Context) {

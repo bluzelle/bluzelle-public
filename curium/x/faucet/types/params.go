@@ -9,13 +9,11 @@ import (
 
 var _ paramtypes.ParamSet = (*Params)(nil)
 
-
 var (
 	KeyTestnet = []byte("Testnet")
 	// TODO: Determine the default value
 	DefaultTestnet string = "testnet"
 )
-
 
 // ParamKeyTable the param key table for launch module
 func ParamKeyTable() paramtypes.KeyTable {
@@ -27,14 +25,14 @@ func NewParams(
 	testnet string,
 ) Params {
 	return Params{
-        Testnet: testnet,
+		Testnet: testnet,
 	}
 }
 
 // DefaultParams returns a default set of parameters
 func DefaultParams() Params {
 	return NewParams(
-        DefaultTestnet,
+		DefaultTestnet,
 	)
 }
 
@@ -47,10 +45,10 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 
 // Validate validates the set of params
 func (p Params) Validate() error {
-   	if err := validateTestnet(p.Testnet); err != nil {
-   		return err
-   	}
-   	
+	if err := validateTestnet(p.Testnet); err != nil {
+		return err
+	}
+
 	return nil
 }
 
