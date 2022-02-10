@@ -47,7 +47,8 @@ export class BluzelleLocalWallet extends DirectSecp256k1HdWallet implements Bluz
 function makePath(idx: number =  0): HdPath {
     return [
         Slip10RawIndex.hardened(44),
-        Slip10RawIndex.hardened(483),  // BNT
+        // Slip10RawIndex.hardened(483),  // BNT
+        Slip10RawIndex.hardened(118),
         Slip10RawIndex.hardened(0),
         Slip10RawIndex.normal(0),
         Slip10RawIndex.normal(idx),

@@ -12619,8 +12619,6 @@ definitions:
   bluzelle.curium.faucet.MsgMintResponse:
     type: object
     properties:
-      mnemonic:
-        type: string
       address:
         type: string
   bluzelle.curium.faucet.Params:
