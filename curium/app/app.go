@@ -367,6 +367,7 @@ func New(
 		appCodec,
 		keys[curiummoduletypes.StoreKey],
 		keys[curiummoduletypes.MemStoreKey],
+		app.GasMeterKeeper,
 	)
 	curiumModule := curiummodule.NewAppModule(appCodec, app.CuriumKeeper)
 
@@ -448,7 +449,7 @@ func New(
 		feegrant.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, curiummoduletypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.

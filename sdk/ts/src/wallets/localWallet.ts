@@ -2,7 +2,7 @@ import {DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
 import {BluzelleWallet, SigningBluzelleClient} from "../sdk";
 import {SequenceResponse} from "@cosmjs/stargate";
 import {DirectSecp256k1HdWalletOptions} from "@cosmjs/proto-signing/build/directsecp256k1hdwallet";
-import {Bip39, EnglishMnemonic, HdPath, Slip10RawIndex} from "@cosmjs/crypto";
+import {EnglishMnemonic, Bip39, HdPath, Slip10RawIndex} from "@cosmjs/crypto";
 import {passThrough} from "promise-passthrough";
 
 
