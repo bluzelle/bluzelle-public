@@ -3,27 +3,11 @@ package keeper
 import (
 	"context"
 	"github.com/bluzelle/curium/x/faucet/types"
-	"github.com/cosmos/cosmos-sdk/crypto/hd"
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (k msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	var mnemonic string
-	address := msg.Address
-
-	if len(address) == 0 {
-		kr := keyring.NewInMemory()
-		info, m, err := kr.NewMnemonic("temp", keyring.English, "m/44'/483'/0'/0/0", "", hd.Secp256k1)
-		mnemonic = m
-		if err != nil {
-			return nil, err
-		}
-
-		address = info.GetAddress().String()
-	}
 
 	addr, err := sdk.AccAddressFromBech32(msg.Address)
 	if err != nil {
@@ -41,8 +25,7 @@ func (k msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMi
 	}
 
 	response := types.MsgMintResponse{
-		Mnemonic: mnemonic,
-		Address:  address,
+		Address: msg.Address,
 	}
 
 	return &response, nil

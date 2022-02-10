@@ -1,6 +1,5 @@
 import {newBluzelleClient} from "./sdk";
 import {newLocalWallet} from "./wallets/localWallet";
-import {pinCid} from "./tx";
 
 describe('faucet', () => {
     it('should mint tokens', () =>
