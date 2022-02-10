@@ -4,6 +4,45 @@ info:
   name: ''
   description: ''
 paths:
+  '/bluzelle/curium/faucet/mint/{address}':
+    get:
+      summary: Queries a list of Mint items.
+      operationId: BluzelleCuriumFaucetMint
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              address:
+                type: string
+              mnemonic:
+                type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
   /bluzelle/curium/faucet/params:
     get:
       summary: Parameters queries the parameters of the module.
@@ -12579,12 +12618,24 @@ paths:
 definitions:
   bluzelle.curium.faucet.MsgMintResponse:
     type: object
+    properties:
+      mnemonic:
+        type: string
+      address:
+        type: string
   bluzelle.curium.faucet.Params:
     type: object
     properties:
       testnet:
         type: string
     description: Params defines the parameters for the module.
+  bluzelle.curium.faucet.QueryMintResponse:
+    type: object
+    properties:
+      address:
+        type: string
+      mnemonic:
+        type: string
   bluzelle.curium.faucet.QueryParamsResponse:
     type: object
     properties:

@@ -12,5 +12,5 @@ describe('sending transactions', () => {
                 pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000});
             }))
             .then(x  => x);
-    })
+    });
 })

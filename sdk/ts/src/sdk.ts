@@ -9,10 +9,14 @@ import {
 import {
     QueryClientImpl as BankQueryClientImpl
 } from "./generated/cosmos/cosmos-sdk/cosmos.bank.v1beta1/module/types/cosmos/bank/v1beta1/query";
+import {
+    QueryClientImpl as FaucetQueryClientImpl
+} from './generated/bluzelle/curium/bluzelle.curium.faucet/module/types/faucet/query'
 
 type QueryClientImpl = {
     storage: StorageQueryClientImpl;
     bank: BankQueryClientImpl;
+    faucet: FaucetQueryClientImpl;
 }
 
 export interface BluzelleConfig {
@@ -30,6 +34,7 @@ export interface BluzelleClient {
 export interface BluzelleWallet extends OfflineDirectSigner {
     getSequence: (client: SigningBluzelleClient,signerAddress: string) => Promise<SequenceResponse>
 }
+
 
 export const newBluzelleClient = (config: { wallet: () => Promise<BluzelleWallet>; url: string }): Promise<BluzelleClient> =>
     config.wallet()
@@ -54,6 +59,7 @@ const getRpcClient = (url: string): Promise<QueryClientImpl> =>
         .then(rpcClient => Promise.resolve({
             storage: new StorageQueryClientImpl(rpcClient),
             bank: new BankQueryClientImpl(rpcClient),
+            faucet: new FaucetQueryClientImpl(rpcClient)
         }));
 
 export class SigningBluzelleClient extends SigningStargateClient {

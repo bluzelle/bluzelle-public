@@ -2,6 +2,8 @@ package keeper
 
 import (
 	"fmt"
+	"github.com/bluzelle/curium/x/curium"
+	"github.com/bluzelle/curium/x/curium/keeper"
 
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -13,12 +15,13 @@ import (
 
 type (
 	Keeper struct {
-		cdc        codec.BinaryCodec
-		storeKey   sdk.StoreKey
-		memKey     sdk.StoreKey
-		paramstore paramtypes.Subspace
-
-		bankKeeper types.BankKeeper
+		cdc           codec.BinaryCodec
+		storeKey      sdk.StoreKey
+		memKey        sdk.StoreKey
+		paramstore    paramtypes.Subspace
+		bankKeeper    types.BankKeeper
+		keyringReader *curium.KeyRingReader
+		broadcastMsg  keeper.MsgBroadcaster
 	}
 )
 
@@ -27,8 +30,9 @@ func NewKeeper(
 	storeKey,
 	memKey sdk.StoreKey,
 	ps paramtypes.Subspace,
-
 	bankKeeper types.BankKeeper,
+	keyringReader *curium.KeyRingReader,
+	msgBroadcaster keeper.MsgBroadcaster,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -36,12 +40,13 @@ func NewKeeper(
 	}
 
 	return &Keeper{
-
-		cdc:        cdc,
-		storeKey:   storeKey,
-		memKey:     memKey,
-		paramstore: ps,
-		bankKeeper: bankKeeper,
+		cdc:           cdc,
+		storeKey:      storeKey,
+		memKey:        memKey,
+		paramstore:    ps,
+		bankKeeper:    bankKeeper,
+		keyringReader: keyringReader,
+		broadcastMsg:  msgBroadcaster,
 	}
 }
 

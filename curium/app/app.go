@@ -4,7 +4,9 @@ import (
 	appAnte "github.com/bluzelle/curium/app/ante"
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/curium/app/types"
+	"github.com/bluzelle/curium/x/curium"
 	curiumipfs "github.com/bluzelle/curium/x/storage-ipfs/ipfs"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"io"
 	"net/http"
@@ -385,9 +387,11 @@ func New(
 		keys[faucetmoduletypes.StoreKey],
 		keys[faucetmoduletypes.MemStoreKey],
 		app.GetSubspace(faucetmoduletypes.ModuleName),
-
 		app.BankKeeper,
+		curium.NewKeyRingReader(appOpts.Get(flags.FlagHome).(string)),
+		curiummodulekeeper.NewMsgBroadcaster(&app.AccountKeeper, cast.ToString(appOpts.Get(flags.FlagHome))),
 	)
+
 	faucetModule := faucetmodule.NewAppModule(appCodec, app.FaucetKeeper, app.AccountKeeper, app.BankKeeper)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
