@@ -17,6 +17,7 @@ const (
 	Denom                = "ubnt"
 	ErrLowGasPrice       = "Specified gas price too low"
 	ErrGasTxParseError   = "Tx must be GasTx"
+	CoinType             = 483
 )
 
 // GasTx defines a Tx with a GetGas() method which is needed to use SetUpContextDecorator
