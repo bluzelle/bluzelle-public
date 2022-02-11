@@ -1,8 +1,8 @@
 package ante
 
 import (
-	"github.com/bluzelle/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/curium/app/types"
+	"github.com/bluzelle/curium/app/types/global"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -18,7 +18,7 @@ func NewAnteHandler(options appTypes.AnteHandlerOptions) (sdk.AnteHandler, error
 		sigGasConsumer = ante.DefaultSigVerificationGasConsumer
 	}
 
-	gasMeterKeeper := gasmeter.NewGasMeterKeeper()
+	gasMeterKeeper := global.GMK
 	minGasPriceCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(appTypes.Denom, sdk.NewInt(1)))
 
 	anteDecorators := []sdk.AnteDecorator{

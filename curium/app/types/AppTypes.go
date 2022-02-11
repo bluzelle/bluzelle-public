@@ -26,17 +26,6 @@ type GasTx interface {
 	GetGas() uint64
 }
 
-//type GasMeterOptions struct {
-//	Simulate         bool
-//	Ctx              sdk.Context
-//	GasLimit         uint64
-//	Tx               sdk.Tx
-//	GasMeterKeeper   *gasmeter.Keeper
-//	BankKeeper       bankkeeper.BaseKeeper
-//	AccountKeeper    acctypes.AccountKeeper
-//	MinGasPriceCoins sdk.DecCoins
-//}
-
 type AnteHandlerOptions struct {
 	AccountKeeper   acctypes.AccountKeeper
 	BankKeeper      bankkeeper.BaseKeeper

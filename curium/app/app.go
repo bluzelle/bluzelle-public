@@ -4,6 +4,7 @@ import (
 	appAnte "github.com/bluzelle/curium/app/ante"
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/curium/app/types"
+	"github.com/bluzelle/curium/app/types/global"
 	"github.com/bluzelle/curium/x/curium"
 	curiumipfs "github.com/bluzelle/curium/x/storage-ipfs/ipfs"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -361,7 +362,7 @@ func New(
 		&stakingKeeper, govRouter,
 	)
 
-	app.GasMeterKeeper = gasmeter.NewGasMeterKeeper()
+	app.GasMeterKeeper = global.GMK
 
 	app.CuriumKeeper = *curiummodulekeeper.NewKeeper(
 		appCodec,
@@ -369,7 +370,7 @@ func New(
 		keys[curiummoduletypes.MemStoreKey],
 		app.GasMeterKeeper,
 	)
-	curiumModule := curiummodule.NewAppModule(appCodec, app.CuriumKeeper)
+	curiumModule := curiummodule.NewAppModule(appCodec, &app.CuriumKeeper)
 
 	storageDir := appOpts.Get("storage-dir").(string)
 	storageNode, err := startupStorageNode(storageDir)
@@ -433,7 +434,7 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		curiumModule,
+		&curiumModule,
 		storageModule,
 		faucetModule,
 		// this line is used by starport scaffolding # stargate/app/appModule

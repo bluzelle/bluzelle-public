@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	_ module.AppModule      = AppModule{}
+	_ module.AppModule      = &AppModule{}
 	_ module.AppModuleBasic = AppModuleBasic{}
 )
 
@@ -98,10 +98,10 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 
-	keeper keeper.Keeper
+	keeper *keeper.Keeper
 }
 
-func NewAppModule(cdc codec.Codec, keeper keeper.Keeper) AppModule {
+func NewAppModule(cdc codec.Codec, keeper *keeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         keeper,
@@ -115,7 +115,7 @@ func (am AppModule) Name() string {
 
 // Route returns the capability module's message routing key.
 func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
+	return sdk.NewRoute(types.RouterKey, NewHandler(*am.keeper))
 }
 
 // QuerierRoute returns the capability module's query routing key.
@@ -142,14 +142,14 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.Ra
 	// Initialize global index to index in genesis state
 	cdc.MustUnmarshalJSON(gs, &genState)
 
-	InitGenesis(ctx, am.keeper, genState)
+	InitGenesis(ctx, *am.keeper, genState)
 
 	return []abci.ValidatorUpdate{}
 }
 
 // ExportGenesis returns the capability module's exported genesis state as raw JSON bytes.
 func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.RawMessage {
-	genState := ExportGenesis(ctx, am.keeper)
+	genState := ExportGenesis(ctx, *am.keeper)
 	return cdc.MustMarshalJSON(genState)
 }
 
@@ -161,7 +161,12 @@ func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 
 // EndBlock executes all ABCI EndBlock logic respective to the capability module. It
 // returns no validator updates.
-func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+func (am *AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+	//fmt.Println("************************************************* END BLOCKER GAS METER COUNT", am.keeper.GasMeterKeeper, len(am.keeper.GasMeterKeeper.GetAllGasMeters()))
+	//if len(am.keeper.GasMeterKeeper.GetAllGasMeters()) > 0 {
+	//	fmt.Println("HERE")
+	//}
+
 	errors := am.keeper.GasMeterKeeper.ChargeAll(ctx)
 
 	if len(errors) > 0 {

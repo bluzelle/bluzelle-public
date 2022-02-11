@@ -16,11 +16,11 @@ type ChargingGasMeter struct {
 	consumed      sdk.Gas
 	PayerAccount  sdk.AccAddress
 	gasPrice      sdk.DecCoins
-	bankKeeper    bankkeeper.BaseKeeper
+	bankKeeper    bankkeeper.Keeper
 	accountKeeper acctypes.AccountKeeper
 }
 
-func NewChargingGasMeter(bankKeeper bankkeeper.BaseKeeper, accountKeeper acctypes.AccountKeeper, limit sdk.Gas, payerAccount sdk.AccAddress, gasPrice sdk.DecCoins) *ChargingGasMeter {
+func NewChargingGasMeter(bankKeeper bankkeeper.Keeper, accountKeeper acctypes.AccountKeeper, limit sdk.Gas, payerAccount sdk.AccAddress, gasPrice sdk.DecCoins) *ChargingGasMeter {
 	return &ChargingGasMeter{
 		limit:         limit,
 		consumed:      0,
@@ -102,7 +102,7 @@ func (g *ChargingGasMeter) GetGasPrice() sdk.DecCoins {
 	return g.gasPrice
 }
 
-func deductFees(ctx sdk.Context, bankKeeper bankkeeper.BaseKeeper, addr sdk.AccAddress, fees sdk.Coins) error {
+func deductFees(ctx sdk.Context, bankKeeper bankkeeper.Keeper, addr sdk.AccAddress, fees sdk.Coins) error {
 
 	if !fees.IsValid() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fees)

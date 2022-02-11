@@ -10,7 +10,7 @@ type Keeper struct {
 
 func NewGasMeterKeeper() *Keeper {
 	return &Keeper{
-		gasMeters: make([]*ChargingGasMeter, 0),
+		gasMeters: []*ChargingGasMeter{},
 	}
 }
 

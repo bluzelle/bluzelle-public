@@ -52,7 +52,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				accountKeeper,
 				app.GetSubspace(banktypes.ModuleName),
 				app.ModuleAccountAddrs())
-			gasMeterCtx, _ := ante.SetGasMeter(ante.GasMeterOptions{
+			gasMeterCtx, _ := ante.SetGasMeter(ante.SetGasMeterOptions{
 				Simulate:         true,
 				Ctx:              ctx,
 				GasLimit:         0,
@@ -83,7 +83,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 			txBuilder.SetFeePayer(addr)
 			newTx := txBuilder.GetTx()
 
-			gasMeterCtx, _ := ante.SetGasMeter(ante.GasMeterOptions{
+			gasMeterCtx, _ := ante.SetGasMeter(ante.SetGasMeterOptions{
 				Simulate:         false,
 				Ctx:              ctx,
 				GasLimit:         testdata.NewTestGasLimit(),
@@ -115,7 +115,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 			txBuilder.SetFeePayer(addr)
 			newTx := txBuilder.GetTx()
 
-			_, err := ante.SetGasMeter(ante.GasMeterOptions{
+			_, err := ante.SetGasMeter(ante.SetGasMeterOptions{
 				Simulate:         false,
 				Ctx:              ctx,
 				GasLimit:         testdata.NewTestGasLimit(),

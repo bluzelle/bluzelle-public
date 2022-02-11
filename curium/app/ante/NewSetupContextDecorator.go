@@ -10,7 +10,7 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 )
 
-type GasMeterOptions struct {
+type SetGasMeterOptions struct {
 	Simulate         bool
 	Ctx              sdk.Context
 	GasLimit         uint64
@@ -48,7 +48,7 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 	if !ok {
 		// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
 		// during runTx.
-		gasMeterOptions := GasMeterOptions{
+		gasMeterOptions := SetGasMeterOptions{
 			Simulate:         simulate,
 			Ctx:              ctx,
 			GasLimit:         0,
@@ -62,7 +62,7 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 		return newCtx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, appTypes.ErrGasTxParseError)
 	}
 
-	gasMeterOptions := GasMeterOptions{
+	gasMeterOptions := SetGasMeterOptions{
 		Simulate:         simulate,
 		Ctx:              ctx,
 		GasLimit:         gasTx.GetGas(),
@@ -98,7 +98,7 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 }
 
 // SetGasMeter returns a new context with a gas meter set from a given context.
-func SetGasMeter(options GasMeterOptions) (sdk.Context, error) {
+func SetGasMeter(options SetGasMeterOptions) (sdk.Context, error) {
 	// In various cases such as simulation and during the genesis block, we do not
 	// meter any gas utilization.
 	if options.Simulate || options.Ctx.BlockHeight() == 0 {
@@ -124,6 +124,7 @@ func SetGasMeter(options GasMeterOptions) (sdk.Context, error) {
 	gm := gasmeter.NewChargingGasMeter(options.BankKeeper, options.AccountKeeper, options.GasLimit, feePayer, gasPriceCoins)
 	if !options.Ctx.IsCheckTx() {
 		options.GasMeterKeeper.AddGasMeter(gm)
+		//fmt.Println("*************************************************** adding gas meter", options.GasMeterKeeper, len(options.GasMeterKeeper.GetAllGasMeters()))
 	}
 	return options.Ctx.WithGasMeter(gm), nil
 }
