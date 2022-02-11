@@ -5,7 +5,7 @@ import {pinCid, withTransaction} from "./tx";
 import {BehaviorSubject} from "rxjs";
 import {times} from "lodash";
 import {passThroughAwait} from "promise-passthrough";
-import {createCtx, withCtxAwait} from "with-context";
+import {createCtx, createCtxAwait, withCtxAwait} from "with-context";
 import {create} from "ipfs-http-client";
 import {expect} from "chai";
 
@@ -66,6 +66,13 @@ describe('query', function () {
             )))
             .then(ctx => getAccountBalance(ctx.client, ctx.client.address))
             .then(res => typeof(res) === "number")
+    );
+
+    it("getAccountBalance should not charge gas", () =>
+        Promise.resolve(createCtxAwait('client', () => getBlzClient(curiumUrl, mnemonic.getValue())))
+            .then(withCtxAwait('balanceBefore', (ctx) => getAccountBalance(ctx.client, ctx.client.address)))
+            .then(withCtxAwait('balanceAfter', (ctx) => getAccountBalance(ctx.client, ctx.client.address)))
+            .then((ctx) => expect(ctx.balanceAfter).equal(ctx.balanceBefore))
     );
 
 })
