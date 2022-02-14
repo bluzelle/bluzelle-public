@@ -124,7 +124,6 @@ func SetGasMeter(options SetGasMeterOptions) (sdk.Context, error) {
 	gm := gasmeter.NewChargingGasMeter(options.BankKeeper, options.AccountKeeper, options.GasLimit, feePayer, gasPriceCoins)
 	if !options.Ctx.IsCheckTx() {
 		options.GasMeterKeeper.AddGasMeter(gm)
-		//fmt.Println("*************************************************** adding gas meter", options.GasMeterKeeper, len(options.GasMeterKeeper.GetAllGasMeters()))
 	}
 	return options.Ctx.WithGasMeter(gm), nil
 }
