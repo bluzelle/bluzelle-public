@@ -18,7 +18,7 @@ func NewAnteHandler(options appTypes.AnteHandlerOptions) (sdk.AnteHandler, error
 		sigGasConsumer = ante.DefaultSigVerificationGasConsumer
 	}
 
-	gasMeterKeeper := global.GMK
+	gasMeterKeeper := global.GasMeterKeeper
 	minGasPriceCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(appTypes.Denom, sdk.NewInt(1)))
 
 	anteDecorators := []sdk.AnteDecorator{

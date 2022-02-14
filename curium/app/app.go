@@ -362,7 +362,7 @@ func New(
 		&stakingKeeper, govRouter,
 	)
 
-	app.GasMeterKeeper = global.GMK
+	app.GasMeterKeeper = global.GasMeterKeeper
 
 	app.CuriumKeeper = *curiummodulekeeper.NewKeeper(
 		appCodec,
