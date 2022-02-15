@@ -5,28 +5,23 @@ import {Some} from "monet";
 import BIP32Factory from 'bip32';
 import * as ecc from 'tiny-secp256k1';
 import {BIP32Interface} from 'bip32'
-
-const bip32 = BIP32Factory(ecc);
 import {bech32} from "bech32"
-import {
-    QueryBalanceResponse
-} from "./generated/cosmos/cosmos-sdk/cosmos.bank.v1beta1/module/types/cosmos/bank/v1beta1/query";
 import * as delay from "delay";
 import {getAccountBalance} from "./query";
 
-const hdPath = "m/44'/483'/0'/0'";
+const bip32 = BIP32Factory(ecc);
+const hdPath = "m/44'/483'/0'/0/0";
 const bech32Prefix = "bluzelle"
 
 
-
-export function createAddress(): Promise<{mnemonic: string, address: string}> {
+export function createAddress(): Promise<{ mnemonic: string, address: string }> {
     return Some({mnemonic: bip39.generateMnemonic(256)})
         .map(ctx => [ctx, bip39.mnemonicToSeedSync(ctx.mnemonic)])
         .map(([ctx, seed]) => [ctx, bip32.fromSeed(seed as Buffer)])
         .map(([ctx, node]) => [ctx, (node as BIP32Interface).derivePath(hdPath)])
         .map(([ctx, child]) => [ctx, bech32.toWords((child as BIP32Interface).identifier)])
         .map(([ctx, words]) => [ctx, bech32.encode(bech32Prefix, words as Buffer)])
-        .map(([ctx, address]) => ({...ctx as {mnemonic: string}, address}))
+        .map(([ctx, address]) => ({...ctx as { mnemonic: string }, address}))
         .join()
 }
 
@@ -50,9 +45,9 @@ export function waitUntilFunded(client: BluzelleClient, address: string): Promis
     return getAccountBalance(client, address)
         .then(waitForMint);
 
-        function waitForMint(startBalance: number): Promise<unknown> {
-            return getAccountBalance(client, address)
-                .then(passThroughAwait(balance => console.log('waiting for funds...', balance)))
-                .then(balance => balance === startBalance && delay(1000).then(() => waitForMint(startBalance)))
-        }
+    function waitForMint(startBalance: number): Promise<unknown> {
+        return getAccountBalance(client, address)
+            .then(passThroughAwait(balance => console.log('waiting for funds...', balance)))
+            .then(balance => balance === startBalance && delay(1000).then(() => waitForMint(startBalance)))
+    }
 }

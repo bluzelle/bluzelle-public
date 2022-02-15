@@ -1,5 +1,4 @@
 import {createProtobufRpcClient, QueryClient, SequenceResponse, SigningStargateClient} from "@cosmjs/stargate";
-import {OfflineDirectSigner} from "@cosmjs/proto-signing/build/signer";
 import {getRegistry} from "./registry";
 import {SigningStargateClientOptions} from "@cosmjs/stargate/build/signingstargateclient";
 import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
@@ -12,6 +11,7 @@ import {
 import {
     QueryClientImpl as FaucetQueryClientImpl
 } from './generated/bluzelle/curium/bluzelle.curium.faucet/module/types/faucet/query'
+import {BluzelleWallet} from "./wallets/BluzelleWallet";
 
 import {
     QueryClientImpl as TaxQueryClientImpl
@@ -34,10 +34,6 @@ export interface BluzelleClient {
     address: string;
     sgClient: SigningStargateClient;
     queryClient: QueryClientImpl;
-}
-
-export interface BluzelleWallet extends OfflineDirectSigner {
-    getSequence: (client: SigningBluzelleClient,signerAddress: string) => Promise<SequenceResponse>
 }
 
 

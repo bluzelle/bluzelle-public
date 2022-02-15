@@ -1,9 +1,10 @@
 import {DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
-import {BluzelleWallet, SigningBluzelleClient} from "../sdk";
+import {SigningBluzelleClient} from "../sdk";
 import {SequenceResponse} from "@cosmjs/stargate";
 import {DirectSecp256k1HdWalletOptions} from "@cosmjs/proto-signing/build/directsecp256k1hdwallet";
 import {EnglishMnemonic, Bip39, HdPath, Slip10RawIndex} from "@cosmjs/crypto";
 import {passThrough} from "promise-passthrough";
+import {BluzelleWallet} from "./BluzelleWallet";
 
 
 export const newLocalWallet = (mnemonic: string) => (): Promise<BluzelleWallet> => Promise.resolve(
@@ -41,7 +42,6 @@ export class BluzelleLocalWallet extends DirectSecp256k1HdWallet implements Bluz
                 }))
         )
     }
-
 }
 
 function makePath(idx: number =  0): HdPath {
