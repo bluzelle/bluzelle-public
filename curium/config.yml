@@ -24,6 +24,10 @@ init:
       timeout_commit: "5s"
 genesis:
   app_state:
+    tax:
+      feeBp: 100
+      transferBp: 1
+      taxCollector: 'bluzelle1dvc2u4l84hyfeem5fmfm9eyjlndpsycwwfhtln'
     staking:
       params:
         bond_denom: "ubnt"
