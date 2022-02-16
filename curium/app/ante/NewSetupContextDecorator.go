@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/curium/app/types"
+	taxmodulekeeper "github.com/bluzelle/curium/x/tax/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -16,8 +17,9 @@ type SetGasMeterOptions struct {
 	GasLimit         uint64
 	Tx               sdk.Tx
 	GasMeterKeeper   *gasmeter.Keeper
-	BankKeeper       bankkeeper.BaseKeeper
+	BankKeeper       bankkeeper.Keeper
 	AccountKeeper    acctypes.AccountKeeper
+	TaxKeeper        taxmodulekeeper.Keeper
 	MinGasPriceCoins sdk.DecCoins
 }
 
@@ -28,16 +30,18 @@ type SetGasMeterOptions struct {
 // CONTRACT: Tx must implement GasTx interface
 type SetUpContextDecorator struct {
 	gasMeterKeeper   *gasmeter.Keeper
-	bankKeeper       bankkeeper.BaseKeeper
+	bankKeeper       bankkeeper.Keeper
 	accountKeeper    acctypes.AccountKeeper
+	taxKeeper        taxmodulekeeper.Keeper
 	minGasPriceCoins sdk.DecCoins
 }
 
-func NewSetUpContextDecorator(gasMeterKeeper *gasmeter.Keeper, bankKeeper bankkeeper.BaseKeeper, accountKeeper acctypes.AccountKeeper, minGasPriceCoins sdk.DecCoins) SetUpContextDecorator {
+func NewSetUpContextDecorator(gasMeterKeeper *gasmeter.Keeper, bankKeeper bankkeeper.Keeper, accountKeeper acctypes.AccountKeeper, taxKeeper taxmodulekeeper.Keeper, minGasPriceCoins sdk.DecCoins) SetUpContextDecorator {
 	return SetUpContextDecorator{
 		gasMeterKeeper:   gasMeterKeeper,
 		bankKeeper:       bankKeeper,
 		accountKeeper:    accountKeeper,
+		taxKeeper:        taxKeeper,
 		minGasPriceCoins: minGasPriceCoins,
 	}
 }
@@ -56,6 +60,7 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 			GasMeterKeeper:   sud.gasMeterKeeper,
 			BankKeeper:       sud.bankKeeper,
 			AccountKeeper:    sud.accountKeeper,
+			TaxKeeper:        sud.taxKeeper,
 			MinGasPriceCoins: sud.minGasPriceCoins,
 		}
 		newCtx, _ = SetGasMeter(gasMeterOptions)
@@ -70,6 +75,7 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 		GasMeterKeeper:   sud.gasMeterKeeper,
 		BankKeeper:       sud.bankKeeper,
 		AccountKeeper:    sud.accountKeeper,
+		TaxKeeper:        sud.taxKeeper,
 		MinGasPriceCoins: sud.minGasPriceCoins,
 	}
 	newCtx, _ = SetGasMeter(gasMeterOptions)
@@ -121,7 +127,7 @@ func SetGasMeter(options SetGasMeterOptions) (sdk.Context, error) {
 		return options.Ctx, sdkerrors.New(appTypes.Name, 2, appTypes.ErrLowGasPrice)
 	}
 
-	gm := gasmeter.NewChargingGasMeter(options.BankKeeper, options.AccountKeeper, options.GasLimit, feePayer, gasPriceCoins)
+	gm := gasmeter.NewChargingGasMeter(options.BankKeeper, options.AccountKeeper, options.TaxKeeper, options.GasLimit, feePayer, gasPriceCoins)
 	if !options.Ctx.IsCheckTx() {
 		options.GasMeterKeeper.AddGasMeter(gm)
 	}

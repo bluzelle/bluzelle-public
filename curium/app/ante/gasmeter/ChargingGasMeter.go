@@ -3,6 +3,7 @@ package gasmeter
 import (
 	"fmt"
 	appTypes "github.com/bluzelle/curium/app/types"
+	taxmodulekeeper "github.com/bluzelle/curium/x/tax/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -18,9 +19,10 @@ type ChargingGasMeter struct {
 	gasPrice      sdk.DecCoins
 	bankKeeper    bankkeeper.Keeper
 	accountKeeper acctypes.AccountKeeper
+	taxKeeper     taxmodulekeeper.Keeper
 }
 
-func NewChargingGasMeter(bankKeeper bankkeeper.Keeper, accountKeeper acctypes.AccountKeeper, limit sdk.Gas, payerAccount sdk.AccAddress, gasPrice sdk.DecCoins) *ChargingGasMeter {
+func NewChargingGasMeter(bankKeeper bankkeeper.Keeper, accountKeeper acctypes.AccountKeeper, taxKeeper taxmodulekeeper.Keeper, limit sdk.Gas, payerAccount sdk.AccAddress, gasPrice sdk.DecCoins) *ChargingGasMeter {
 	return &ChargingGasMeter{
 		limit:         limit,
 		consumed:      0,
@@ -28,6 +30,7 @@ func NewChargingGasMeter(bankKeeper bankkeeper.Keeper, accountKeeper acctypes.Ac
 		gasPrice:      gasPrice,
 		bankKeeper:    bankKeeper,
 		accountKeeper: accountKeeper,
+		taxKeeper:     taxKeeper,
 	}
 }
 
@@ -85,14 +88,18 @@ func (g *ChargingGasMeter) String() string {
 }
 
 func (g *ChargingGasMeter) Charge(ctx sdk.Context) error {
-	gasFee := calculateGasFee(g)
-
 	acc := g.accountKeeper.GetAccount(ctx, g.PayerAccount)
-
 	addr := acc.GetAddress()
-	err := deductFees(ctx, g.bankKeeper, addr, gasFee)
-	if err != nil {
-		return err
+
+	gasFee := calculateGasFee(g)
+	feeErr := deductFees(ctx, g.bankKeeper, addr, gasFee)
+	if feeErr != nil {
+		return feeErr
+	}
+
+	taxErr := g.taxKeeper.ChargeGasTax(ctx, addr, gasFee)
+	if taxErr != nil {
+		return taxErr
 	}
 
 	return nil

@@ -25,8 +25,8 @@ init:
 genesis:
   app_state:
     tax:
-      feeBp: 100
-      transferBp: 1
+      gasTaxBp: 100
+      transferTaxBp: 1
       taxCollector: 'bluzelle1dvc2u4l84hyfeem5fmfm9eyjlndpsycwwfhtln'
     staking:
       params:

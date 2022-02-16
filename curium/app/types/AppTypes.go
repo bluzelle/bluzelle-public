@@ -1,6 +1,7 @@
 package types
 
 import (
+	taxmodulekeeper "github.com/bluzelle/curium/x/tax/keeper"
 	"github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
@@ -30,6 +31,7 @@ type AnteHandlerOptions struct {
 	AccountKeeper   acctypes.AccountKeeper
 	BankKeeper      bankkeeper.BaseKeeper
 	FeegrantKeeper  ante.FeegrantKeeper
+	TaxKeeper       taxmodulekeeper.Keeper
 	SignModeHandler authsigning.SignModeHandler
 	SigGasConsumer  func(meter types.GasMeter, sig signing.SignatureV2, params auth.Params) error
 }

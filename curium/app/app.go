@@ -105,6 +105,9 @@ import (
 	storagemodule "github.com/bluzelle/curium/x/storage"
 	storagemodulekeeper "github.com/bluzelle/curium/x/storage/keeper"
 	storagemoduletypes "github.com/bluzelle/curium/x/storage/types"
+	taxmodule "github.com/bluzelle/curium/x/tax"
+	taxmodulekeeper "github.com/bluzelle/curium/x/tax/keeper"
+	taxmoduletypes "github.com/bluzelle/curium/x/tax/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -153,6 +156,7 @@ var (
 		curiummodule.AppModuleBasic{},
 		storagemodule.AppModuleBasic{},
 		faucetmodule.AppModuleBasic{},
+		taxmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -166,6 +170,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		faucetmoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		taxmoduletypes.ModuleName:      nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -228,6 +233,8 @@ type App struct {
 	StorageKeeper storagemodulekeeper.Keeper
 
 	FaucetKeeper faucetmodulekeeper.Keeper
+
+	TaxKeeper taxmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// the module manager
@@ -264,6 +271,7 @@ func New(
 		curiummoduletypes.StoreKey,
 		storagemoduletypes.StoreKey,
 		faucetmoduletypes.StoreKey,
+		taxmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -396,6 +404,16 @@ func New(
 
 	faucetModule := faucetmodule.NewAppModule(appCodec, app.FaucetKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.TaxKeeper = *taxmodulekeeper.NewKeeper(
+		appCodec,
+		keys[taxmoduletypes.StoreKey],
+		keys[taxmoduletypes.MemStoreKey],
+		app.GetSubspace(taxmoduletypes.ModuleName),
+		app.BankKeeper,
+		app.AccountKeeper,
+	)
+	taxModule := taxmodule.NewAppModule(appCodec, app.TaxKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it
@@ -437,6 +455,7 @@ func New(
 		&curiumModule,
 		storageModule,
 		faucetModule,
+		taxModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -474,6 +493,7 @@ func New(
 		curiummoduletypes.ModuleName,
 		storagemoduletypes.ModuleName,
 		faucetmoduletypes.ModuleName,
+		taxmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -494,6 +514,7 @@ func New(
 		appTypes.AnteHandlerOptions{
 			AccountKeeper:   app.AccountKeeper,
 			BankKeeper:      app.BankKeeper.(bankkeeper.BaseKeeper),
+			TaxKeeper:       app.TaxKeeper,
 			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 			FeegrantKeeper:  app.FeeGrantKeeper,
 			SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
@@ -680,6 +701,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(curiummoduletypes.ModuleName)
 	paramsKeeper.Subspace(storagemoduletypes.ModuleName)
 	paramsKeeper.Subspace(faucetmoduletypes.ModuleName)
+	paramsKeeper.Subspace(taxmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper

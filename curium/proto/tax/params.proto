@@ -1,0 +1,14 @@
+syntax = "proto3";
+package bluzelle.curium.tax;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bluzelle/curium/x/tax/types";
+
+// Params defines the parameters for the module.
+//message Params {
+//  option (gogoproto.goproto_stringer) = false;
+//    uint64 gasTaxBp = 1;
+//    uint64 transferTaxBp = 2;
+//    string taxCollector = 3;
+//}

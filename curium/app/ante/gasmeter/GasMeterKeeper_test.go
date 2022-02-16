@@ -3,6 +3,8 @@ package gasmeter_test
 import (
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/curium/app/types"
+	taxmodulekeeper "github.com/bluzelle/curium/x/tax/keeper"
+	taxmoduletypes "github.com/bluzelle/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -25,6 +27,15 @@ func TestGasMeterKeeper(t *testing.T) {
 	_, _, addr := testdata.KeyTestPubAddr()
 	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(appTypes.Denom, sdk.NewInt(2)))
 
+	taxKeeper := *taxmodulekeeper.NewKeeper(
+		app.AppCodec(),
+		app.GetKey(taxmoduletypes.StoreKey),
+		app.GetKey(taxmoduletypes.MemStoreKey),
+		app.GetSubspace(taxmoduletypes.ModuleName),
+		bankKeeper,
+		accountKeeper,
+	)
+
 	t.Run("NewGasMeterKeeper should return a new gas meter keeper", func(t *testing.T) {
 		gasMeterKeeper := gasmeter.NewGasMeterKeeper()
 		require.NotNil(t, gasMeterKeeper)
@@ -39,7 +50,7 @@ func TestGasMeterKeeper(t *testing.T) {
 		})
 
 		t.Run("should contain gas meter if it is added", func(t *testing.T) {
-			gasMeter := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, 0, addr, decCoins)
+			gasMeter := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, taxKeeper, 0, addr, decCoins)
 			gasMeterKeeper := gasmeter.NewGasMeterKeeper()
 			gasMeterKeeper.AddGasMeter(gasMeter)
 			require.Contains(t, gasMeterKeeper.GetAllGasMeters(), gasMeter)
@@ -47,9 +58,9 @@ func TestGasMeterKeeper(t *testing.T) {
 
 		t.Run("should contain all the gas meters that were added", func(t *testing.T) {
 			gasMeterKeeper := gasmeter.NewGasMeterKeeper()
-			gasMeter1 := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, 0, addr, decCoins)
-			gasMeter2 := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, 10, addr, decCoins)
-			gasMeter3 := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, 50, addr, decCoins)
+			gasMeter1 := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, taxKeeper, 0, addr, decCoins)
+			gasMeter2 := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, taxKeeper, 10, addr, decCoins)
+			gasMeter3 := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, taxKeeper, 50, addr, decCoins)
 			gasMeterKeeper.AddGasMeter(gasMeter1)
 			gasMeterKeeper.AddGasMeter(gasMeter2)
 			gasMeterKeeper.AddGasMeter(gasMeter3)
@@ -59,7 +70,7 @@ func TestGasMeterKeeper(t *testing.T) {
 		})
 
 		t.Run("should contain no gas meters is the gas meter keeper is cleared", func(t *testing.T) {
-			gasMeter := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, 0, addr, decCoins)
+			gasMeter := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, taxKeeper, 0, addr, decCoins)
 			gasMeterKeeper := gasmeter.NewGasMeterKeeper()
 			gasMeterKeeper.AddGasMeter(gasMeter)
 			gasMeterKeeper.ClearAll()

@@ -7,12 +7,17 @@ import (
 	testutilante "github.com/bluzelle/curium/testutil/ante"
 	testutil "github.com/bluzelle/curium/testutil/simapp"
 	"github.com/bluzelle/curium/testutil/tx"
+	"github.com/bluzelle/curium/x/faucet/types"
+	taxmodulekeeper "github.com/bluzelle/curium/x/tax/keeper"
+	taxmoduletypes "github.com/bluzelle/curium/x/tax/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	sdkante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -36,7 +41,22 @@ func TestNewSetupContextDecorator(t *testing.T) {
 			accountKeeper,
 			app.GetSubspace(banktypes.ModuleName),
 			app.ModuleAccountAddrs())
-		setUpContextDecorator := ante.NewSetUpContextDecorator(gasMeterKeeper, bankKeeper, accountKeeper, minGasPriceCoins)
+		storeKey := sdk.NewKVStoreKey(taxmoduletypes.StoreKey)
+		memStoreKey := storetypes.NewMemoryStoreKey(taxmoduletypes.MemStoreKey)
+		paramsSubspace := typesparams.NewSubspace(
+			app.AppCodec(),
+			types.Amino,
+			storeKey,
+			memStoreKey,
+			"TaxParams")
+		taxKeeper := taxmodulekeeper.NewKeeper(
+			app.AppCodec(),
+			storeKey,
+			memStoreKey,
+			paramsSubspace,
+			bankKeeper,
+			accountKeeper)
+		setUpContextDecorator := ante.NewSetUpContextDecorator(gasMeterKeeper, bankKeeper, accountKeeper, *taxKeeper, minGasPriceCoins)
 		require.NotNil(t, setUpContextDecorator)
 	})
 
@@ -78,6 +98,14 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				app.GetSubspace(banktypes.ModuleName),
 				app.ModuleAccountAddrs())
 
+			taxKeeper := *taxmodulekeeper.NewKeeper(
+				app.AppCodec(),
+				app.GetKey(taxmoduletypes.StoreKey),
+				app.GetKey(taxmoduletypes.MemStoreKey),
+				app.GetSubspace(taxmoduletypes.ModuleName),
+				bankKeeper,
+				accountKeeper)
+
 			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(appTypes.Denom, 20))
 			txBuilder.SetFeeAmount(feeAmount)
 			txBuilder.SetFeePayer(addr)
@@ -93,7 +121,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				AccountKeeper:    accountKeeper,
 				MinGasPriceCoins: minGasPriceCoins,
 			})
-			expectedChargingGasMeter := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, testdata.NewTestGasLimit(), addr, minGasPriceCoins)
+			expectedChargingGasMeter := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, taxKeeper, testdata.NewTestGasLimit(), addr, minGasPriceCoins)
 			expectedGasMeter := sdk.GasMeter(expectedChargingGasMeter)
 			require.EqualValues(t, expectedGasMeter.String(), gasMeterCtx.GasMeter().String())
 		})
@@ -143,7 +171,22 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				accountKeeper,
 				app.GetSubspace(banktypes.ModuleName),
 				app.ModuleAccountAddrs())
-			setUpContextDecorator := ante.NewSetUpContextDecorator(gasMeterKeeper, bankKeeper, accountKeeper, minGasPriceCoins)
+			storeKey := sdk.NewKVStoreKey(taxmoduletypes.StoreKey)
+			memStoreKey := storetypes.NewMemoryStoreKey(taxmoduletypes.MemStoreKey)
+			paramsSubspace := typesparams.NewSubspace(
+				app.AppCodec(),
+				types.Amino,
+				storeKey,
+				memStoreKey,
+				"TaxParams")
+			taxKeeper := taxmodulekeeper.NewKeeper(
+				app.AppCodec(),
+				storeKey,
+				memStoreKey,
+				paramsSubspace,
+				bankKeeper,
+				accountKeeper)
+			setUpContextDecorator := ante.NewSetUpContextDecorator(gasMeterKeeper, bankKeeper, accountKeeper, *taxKeeper, minGasPriceCoins)
 
 			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(appTypes.Denom, 20))
 			txBuilder.SetFeeAmount(feeAmount)
