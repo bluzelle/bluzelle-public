@@ -30,21 +30,21 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type QueryParamsRequest struct {
+type QueryGetTaxInfoRequest struct {
 }
 
-func (m *QueryParamsRequest) Reset()         { *m = QueryParamsRequest{} }
-func (m *QueryParamsRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryParamsRequest) ProtoMessage()    {}
-func (*QueryParamsRequest) Descriptor() ([]byte, []int) {
+func (m *QueryGetTaxInfoRequest) Reset()         { *m = QueryGetTaxInfoRequest{} }
+func (m *QueryGetTaxInfoRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGetTaxInfoRequest) ProtoMessage()    {}
+func (*QueryGetTaxInfoRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_c7620848389f966a, []int{0}
 }
-func (m *QueryParamsRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetTaxInfoRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryParamsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetTaxInfoRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryParamsRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetTaxInfoRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -54,36 +54,36 @@ func (m *QueryParamsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-func (m *QueryParamsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryParamsRequest.Merge(m, src)
+func (m *QueryGetTaxInfoRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetTaxInfoRequest.Merge(m, src)
 }
-func (m *QueryParamsRequest) XXX_Size() int {
+func (m *QueryGetTaxInfoRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryParamsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryParamsRequest.DiscardUnknown(m)
+func (m *QueryGetTaxInfoRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetTaxInfoRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryParamsRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetTaxInfoRequest proto.InternalMessageInfo
 
-type QueryParamsResponse struct {
-	GasTaxBp      uint64 `protobuf:"varint,1,opt,name=gasTaxBp,proto3" json:"gasTaxBp,omitempty"`
-	TransferTaxBp uint64 `protobuf:"varint,2,opt,name=transferTaxBp,proto3" json:"transferTaxBp,omitempty"`
+type QueryGetTaxInfoResponse struct {
+	GasTaxBp      int64  `protobuf:"varint,1,opt,name=gasTaxBp,proto3" json:"gasTaxBp,omitempty"`
+	TransferTaxBp int64  `protobuf:"varint,2,opt,name=transferTaxBp,proto3" json:"transferTaxBp,omitempty"`
 	TaxCollector  string `protobuf:"bytes,3,opt,name=taxCollector,proto3" json:"taxCollector,omitempty"`
 }
 
-func (m *QueryParamsResponse) Reset()         { *m = QueryParamsResponse{} }
-func (m *QueryParamsResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryParamsResponse) ProtoMessage()    {}
-func (*QueryParamsResponse) Descriptor() ([]byte, []int) {
+func (m *QueryGetTaxInfoResponse) Reset()         { *m = QueryGetTaxInfoResponse{} }
+func (m *QueryGetTaxInfoResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGetTaxInfoResponse) ProtoMessage()    {}
+func (*QueryGetTaxInfoResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_c7620848389f966a, []int{1}
 }
-func (m *QueryParamsResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetTaxInfoResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetTaxInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryParamsResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetTaxInfoResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -93,33 +93,33 @@ func (m *QueryParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (m *QueryParamsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryParamsResponse.Merge(m, src)
+func (m *QueryGetTaxInfoResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetTaxInfoResponse.Merge(m, src)
 }
-func (m *QueryParamsResponse) XXX_Size() int {
+func (m *QueryGetTaxInfoResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryParamsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryParamsResponse.DiscardUnknown(m)
+func (m *QueryGetTaxInfoResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetTaxInfoResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryParamsResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetTaxInfoResponse proto.InternalMessageInfo
 
-func (m *QueryParamsResponse) GetGasTaxBp() uint64 {
+func (m *QueryGetTaxInfoResponse) GetGasTaxBp() int64 {
 	if m != nil {
 		return m.GasTaxBp
 	}
 	return 0
 }
 
-func (m *QueryParamsResponse) GetTransferTaxBp() uint64 {
+func (m *QueryGetTaxInfoResponse) GetTransferTaxBp() int64 {
 	if m != nil {
 		return m.TransferTaxBp
 	}
 	return 0
 }
 
-func (m *QueryParamsResponse) GetTaxCollector() string {
+func (m *QueryGetTaxInfoResponse) GetTaxCollector() string {
 	if m != nil {
 		return m.TaxCollector
 	}
@@ -127,34 +127,36 @@ func (m *QueryParamsResponse) GetTaxCollector() string {
 }
 
 func init() {
-	proto.RegisterType((*QueryParamsRequest)(nil), "bluzelle.curium.tax.QueryParamsRequest")
-	proto.RegisterType((*QueryParamsResponse)(nil), "bluzelle.curium.tax.QueryParamsResponse")
+	proto.RegisterType((*QueryGetTaxInfoRequest)(nil), "bluzelle.curium.tax.QueryGetTaxInfoRequest")
+	proto.RegisterType((*QueryGetTaxInfoResponse)(nil), "bluzelle.curium.tax.QueryGetTaxInfoResponse")
 }
 
 func init() { proto.RegisterFile("tax/query.proto", fileDescriptor_c7620848389f966a) }
 
 var fileDescriptor_c7620848389f966a = []byte{
-	// 308 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x91, 0xcf, 0x4a, 0xc3, 0x40,
-	0x10, 0xc6, 0x13, 0xff, 0x14, 0x5d, 0x14, 0x61, 0xdb, 0x43, 0x09, 0x12, 0x4a, 0x10, 0x2d, 0x1e,
-	0xb2, 0x54, 0x5f, 0x40, 0xea, 0x0b, 0x68, 0xf1, 0x24, 0x78, 0x98, 0x84, 0xe9, 0x1a, 0x48, 0x32,
-	0xe9, 0xee, 0x44, 0x52, 0x7d, 0x09, 0x1f, 0xcb, 0x63, 0x8f, 0x1e, 0xa5, 0x7d, 0x11, 0x69, 0x56,
-	0x85, 0xa2, 0xe0, 0x6d, 0xf7, 0x9b, 0x1f, 0xf3, 0x7d, 0xfb, 0xad, 0x38, 0x62, 0x68, 0xd4, 0xac,
-	0x46, 0x33, 0x8f, 0x2b, 0x43, 0x4c, 0xb2, 0x9b, 0xe4, 0xf5, 0x33, 0xe6, 0x39, 0xc6, 0x69, 0x6d,
-	0xb2, 0xba, 0x88, 0x19, 0x9a, 0xa0, 0xa7, 0x49, 0x53, 0x3b, 0x57, 0xeb, 0x93, 0x43, 0x83, 0x63,
-	0x4d, 0xa4, 0x73, 0x54, 0x50, 0x65, 0x0a, 0xca, 0x92, 0x18, 0x38, 0xa3, 0xd2, 0x7e, 0x4d, 0xcf,
-	0x53, 0xb2, 0x05, 0x59, 0x95, 0x80, 0x45, 0xe7, 0xa0, 0x9e, 0x46, 0x09, 0x32, 0x8c, 0x54, 0x05,
-	0x3a, 0x2b, 0x5b, 0xd8, 0xb1, 0x51, 0x4f, 0xc8, 0xdb, 0x35, 0x71, 0x03, 0x06, 0x0a, 0x3b, 0xc1,
-	0x59, 0x8d, 0x96, 0xa3, 0x17, 0xd1, 0xdd, 0x50, 0x6d, 0x45, 0xa5, 0x45, 0x19, 0x88, 0x3d, 0x0d,
-	0xf6, 0x0e, 0x9a, 0x71, 0xd5, 0xf7, 0x07, 0xfe, 0x70, 0x67, 0xf2, 0x73, 0x97, 0x27, 0xe2, 0x90,
-	0x0d, 0x94, 0x76, 0x8a, 0xc6, 0x01, 0x5b, 0x2d, 0xb0, 0x29, 0xca, 0x48, 0x1c, 0x30, 0x34, 0xd7,
-	0x94, 0xe7, 0x98, 0x32, 0x99, 0xfe, 0xf6, 0xc0, 0x1f, 0xee, 0x4f, 0x36, 0xb4, 0x8b, 0xa9, 0xd8,
-	0x6d, 0xcd, 0xe5, 0x83, 0xe8, 0xb8, 0x00, 0xf2, 0x2c, 0xfe, 0xa3, 0x9b, 0xf8, 0x77, 0xf0, 0x60,
-	0xf8, 0x3f, 0xe8, 0xde, 0x12, 0x79, 0xe3, 0xab, 0xb7, 0x65, 0xe8, 0x2f, 0x96, 0xa1, 0xff, 0xb1,
-	0x0c, 0xfd, 0xd7, 0x55, 0xe8, 0x2d, 0x56, 0xa1, 0xf7, 0xbe, 0x0a, 0xbd, 0xfb, 0x53, 0x9d, 0xf1,
-	0x63, 0x9d, 0xc4, 0x29, 0x15, 0xea, 0x7b, 0x9f, 0x72, 0xfb, 0x54, 0xa3, 0xd6, 0xff, 0xc6, 0xf3,
-	0x0a, 0x6d, 0xd2, 0x69, 0x3b, 0xbc, 0xfc, 0x0c, 0x00, 0x00, 0xff, 0xff, 0xde, 0xf8, 0x97, 0xde,
-	0xcb, 0x01, 0x00, 0x00,
+	// 342 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x91, 0xcf, 0x4a, 0xc3, 0x40,
+	0x10, 0xc6, 0xbb, 0x2d, 0x8a, 0x2e, 0x8a, 0x10, 0x45, 0x4b, 0x90, 0x50, 0xa3, 0x48, 0xfd, 0x43,
+	0x96, 0xea, 0x0b, 0x48, 0x3d, 0x88, 0x47, 0x4b, 0x4f, 0x5e, 0xca, 0x26, 0x4c, 0xd7, 0x40, 0xba,
+	0x93, 0x66, 0x27, 0x92, 0x7a, 0x11, 0x7c, 0x02, 0xd1, 0xab, 0x0f, 0xe4, 0xb1, 0xe0, 0xc5, 0xa3,
+	0xb4, 0x3e, 0x88, 0x34, 0xf1, 0x0f, 0xa5, 0x3d, 0x78, 0xdb, 0x9d, 0xef, 0x37, 0xb3, 0xf3, 0xed,
+	0xc7, 0xd7, 0x48, 0x66, 0xa2, 0x9f, 0x42, 0x32, 0xf0, 0xe2, 0x04, 0x09, 0xad, 0x75, 0x3f, 0x4a,
+	0xef, 0x20, 0x8a, 0xc0, 0x0b, 0xd2, 0x24, 0x4c, 0x7b, 0x1e, 0xc9, 0xcc, 0xde, 0x50, 0xa8, 0x30,
+	0xd7, 0xc5, 0xe4, 0x54, 0xa0, 0xf6, 0xb6, 0x42, 0x54, 0x11, 0x08, 0x19, 0x87, 0x42, 0x6a, 0x8d,
+	0x24, 0x29, 0x44, 0x6d, 0xbe, 0xd5, 0xc3, 0x00, 0x4d, 0x0f, 0x8d, 0xf0, 0xa5, 0x81, 0xe2, 0x05,
+	0x71, 0xdb, 0xf0, 0x81, 0x64, 0x43, 0xc4, 0x52, 0x85, 0x3a, 0x87, 0x0b, 0xd6, 0xad, 0xf2, 0xcd,
+	0xab, 0x09, 0x71, 0x01, 0xd4, 0x96, 0xd9, 0xa5, 0xee, 0x62, 0x0b, 0xfa, 0x29, 0x18, 0x72, 0xef,
+	0xf9, 0xd6, 0x8c, 0x62, 0x62, 0xd4, 0x06, 0x2c, 0x9b, 0x2f, 0x29, 0x69, 0xda, 0x32, 0x6b, 0xc6,
+	0x55, 0x56, 0x63, 0xf5, 0x4a, 0xeb, 0xf7, 0x6e, 0xed, 0xf1, 0x55, 0x4a, 0xa4, 0x36, 0x5d, 0x48,
+	0x0a, 0xa0, 0x9c, 0x03, 0xd3, 0x45, 0xcb, 0xe5, 0x2b, 0x24, 0xb3, 0x73, 0x8c, 0x22, 0x08, 0x08,
+	0x93, 0x6a, 0xa5, 0xc6, 0xea, 0xcb, 0xad, 0xa9, 0xda, 0xc9, 0x0b, 0xe3, 0x0b, 0xf9, 0x06, 0xd6,
+	0x13, 0xe3, 0xfc, 0x6f, 0x0d, 0xeb, 0xc8, 0x9b, 0xf3, 0x53, 0xde, 0x7c, 0x1b, 0xf6, 0xf1, 0xff,
+	0xe0, 0xc2, 0x99, 0x7b, 0xf0, 0xf0, 0xf6, 0xf9, 0x5c, 0xde, 0xb5, 0x76, 0xc4, 0x4f, 0x97, 0x28,
+	0xba, 0xc4, 0x24, 0x2d, 0x05, 0xd4, 0x21, 0x99, 0x75, 0x42, 0xdd, 0xc5, 0xe6, 0xd9, 0xeb, 0xc8,
+	0x61, 0xc3, 0x91, 0xc3, 0x3e, 0x46, 0x0e, 0x7b, 0x1c, 0x3b, 0xa5, 0xe1, 0xd8, 0x29, 0xbd, 0x8f,
+	0x9d, 0xd2, 0xf5, 0xbe, 0x0a, 0xe9, 0x26, 0xf5, 0xbd, 0x00, 0x7b, 0x33, 0x63, 0xb2, 0x7c, 0x10,
+	0x0d, 0x62, 0x30, 0xfe, 0x62, 0x1e, 0xc1, 0xe9, 0x57, 0x00, 0x00, 0x00, 0xff, 0xff, 0xd3, 0x2c,
+	0x63, 0x20, 0x0a, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -169,7 +171,8 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
-	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
+	// Queries a list of GetTaxInfo items.
+	GetTaxInfo(ctx context.Context, in *QueryGetTaxInfoRequest, opts ...grpc.CallOption) (*QueryGetTaxInfoResponse, error)
 }
 
 type queryClient struct {
@@ -180,9 +183,9 @@ func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error) {
-	out := new(QueryParamsResponse)
-	err := c.cc.Invoke(ctx, "/bluzelle.curium.tax.Query/Params", in, out, opts...)
+func (c *queryClient) GetTaxInfo(ctx context.Context, in *QueryGetTaxInfoRequest, opts ...grpc.CallOption) (*QueryGetTaxInfoResponse, error) {
+	out := new(QueryGetTaxInfoResponse)
+	err := c.cc.Invoke(ctx, "/bluzelle.curium.tax.Query/GetTaxInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -191,35 +194,36 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
-	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
+	// Queries a list of GetTaxInfo items.
+	GetTaxInfo(context.Context, *QueryGetTaxInfoRequest) (*QueryGetTaxInfoResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
 type UnimplementedQueryServer struct {
 }
 
-func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsRequest) (*QueryParamsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
+func (*UnimplementedQueryServer) GetTaxInfo(ctx context.Context, req *QueryGetTaxInfoRequest) (*QueryGetTaxInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTaxInfo not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 	s.RegisterService(&_Query_serviceDesc, srv)
 }
 
-func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryParamsRequest)
+func _Query_GetTaxInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetTaxInfoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).Params(ctx, in)
+		return srv.(QueryServer).GetTaxInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/bluzelle.curium.tax.Query/Params",
+		FullMethod: "/bluzelle.curium.tax.Query/GetTaxInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Params(ctx, req.(*QueryParamsRequest))
+		return srv.(QueryServer).GetTaxInfo(ctx, req.(*QueryGetTaxInfoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -229,15 +233,15 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Params",
-			Handler:    _Query_Params_Handler,
+			MethodName: "GetTaxInfo",
+			Handler:    _Query_GetTaxInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "tax/query.proto",
 }
 
-func (m *QueryParamsRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetTaxInfoRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -247,12 +251,12 @@ func (m *QueryParamsRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryParamsRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetTaxInfoRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryParamsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetTaxInfoRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -260,7 +264,7 @@ func (m *QueryParamsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryParamsResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetTaxInfoResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -270,12 +274,12 @@ func (m *QueryParamsResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryParamsResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetTaxInfoResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetTaxInfoResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -311,7 +315,7 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *QueryParamsRequest) Size() (n int) {
+func (m *QueryGetTaxInfoRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -320,7 +324,7 @@ func (m *QueryParamsRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryParamsResponse) Size() (n int) {
+func (m *QueryGetTaxInfoResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -345,7 +349,7 @@ func sovQuery(x uint64) (n int) {
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *QueryParamsRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryGetTaxInfoRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -368,10 +372,10 @@ func (m *QueryParamsRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryParamsRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetTaxInfoRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryParamsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetTaxInfoRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -395,7 +399,7 @@ func (m *QueryParamsRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryParamsResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryGetTaxInfoResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -418,10 +422,10 @@ func (m *QueryParamsResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryParamsResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetTaxInfoResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetTaxInfoResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -438,7 +442,7 @@ func (m *QueryParamsResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.GasTaxBp |= uint64(b&0x7F) << shift
+				m.GasTaxBp |= int64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -457,7 +461,7 @@ func (m *QueryParamsResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TransferTaxBp |= uint64(b&0x7F) << shift
+				m.TransferTaxBp |= int64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

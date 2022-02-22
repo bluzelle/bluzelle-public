@@ -118,6 +118,44 @@ paths:
           type: string
       tags:
         - Query
+  /bluzelle/curium/tax/get_tax_info:
+    get:
+      summary: Queries a list of GetTaxInfo items.
+      operationId: BluzelleCuriumTaxGetTaxInfo
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              gasTaxBp:
+                type: string
+                format: int64
+              transferTaxBp:
+                type: string
+                format: int64
+              taxCollector:
+                type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
   /cosmos/authz/v1beta1/grants:
     get:
       summary: 'Returns list of `Authorization`, granted to the grantee by the granter.'
@@ -12974,6 +13012,23 @@ definitions:
     properties:
       hasContent:
         type: boolean
+  bluzelle.curium.tax.MsgSetGasTaxBpResponse:
+    type: object
+  bluzelle.curium.tax.MsgSetTaxCollectorResponse:
+    type: object
+  bluzelle.curium.tax.MsgSetTransferTaxBpResponse:
+    type: object
+  bluzelle.curium.tax.QueryGetTaxInfoResponse:
+    type: object
+    properties:
+      gasTaxBp:
+        type: string
+        format: int64
+      transferTaxBp:
+        type: string
+        format: int64
+      taxCollector:
+        type: string
   cosmos.authz.v1beta1.Grant:
     type: object
     properties:

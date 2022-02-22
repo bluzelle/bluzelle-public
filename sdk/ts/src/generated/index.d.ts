@@ -1,6 +1,7 @@
 declare const _default: {
     BluzelleCuriumBluzelleCuriumFaucet: (store: any) => void;
     BluzelleCuriumBluzelleCuriumStorage: (store: any) => void;
+    BluzelleCuriumBluzelleCuriumTax: (store: any) => void;
     CosmosCosmosSdkCosmosAuthzV1Beta1: (store: any) => void;
     CosmosCosmosSdkCosmosBankV1Beta1: (store: any) => void;
     CosmosCosmosSdkCosmosCrisisV1Beta1: (store: any) => void;

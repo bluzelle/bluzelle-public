@@ -10,31 +10,23 @@ option go_package = "github.com/bluzelle/curium/x/tax/types";
 
 // Query defines the gRPC querier service.
 service Query {
-  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+  // Queries a list of GetTaxInfo items.
+	rpc GetTaxInfo(QueryGetTaxInfoRequest) returns (QueryGetTaxInfoResponse) {
+		option (google.api.http).get = "/bluzelle/curium/tax/get_tax_info";
+	}
 
-  }
+// this line is used by starport scaffolding # 2
+
 }
 
-message QueryParamsRequest {}
-message QueryParamsResponse {
-  uint64 gasTaxBp = 1;
-  uint64 transferTaxBp = 2;
+
+message QueryGetTaxInfoRequest {
+}
+
+message QueryGetTaxInfoResponse {
+  int64 gasTaxBp = 1;
+  int64 transferTaxBp = 2;
   string taxCollector = 3;
 }
-  // Parameters queries the parameters of the module.
-//  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-//    option (google.api.http).get = "/bluzelle/curium/tax/params";
-//  }
-//  // this line is used by starport scaffolding # 2
-//}
-//
-//// QueryParamsRequest is request type for the Query/Params RPC method.
-//message QueryParamsRequest {}
-//
-//// QueryParamsResponse is response type for the Query/Params RPC method.
-//message QueryParamsResponse {
-//  // params holds all the parameters of this module.
-//  Params params = 1 [(gogoproto.nullable) = false];
-
 
 // this line is used by starport scaffolding # 3

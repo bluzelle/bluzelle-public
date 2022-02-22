@@ -5,10 +5,8 @@ import sdk "github.com/cosmos/cosmos-sdk/types"
 const (
 	AccountAddressPrefix = "bluzelle"
 	Denom                = "ubnt"
-	KeyGasTaxBp          = "gas_tax_bp"
-	KeyTransferTaxBp     = "transfer_tax_bp"
-	KeyTaxCollector      = "tax_collector"
 	KeyTaxInfo           = "taxinfo"
+	AdminAddress         = "bluzelle1dvc2u4l84hyfeem5fmfm9eyjlndpsycwwfhtln"
 )
 
 type TaxInfo struct {

@@ -121,11 +121,11 @@ func SetupTaxKeepersAndCtx(t testing.TB) (*keeper.Keeper, bankkeeper.Keeper, acc
 	genesisState := types.GenesisState{
 		GasTaxBp:      10,
 		TransferTaxBp: 15,
-		TaxCollector:  types.TaxCollector,
+		TaxCollector:  "bluzelle1dvc2u4l84hyfeem5fmfm9eyjlndpsycwwfhtln",
 	}
 	taxKeeper, bankKeeper, accountKeeper, ctx := GetKeepers(t)
 	tax.InitGenesis(ctx, *taxKeeper, genesisState)
-	taxKeeper.SetTaxInfo(ctx, genesisState)
+	taxKeeper.SetTaxInfoKeep(ctx, &genesisState)
 
 	return taxKeeper, bankKeeper, accountKeeper, ctx
 }

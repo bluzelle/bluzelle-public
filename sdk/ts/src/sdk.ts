@@ -13,10 +13,15 @@ import {
     QueryClientImpl as FaucetQueryClientImpl
 } from './generated/bluzelle/curium/bluzelle.curium.faucet/module/types/faucet/query'
 
+import {
+    QueryClientImpl as TaxQueryClientImpl
+} from './generated/bluzelle/curium/bluzelle.curium.tax/module/types/tax/query'
+
 type QueryClientImpl = {
     storage: StorageQueryClientImpl;
     bank: BankQueryClientImpl;
     faucet: FaucetQueryClientImpl;
+    tax: TaxQueryClientImpl;
 }
 
 export interface BluzelleConfig {
@@ -59,7 +64,8 @@ const getRpcClient = (url: string): Promise<QueryClientImpl> =>
         .then(rpcClient => Promise.resolve({
             storage: new StorageQueryClientImpl(rpcClient),
             bank: new BankQueryClientImpl(rpcClient),
-            faucet: new FaucetQueryClientImpl(rpcClient)
+            faucet: new FaucetQueryClientImpl(rpcClient),
+            tax: new TaxQueryClientImpl(rpcClient)
         }));
 
 export class SigningBluzelleClient extends SigningStargateClient {

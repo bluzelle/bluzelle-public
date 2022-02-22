@@ -2,6 +2,7 @@
 
 import BluzelleCuriumBluzelleCuriumFaucet from './bluzelle/curium/bluzelle.curium.faucet'
 import BluzelleCuriumBluzelleCuriumStorage from './bluzelle/curium/bluzelle.curium.storage'
+import BluzelleCuriumBluzelleCuriumTax from './bluzelle/curium/bluzelle.curium.tax'
 import CosmosCosmosSdkCosmosAuthzV1Beta1 from './cosmos/cosmos-sdk/cosmos.authz.v1beta1'
 import CosmosCosmosSdkCosmosBankV1Beta1 from './cosmos/cosmos-sdk/cosmos.bank.v1beta1'
 import CosmosCosmosSdkCosmosCrisisV1Beta1 from './cosmos/cosmos-sdk/cosmos.crisis.v1beta1'
@@ -18,6 +19,7 @@ import CosmosIbcGoIbcApplicationsTransferV1 from './cosmos/ibc-go/ibc.applicatio
 export default { 
   BluzelleCuriumBluzelleCuriumFaucet: load(BluzelleCuriumBluzelleCuriumFaucet, 'bluzelle.curium.faucet'),
   BluzelleCuriumBluzelleCuriumStorage: load(BluzelleCuriumBluzelleCuriumStorage, 'bluzelle.curium.storage'),
+  BluzelleCuriumBluzelleCuriumTax: load(BluzelleCuriumBluzelleCuriumTax, 'bluzelle.curium.tax'),
   CosmosCosmosSdkCosmosAuthzV1Beta1: load(CosmosCosmosSdkCosmosAuthzV1Beta1, 'cosmos.authz.v1beta1'),
   CosmosCosmosSdkCosmosBankV1Beta1: load(CosmosCosmosSdkCosmosBankV1Beta1, 'cosmos.bank.v1beta1'),
   CosmosCosmosSdkCosmosCrisisV1Beta1: load(CosmosCosmosSdkCosmosCrisisV1Beta1, 'cosmos.crisis.v1beta1'),

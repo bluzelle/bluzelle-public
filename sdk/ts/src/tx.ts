@@ -6,6 +6,13 @@ import {Left, Right, Some} from "monet";
 import {passThrough} from "promise-passthrough";
 import {identity} from "lodash";
 import {BroadcastTxResponse} from "@cosmjs/stargate/build/stargateclient";
+import {MsgSend} from "./generated/cosmos/cosmos-sdk/cosmos.bank.v1beta1/module/types/cosmos/bank/v1beta1/tx";
+import {Coin} from "./generated/cosmos/cosmos-sdk/cosmos.bank.v1beta1/module/types/cosmos/base/v1beta1/coin";
+import {
+    MsgSetGasTaxBp,
+    MsgSetTaxCollector,
+    MsgSetTransferTaxBp
+} from "./generated/bluzelle/curium/bluzelle.curium.tax/module/types/tax/tx";
 
 interface MsgQueueItem<T> {
     msg: EncodeObject;
@@ -46,6 +53,10 @@ const endTransaction = (queue: MsgQueue, client: BluzelleClient) => {
 
 export const registerMessages = (registry: Registry) => {
     registry.register('/bluzelle.curium.storage.MsgPin', MsgPin);
+    registry.register('/cosmos.bank.v1beta1.MsgSend', MsgSend)
+    registry.register('/bluzelle.curium.tax.MsgSetGasTaxBp', MsgSetGasTaxBp)
+    registry.register('/bluzelle.curium.tax.MsgSetTransferTaxBp', MsgSetTransferTaxBp)
+    registry.register('/bluzelle.curium.tax.MsgSetTaxCollector', MsgSetTaxCollector)
     return registry
 }
 
@@ -63,13 +74,24 @@ const queueMessage = (msg: EncodeObject, options: BroadcastOptions) =>
 
 
 export const pinCid = (client: BluzelleClient, cid: string, options: BroadcastOptions) =>
-    sendTx(client, 'storage.MsgPin', {cid, creator: client.address}, options);
+    sendTx(client, '/bluzelle.curium.storage.MsgPin', {cid, creator: client.address}, options);
 
+export const send = (client: BluzelleClient, toAddress: string, amount: Coin[], options: BroadcastOptions) =>
+    sendTx(client, '/cosmos.bank.v1beta1.MsgSend', {toAddress, amount, fromAddress: client.address}, options);
+
+export const setGasTaxBp = (client: BluzelleClient, bp: number, options: BroadcastOptions) =>
+    sendTx(client, '/bluzelle.curium.tax.MsgSetGasTaxBp', {bp, creator: client.address}, options)
+
+export const setTransferTaxBp = (client: BluzelleClient, bp: number, options: BroadcastOptions) =>
+    sendTx(client, '/bluzelle.curium.tax.MsgSetTransferTaxBp', {bp, creator: client.address}, options)
+
+export const setTaxCollector = (client: BluzelleClient, taxCollector: string, options: BroadcastOptions) =>
+    sendTx(client, '/bluzelle.curium.tax.MsgSetTaxCollector', {taxCollector, creator: client.address}, options)
 
 const sendTx = <T>(client: BluzelleClient, type: string, msg: T, options: BroadcastOptions) =>
     Right(msg)
         .map(msg => ({
-            typeUrl: `/bluzelle.curium.${type}`,
+            typeUrl: type,
             value: msg
         } as EncodeObject))
         .bind(msg => msgQueue ? Left(msg) : Right(msg))
@@ -78,14 +100,17 @@ const sendTx = <T>(client: BluzelleClient, type: string, msg: T, options: Broadc
         .cata(identity, identity);
 
 const broadcastTx = <T>(client: BluzelleClient, msgs: EncodeObject[], options: BroadcastOptions): Promise<BroadcastTxResponse> =>
-        client.sgClient.signAndBroadcast(
-            client.address,
-            msgs,
-            {
-                gas: options.maxGas.toFixed(0), amount: [{
-                    denom: 'ubnt',
-                    amount: (options.gasPrice * options.maxGas).toFixed(0)
-                }]
-            },
-            options.memo,
-        ).then(response => ({...response, rawLog: JSON.parse(response.rawLog || '[]')}))
+    client.sgClient.signAndBroadcast(
+        client.address,
+        msgs,
+        {
+            gas: options.maxGas.toFixed(0), amount: [{
+                denom: 'ubnt',
+                amount: (options.gasPrice * options.maxGas).toFixed(0)
+            }]
+        },
+        options.memo)
+        .then(response => ({
+            ...response,
+            rawLog: typeof response.rawLog === "string" ? response.rawLog : JSON.parse(response.rawLog || '[]')
+        }))

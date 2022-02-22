@@ -15,3 +15,10 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 }
 
 var _ types.MsgServer = msgServer{}
+
+func isAdmin(creator string) bool {
+	if creator == types.AdminAddress {
+		return true
+	}
+	return false
+}

@@ -9,7 +9,6 @@ import (
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	bankKeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	paramTypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	gogotypes "github.com/gogo/protobuf/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
 
@@ -52,65 +51,7 @@ func (k Keeper) GetCodec() codec.BinaryCodec {
 	return k.cdc
 }
 
-func (k Keeper) GetTaxCollector(ctx sdk.Context) (sdk.AccAddress, error) {
-	store := k.GetKVStore(ctx)
-	var collector sdk.AccAddress
-	bz := store.Get([]byte(taxTypes.KeyTaxCollector))
-	err := collector.Unmarshal(bz)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, err.Error())
-	}
-	return collector, nil
-}
-
-func (k Keeper) SetTaxCollector(ctx sdk.Context, address string) (sdk.AccAddress, error) {
-	store := k.GetKVStore(ctx)
-
-	bz, err := sdk.GetFromBech32(address, taxTypes.AccountAddressPrefix)
-	if err != nil {
-		return nil, err
-	}
-
-	err = sdk.VerifyAddressFormat(bz)
-	if err != nil {
-		return nil, err
-	}
-
-	addr := sdk.AccAddress(bz)
-	store.Set([]byte(taxTypes.KeyTaxCollector), addr)
-
-	return addr, nil
-}
-
-func (k Keeper) GetGasTaxBp(ctx sdk.Context) gogotypes.Int64Value {
-	store := k.GetKVStore(ctx)
-	var bp gogotypes.Int64Value
-	bz := store.Get([]byte(taxTypes.KeyGasTaxBp))
-	k.cdc.MustUnmarshal(bz, &bp)
-	return bp
-}
-
-func (k Keeper) SetGasTaxBp(ctx sdk.Context, gasTaxBp int64) {
-	store := k.GetKVStore(ctx)
-	bz := k.GetCodec().MustMarshal(&gogotypes.Int64Value{Value: gasTaxBp})
-	store.Set([]byte(taxTypes.KeyGasTaxBp), bz)
-}
-
-func (k Keeper) GetTransferTaxBp(ctx sdk.Context) gogotypes.Int64Value {
-	store := k.GetKVStore(ctx)
-	var bp gogotypes.Int64Value
-	bz := store.Get([]byte(taxTypes.KeyTransferTaxBp))
-	k.cdc.MustUnmarshal(bz, &bp)
-	return bp
-}
-
-func (k Keeper) SetTransferTaxBp(ctx sdk.Context, transferTaxBp int64) {
-	store := k.GetKVStore(ctx)
-	bz := k.GetCodec().MustMarshal(&gogotypes.Int64Value{Value: transferTaxBp})
-	store.Set([]byte(taxTypes.KeyTransferTaxBp), bz)
-}
-
-func (k Keeper) GetTaxInfo(ctx sdk.Context) (taxTypes.GenesisState, error) {
+func (k Keeper) GetTaxInfoKeep(ctx sdk.Context) (taxTypes.GenesisState, error) {
 	store := k.GetKVStore(ctx)
 	var info taxTypes.GenesisState
 	bz := store.Get([]byte(taxTypes.KeyTaxInfo))
@@ -118,9 +59,24 @@ func (k Keeper) GetTaxInfo(ctx sdk.Context) (taxTypes.GenesisState, error) {
 	return info, err
 }
 
+func (k Keeper) SetTaxInfoKeep(ctx sdk.Context, info *taxTypes.GenesisState) error {
+	store := k.GetKVStore(ctx)
+
+	bz, err := info.Marshal()
+	if err != nil {
+		return err
+	}
+	store.Set([]byte(taxTypes.KeyTaxInfo), bz)
+	return err
+}
+
 func (k Keeper) ChargeGasTax(ctx sdk.Context, sender sdk.AccAddress, gasFee sdk.Coins) error {
 	gasTaxes := k.calculateGasTax(ctx, gasFee)
-	taxCollector, err := k.GetTaxCollector(ctx)
+	info, err := k.GetTaxInfoKeep(ctx)
+	if err != nil {
+		return err
+	}
+	taxCollector, err := sdk.AccAddressFromBech32(info.TaxCollector)
 	if err != nil {
 		return err
 	}
@@ -140,5 +96,9 @@ func (k Keeper) ChargeGasTax(ctx sdk.Context, sender sdk.AccAddress, gasFee sdk.
 }
 
 func (k Keeper) calculateGasTax(ctx sdk.Context, gasFee sdk.Coins) sdk.Coins {
-	return sdk.NewCoins(sdk.NewInt64Coin(taxTypes.Denom, gasFee.AmountOf(taxTypes.Denom).Int64()*k.GetGasTaxBp(ctx).Value/10000))
+	info, err := k.GetTaxInfoKeep(ctx)
+	if err != nil {
+		return sdk.NewCoins(sdk.NewInt64Coin(taxTypes.Denom, 0))
+	}
+	return sdk.NewCoins(sdk.NewInt64Coin(taxTypes.Denom, gasFee.AmountOf(taxTypes.Denom).Int64()*info.GasTaxBp/10000))
 }

@@ -12,7 +12,7 @@ func TestGenesisState_Validate(t *testing.T) {
 		gs := taxTypes.GenesisState{
 			GasTaxBp:      -1,
 			TransferTaxBp: 0,
-			TaxCollector:  taxTypes.TaxCollector,
+			TaxCollector:  "",
 		}
 		err := gs.Validate()
 		require.NotNil(t, err)
@@ -22,7 +22,7 @@ func TestGenesisState_Validate(t *testing.T) {
 		gs := taxTypes.GenesisState{
 			GasTaxBp:      10,
 			TransferTaxBp: -1,
-			TaxCollector:  taxTypes.TaxCollector,
+			TaxCollector:  "bluzelle197xx52k9tw08e7h0jqahptwucyv3e6pxex3xfe",
 		}
 		err := gs.Validate()
 		require.NotNil(t, err)
@@ -52,7 +52,7 @@ func TestGenesisState_Validate(t *testing.T) {
 		gs := taxTypes.GenesisState{
 			GasTaxBp:      10,
 			TransferTaxBp: 10,
-			TaxCollector:  taxTypes.TaxCollector + "random",
+			TaxCollector:  "bluzelle197xx52k9tw08e7h0jqahptwucyv3e6pxex3xfe" + "random",
 		}
 		gs2 := taxTypes.GenesisState{
 			GasTaxBp:      10,
@@ -69,7 +69,7 @@ func TestGenesisState_Validate(t *testing.T) {
 		gs := taxTypes.GenesisState{
 			GasTaxBp:      10,
 			TransferTaxBp: 10,
-			TaxCollector:  taxTypes.TaxCollector,
+			TaxCollector:  "bluzelle197xx52k9tw08e7h0jqahptwucyv3e6pxex3xfe",
 		}
 		err := gs.Validate()
 		require.Nil(t, err)

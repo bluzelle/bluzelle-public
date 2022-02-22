@@ -10,14 +10,16 @@ import (
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// this line is used by starport scaffolding # genesis/module/init
-	k.SetGasTaxBp(ctx, genState.GetGasTaxBp())
-	k.SetTransferTaxBp(ctx, genState.GetTransferTaxBp())
-	k.SetTaxCollector(ctx, genState.GetTaxCollector())
+	k.SetTaxInfoKeep(ctx, &types.GenesisState{
+		GasTaxBp:      genState.GasTaxBp,
+		TransferTaxBp: genState.TransferTaxBp,
+		TaxCollector:  genState.TaxCollector,
+	})
 }
 
 // ExportGenesis returns the capability module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	info, err := k.GetTaxInfo(ctx)
+	info, err := k.GetTaxInfoKeep(ctx)
 	if err != nil {
 		panic("Invalid tax genesis info")
 	}

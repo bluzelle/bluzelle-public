@@ -69,7 +69,7 @@ func TestGasMeterKeeper(t *testing.T) {
 			require.Contains(t, gasMeterKeeper.GetAllGasMeters(), gasMeter3)
 		})
 
-		t.Run("should contain no gas meters is the gas meter keeper is cleared", func(t *testing.T) {
+		t.Run("should contain no gas meters when the gas meter keeper is cleared", func(t *testing.T) {
 			gasMeter := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, taxKeeper, 0, addr, decCoins)
 			gasMeterKeeper := gasmeter.NewGasMeterKeeper()
 			gasMeterKeeper.AddGasMeter(gasMeter)

@@ -7,7 +7,34 @@ option go_package = "github.com/bluzelle/curium/x/tax/types";
 
 // Msg defines the Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
+  rpc SetGasTaxBp(MsgSetGasTaxBp) returns (MsgSetGasTaxBpResponse);
+  rpc SetTransferTaxBp(MsgSetTransferTaxBp) returns (MsgSetTransferTaxBpResponse);
+  rpc SetTaxCollector(MsgSetTaxCollector) returns (MsgSetTaxCollectorResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
+}
+
+message MsgSetGasTaxBp {
+  string creator = 1;
+  int64 bp = 2;
+}
+
+message MsgSetGasTaxBpResponse {
+}
+
+message MsgSetTransferTaxBp {
+  string creator = 1;
+  int64 bp = 2;
+}
+
+message MsgSetTransferTaxBpResponse {
+}
+
+message MsgSetTaxCollector {
+  string creator = 1;
+  string taxCollector = 2;
+}
+
+message MsgSetTaxCollectorResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

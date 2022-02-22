@@ -1,6 +1,7 @@
 package ante
 
 import (
+	"fmt"
 	appTypes "github.com/bluzelle/curium/app/types"
 	taxmodulekeeper "github.com/bluzelle/curium/x/tax/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -48,34 +49,39 @@ func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 	return next(ctx, tx, simulate)
 }
 
+func forSendMessagesOnly(msgs []sdk.Msg, fn func(msg sdk.Msg)) {
+	for _, msg := range msgs {
+		if sdk.MsgTypeURL(msg) == sdk.MsgTypeURL(&banktypes.MsgSend{}) {
+			fn(msg)
+		}
+	}
+}
+
 func handleTx(ctx sdk.Context, td TaxDecorator, tx FeeTx) error {
 	msgs := tx.GetMsgs()
 
-	for _, msg := range msgs {
-		transferTaxes := calculateTransferTaxes(ctx, td, msg)
+	forSendMessagesOnly(msgs, func(msg sdk.Msg) {
+		transferTaxes := calculateTaxesForSendMsg(ctx, td, msg)
 		err := chargeTransactionTaxes(ctx, td, transferTaxes, tx)
 		if err != nil {
-			return err
+			fmt.Println("ERROR: Can not charge tax")
 		}
-	}
+	})
+
 	return nil
 }
 
-func calculateTransferTaxes(ctx sdk.Context, td TaxDecorator, msg sdk.Msg) sdk.Coins {
-	switch sdk.MsgTypeURL(msg) {
-	case sdk.MsgTypeURL(&banktypes.MsgSend{}):
-		return calculateTaxesForSendMsg(ctx, td, msg)
-	default:
+func calculateTaxesForSendMsg(ctx sdk.Context, td TaxDecorator, msg sdk.Msg) sdk.Coins {
+	info, err := td.taxKeeper.GetTaxInfoKeep(ctx)
+	if err != nil {
 		return sdk.Coins{}
 	}
-}
 
-func calculateTaxesForSendMsg(ctx sdk.Context, td TaxDecorator, msg sdk.Msg) sdk.Coins {
-	transferTaxBp := td.taxKeeper.GetTransferTaxBp(ctx)
+	transferTaxBp := info.TransferTaxBp
 	bankMsg := msg.(*banktypes.MsgSend)
 	transferTaxes := sdk.Coins{}
 	for _, coin := range bankMsg.Amount {
-		feeAmt := coin.Amount.Int64() * transferTaxBp.Value / 10_000
+		feeAmt := coin.Amount.Int64() * transferTaxBp / 10_000
 		if feeAmt > 0 {
 			transferTax := sdk.NewInt64Coin(appTypes.Denom, feeAmt)
 			transferTaxes = append(transferTaxes, transferTax)
@@ -92,7 +98,11 @@ func chargeTransactionTaxes(ctx sdk.Context, td TaxDecorator, transferTaxes sdk.
 	}
 
 	if len(transferTaxes) > 0 {
-		taxCollector, err := td.taxKeeper.GetTaxCollector(ctx)
+		info, err := td.taxKeeper.GetTaxInfoKeep(ctx)
+		if err != nil {
+			return err
+		}
+		taxCollector, err := sdk.AccAddressFromBech32(info.TaxCollector)
 		if err != nil {
 			return err
 		}
