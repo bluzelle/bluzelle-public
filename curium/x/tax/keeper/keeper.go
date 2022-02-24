@@ -71,29 +71,9 @@ func (k Keeper) SetTaxInfoKeep(ctx sdk.Context, info *taxTypes.GenesisState) err
 	return err
 }
 
-func (k Keeper) ChargeGasTax(ctx sdk.Context, sender sdk.AccAddress, gasFee sdk.Coins) error {
+func (k Keeper) ChargeGasTax(ctx sdk.Context, taxPayer sdk.AccAddress, gasFee sdk.Coins) error {
 	gasTaxes := k.calculateGasTax(ctx, gasFee)
-	if !gasTaxes.IsZero() {
-		info, err := k.GetTaxInfoKeep(ctx)
-		if err != nil {
-			return err
-		}
-		taxCollector, err := sdk.AccAddressFromBech32(info.TaxCollector)
-		if err != nil {
-			return err
-		}
-		err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, sender, taxTypes.ModuleName, gasTaxes)
-		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
-		}
-
-		err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx, taxTypes.ModuleName, taxCollector, gasTaxes)
-		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
-		}
-	}
-
-	return nil
+	return k.chargeTax(ctx, taxPayer, gasTaxes)
 }
 
 func (k Keeper) calculateGasTax(ctx sdk.Context, gasFee sdk.Coins) sdk.Coins {
@@ -110,28 +90,7 @@ func (k Keeper) ChargeTransferTax(ctx sdk.Context, taxPayer sdk.AccAddress, msg 
 		return sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "fee payer address: %s does not exist", taxPayer)
 	}
 	transferTaxes := k.calculateTransferTax(ctx, msg)
-	if !transferTaxes.IsZero() {
-		info, err := k.GetTaxInfoKeep(ctx)
-		if err != nil {
-			return err
-		}
-		taxCollector, err := sdk.AccAddressFromBech32(info.TaxCollector)
-		if err != nil {
-			return err
-		}
-
-		err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, taxPayer, taxTypes.ModuleName, transferTaxes)
-		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
-		}
-
-		err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx, taxTypes.ModuleName, taxCollector, transferTaxes)
-		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
-		}
-	}
-
-	return nil
+	return k.chargeTax(ctx, taxPayer, transferTaxes)
 }
 
 func (k Keeper) calculateTransferTax(ctx sdk.Context, msg sdk.Msg) sdk.Coins {
@@ -150,4 +109,29 @@ func (k Keeper) calculateTransferTax(ctx sdk.Context, msg sdk.Msg) sdk.Coins {
 		}
 	}
 	return transferTaxes
+}
+
+func (k Keeper) chargeTax(ctx sdk.Context, taxPayer sdk.AccAddress, taxes sdk.Coins) error {
+	if !taxes.IsZero() {
+		info, err := k.GetTaxInfoKeep(ctx)
+		if err != nil {
+			return err
+		}
+		taxCollector, err := sdk.AccAddressFromBech32(info.TaxCollector)
+		if err != nil {
+			return err
+		}
+
+		err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, taxPayer, taxTypes.ModuleName, taxes)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+		}
+
+		err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx, taxTypes.ModuleName, taxCollector, taxes)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+		}
+	}
+
+	return nil
 }
