@@ -76,8 +76,8 @@ const queueMessage = (msg: EncodeObject, options: BroadcastOptions) =>
 export const pinCid = (client: BluzelleClient, cid: string, options: BroadcastOptions) =>
     sendTx(client, '/bluzelle.curium.storage.MsgPin', {cid, creator: client.address}, options);
 
-export const send = (client: BluzelleClient, toAddress: string, amount: Coin[], options: BroadcastOptions) =>
-    sendTx(client, '/cosmos.bank.v1beta1.MsgSend', {toAddress, amount, fromAddress: client.address}, options);
+export const send = (client: BluzelleClient, toAddress: string, amount: number, options: BroadcastOptions) =>
+    sendTx(client, '/cosmos.bank.v1beta1.MsgSend', {toAddress, amount: [{denom: 'ubnt', amount: amount.toString()}], fromAddress: client.address} as MsgSend, options);
 
 export const setGasTaxBp = (client: BluzelleClient, bp: number, options: BroadcastOptions) =>
     sendTx(client, '/bluzelle.curium.tax.MsgSetGasTaxBp', {bp, creator: client.address}, options)
