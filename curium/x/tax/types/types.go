@@ -6,7 +6,6 @@ const (
 	AccountAddressPrefix = "bluzelle"
 	Denom                = "ubnt"
 	KeyTaxInfo           = "taxinfo"
-	AdminAddress         = "bluzelle1dvc2u4l84hyfeem5fmfm9eyjlndpsycwwfhtln"
 )
 
 type TaxInfo struct {
