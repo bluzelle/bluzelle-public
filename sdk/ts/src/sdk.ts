@@ -34,6 +34,7 @@ export interface BluzelleClient {
     address: string;
     sgClient: SigningStargateClient;
     queryClient: QueryClientImpl;
+    tmClient: Tendermint34Client;
 }
 
 
@@ -45,12 +46,14 @@ export const newBluzelleClient = (config: { wallet: () => Promise<BluzelleWallet
                     getRpcClient(config.url),
                     sgClient,
                     wallet.getAccounts().then(acc => acc[0].address),
+                    Tendermint34Client.connect(config.url)
                 ])))
-        .then(([queryClient, sgClient, address]) => ({
+        .then(([queryClient, sgClient, address, tmClient]) => ({
             url: config.url,
             queryClient,
             sgClient,
             address,
+            tmClient
         }));
 
 const getRpcClient = (url: string): Promise<QueryClientImpl> =>

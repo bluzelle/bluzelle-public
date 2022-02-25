@@ -4,15 +4,15 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, OfflineSigner, EncodeObject, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
-import { MsgSetTaxCollector } from "./types/tax/tx";
 import { MsgSetGasTaxBp } from "./types/tax/tx";
 import { MsgSetTransferTaxBp } from "./types/tax/tx";
+import { MsgSetTaxCollector } from "./types/tax/tx";
 
 
 const types = [
-  ["/bluzelle.curium.tax.MsgSetTaxCollector", MsgSetTaxCollector],
   ["/bluzelle.curium.tax.MsgSetGasTaxBp", MsgSetGasTaxBp],
   ["/bluzelle.curium.tax.MsgSetTransferTaxBp", MsgSetTransferTaxBp],
+  ["/bluzelle.curium.tax.MsgSetTaxCollector", MsgSetTaxCollector],
   
 ];
 export const MissingWalletError = new Error("wallet is required");
@@ -45,9 +45,9 @@ const txClient = async (wallet: OfflineSigner, { addr: addr }: TxClientOptions =
 
   return {
     signAndBroadcast: (msgs: EncodeObject[], { fee, memo }: SignAndBroadcastOptions = {fee: defaultFee, memo: ""}) => client.signAndBroadcast(address, msgs, fee,memo),
-    msgSetTaxCollector: (data: MsgSetTaxCollector): EncodeObject => ({ typeUrl: "/bluzelle.curium.tax.MsgSetTaxCollector", value: MsgSetTaxCollector.fromPartial( data ) }),
     msgSetGasTaxBp: (data: MsgSetGasTaxBp): EncodeObject => ({ typeUrl: "/bluzelle.curium.tax.MsgSetGasTaxBp", value: MsgSetGasTaxBp.fromPartial( data ) }),
     msgSetTransferTaxBp: (data: MsgSetTransferTaxBp): EncodeObject => ({ typeUrl: "/bluzelle.curium.tax.MsgSetTransferTaxBp", value: MsgSetTransferTaxBp.fromPartial( data ) }),
+    msgSetTaxCollector: (data: MsgSetTaxCollector): EncodeObject => ({ typeUrl: "/bluzelle.curium.tax.MsgSetTaxCollector", value: MsgSetTaxCollector.fromPartial( data ) }),
     
   };
 };

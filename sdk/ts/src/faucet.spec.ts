@@ -1,5 +1,3 @@
-import {newBluzelleClient} from "./sdk";
-import {newLocalWallet} from "./wallets/localWallet";
 import {startSwarmWithClient} from "@bluzelle/testing/src/swarmUtils";
 import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {expect} from "chai";
