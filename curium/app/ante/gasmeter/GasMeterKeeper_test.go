@@ -2,7 +2,7 @@ package gasmeter_test
 
 import (
 	"github.com/bluzelle/curium/app/ante/gasmeter"
-	appTypes "github.com/bluzelle/curium/app/types"
+	"github.com/bluzelle/curium/app/types/global"
 	taxmodulekeeper "github.com/bluzelle/curium/x/tax/keeper"
 	taxmoduletypes "github.com/bluzelle/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -25,7 +25,7 @@ func TestGasMeterKeeper(t *testing.T) {
 		app.GetSubspace(banktypes.ModuleName),
 		app.ModuleAccountAddrs())
 	_, _, addr := testdata.KeyTestPubAddr()
-	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(appTypes.Denom, sdk.NewInt(2)))
+	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdk.NewInt(2)))
 
 	taxKeeper := *taxmodulekeeper.NewKeeper(
 		app.AppCodec(),

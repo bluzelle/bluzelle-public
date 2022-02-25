@@ -4,7 +4,6 @@ import (
 	appAnte "github.com/bluzelle/curium/app/ante"
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/curium/app/types"
-	"github.com/bluzelle/curium/app/types/global"
 	"github.com/bluzelle/curium/x/curium"
 	curiumipfs "github.com/bluzelle/curium/x/storage-ipfs/ipfs"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -370,7 +369,7 @@ func New(
 		&stakingKeeper, govRouter,
 	)
 
-	app.GasMeterKeeper = global.GasMeterKeeper
+	app.GasMeterKeeper = gasmeter.NewGasMeterKeeper()
 
 	app.CuriumKeeper = *curiummodulekeeper.NewKeeper(
 		appCodec,
@@ -518,6 +517,7 @@ func New(
 			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 			FeegrantKeeper:  app.FeeGrantKeeper,
 			SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+			GasMeterKeeper:  app.GasMeterKeeper,
 		},
 	)
 	if err != nil {

@@ -18,11 +18,10 @@ func NewAnteHandler(options appTypes.AnteHandlerOptions) (sdk.AnteHandler, error
 		sigGasConsumer = ante.DefaultSigVerificationGasConsumer
 	}
 
-	gasMeterKeeper := global.GasMeterKeeper
-	minGasPriceCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(appTypes.Denom, sdk.NewInt(1)))
+	minGasPriceCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdk.NewInt(1)))
 
 	anteDecorators := []sdk.AnteDecorator{
-		NewSetUpContextDecorator(gasMeterKeeper, options.BankKeeper, options.AccountKeeper, options.TaxKeeper, minGasPriceCoins), // outermost AnteDecorator. SetUpContext must be called first
+		NewSetUpContextDecorator(options.GasMeterKeeper, options.BankKeeper, options.AccountKeeper, options.TaxKeeper, minGasPriceCoins), // outermost AnteDecorator. SetUpContext must be called first
 		ante.NewRejectExtensionOptionsDecorator(),
 		ante.NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),

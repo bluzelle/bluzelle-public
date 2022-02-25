@@ -4,6 +4,7 @@ import (
 	"github.com/bluzelle/curium/app/ante"
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/curium/app/types"
+	"github.com/bluzelle/curium/app/types/global"
 	testutilante "github.com/bluzelle/curium/testutil/ante"
 	testutil "github.com/bluzelle/curium/testutil/simapp"
 	"github.com/bluzelle/curium/testutil/tx"
@@ -28,7 +29,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 	txBuilder.SetGasLimit(20)
 
 	_, _, addr := testdata.KeyTestPubAddr()
-	minGasPriceCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(appTypes.Denom, sdk.NewInt(1)))
+	minGasPriceCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdk.NewInt(1)))
 	gasMeterKeeper := gasmeter.NewGasMeterKeeper()
 
 	t.Run("NewSetUpContextDecorator should return a SetUpContextDecorator", func(t *testing.T) {
@@ -106,7 +107,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				bankKeeper,
 				accountKeeper)
 
-			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(appTypes.Denom, 20))
+			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(global.Denom, 20))
 			txBuilder.SetFeeAmount(feeAmount)
 			txBuilder.SetFeePayer(addr)
 			newTx := txBuilder.GetTx()
@@ -138,7 +139,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				app.GetSubspace(banktypes.ModuleName),
 				app.ModuleAccountAddrs())
 
-			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(appTypes.Denom, 19))
+			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(global.Denom, 19))
 			txBuilder.SetFeeAmount(feeAmount)
 			txBuilder.SetFeePayer(addr)
 			newTx := txBuilder.GetTx()
@@ -188,7 +189,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				accountKeeper)
 			setUpContextDecorator := ante.NewSetUpContextDecorator(gasMeterKeeper, bankKeeper, accountKeeper, *taxKeeper, minGasPriceCoins)
 
-			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(appTypes.Denom, 20))
+			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(global.Denom, 20))
 			txBuilder.SetFeeAmount(feeAmount)
 			txBuilder.SetFeePayer(addr)
 			newTx := txBuilder.GetTx()

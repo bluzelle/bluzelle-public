@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bluzelle/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/curium/app/types"
+	"github.com/bluzelle/curium/app/types/global"
 	taxmodulekeeper "github.com/bluzelle/curium/x/tax/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -115,15 +116,15 @@ func SetGasMeter(options SetGasMeterOptions) (sdk.Context, error) {
 	maxGas := feeTx.GetGas()
 
 	maxGasInt := sdk.NewIntFromUint64(maxGas).ToDec()
-	feeInt := feeTx.GetFee().AmountOf(appTypes.Denom).ToDec()
+	feeInt := feeTx.GetFee().AmountOf(global.Denom).ToDec()
 
 	gasPrice := feeInt.Quo(maxGasInt)
-	gasPriceCoin := sdk.NewDecCoinFromDec(appTypes.Denom, gasPrice)
+	gasPriceCoin := sdk.NewDecCoinFromDec(global.Denom, gasPrice)
 	gasPriceCoins := sdk.NewDecCoins(gasPriceCoin)
 
 	feePayer := feeTx.FeePayer()
 
-	if gasPriceCoins.AmountOf(appTypes.Denom).LT(options.MinGasPriceCoins.AmountOf(appTypes.Denom)) {
+	if gasPriceCoins.AmountOf(global.Denom).LT(options.MinGasPriceCoins.AmountOf(global.Denom)) {
 		return options.Ctx, sdkerrors.New(appTypes.Name, 2, appTypes.ErrLowGasPrice)
 	}
 

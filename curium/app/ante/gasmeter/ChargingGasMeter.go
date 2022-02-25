@@ -2,7 +2,7 @@ package gasmeter
 
 import (
 	"fmt"
-	appTypes "github.com/bluzelle/curium/app/types"
+	"github.com/bluzelle/curium/app/types/global"
 	taxmodulekeeper "github.com/bluzelle/curium/x/tax/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -127,10 +127,10 @@ func calculateGasFee(gm *ChargingGasMeter) sdk.Coins {
 
 	gasPrice := gm.gasPrice
 
-	gasPriceAmount := gasPrice.AmountOf(appTypes.Denom)
+	gasPriceAmount := gasPrice.AmountOf(global.Denom)
 
 	gasConsumed := gm.GasConsumed()
 
 	gasFee := gasPriceAmount.MulInt64(int64(gasConsumed)).RoundInt64()
-	return sdk.NewCoins(sdk.NewCoin(appTypes.Denom, sdk.NewInt(gasFee)))
+	return sdk.NewCoins(sdk.NewCoin(global.Denom, sdk.NewInt(gasFee)))
 }

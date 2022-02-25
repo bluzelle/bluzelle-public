@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/bluzelle/curium/app/ante/gasmeter"
 	taxmodulekeeper "github.com/bluzelle/curium/x/tax/keeper"
 	"github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,7 +16,6 @@ import (
 const (
 	AccountAddressPrefix = "bluzelle"
 	Name                 = "curium"
-	Denom                = "ubnt"
 	ErrLowGasPrice       = "Specified gas price too low"
 	ErrGasTxParseError   = "Tx must be GasTx"
 	CoinType             = 483
@@ -34,4 +34,5 @@ type AnteHandlerOptions struct {
 	TaxKeeper       taxmodulekeeper.Keeper
 	SignModeHandler authsigning.SignModeHandler
 	SigGasConsumer  func(meter types.GasMeter, sig signing.SignatureV2, params auth.Params) error
+	GasMeterKeeper  *gasmeter.Keeper
 }
