@@ -1,4 +1,6 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
+// @ts-ignore
+import { SpVuexError } from '@starport/vuex'
 
 
 
@@ -106,7 +108,7 @@ export default {
 					const sub=JSON.parse(subscription)
 					await dispatch(sub.action, sub.payload)
 				}catch(e) {
-					throw new Error('Subscriptions: ' + e.message)
+					throw new SpVuexError('Subscriptions: ' + e.message)
 				}
 			})
 		},
@@ -127,27 +129,12 @@ export default {
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryGetTaxInfo', payload: { options: { all }, params: {...key},query }})
 				return getters['getGetTaxInfo']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryGetTaxInfo API Node Unavailable. Could not perform query: ' + e.message)
+				throw new SpVuexError('QueryClient:QueryGetTaxInfo', 'API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
 		
 		
-		async sendMsgSetTaxCollector({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSetTaxCollector(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSetTaxCollector:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgSetTaxCollector:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		async sendMsgSetGasTaxBp({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -157,9 +144,24 @@ export default {
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSetGasTaxBp:Init Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgSetGasTaxBp:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSetGasTaxBp:Send Could not broadcast Tx: '+ e.message)
+					throw new SpVuexError('TxClient:MsgSetGasTaxBp:Send', 'Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgSetTaxCollector({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgSetTaxCollector(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new SpVuexError('TxClient:MsgSetTaxCollector:Init', 'Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new SpVuexError('TxClient:MsgSetTaxCollector:Send', 'Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -172,26 +174,13 @@ export default {
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSetTransferTaxBp:Init Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgSetTransferTaxBp:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSetTransferTaxBp:Send Could not broadcast Tx: '+ e.message)
+					throw new SpVuexError('TxClient:MsgSetTransferTaxBp:Send', 'Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
 		
-		async MsgSetTaxCollector({ rootGetters }, { value }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSetTaxCollector(value)
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSetTaxCollector:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgSetTaxCollector:Create Could not create message: ' + e.message)
-				}
-			}
-		},
 		async MsgSetGasTaxBp({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -199,9 +188,24 @@ export default {
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSetGasTaxBp:Init Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgSetGasTaxBp:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSetGasTaxBp:Create Could not create message: ' + e.message)
+					throw new SpVuexError('TxClient:MsgSetGasTaxBp:Create', 'Could not create message: ' + e.message)
+					
+				}
+			}
+		},
+		async MsgSetTaxCollector({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgSetTaxCollector(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new SpVuexError('TxClient:MsgSetTaxCollector:Init', 'Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new SpVuexError('TxClient:MsgSetTaxCollector:Create', 'Could not create message: ' + e.message)
+					
 				}
 			}
 		},
@@ -212,9 +216,10 @@ export default {
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSetTransferTaxBp:Init Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgSetTransferTaxBp:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSetTransferTaxBp:Create Could not create message: ' + e.message)
+					throw new SpVuexError('TxClient:MsgSetTransferTaxBp:Create', 'Could not create message: ' + e.message)
+					
 				}
 			}
 		},

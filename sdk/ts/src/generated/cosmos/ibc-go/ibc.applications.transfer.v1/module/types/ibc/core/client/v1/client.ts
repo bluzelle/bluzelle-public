@@ -12,9 +12,9 @@ export const protobufPackage = "ibc.core.client.v1";
  */
 export interface IdentifiedClientState {
   /** client identifier */
-  client_id: string;
+  clientId: string;
   /** client state */
-  client_state: Any | undefined;
+  clientState: Any | undefined;
 }
 
 /**
@@ -25,7 +25,7 @@ export interface ConsensusStateWithHeight {
   /** consensus state height */
   height: Height | undefined;
   /** consensus state */
-  consensus_state: Any | undefined;
+  consensusState: Any | undefined;
 }
 
 /**
@@ -34,9 +34,9 @@ export interface ConsensusStateWithHeight {
  */
 export interface ClientConsensusStates {
   /** client identifier */
-  client_id: string;
+  clientId: string;
   /** consensus states and their heights associated with the client */
-  consensus_states: ConsensusStateWithHeight[];
+  consensusStates: ConsensusStateWithHeight[];
 }
 
 /**
@@ -51,12 +51,12 @@ export interface ClientUpdateProposal {
   /** the description of the proposal */
   description: string;
   /** the client identifier for the client to be updated if the proposal passes */
-  subject_client_id: string;
+  subjectClientId: string;
   /**
    * the substitute client identifier for the client standing in for the subject
    * client
    */
-  substitute_client_id: string;
+  substituteClientId: string;
 }
 
 /**
@@ -75,7 +75,7 @@ export interface UpgradeProposal {
    * of the chain. This will allow IBC connections to persist smoothly across
    * planned chain upgrades
    */
-  upgraded_client_state: Any | undefined;
+  upgradedClientState: Any | undefined;
 }
 
 /**
@@ -92,29 +92,29 @@ export interface UpgradeProposal {
  */
 export interface Height {
   /** the revision that the client is currently on */
-  revision_number: number;
+  revisionNumber: number;
   /** the height within the given revision */
-  revision_height: number;
+  revisionHeight: number;
 }
 
 /** Params defines the set of IBC light client parameters. */
 export interface Params {
   /** allowed_clients defines the list of allowed client state types. */
-  allowed_clients: string[];
+  allowedClients: string[];
 }
 
-const baseIdentifiedClientState: object = { client_id: "" };
+const baseIdentifiedClientState: object = { clientId: "" };
 
 export const IdentifiedClientState = {
   encode(
     message: IdentifiedClientState,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.client_id !== "") {
-      writer.uint32(10).string(message.client_id);
+    if (message.clientId !== "") {
+      writer.uint32(10).string(message.clientId);
     }
-    if (message.client_state !== undefined) {
-      Any.encode(message.client_state, writer.uint32(18).fork()).ldelim();
+    if (message.clientState !== undefined) {
+      Any.encode(message.clientState, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -127,10 +127,10 @@ export const IdentifiedClientState = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.client_id = reader.string();
+          message.clientId = reader.string();
           break;
         case 2:
-          message.client_state = Any.decode(reader, reader.uint32());
+          message.clientState = Any.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -142,25 +142,25 @@ export const IdentifiedClientState = {
 
   fromJSON(object: any): IdentifiedClientState {
     const message = { ...baseIdentifiedClientState } as IdentifiedClientState;
-    if (object.client_id !== undefined && object.client_id !== null) {
-      message.client_id = String(object.client_id);
+    if (object.clientId !== undefined && object.clientId !== null) {
+      message.clientId = String(object.clientId);
     } else {
-      message.client_id = "";
+      message.clientId = "";
     }
-    if (object.client_state !== undefined && object.client_state !== null) {
-      message.client_state = Any.fromJSON(object.client_state);
+    if (object.clientState !== undefined && object.clientState !== null) {
+      message.clientState = Any.fromJSON(object.clientState);
     } else {
-      message.client_state = undefined;
+      message.clientState = undefined;
     }
     return message;
   },
 
   toJSON(message: IdentifiedClientState): unknown {
     const obj: any = {};
-    message.client_id !== undefined && (obj.client_id = message.client_id);
-    message.client_state !== undefined &&
-      (obj.client_state = message.client_state
-        ? Any.toJSON(message.client_state)
+    message.clientId !== undefined && (obj.clientId = message.clientId);
+    message.clientState !== undefined &&
+      (obj.clientState = message.clientState
+        ? Any.toJSON(message.clientState)
         : undefined);
     return obj;
   },
@@ -169,15 +169,15 @@ export const IdentifiedClientState = {
     object: DeepPartial<IdentifiedClientState>
   ): IdentifiedClientState {
     const message = { ...baseIdentifiedClientState } as IdentifiedClientState;
-    if (object.client_id !== undefined && object.client_id !== null) {
-      message.client_id = object.client_id;
+    if (object.clientId !== undefined && object.clientId !== null) {
+      message.clientId = object.clientId;
     } else {
-      message.client_id = "";
+      message.clientId = "";
     }
-    if (object.client_state !== undefined && object.client_state !== null) {
-      message.client_state = Any.fromPartial(object.client_state);
+    if (object.clientState !== undefined && object.clientState !== null) {
+      message.clientState = Any.fromPartial(object.clientState);
     } else {
-      message.client_state = undefined;
+      message.clientState = undefined;
     }
     return message;
   },
@@ -193,8 +193,8 @@ export const ConsensusStateWithHeight = {
     if (message.height !== undefined) {
       Height.encode(message.height, writer.uint32(10).fork()).ldelim();
     }
-    if (message.consensus_state !== undefined) {
-      Any.encode(message.consensus_state, writer.uint32(18).fork()).ldelim();
+    if (message.consensusState !== undefined) {
+      Any.encode(message.consensusState, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -215,7 +215,7 @@ export const ConsensusStateWithHeight = {
           message.height = Height.decode(reader, reader.uint32());
           break;
         case 2:
-          message.consensus_state = Any.decode(reader, reader.uint32());
+          message.consensusState = Any.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -234,13 +234,10 @@ export const ConsensusStateWithHeight = {
     } else {
       message.height = undefined;
     }
-    if (
-      object.consensus_state !== undefined &&
-      object.consensus_state !== null
-    ) {
-      message.consensus_state = Any.fromJSON(object.consensus_state);
+    if (object.consensusState !== undefined && object.consensusState !== null) {
+      message.consensusState = Any.fromJSON(object.consensusState);
     } else {
-      message.consensus_state = undefined;
+      message.consensusState = undefined;
     }
     return message;
   },
@@ -249,9 +246,9 @@ export const ConsensusStateWithHeight = {
     const obj: any = {};
     message.height !== undefined &&
       (obj.height = message.height ? Height.toJSON(message.height) : undefined);
-    message.consensus_state !== undefined &&
-      (obj.consensus_state = message.consensus_state
-        ? Any.toJSON(message.consensus_state)
+    message.consensusState !== undefined &&
+      (obj.consensusState = message.consensusState
+        ? Any.toJSON(message.consensusState)
         : undefined);
     return obj;
   },
@@ -267,29 +264,26 @@ export const ConsensusStateWithHeight = {
     } else {
       message.height = undefined;
     }
-    if (
-      object.consensus_state !== undefined &&
-      object.consensus_state !== null
-    ) {
-      message.consensus_state = Any.fromPartial(object.consensus_state);
+    if (object.consensusState !== undefined && object.consensusState !== null) {
+      message.consensusState = Any.fromPartial(object.consensusState);
     } else {
-      message.consensus_state = undefined;
+      message.consensusState = undefined;
     }
     return message;
   },
 };
 
-const baseClientConsensusStates: object = { client_id: "" };
+const baseClientConsensusStates: object = { clientId: "" };
 
 export const ClientConsensusStates = {
   encode(
     message: ClientConsensusStates,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.client_id !== "") {
-      writer.uint32(10).string(message.client_id);
+    if (message.clientId !== "") {
+      writer.uint32(10).string(message.clientId);
     }
-    for (const v of message.consensus_states) {
+    for (const v of message.consensusStates) {
       ConsensusStateWithHeight.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
@@ -299,15 +293,15 @@ export const ClientConsensusStates = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseClientConsensusStates } as ClientConsensusStates;
-    message.consensus_states = [];
+    message.consensusStates = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.client_id = reader.string();
+          message.clientId = reader.string();
           break;
         case 2:
-          message.consensus_states.push(
+          message.consensusStates.push(
             ConsensusStateWithHeight.decode(reader, reader.uint32())
           );
           break;
@@ -321,18 +315,18 @@ export const ClientConsensusStates = {
 
   fromJSON(object: any): ClientConsensusStates {
     const message = { ...baseClientConsensusStates } as ClientConsensusStates;
-    message.consensus_states = [];
-    if (object.client_id !== undefined && object.client_id !== null) {
-      message.client_id = String(object.client_id);
+    message.consensusStates = [];
+    if (object.clientId !== undefined && object.clientId !== null) {
+      message.clientId = String(object.clientId);
     } else {
-      message.client_id = "";
+      message.clientId = "";
     }
     if (
-      object.consensus_states !== undefined &&
-      object.consensus_states !== null
+      object.consensusStates !== undefined &&
+      object.consensusStates !== null
     ) {
-      for (const e of object.consensus_states) {
-        message.consensus_states.push(ConsensusStateWithHeight.fromJSON(e));
+      for (const e of object.consensusStates) {
+        message.consensusStates.push(ConsensusStateWithHeight.fromJSON(e));
       }
     }
     return message;
@@ -340,13 +334,13 @@ export const ClientConsensusStates = {
 
   toJSON(message: ClientConsensusStates): unknown {
     const obj: any = {};
-    message.client_id !== undefined && (obj.client_id = message.client_id);
-    if (message.consensus_states) {
-      obj.consensus_states = message.consensus_states.map((e) =>
+    message.clientId !== undefined && (obj.clientId = message.clientId);
+    if (message.consensusStates) {
+      obj.consensusStates = message.consensusStates.map((e) =>
         e ? ConsensusStateWithHeight.toJSON(e) : undefined
       );
     } else {
-      obj.consensus_states = [];
+      obj.consensusStates = [];
     }
     return obj;
   },
@@ -355,18 +349,18 @@ export const ClientConsensusStates = {
     object: DeepPartial<ClientConsensusStates>
   ): ClientConsensusStates {
     const message = { ...baseClientConsensusStates } as ClientConsensusStates;
-    message.consensus_states = [];
-    if (object.client_id !== undefined && object.client_id !== null) {
-      message.client_id = object.client_id;
+    message.consensusStates = [];
+    if (object.clientId !== undefined && object.clientId !== null) {
+      message.clientId = object.clientId;
     } else {
-      message.client_id = "";
+      message.clientId = "";
     }
     if (
-      object.consensus_states !== undefined &&
-      object.consensus_states !== null
+      object.consensusStates !== undefined &&
+      object.consensusStates !== null
     ) {
-      for (const e of object.consensus_states) {
-        message.consensus_states.push(ConsensusStateWithHeight.fromPartial(e));
+      for (const e of object.consensusStates) {
+        message.consensusStates.push(ConsensusStateWithHeight.fromPartial(e));
       }
     }
     return message;
@@ -376,8 +370,8 @@ export const ClientConsensusStates = {
 const baseClientUpdateProposal: object = {
   title: "",
   description: "",
-  subject_client_id: "",
-  substitute_client_id: "",
+  subjectClientId: "",
+  substituteClientId: "",
 };
 
 export const ClientUpdateProposal = {
@@ -391,11 +385,11 @@ export const ClientUpdateProposal = {
     if (message.description !== "") {
       writer.uint32(18).string(message.description);
     }
-    if (message.subject_client_id !== "") {
-      writer.uint32(26).string(message.subject_client_id);
+    if (message.subjectClientId !== "") {
+      writer.uint32(26).string(message.subjectClientId);
     }
-    if (message.substitute_client_id !== "") {
-      writer.uint32(34).string(message.substitute_client_id);
+    if (message.substituteClientId !== "") {
+      writer.uint32(34).string(message.substituteClientId);
     }
     return writer;
   },
@@ -414,10 +408,10 @@ export const ClientUpdateProposal = {
           message.description = reader.string();
           break;
         case 3:
-          message.subject_client_id = reader.string();
+          message.subjectClientId = reader.string();
           break;
         case 4:
-          message.substitute_client_id = reader.string();
+          message.substituteClientId = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -440,20 +434,20 @@ export const ClientUpdateProposal = {
       message.description = "";
     }
     if (
-      object.subject_client_id !== undefined &&
-      object.subject_client_id !== null
+      object.subjectClientId !== undefined &&
+      object.subjectClientId !== null
     ) {
-      message.subject_client_id = String(object.subject_client_id);
+      message.subjectClientId = String(object.subjectClientId);
     } else {
-      message.subject_client_id = "";
+      message.subjectClientId = "";
     }
     if (
-      object.substitute_client_id !== undefined &&
-      object.substitute_client_id !== null
+      object.substituteClientId !== undefined &&
+      object.substituteClientId !== null
     ) {
-      message.substitute_client_id = String(object.substitute_client_id);
+      message.substituteClientId = String(object.substituteClientId);
     } else {
-      message.substitute_client_id = "";
+      message.substituteClientId = "";
     }
     return message;
   },
@@ -463,10 +457,10 @@ export const ClientUpdateProposal = {
     message.title !== undefined && (obj.title = message.title);
     message.description !== undefined &&
       (obj.description = message.description);
-    message.subject_client_id !== undefined &&
-      (obj.subject_client_id = message.subject_client_id);
-    message.substitute_client_id !== undefined &&
-      (obj.substitute_client_id = message.substitute_client_id);
+    message.subjectClientId !== undefined &&
+      (obj.subjectClientId = message.subjectClientId);
+    message.substituteClientId !== undefined &&
+      (obj.substituteClientId = message.substituteClientId);
     return obj;
   },
 
@@ -483,20 +477,20 @@ export const ClientUpdateProposal = {
       message.description = "";
     }
     if (
-      object.subject_client_id !== undefined &&
-      object.subject_client_id !== null
+      object.subjectClientId !== undefined &&
+      object.subjectClientId !== null
     ) {
-      message.subject_client_id = object.subject_client_id;
+      message.subjectClientId = object.subjectClientId;
     } else {
-      message.subject_client_id = "";
+      message.subjectClientId = "";
     }
     if (
-      object.substitute_client_id !== undefined &&
-      object.substitute_client_id !== null
+      object.substituteClientId !== undefined &&
+      object.substituteClientId !== null
     ) {
-      message.substitute_client_id = object.substitute_client_id;
+      message.substituteClientId = object.substituteClientId;
     } else {
-      message.substitute_client_id = "";
+      message.substituteClientId = "";
     }
     return message;
   },
@@ -515,9 +509,9 @@ export const UpgradeProposal = {
     if (message.plan !== undefined) {
       Plan.encode(message.plan, writer.uint32(26).fork()).ldelim();
     }
-    if (message.upgraded_client_state !== undefined) {
+    if (message.upgradedClientState !== undefined) {
       Any.encode(
-        message.upgraded_client_state,
+        message.upgradedClientState,
         writer.uint32(34).fork()
       ).ldelim();
     }
@@ -541,7 +535,7 @@ export const UpgradeProposal = {
           message.plan = Plan.decode(reader, reader.uint32());
           break;
         case 4:
-          message.upgraded_client_state = Any.decode(reader, reader.uint32());
+          message.upgradedClientState = Any.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -569,14 +563,12 @@ export const UpgradeProposal = {
       message.plan = undefined;
     }
     if (
-      object.upgraded_client_state !== undefined &&
-      object.upgraded_client_state !== null
+      object.upgradedClientState !== undefined &&
+      object.upgradedClientState !== null
     ) {
-      message.upgraded_client_state = Any.fromJSON(
-        object.upgraded_client_state
-      );
+      message.upgradedClientState = Any.fromJSON(object.upgradedClientState);
     } else {
-      message.upgraded_client_state = undefined;
+      message.upgradedClientState = undefined;
     }
     return message;
   },
@@ -588,9 +580,9 @@ export const UpgradeProposal = {
       (obj.description = message.description);
     message.plan !== undefined &&
       (obj.plan = message.plan ? Plan.toJSON(message.plan) : undefined);
-    message.upgraded_client_state !== undefined &&
-      (obj.upgraded_client_state = message.upgraded_client_state
-        ? Any.toJSON(message.upgraded_client_state)
+    message.upgradedClientState !== undefined &&
+      (obj.upgradedClientState = message.upgradedClientState
+        ? Any.toJSON(message.upgradedClientState)
         : undefined);
     return obj;
   },
@@ -613,28 +605,26 @@ export const UpgradeProposal = {
       message.plan = undefined;
     }
     if (
-      object.upgraded_client_state !== undefined &&
-      object.upgraded_client_state !== null
+      object.upgradedClientState !== undefined &&
+      object.upgradedClientState !== null
     ) {
-      message.upgraded_client_state = Any.fromPartial(
-        object.upgraded_client_state
-      );
+      message.upgradedClientState = Any.fromPartial(object.upgradedClientState);
     } else {
-      message.upgraded_client_state = undefined;
+      message.upgradedClientState = undefined;
     }
     return message;
   },
 };
 
-const baseHeight: object = { revision_number: 0, revision_height: 0 };
+const baseHeight: object = { revisionNumber: 0, revisionHeight: 0 };
 
 export const Height = {
   encode(message: Height, writer: Writer = Writer.create()): Writer {
-    if (message.revision_number !== 0) {
-      writer.uint32(8).uint64(message.revision_number);
+    if (message.revisionNumber !== 0) {
+      writer.uint32(8).uint64(message.revisionNumber);
     }
-    if (message.revision_height !== 0) {
-      writer.uint32(16).uint64(message.revision_height);
+    if (message.revisionHeight !== 0) {
+      writer.uint32(16).uint64(message.revisionHeight);
     }
     return writer;
   },
@@ -647,10 +637,10 @@ export const Height = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.revision_number = longToNumber(reader.uint64() as Long);
+          message.revisionNumber = longToNumber(reader.uint64() as Long);
           break;
         case 2:
-          message.revision_height = longToNumber(reader.uint64() as Long);
+          message.revisionHeight = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -662,61 +652,49 @@ export const Height = {
 
   fromJSON(object: any): Height {
     const message = { ...baseHeight } as Height;
-    if (
-      object.revision_number !== undefined &&
-      object.revision_number !== null
-    ) {
-      message.revision_number = Number(object.revision_number);
+    if (object.revisionNumber !== undefined && object.revisionNumber !== null) {
+      message.revisionNumber = Number(object.revisionNumber);
     } else {
-      message.revision_number = 0;
+      message.revisionNumber = 0;
     }
-    if (
-      object.revision_height !== undefined &&
-      object.revision_height !== null
-    ) {
-      message.revision_height = Number(object.revision_height);
+    if (object.revisionHeight !== undefined && object.revisionHeight !== null) {
+      message.revisionHeight = Number(object.revisionHeight);
     } else {
-      message.revision_height = 0;
+      message.revisionHeight = 0;
     }
     return message;
   },
 
   toJSON(message: Height): unknown {
     const obj: any = {};
-    message.revision_number !== undefined &&
-      (obj.revision_number = message.revision_number);
-    message.revision_height !== undefined &&
-      (obj.revision_height = message.revision_height);
+    message.revisionNumber !== undefined &&
+      (obj.revisionNumber = message.revisionNumber);
+    message.revisionHeight !== undefined &&
+      (obj.revisionHeight = message.revisionHeight);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Height>): Height {
     const message = { ...baseHeight } as Height;
-    if (
-      object.revision_number !== undefined &&
-      object.revision_number !== null
-    ) {
-      message.revision_number = object.revision_number;
+    if (object.revisionNumber !== undefined && object.revisionNumber !== null) {
+      message.revisionNumber = object.revisionNumber;
     } else {
-      message.revision_number = 0;
+      message.revisionNumber = 0;
     }
-    if (
-      object.revision_height !== undefined &&
-      object.revision_height !== null
-    ) {
-      message.revision_height = object.revision_height;
+    if (object.revisionHeight !== undefined && object.revisionHeight !== null) {
+      message.revisionHeight = object.revisionHeight;
     } else {
-      message.revision_height = 0;
+      message.revisionHeight = 0;
     }
     return message;
   },
 };
 
-const baseParams: object = { allowed_clients: "" };
+const baseParams: object = { allowedClients: "" };
 
 export const Params = {
   encode(message: Params, writer: Writer = Writer.create()): Writer {
-    for (const v of message.allowed_clients) {
+    for (const v of message.allowedClients) {
       writer.uint32(10).string(v!);
     }
     return writer;
@@ -726,12 +704,12 @@ export const Params = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseParams } as Params;
-    message.allowed_clients = [];
+    message.allowedClients = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.allowed_clients.push(reader.string());
+          message.allowedClients.push(reader.string());
           break;
         default:
           reader.skipType(tag & 7);
@@ -743,13 +721,10 @@ export const Params = {
 
   fromJSON(object: any): Params {
     const message = { ...baseParams } as Params;
-    message.allowed_clients = [];
-    if (
-      object.allowed_clients !== undefined &&
-      object.allowed_clients !== null
-    ) {
-      for (const e of object.allowed_clients) {
-        message.allowed_clients.push(String(e));
+    message.allowedClients = [];
+    if (object.allowedClients !== undefined && object.allowedClients !== null) {
+      for (const e of object.allowedClients) {
+        message.allowedClients.push(String(e));
       }
     }
     return message;
@@ -757,23 +732,20 @@ export const Params = {
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    if (message.allowed_clients) {
-      obj.allowed_clients = message.allowed_clients.map((e) => e);
+    if (message.allowedClients) {
+      obj.allowedClients = message.allowedClients.map((e) => e);
     } else {
-      obj.allowed_clients = [];
+      obj.allowedClients = [];
     }
     return obj;
   },
 
   fromPartial(object: DeepPartial<Params>): Params {
     const message = { ...baseParams } as Params;
-    message.allowed_clients = [];
-    if (
-      object.allowed_clients !== undefined &&
-      object.allowed_clients !== null
-    ) {
-      for (const e of object.allowed_clients) {
-        message.allowed_clients.push(e);
+    message.allowedClients = [];
+    if (object.allowedClients !== undefined && object.allowedClients !== null) {
+      for (const e of object.allowedClients) {
+        message.allowedClients.push(e);
       }
     }
     return message;

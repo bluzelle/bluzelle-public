@@ -1,4 +1,6 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
+// @ts-ignore
+import { SpVuexError } from '@starport/vuex'
 
 import { Params } from "./module/types/faucet/params"
 
@@ -115,7 +117,7 @@ export default {
 					const sub=JSON.parse(subscription)
 					await dispatch(sub.action, sub.payload)
 				}catch(e) {
-					throw new Error('Subscriptions: ' + e.message)
+					throw new SpVuexError('Subscriptions: ' + e.message)
 				}
 			})
 		},
@@ -136,7 +138,7 @@ export default {
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryParams', payload: { options: { all }, params: {...key},query }})
 				return getters['getParams']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryParams API Node Unavailable. Could not perform query: ' + e.message)
+				throw new SpVuexError('QueryClient:QueryParams', 'API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -158,7 +160,7 @@ export default {
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryMint', payload: { options: { all }, params: {...key},query }})
 				return getters['getMint']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryMint API Node Unavailable. Could not perform query: ' + e.message)
+				throw new SpVuexError('QueryClient:QueryMint', 'API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -173,9 +175,9 @@ export default {
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgMint:Init Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgMint:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgMint:Send Could not broadcast Tx: '+ e.message)
+					throw new SpVuexError('TxClient:MsgMint:Send', 'Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -187,9 +189,10 @@ export default {
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgMint:Init Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgMint:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgMint:Create Could not create message: ' + e.message)
+					throw new SpVuexError('TxClient:MsgMint:Create', 'Could not create message: ' + e.message)
+					
 				}
 			}
 		},

@@ -1,6 +1,9 @@
 syntax = "proto3";
 package bluzelle.curium.storage;
 
+import "gogoproto/gogo.proto";
+import "storage/tx.proto";
+
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/bluzelle/curium/x/storage/types";
@@ -8,4 +11,5 @@ option go_package = "github.com/bluzelle/curium/x/storage/types";
 // GenesisState defines the storage module's genesis state.
 message GenesisState {
     // this line is used by starport scaffolding # genesis/proto/state
+  repeated MsgPin pins = 1 [(gogoproto.nullable) = false];
 }

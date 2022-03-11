@@ -58,7 +58,7 @@ export interface V1Beta1PageRequest {
    * count_total is only respected when offset is used. It is ignored when key
    * is set.
    */
-  count_total?: boolean;
+  countTotal?: boolean;
 
   /** reverse is set to true if results are to be returned in the descending order. */
   reverse?: boolean;
@@ -75,7 +75,7 @@ corresponding request message has used PageRequest.
 */
 export interface V1Beta1PageResponse {
   /** @format byte */
-  next_key?: string;
+  nextKey?: string;
 
   /** @format uint64 */
   total?: string;
@@ -86,17 +86,17 @@ export interface V1Beta1PageResponse {
  */
 export interface V1Beta1Params {
   /** @format int64 */
-  signed_blocks_window?: string;
+  signedBlocksWindow?: string;
 
   /** @format byte */
-  min_signed_per_window?: string;
-  downtime_jail_duration?: string;
+  minSignedPerWindow?: string;
+  downtimeJailDuration?: string;
 
   /** @format byte */
-  slash_fraction_double_sign?: string;
+  slashFractionDoubleSign?: string;
 
   /** @format byte */
-  slash_fraction_downtime?: string;
+  slashFractionDowntime?: string;
 }
 
 export interface V1Beta1QueryParamsResponse {
@@ -109,7 +109,7 @@ export interface V1Beta1QuerySigningInfoResponse {
    * ValidatorSigningInfo defines a validator's signing info for monitoring their
    * liveness activity.
    */
-  val_signing_info?: V1Beta1ValidatorSigningInfo;
+  valSigningInfo?: V1Beta1ValidatorSigningInfo;
 }
 
 export interface V1Beta1QuerySigningInfosResponse {
@@ -135,7 +135,7 @@ export interface V1Beta1ValidatorSigningInfo {
   address?: string;
 
   /** @format int64 */
-  start_height?: string;
+  startHeight?: string;
 
   /**
    * Index which is incremented each time the validator was a bonded
@@ -143,13 +143,13 @@ export interface V1Beta1ValidatorSigningInfo {
    * `SignedBlocksWindow` param determines the index in the `MissedBlocksBitArray`.
    * @format int64
    */
-  index_offset?: string;
+  indexOffset?: string;
 
   /**
    * Timestamp until which the validator is jailed due to liveness downtime.
    * @format date-time
    */
-  jailed_until?: string;
+  jailedUntil?: string;
 
   /**
    * Whether or not a validator has been tombstoned (killed out of validator set). It is set
@@ -162,7 +162,7 @@ export interface V1Beta1ValidatorSigningInfo {
    * Note that `Sum(MissedBlocksBitArray)` always equals `MissedBlocksCounter`.
    * @format int64
    */
-  missed_blocks_counter?: string;
+  missedBlocksCounter?: string;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -390,7 +390,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.key"?: string;
       "pagination.offset"?: string;
       "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
+      "pagination.countTotal"?: boolean;
       "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
@@ -409,11 +409,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QuerySigningInfo
    * @summary SigningInfo queries the signing info of given cons address
-   * @request GET:/cosmos/slashing/v1beta1/signing_infos/{cons_address}
+   * @request GET:/cosmos/slashing/v1beta1/signing_infos/{consAddress}
    */
-  querySigningInfo = (cons_address: string, params: RequestParams = {}) =>
+  querySigningInfo = (consAddress: string, params: RequestParams = {}) =>
     this.request<V1Beta1QuerySigningInfoResponse, RpcStatus>({
-      path: `/cosmos/slashing/v1beta1/signing_infos/${cons_address}`,
+      path: `/cosmos/slashing/v1beta1/signing_infos/${consAddress}`,
       method: "GET",
       format: "json",
       ...params,

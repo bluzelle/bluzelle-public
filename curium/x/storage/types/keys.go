@@ -20,3 +20,7 @@ const (
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
+
+func PinKey(pin MsgPin) []byte {
+	return append([]byte(pin.Creator), []byte(pin.Cid)...)
+}

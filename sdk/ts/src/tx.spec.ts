@@ -4,6 +4,8 @@ import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {getTaxInfo} from "./query";
 import {passThroughAwait} from "promise-passthrough";
 import {expect} from "chai";
+import {withCtxAwait} from "with-context";
+import {Swarm} from "daemon-manager/src/Swarm";
 
 const MAX_GAS = 200000;
 const GAS_PRICE = 2;
@@ -19,6 +21,30 @@ describe('sending transactions', function () {
                 pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000});
             }))
     });
+
+    it('should store pin to state in a pin tx', () =>
+        startSwarmWithClient()
+            .then(passThroughAwait(({bzSdk}) => pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000})))
+            .then(withCtxAwait('whitelist',({swarm}) => getWhiteListForGenesisExport(swarm)))
+            .then(withCtxAwait('sentry',({swarm}) => Promise.resolve(swarm.getSentries()[0])))
+            .then(withCtxAwait('exportedGenesis', ({sentry, whitelist}) => sentry.exportGenesis({
+                whitelist: whitelist
+            })))
+            .then(withCtxAwait('genesis', ({exportedGenesis}) => Promise.resolve(exportedGenesis as {
+                app_state: {
+                    storage: {
+                        pins: {
+                            cid: string,
+                            creator: string
+                        }[]
+                    }
+                }
+            })))
+            .then(({genesis, auth}) => expect(genesis.app_state.storage.pins[0]).to.deep.equal({
+                cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR',
+                creator: auth.address
+            }))
+    );
 
     // skipping because we don't want to add admin info to repo right now
     describe.skip('as admin', () => {
@@ -47,7 +73,7 @@ describe('sending transactions', function () {
                 .then(taxInfo => expect(taxInfo.taxCollector).equal(TAX_COLLECTOR))
         );
 
-    })
+    });
 
     describe('as non-admin', () => {
 
@@ -75,8 +101,14 @@ describe('sending transactions', function () {
                 .then(taxInfo => expect(taxInfo.taxCollector).not.equal(TAX_COLLECTOR))
         );
 
-    })
+    });
 
 
 
-})
+});
+
+const getWhiteListForGenesisExport = (swarm: Swarm): Promise<string[]> =>
+    Promise.resolve(swarm.getValidators()[0])
+        .then(validator => validator.exec('curiumd query staking validators'))
+        .then(validators => validators as {validators: { operator_address: string }[]})
+        .then(addresses => addresses.validators.map(addr => addr.operator_address));

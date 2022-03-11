@@ -31,7 +31,7 @@ export interface DenomTrace {
    */
   path: string;
   /** base denomination of the relayed fungible token. */
-  base_denom: string;
+  baseDenom: string;
 }
 
 /**
@@ -45,12 +45,12 @@ export interface Params {
    * send_enabled enables or disables all cross-chain token transfers from this
    * chain.
    */
-  send_enabled: boolean;
+  sendEnabled: boolean;
   /**
    * receive_enabled enables or disables all cross-chain token transfers to this
    * chain.
    */
-  receive_enabled: boolean;
+  receiveEnabled: boolean;
 }
 
 const baseFungibleTokenPacketData: object = {
@@ -175,15 +175,15 @@ export const FungibleTokenPacketData = {
   },
 };
 
-const baseDenomTrace: object = { path: "", base_denom: "" };
+const baseDenomTrace: object = { path: "", baseDenom: "" };
 
 export const DenomTrace = {
   encode(message: DenomTrace, writer: Writer = Writer.create()): Writer {
     if (message.path !== "") {
       writer.uint32(10).string(message.path);
     }
-    if (message.base_denom !== "") {
-      writer.uint32(18).string(message.base_denom);
+    if (message.baseDenom !== "") {
+      writer.uint32(18).string(message.baseDenom);
     }
     return writer;
   },
@@ -199,7 +199,7 @@ export const DenomTrace = {
           message.path = reader.string();
           break;
         case 2:
-          message.base_denom = reader.string();
+          message.baseDenom = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -216,10 +216,10 @@ export const DenomTrace = {
     } else {
       message.path = "";
     }
-    if (object.base_denom !== undefined && object.base_denom !== null) {
-      message.base_denom = String(object.base_denom);
+    if (object.baseDenom !== undefined && object.baseDenom !== null) {
+      message.baseDenom = String(object.baseDenom);
     } else {
-      message.base_denom = "";
+      message.baseDenom = "";
     }
     return message;
   },
@@ -227,7 +227,7 @@ export const DenomTrace = {
   toJSON(message: DenomTrace): unknown {
     const obj: any = {};
     message.path !== undefined && (obj.path = message.path);
-    message.base_denom !== undefined && (obj.base_denom = message.base_denom);
+    message.baseDenom !== undefined && (obj.baseDenom = message.baseDenom);
     return obj;
   },
 
@@ -238,24 +238,24 @@ export const DenomTrace = {
     } else {
       message.path = "";
     }
-    if (object.base_denom !== undefined && object.base_denom !== null) {
-      message.base_denom = object.base_denom;
+    if (object.baseDenom !== undefined && object.baseDenom !== null) {
+      message.baseDenom = object.baseDenom;
     } else {
-      message.base_denom = "";
+      message.baseDenom = "";
     }
     return message;
   },
 };
 
-const baseParams: object = { send_enabled: false, receive_enabled: false };
+const baseParams: object = { sendEnabled: false, receiveEnabled: false };
 
 export const Params = {
   encode(message: Params, writer: Writer = Writer.create()): Writer {
-    if (message.send_enabled === true) {
-      writer.uint32(8).bool(message.send_enabled);
+    if (message.sendEnabled === true) {
+      writer.uint32(8).bool(message.sendEnabled);
     }
-    if (message.receive_enabled === true) {
-      writer.uint32(16).bool(message.receive_enabled);
+    if (message.receiveEnabled === true) {
+      writer.uint32(16).bool(message.receiveEnabled);
     }
     return writer;
   },
@@ -268,10 +268,10 @@ export const Params = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.send_enabled = reader.bool();
+          message.sendEnabled = reader.bool();
           break;
         case 2:
-          message.receive_enabled = reader.bool();
+          message.receiveEnabled = reader.bool();
           break;
         default:
           reader.skipType(tag & 7);
@@ -283,45 +283,39 @@ export const Params = {
 
   fromJSON(object: any): Params {
     const message = { ...baseParams } as Params;
-    if (object.send_enabled !== undefined && object.send_enabled !== null) {
-      message.send_enabled = Boolean(object.send_enabled);
+    if (object.sendEnabled !== undefined && object.sendEnabled !== null) {
+      message.sendEnabled = Boolean(object.sendEnabled);
     } else {
-      message.send_enabled = false;
+      message.sendEnabled = false;
     }
-    if (
-      object.receive_enabled !== undefined &&
-      object.receive_enabled !== null
-    ) {
-      message.receive_enabled = Boolean(object.receive_enabled);
+    if (object.receiveEnabled !== undefined && object.receiveEnabled !== null) {
+      message.receiveEnabled = Boolean(object.receiveEnabled);
     } else {
-      message.receive_enabled = false;
+      message.receiveEnabled = false;
     }
     return message;
   },
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    message.send_enabled !== undefined &&
-      (obj.send_enabled = message.send_enabled);
-    message.receive_enabled !== undefined &&
-      (obj.receive_enabled = message.receive_enabled);
+    message.sendEnabled !== undefined &&
+      (obj.sendEnabled = message.sendEnabled);
+    message.receiveEnabled !== undefined &&
+      (obj.receiveEnabled = message.receiveEnabled);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Params>): Params {
     const message = { ...baseParams } as Params;
-    if (object.send_enabled !== undefined && object.send_enabled !== null) {
-      message.send_enabled = object.send_enabled;
+    if (object.sendEnabled !== undefined && object.sendEnabled !== null) {
+      message.sendEnabled = object.sendEnabled;
     } else {
-      message.send_enabled = false;
+      message.sendEnabled = false;
     }
-    if (
-      object.receive_enabled !== undefined &&
-      object.receive_enabled !== null
-    ) {
-      message.receive_enabled = object.receive_enabled;
+    if (object.receiveEnabled !== undefined && object.receiveEnabled !== null) {
+      message.receiveEnabled = object.receiveEnabled;
     } else {
-      message.receive_enabled = false;
+      message.receiveEnabled = false;
     }
     return message;
   },

@@ -1,4 +1,6 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
+// @ts-ignore
+import { SpVuexError } from '@starport/vuex'
 
 import { SendAuthorization } from "./module/types/cosmos/bank/v1beta1/authz"
 import { Params } from "./module/types/cosmos/bank/v1beta1/bank"
@@ -166,7 +168,7 @@ export default {
 					const sub=JSON.parse(subscription)
 					await dispatch(sub.action, sub.payload)
 				}catch(e) {
-					throw new Error('Subscriptions: ' + e.message)
+					throw new SpVuexError('Subscriptions: ' + e.message)
 				}
 			})
 		},
@@ -187,7 +189,7 @@ export default {
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryBalance', payload: { options: { all }, params: {...key},query }})
 				return getters['getBalance']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryBalance API Node Unavailable. Could not perform query: ' + e.message)
+				throw new SpVuexError('QueryClient:QueryBalance', 'API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -213,7 +215,7 @@ export default {
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryAllBalances', payload: { options: { all }, params: {...key},query }})
 				return getters['getAllBalances']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryAllBalances API Node Unavailable. Could not perform query: ' + e.message)
+				throw new SpVuexError('QueryClient:QueryAllBalances', 'API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -239,7 +241,7 @@ export default {
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTotalSupply', payload: { options: { all }, params: {...key},query }})
 				return getters['getTotalSupply']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryTotalSupply API Node Unavailable. Could not perform query: ' + e.message)
+				throw new SpVuexError('QueryClient:QueryTotalSupply', 'API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -261,7 +263,7 @@ export default {
 				if (subscribe) commit('SUBSCRIBE', { action: 'QuerySupplyOf', payload: { options: { all }, params: {...key},query }})
 				return getters['getSupplyOf']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QuerySupplyOf API Node Unavailable. Could not perform query: ' + e.message)
+				throw new SpVuexError('QueryClient:QuerySupplyOf', 'API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -283,7 +285,7 @@ export default {
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryParams', payload: { options: { all }, params: {...key},query }})
 				return getters['getParams']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryParams API Node Unavailable. Could not perform query: ' + e.message)
+				throw new SpVuexError('QueryClient:QueryParams', 'API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -305,7 +307,7 @@ export default {
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryDenomMetadata', payload: { options: { all }, params: {...key},query }})
 				return getters['getDenomMetadata']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryDenomMetadata API Node Unavailable. Could not perform query: ' + e.message)
+				throw new SpVuexError('QueryClient:QueryDenomMetadata', 'API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -331,7 +333,7 @@ export default {
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryDenomsMetadata', payload: { options: { all }, params: {...key},query }})
 				return getters['getDenomsMetadata']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryDenomsMetadata API Node Unavailable. Could not perform query: ' + e.message)
+				throw new SpVuexError('QueryClient:QueryDenomsMetadata', 'API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -346,9 +348,9 @@ export default {
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgMultiSend:Init Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgMultiSend:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgMultiSend:Send Could not broadcast Tx: '+ e.message)
+					throw new SpVuexError('TxClient:MsgMultiSend:Send', 'Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -361,9 +363,9 @@ export default {
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSend:Init Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgSend:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSend:Send Could not broadcast Tx: '+ e.message)
+					throw new SpVuexError('TxClient:MsgSend:Send', 'Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -375,9 +377,10 @@ export default {
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgMultiSend:Init Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgMultiSend:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgMultiSend:Create Could not create message: ' + e.message)
+					throw new SpVuexError('TxClient:MsgMultiSend:Create', 'Could not create message: ' + e.message)
+					
 				}
 			}
 		},
@@ -388,9 +391,10 @@ export default {
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSend:Init Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgSend:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSend:Create Could not create message: ' + e.message)
+					throw new SpVuexError('TxClient:MsgSend:Create', 'Could not create message: ' + e.message)
+					
 				}
 			}
 		},

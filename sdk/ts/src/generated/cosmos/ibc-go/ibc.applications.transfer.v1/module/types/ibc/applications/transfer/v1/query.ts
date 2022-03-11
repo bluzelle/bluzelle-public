@@ -26,7 +26,7 @@ export interface QueryDenomTraceRequest {
  */
 export interface QueryDenomTraceResponse {
   /** denom_trace returns the requested denomination trace information. */
-  denom_trace: DenomTrace | undefined;
+  denomTrace: DenomTrace | undefined;
 }
 
 /**
@@ -44,7 +44,7 @@ export interface QueryDenomTracesRequest {
  */
 export interface QueryDenomTracesResponse {
   /** denom_traces returns all denominations trace information. */
-  denom_traces: DenomTrace[];
+  denomTraces: DenomTrace[];
   /** pagination defines the pagination in the response. */
   pagination: PageResponse | undefined;
 }
@@ -125,8 +125,8 @@ export const QueryDenomTraceResponse = {
     message: QueryDenomTraceResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.denom_trace !== undefined) {
-      DenomTrace.encode(message.denom_trace, writer.uint32(10).fork()).ldelim();
+    if (message.denomTrace !== undefined) {
+      DenomTrace.encode(message.denomTrace, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -141,7 +141,7 @@ export const QueryDenomTraceResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.denom_trace = DenomTrace.decode(reader, reader.uint32());
+          message.denomTrace = DenomTrace.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -155,19 +155,19 @@ export const QueryDenomTraceResponse = {
     const message = {
       ...baseQueryDenomTraceResponse,
     } as QueryDenomTraceResponse;
-    if (object.denom_trace !== undefined && object.denom_trace !== null) {
-      message.denom_trace = DenomTrace.fromJSON(object.denom_trace);
+    if (object.denomTrace !== undefined && object.denomTrace !== null) {
+      message.denomTrace = DenomTrace.fromJSON(object.denomTrace);
     } else {
-      message.denom_trace = undefined;
+      message.denomTrace = undefined;
     }
     return message;
   },
 
   toJSON(message: QueryDenomTraceResponse): unknown {
     const obj: any = {};
-    message.denom_trace !== undefined &&
-      (obj.denom_trace = message.denom_trace
-        ? DenomTrace.toJSON(message.denom_trace)
+    message.denomTrace !== undefined &&
+      (obj.denomTrace = message.denomTrace
+        ? DenomTrace.toJSON(message.denomTrace)
         : undefined);
     return obj;
   },
@@ -178,10 +178,10 @@ export const QueryDenomTraceResponse = {
     const message = {
       ...baseQueryDenomTraceResponse,
     } as QueryDenomTraceResponse;
-    if (object.denom_trace !== undefined && object.denom_trace !== null) {
-      message.denom_trace = DenomTrace.fromPartial(object.denom_trace);
+    if (object.denomTrace !== undefined && object.denomTrace !== null) {
+      message.denomTrace = DenomTrace.fromPartial(object.denomTrace);
     } else {
-      message.denom_trace = undefined;
+      message.denomTrace = undefined;
     }
     return message;
   },
@@ -263,7 +263,7 @@ export const QueryDenomTracesResponse = {
     message: QueryDenomTracesResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    for (const v of message.denom_traces) {
+    for (const v of message.denomTraces) {
       DenomTrace.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
@@ -284,12 +284,12 @@ export const QueryDenomTracesResponse = {
     const message = {
       ...baseQueryDenomTracesResponse,
     } as QueryDenomTracesResponse;
-    message.denom_traces = [];
+    message.denomTraces = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.denom_traces.push(DenomTrace.decode(reader, reader.uint32()));
+          message.denomTraces.push(DenomTrace.decode(reader, reader.uint32()));
           break;
         case 2:
           message.pagination = PageResponse.decode(reader, reader.uint32());
@@ -306,10 +306,10 @@ export const QueryDenomTracesResponse = {
     const message = {
       ...baseQueryDenomTracesResponse,
     } as QueryDenomTracesResponse;
-    message.denom_traces = [];
-    if (object.denom_traces !== undefined && object.denom_traces !== null) {
-      for (const e of object.denom_traces) {
-        message.denom_traces.push(DenomTrace.fromJSON(e));
+    message.denomTraces = [];
+    if (object.denomTraces !== undefined && object.denomTraces !== null) {
+      for (const e of object.denomTraces) {
+        message.denomTraces.push(DenomTrace.fromJSON(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -322,12 +322,12 @@ export const QueryDenomTracesResponse = {
 
   toJSON(message: QueryDenomTracesResponse): unknown {
     const obj: any = {};
-    if (message.denom_traces) {
-      obj.denom_traces = message.denom_traces.map((e) =>
+    if (message.denomTraces) {
+      obj.denomTraces = message.denomTraces.map((e) =>
         e ? DenomTrace.toJSON(e) : undefined
       );
     } else {
-      obj.denom_traces = [];
+      obj.denomTraces = [];
     }
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -342,10 +342,10 @@ export const QueryDenomTracesResponse = {
     const message = {
       ...baseQueryDenomTracesResponse,
     } as QueryDenomTracesResponse;
-    message.denom_traces = [];
-    if (object.denom_traces !== undefined && object.denom_traces !== null) {
-      for (const e of object.denom_traces) {
-        message.denom_traces.push(DenomTrace.fromPartial(e));
+    message.denomTraces = [];
+    if (object.denomTraces !== undefined && object.denomTraces !== null) {
+      for (const e of object.denomTraces) {
+        message.denomTraces.push(DenomTrace.fromPartial(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {

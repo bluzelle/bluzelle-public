@@ -9,19 +9,19 @@ export const protobufPackage = "ibc.applications.transfer.v1";
 
 /** GenesisState defines the ibc-transfer genesis state */
 export interface GenesisState {
-  port_id: string;
-  denom_traces: DenomTrace[];
+  portId: string;
+  denomTraces: DenomTrace[];
   params: Params | undefined;
 }
 
-const baseGenesisState: object = { port_id: "" };
+const baseGenesisState: object = { portId: "" };
 
 export const GenesisState = {
   encode(message: GenesisState, writer: Writer = Writer.create()): Writer {
-    if (message.port_id !== "") {
-      writer.uint32(10).string(message.port_id);
+    if (message.portId !== "") {
+      writer.uint32(10).string(message.portId);
     }
-    for (const v of message.denom_traces) {
+    for (const v of message.denomTraces) {
       DenomTrace.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     if (message.params !== undefined) {
@@ -34,15 +34,15 @@ export const GenesisState = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseGenesisState } as GenesisState;
-    message.denom_traces = [];
+    message.denomTraces = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.port_id = reader.string();
+          message.portId = reader.string();
           break;
         case 2:
-          message.denom_traces.push(DenomTrace.decode(reader, reader.uint32()));
+          message.denomTraces.push(DenomTrace.decode(reader, reader.uint32()));
           break;
         case 3:
           message.params = Params.decode(reader, reader.uint32());
@@ -57,15 +57,15 @@ export const GenesisState = {
 
   fromJSON(object: any): GenesisState {
     const message = { ...baseGenesisState } as GenesisState;
-    message.denom_traces = [];
-    if (object.port_id !== undefined && object.port_id !== null) {
-      message.port_id = String(object.port_id);
+    message.denomTraces = [];
+    if (object.portId !== undefined && object.portId !== null) {
+      message.portId = String(object.portId);
     } else {
-      message.port_id = "";
+      message.portId = "";
     }
-    if (object.denom_traces !== undefined && object.denom_traces !== null) {
-      for (const e of object.denom_traces) {
-        message.denom_traces.push(DenomTrace.fromJSON(e));
+    if (object.denomTraces !== undefined && object.denomTraces !== null) {
+      for (const e of object.denomTraces) {
+        message.denomTraces.push(DenomTrace.fromJSON(e));
       }
     }
     if (object.params !== undefined && object.params !== null) {
@@ -78,13 +78,13 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.port_id !== undefined && (obj.port_id = message.port_id);
-    if (message.denom_traces) {
-      obj.denom_traces = message.denom_traces.map((e) =>
+    message.portId !== undefined && (obj.portId = message.portId);
+    if (message.denomTraces) {
+      obj.denomTraces = message.denomTraces.map((e) =>
         e ? DenomTrace.toJSON(e) : undefined
       );
     } else {
-      obj.denom_traces = [];
+      obj.denomTraces = [];
     }
     message.params !== undefined &&
       (obj.params = message.params ? Params.toJSON(message.params) : undefined);
@@ -93,15 +93,15 @@ export const GenesisState = {
 
   fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = { ...baseGenesisState } as GenesisState;
-    message.denom_traces = [];
-    if (object.port_id !== undefined && object.port_id !== null) {
-      message.port_id = object.port_id;
+    message.denomTraces = [];
+    if (object.portId !== undefined && object.portId !== null) {
+      message.portId = object.portId;
     } else {
-      message.port_id = "";
+      message.portId = "";
     }
-    if (object.denom_traces !== undefined && object.denom_traces !== null) {
-      for (const e of object.denom_traces) {
-        message.denom_traces.push(DenomTrace.fromPartial(e));
+    if (object.denomTraces !== undefined && object.denomTraces !== null) {
+      for (const e of object.denomTraces) {
+        message.denomTraces.push(DenomTrace.fromPartial(e));
       }
     }
     if (object.params !== undefined && object.params !== null) {

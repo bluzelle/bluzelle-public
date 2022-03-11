@@ -10,13 +10,17 @@ import (
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// this line is used by starport scaffolding # genesis/module/init
+	k.ImportPins(ctx, &types.GenesisState{
+		Pins: genState.Pins,
+	})
 }
 
 // ExportGenesis returns the capability module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	genesis := types.DefaultGenesis()
-
 	// this line is used by starport scaffolding # genesis/module/export
+	pins := k.ExportPins(ctx)
 
-	return genesis
+	return &types.GenesisState{
+		Pins: pins,
+	}
 }

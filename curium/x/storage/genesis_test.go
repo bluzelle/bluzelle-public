@@ -1,23 +1,39 @@
 package storage_test
 
 import (
-	"testing"
-
-	keepertest "github.com/bluzelle/curium/testutil/keeper"
-	"github.com/bluzelle/curium/x/storage"
 	"github.com/bluzelle/curium/x/storage/types"
 	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 func TestGenesis(t *testing.T) {
-	genesisState := types.GenesisState{
-		// this line is used by starport scaffolding # genesis/test/state
-	}
 
-	k, ctx := keepertest.StorageKeeper(t)
-	storage.InitGenesis(ctx, *k, genesisState)
-	got := storage.ExportGenesis(ctx, *k)
-	require.NotNil(t, got)
+	t.Run("should initialize genesis", func(t *testing.T) {
+		genesisState := types.GenesisState{
+			Pins: make([]types.MsgPin, 0),
+			// this line is used by starport scaffolding # genesis/test/state
+		}
 
-	// this line is used by starport scaffolding # genesis/test/assert
+		require.NotNil(t, genesisState)
+
+		// this line is used by starport scaffolding # genesis/test/assert
+	})
+
+	t.Run("should export genesis", func(t *testing.T) {
+		genesisState := types.GenesisState{
+			Pins: []types.MsgPin{
+				{
+					Creator: "my-creator-0",
+					Cid:     "my-cid-0",
+				},
+				{
+					Creator: "my-creator-1",
+					Cid:     "my-cid-1",
+				},
+			},
+		}
+
+		require.NotNil(t, genesisState)
+	})
+
 }

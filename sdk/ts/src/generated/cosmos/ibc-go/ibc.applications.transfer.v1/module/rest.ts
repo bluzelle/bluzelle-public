@@ -20,13 +20,13 @@ export interface Applicationstransferv1Params {
    * send_enabled enables or disables all cross-chain token transfers from this
    * chain.
    */
-  send_enabled?: boolean;
+  sendEnabled?: boolean;
 
   /**
    * receive_enabled enables or disables all cross-chain token transfers to this
    * chain.
    */
-  receive_enabled?: boolean;
+  receiveEnabled?: boolean;
 }
 
 /**
@@ -165,7 +165,7 @@ export interface V1DenomTrace {
   path?: string;
 
   /** base denomination of the relayed fungible token. */
-  base_denom?: string;
+  baseDenom?: string;
 }
 
 /**
@@ -178,10 +178,10 @@ gets reset
 */
 export interface V1Height {
   /** @format uint64 */
-  revision_number?: string;
+  revisionNumber?: string;
 
   /** @format uint64 */
-  revision_height?: string;
+  revisionHeight?: string;
 }
 
 /**
@@ -195,7 +195,7 @@ method.
 */
 export interface V1QueryDenomTraceResponse {
   /** denom_trace returns the requested denomination trace information. */
-  denom_trace?: V1DenomTrace;
+  denomTrace?: V1DenomTrace;
 }
 
 /**
@@ -204,7 +204,7 @@ method.
 */
 export interface V1QueryDenomTracesResponse {
   /** denom_traces returns all denominations trace information. */
-  denom_traces?: V1DenomTrace[];
+  denomTraces?: V1DenomTrace[];
 
   /** pagination defines the pagination in the response. */
   pagination?: V1Beta1PageResponse;
@@ -265,7 +265,7 @@ export interface V1Beta1PageRequest {
    * count_total is only respected when offset is used. It is ignored when key
    * is set.
    */
-  count_total?: boolean;
+  countTotal?: boolean;
 }
 
 /**
@@ -279,7 +279,7 @@ corresponding request message has used PageRequest.
 */
 export interface V1Beta1PageResponse {
   /** @format byte */
-  next_key?: string;
+  nextKey?: string;
 
   /** @format uint64 */
   total?: string;
@@ -494,7 +494,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.key"?: string;
       "pagination.offset"?: string;
       "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
+      "pagination.countTotal"?: boolean;
     },
     params: RequestParams = {},
   ) =>
