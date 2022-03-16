@@ -1,9 +1,10 @@
 export {BluzelleWallet} from './wallets/BluzelleWallet'
 export {BluzelleLocalWallet, newLocalWallet} from './wallets/localWallet'
+export {BluzelleKeplrWallet, newKeplrWallet} from './wallets/keplrWallet'
 export {mint} from "./faucet"
 export {newBluzelleClient, BluzelleClient} from "./sdk"
-export {getAccountBalance} from "./query"
+export {getAccountBalance, hasContent} from "./query"
 export {getStatus, getValidators} from "./queryTendermint"
-export {send} from "./tx"
+export {send, pinCid} from "./tx"
 
 
