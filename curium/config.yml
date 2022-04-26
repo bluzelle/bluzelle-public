@@ -24,8 +24,8 @@ init:
   config:
     consensus:
       timeout_commit: "5s"
-      p2p:
-        addr_book_strict: false
+    p2p:
+      addr_book_strict: false
 genesis:
   app_state:
     tax:
