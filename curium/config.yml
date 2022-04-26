@@ -13,6 +13,8 @@ client:
     path: "../sdk/ts/src"
 init:
   app:
+    api:
+      enable: true
     storage-dir: "~/.curium/storage"
     minimum-gas-prices: "0ubnt"
   client:
@@ -22,6 +24,8 @@ init:
   config:
     consensus:
       timeout_commit: "5s"
+      p2p:
+        addr_book_strict: false
 genesis:
   app_state:
     tax:
