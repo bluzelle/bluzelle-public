@@ -1,7 +1,7 @@
 import {BluzelleClient} from "./sdk";
 import {MsgPin} from "./curium/lib/generated/bluzelle/curium/bluzelle.curium.storage/module/types/storage/tx";
 import {EncodeObject, Registry} from "@cosmjs/proto-signing";
-import {Deferred, newDeferred} from 'deferred/src/Deferred'
+import {Deferred, newDeferred} from './utils/Deferred'
 import {Left, Right, Some} from "monet";
 import {passThrough} from "promise-passthrough";
 import {identity} from "lodash";

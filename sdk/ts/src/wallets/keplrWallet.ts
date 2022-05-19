@@ -6,7 +6,7 @@ import {Window} from '@keplr-wallet/types'
 import {AccountData, DirectSignResponse, OfflineDirectSigner} from "@cosmjs/proto-signing/build/signer";
 import {getStatus} from "../queryTendermint";
 import {newLocalWallet} from "./localWallet";
-import {generateMnemonic} from "@bluzelle/wallet/src/wallet";
+import * as bip39 from 'bip39';
 
 interface SignDoc {
     bodyBytes: Uint8Array;
@@ -97,3 +97,6 @@ export class BluzelleKeplrWallet implements BluzelleWallet {
         )
     }
 }
+
+const generateMnemonic = (): Promise<string> =>
+    Promise.resolve(bip39.generateMnemonic(256))

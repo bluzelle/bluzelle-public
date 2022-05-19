@@ -4,7 +4,7 @@ import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {getTaxInfo} from "./query";
 import {passThroughAwait} from "promise-passthrough";
 import {expect} from "chai";
-import {withCtxAwait} from "with-context";
+import {withCtxAwait} from "@scottburch/with-context";
 import {Swarm} from "daemon-manager/src/Swarm";
 
 const MAX_GAS = 200000;

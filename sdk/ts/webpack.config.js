@@ -8,7 +8,7 @@ module.exports = {
         filename: 'index.js',
         path: path.resolve(__dirname, 'lib'),
         // library: "sdk",
-        // libraryTarget: "umd",
+         libraryTarget: "umd",
     },
     target: 'node',
     externalsPresets: {node: true},

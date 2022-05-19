@@ -5,7 +5,7 @@ import {pinCid, withTransaction} from "./tx";
 import {BehaviorSubject} from "rxjs";
 import {times} from "lodash";
 import {passThroughAwait} from "promise-passthrough";
-import {createCtx, createCtxAwait, withCtxAwait} from "with-context";
+import {createCtx, createCtxAwait, withCtxAwait} from "@scottburch/with-context";
 import {create} from "ipfs-http-client";
 import {expect} from "chai";
 
