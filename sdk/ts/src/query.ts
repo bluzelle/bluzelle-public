@@ -1,6 +1,6 @@
 import waitUntil from "async-wait-until";
 import {BluzelleClient} from "./sdk";
-import {QueryGetTaxInfoResponse} from "./generated/bluzelle/curium/bluzelle.curium.tax/module/types/tax/query";
+import {QueryGetTaxInfoResponse} from "./curium/lib/generated/bluzelle/curium/bluzelle.curium.tax/module/types/tax/query";
 
 export const waitForContent = (client: BluzelleClient, path: string, waitTime: number = 5000) =>
     waitUntil(
