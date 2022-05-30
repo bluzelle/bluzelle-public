@@ -6,9 +6,14 @@ import {EnglishMnemonic, Bip39, HdPath, Slip10RawIndex} from "@cosmjs/crypto";
 import {passThrough} from "promise-passthrough";
 import {BluzelleWallet} from "./BluzelleWallet";
 
+export interface LocalWalletOptions {
+    coinType?: number
+    index?: number
+}
 
-export const newLocalWallet = (mnemonic: string) => (): Promise<BluzelleWallet> => Promise.resolve(
-    BluzelleLocalWallet.fromMnemonic(mnemonic, {prefix: 'bluzelle', hdPaths:[makePath()]}));
+
+export const newLocalWallet = (mnemonic: string, options: LocalWalletOptions = {}) => (): Promise<BluzelleWallet> => Promise.resolve(
+    BluzelleLocalWallet.fromMnemonic(mnemonic, {prefix: 'bluzelle', hdPaths:[makePath(options.index, options.coinType)]}));
 
 type AccountAddress = string;
 
@@ -44,10 +49,10 @@ export class BluzelleLocalWallet extends DirectSecp256k1HdWallet implements Bluz
     }
 }
 
-function makePath(idx: number =  0): HdPath {
+function makePath(idx: number =  0, coinType: number = 483): HdPath {
     return [
         Slip10RawIndex.hardened(44),
-        Slip10RawIndex.hardened(483),  // BNT
+        Slip10RawIndex.hardened(coinType),  // BNT
         // Slip10RawIndex.hardened(118),
         Slip10RawIndex.hardened(0),
         Slip10RawIndex.normal(0),

@@ -1,6 +1,6 @@
 export type {BluzelleWallet} from './wallets/BluzelleWallet'
 export type {BluzelleLocalWallet} from './wallets/localWallet'
-export {newLocalWallet} from './wallets/localWallet'
+export {newLocalWallet, LocalWalletOptions} from './wallets/localWallet'
 export type {BluzelleKeplrWallet} from './wallets/keplrWallet'
 export {newKeplrWallet} from './wallets/keplrWallet'
 export {mint} from "./faucet"
