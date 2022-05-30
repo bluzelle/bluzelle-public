@@ -1,11 +1,16 @@
 import {pinCid, setGasTaxBp, setTaxCollector, setTransferTaxBp, withTransaction} from "./tx";
 import {startSwarmWithClient} from "@bluzelle/testing/src/swarmUtils";
 import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
-import {getTaxInfo} from "./query";
+import {getAccountBalance, getTaxInfo} from "./query";
 import {passThroughAwait} from "promise-passthrough";
 import {expect} from "chai";
 import {withCtxAwait} from "@scottburch/with-context";
 import {Swarm} from "daemon-manager/src/Swarm";
+import {mint} from "./faucet";
+import * as chai from 'chai'
+import * as asPromised from 'chai-as-promised'
+
+chai.use(asPromised)
 
 const MAX_GAS = 200000;
 const GAS_PRICE = 2;
@@ -13,8 +18,31 @@ const GAS_PRICE = 2;
 describe('sending transactions', function () {
     this.timeout(2_000_000);
 
+    it('should be able to mint tokens to a new account', () =>
+        startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})
+            .then(info => ({client: info.bzSdk}))
+            .then(withCtxAwait('mintResult', ctx => mint(ctx.client)))
+            .then(ctx => getAccountBalance(ctx.client, ctx.mintResult.address))
+            .then(balance => expect(balance).to.equal(200_000_000))
+    );
+
+
+    it('should be able to mint tokens to a new given', () =>
+        startSwarmWithClient()
+            .then(info => ({client: info.bzSdk}))
+            .then(withCtxAwait('mintResult', ctx => mint(ctx.client, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj')))
+            .then(ctx => getAccountBalance(ctx.client, ctx.mintResult.address))
+            .then(balance => expect(balance).to.equal(200_000_000))
+    );
+
+    it('should not mint if bluzelleFaucet is not turned on', () =>
+        startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: false})
+            .then(info => expect(mint(info.bzSdk)).to.be.rejected)
+    )
+
+
     it('should have a withTransaction that can bundle messages', () => {
-        return startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})
+        return startSwarmWithClient({...defaultSwarmConfig})
             .then(({bzSdk}) => withTransaction(bzSdk, () => {
                 pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000});
                 pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000});
@@ -45,6 +73,8 @@ describe('sending transactions', function () {
                 creator: auth.address
             }))
     );
+
+
 
     // skipping because we don't want to add admin info to repo right now
     describe.skip('as admin', () => {
