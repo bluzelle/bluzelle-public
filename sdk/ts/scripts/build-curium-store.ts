@@ -16,7 +16,8 @@ function generateSdkCurium() {
 
 function buildCuriumStore() {
     cd(rootDir() + '/sdk/ts/src/curium');
-    return $`yarn tsc`
+    return $`yarn`
+        .then(() => $`yarn tsc`);
 }
 
 function removeCuriumStore() {
