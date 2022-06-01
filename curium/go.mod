@@ -10,7 +10,7 @@ require (
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.2 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.3 // indirect
 	github.com/ipfs/go-cid v0.0.7
 	github.com/ipfs/go-ipfs v0.10.0
 	github.com/ipfs/go-ipfs-config v0.16.0
@@ -30,6 +30,7 @@ require (
 	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd
 	google.golang.org/grpc v1.46.2
 	gopkg.in/yaml.v2 v2.4.0
+	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
 replace (
