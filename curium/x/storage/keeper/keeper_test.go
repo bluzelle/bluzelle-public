@@ -84,7 +84,7 @@ func TestStorageKeeper(t *testing.T) {
 		key := types.PinKey(pin)
 
 		pinReturned := keeper.GetPin(ctx, *storageKeeper, key)
-		require.Equal(t, pin, pinReturned)
+		require.Equal(t, pin, *pinReturned)
 	})
 
 	t.Run("should export pins", func(t *testing.T) {
