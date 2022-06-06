@@ -47,8 +47,11 @@ genesis:
         min_deposit:
           - denom: "ubnt"
             amount: "1000000"
-
     mint:
+      minter:
+        inflation: "0.0"
       params:
         mint_denom: "ubnt"
-
+        inflation_min: "0.0"
+        inflation_max: "0.0"
+        inflation_rate_change: "0.0"
