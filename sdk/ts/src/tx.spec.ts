@@ -55,9 +55,7 @@ describe('sending transactions', function () {
             .then(passThroughAwait(({bzSdk}) => pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000})))
             .then(withCtxAwait('whitelist',({swarm}) => getWhiteListForGenesisExport(swarm)))
             .then(withCtxAwait('sentry',({swarm}) => Promise.resolve(swarm.getSentries()[0])))
-            .then(withCtxAwait('exportedGenesis', ({sentry, whitelist}) => sentry.exportGenesis({
-                whitelist: whitelist
-            })))
+            .then(withCtxAwait('exportedGenesis', ({sentry, whitelist}) => sentry.exportGenesis(whitelist)))
             .then(withCtxAwait('genesis', ({exportedGenesis}) => Promise.resolve(exportedGenesis as {
                 app_state: {
                     storage: {
