@@ -10,7 +10,7 @@ module.exports = {
         // library: "sdk",
          libraryTarget: "umd",
     },
-    target: 'node',
+    target: 'web',
     externalsPresets: {node: true},
     externals: [nodeExternals({
         allowlist: [
