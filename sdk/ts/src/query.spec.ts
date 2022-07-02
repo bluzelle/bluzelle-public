@@ -1,7 +1,7 @@
 import {getBlzClient, restartIpfsServerAndSwarm} from "@bluzelle/testing/src/commonUtils";
 import {generateContent} from "@bluzelle/testing/src/fileUtils";
-import {hasContent, getAccountBalance} from "./query";
-import {pinCid, withTransaction} from "./tx";
+import {hasContent, getAccountBalance} from "../lib/index";
+import {pinCid, withTransaction} from "../lib/index";
 import {BehaviorSubject} from "rxjs";
 import {times} from "lodash";
 import {passThroughAwait} from "promise-passthrough";
@@ -65,7 +65,6 @@ describe('query', function () {
                 ctx.contents.forEach((contentObj) => pinCid(ctx.client, contentObj.cid, {maxGas: 200000, gasPrice: 0.002}))
             )))
             .then(ctx => getAccountBalance(ctx.client, ctx.client.address))
-            .then(res => typeof(res) === "number")
     );
 
     it("getAccountBalance should not charge gas", () =>

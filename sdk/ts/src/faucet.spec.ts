@@ -1,7 +1,7 @@
 import {startSwarmWithClient} from "@bluzelle/testing/src/swarmUtils";
 import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {expect} from "chai";
-import {createAddress, mint} from "./faucet";
+import {createAddress, mint} from "../lib/index";
 
 describe('faucet', () => {
 

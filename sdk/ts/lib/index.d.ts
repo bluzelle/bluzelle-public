@@ -623,6 +623,10 @@ export declare class BluzelleKeplrWallet implements BluzelleWallet {
 	getSequenceQueue: Promise<SequenceResponse>;
 	getSequence(client: SigningBluzelleClient, signerAddress: string): Promise<SequenceResponse>;
 }
+export declare function createAddress(): Promise<{
+	mnemonic: string;
+	address: string;
+}>;
 export declare function mint(client: BluzelleClient, address?: string): Promise<{
 	mnemonic: string;
 	address: string;
