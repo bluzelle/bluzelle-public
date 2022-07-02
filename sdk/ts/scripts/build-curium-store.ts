@@ -5,13 +5,16 @@ const rootDir = () => path.join(__dirname, '../../..');
 const curiumDir = () => path.join(rootDir(), 'curium');
 
 
-generateSdkCurium()
-    .then(buildCuriumStore)
-    .then(removeCuriumStore)
+process.argv[1] === __filename && setTimeout(() => doBuildCuriumStore())
+
+export const doBuildCuriumStore = () =>
+    generateSdkCurium()
+        .then(buildCuriumStore)
+        .then(removeCuriumStoreDir)
 
 function generateSdkCurium() {
     cd(curiumDir());
-    return $`sh -c 'ignite generate vuex'`;
+    return $`ignite generate vuex`;
 }
 
 function buildCuriumStore() {
@@ -20,7 +23,7 @@ function buildCuriumStore() {
         .then(() => $`yarn tsc`);
 }
 
-function removeCuriumStore() {
+function removeCuriumStoreDir() {
     return $`rm -rf ${rootDir() + '/sdk/ts/src/curium/store'}`;
 }
 
