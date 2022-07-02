@@ -8,6 +8,6 @@ export {newBluzelleClient} from "./sdk"
 export type {BluzelleClient} from "./sdk"
 export {getAccountBalance, hasContent, getTaxInfo} from "./query"
 export {getStatus, getValidators} from "./queryTendermint"
-export {send, pinCid} from "./tx"
+export {send, pinCid, withTransaction} from "./tx"
 
 

@@ -643,6 +643,7 @@ export interface ValidatorResponse {
 }
 export declare const getStatus: (client: BluzelleClient) => Promise<NodeStatusResponse>;
 export declare const getValidators: (client: BluzelleClient) => Promise<ValidatorResponse[]>;
+export declare const withTransaction: (client: BluzelleClient, fn: () => unknown) => Promise<import("@cosmjs/stargate/build/stargateclient").BroadcastTxSuccess | import("@cosmjs/stargate/build/stargateclient").BroadcastTxFailure>;
 export interface BroadcastOptions {
 	gasPrice: number;
 	maxGas: number;
