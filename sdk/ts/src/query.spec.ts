@@ -1,7 +1,7 @@
 import {getBlzClient, restartIpfsServerAndSwarm} from "@bluzelle/testing/src/commonUtils";
 import {generateContent} from "@bluzelle/testing/src/fileUtils";
-import {hasContent, getAccountBalance} from "../lib/index";
-import {pinCid, withTransaction} from "../lib/index";
+import {hasContent, getAccountBalance} from "./query";
+import {pinCid, withTransaction} from "./tx";
 import {BehaviorSubject} from "rxjs";
 import {times} from "lodash";
 import {passThroughAwait} from "promise-passthrough";

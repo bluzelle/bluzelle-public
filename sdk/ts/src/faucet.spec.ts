@@ -1,9 +1,11 @@
 import {startSwarmWithClient} from "@bluzelle/testing/src/swarmUtils";
 import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {expect} from "chai";
-import {createAddress, mint} from "../lib/index";
+import {createAddress, mint} from "./faucet";
 
-describe('faucet', () => {
+describe('faucet', function () {
+
+    this.timeout(1_800_000);
 
     it('should create an address', () => {
         return Promise.resolve(createAddress())

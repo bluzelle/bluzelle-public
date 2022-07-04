@@ -1,11 +1,11 @@
 import { SequenceResponse, SigningStargateClient } from "@cosmjs/stargate";
 import { SigningStargateClientOptions } from "@cosmjs/stargate/build/signingstargateclient";
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
-import { QueryClientImpl as StorageQueryClientImpl } from "./curium/lib/generated/bluzelle/curium/bluzelle.curium.storage/module/types/storage/query";
-import { QueryClientImpl as BankQueryClientImpl } from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.bank.v1beta1/module/types/cosmos/bank/v1beta1/query";
-import { QueryClientImpl as FaucetQueryClientImpl } from './curium/lib/generated/bluzelle/curium/bluzelle.curium.faucet/module/types/faucet/query';
+import { QueryClientImpl as StorageQueryClientImpl } from "./curium/lib/generated/storage/query";
+import { QueryClientImpl as BankQueryClientImpl } from "./curium/lib/generated/cosmos/bank/v1beta1/query";
+import { QueryClientImpl as FaucetQueryClientImpl } from './curium/lib/generated/faucet/query';
 import { BluzelleWallet } from "./wallets/BluzelleWallet";
-import { QueryClientImpl as TaxQueryClientImpl } from './curium/lib/generated/bluzelle/curium/bluzelle.curium.tax/module/types/tax/query';
+import { QueryClientImpl as TaxQueryClientImpl } from './curium/lib/generated/tax/query';
 declare type QueryClientImpl = {
     storage: StorageQueryClientImpl;
     bank: BankQueryClientImpl;

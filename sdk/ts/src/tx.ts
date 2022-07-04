@@ -1,17 +1,17 @@
 import {BluzelleClient} from "./sdk";
-import {MsgPin} from "./curium/lib/generated/bluzelle/curium/bluzelle.curium.storage/module/types/storage/tx";
+import {MsgPin} from "./curium/lib/generated/storage/tx";
 import {EncodeObject, Registry} from "@cosmjs/proto-signing";
 import {Deferred, newDeferred} from './utils/Deferred'
 import {Left, Right, Some} from "monet";
 import {passThrough} from "promise-passthrough";
 import {identity} from "lodash";
 import {BroadcastTxResponse} from "@cosmjs/stargate/build/stargateclient";
-import {MsgSend} from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.bank.v1beta1/module/types/cosmos/bank/v1beta1/tx";
+import {MsgSend} from "./curium/lib/generated/cosmos/bank/v1beta1/tx";
 import {
     MsgSetGasTaxBp,
     MsgSetTaxCollector,
     MsgSetTransferTaxBp
-} from "./curium/lib/generated/bluzelle/curium/bluzelle.curium.tax/module/types/tax/tx";
+} from "./curium/lib/generated/tax/tx";
 
 interface MsgQueueItem<T> {
     msg: EncodeObject;
@@ -77,9 +77,9 @@ export const pinCid = (client: BluzelleClient, cid: string, options: BroadcastOp
 
 export const send = (client: BluzelleClient, toAddress: string, amount: number, options: BroadcastOptions) =>
     sendTx(client, '/cosmos.bank.v1beta1.MsgSend', {
-        to_address: toAddress,
+        toAddress: toAddress,
         amount: [{denom: 'ubnt', amount: amount.toString()}],
-        from_address: client.address
+        fromAddress: client.address
     } as MsgSend, options);
 
 export const setGasTaxBp = (client: BluzelleClient, bp: number, options: BroadcastOptions) =>

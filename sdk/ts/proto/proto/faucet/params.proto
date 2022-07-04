@@ -1,0 +1,13 @@
+syntax = "proto3";
+package bluzelle.curium.faucet;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bluzelle/curium/x/faucet/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (gogoproto.goproto_stringer) = false;
+  
+  string testnet = 1 [(gogoproto.moretags) = "yaml:\"testnet\""];
+}

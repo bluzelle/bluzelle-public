@@ -6,7 +6,7 @@ import BIP32Factory from 'bip32';
 import * as ecc from 'tiny-secp256k1';
 import {BIP32Interface} from 'bip32'
 import {bech32} from "bech32"
-import * as delay from "delay";
+import delay from "delay";
 import {getAccountBalance} from "./query";
 
 const hdPath = "m/44'/483'/0'/0/0";

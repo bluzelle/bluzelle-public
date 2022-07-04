@@ -1,12 +1,12 @@
 {
   "name": "@bluzelle/sdk",
   "version": "1.0.8",
-  "main": "lib/index.js",
+  "main": "src/index.ts",
   "license": "MIT",
   "dependencies": {
-    "@cosmjs/crypto": "^0.26.5",
+    "@cosmjs/crypto": "0.28.11",
     "@cosmjs/launchpad": "^0.26.5",
-    "@cosmjs/proto-signing": "^0.26.5",
+    "@cosmjs/proto-signing": "^0.28.10",
     "@cosmjs/stargate": "^0.26.5",
     "@cosmjs/tendermint-rpc": "^0.26.5",
     "@keplr-wallet/cosmos": "^0.9.16",
@@ -27,6 +27,7 @@
     "cids": "^1.1.9",
     "delay": "^5.0.0",
     "find-remove": "^4.0.4",
+    "infra-control": "^1.0.0",
     "ipfs-http-client": "^55.0.0",
     "lodash": "^4.17.21",
     "monet": "^0.9.3",
@@ -36,6 +37,7 @@
   },
   "devDependencies": {
     "@bluzelle/testing": "^1.0.0",
+    "@scottburch/exec": "^1.1.1",
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^9.0.0",
@@ -46,9 +48,11 @@
     "daemon-manager": "^1.0.4",
     "dts-bundle-generator": "^6.9.0",
     "mocha": "^9.1.3",
+    "protobufjs": "6.11.3",
     "stream-browserify": "^3.0.0",
     "ts-loader": "^9.2.7",
-    "ts-node": "^10.4.0",
+    "ts-node": "^10.8.2",
+    "ts-proto": "1.118.0",
     "typescript": "^4.6.3",
     "webpack": "^5.70.0",
     "webpack-cli": "^4.9.2",
@@ -58,6 +62,7 @@
   "scripts": {
     "build": "ts-node scripts/build-sdk.ts",
     "build-web": "webpack -c browser.webpack.config.js",
-    "build-curium-store": "ts-node scripts/build-curium-store.ts"
+    "build-curium-store": "ts-node scripts/build-curium-store.ts",
+    "publish-npm": "ts-node scripts/publish-npm.ts"
   }
 }

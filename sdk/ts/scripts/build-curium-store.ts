@@ -1,29 +1,29 @@
-import {$, cd} from 'zx';
 import * as path from "path";
+import {downloadAllProto} from "../proto-builder/buildProtoDir";
+import {generateAllProto} from "../proto-builder/compileProto";
+import {mkdir} from "fs/promises";
+import {cd, exec} from "@scottburch/exec";
 
 const rootDir = () => path.join(__dirname, '../../..');
-const curiumDir = () => path.join(rootDir(), 'curium');
-
 
 process.argv[1] === __filename && setTimeout(() => doBuildCuriumStore())
 
 export const doBuildCuriumStore = () =>
-    generateSdkCurium()
+    mkdir(rootDir() + '/sdk/ts/src/curium/store', {recursive: true})
+        .then(generateSdkCurium)
         .then(buildCuriumStore)
         .then(removeCuriumStoreDir)
 
-function generateSdkCurium() {
-    cd(curiumDir());
-    return $`ignite generate vuex`;
-}
+const generateSdkCurium = () =>
+    downloadAllProto()
+        .then(() => generateAllProto('proto', rootDir() + '/sdk/ts/src/curium/store'));
 
-function buildCuriumStore() {
-    cd(rootDir() + '/sdk/ts/src/curium');
-    return $`yarn`
-        .then(() => $`yarn tsc`);
-}
+const buildCuriumStore = () =>
+    Promise.resolve(cd(rootDir() + '/sdk/ts/src/curium'))
+        .then(() => exec`yarn`.toPromise())
+        .then(() => exec`yarn tsc`.toPromise());
 
 function removeCuriumStoreDir() {
-    return $`rm -rf ${rootDir() + '/sdk/ts/src/curium/store'}`;
+    return exec`rm -rf ${rootDir() + '/sdk/ts/src/curium/store'}`.toPromise();
 }
 

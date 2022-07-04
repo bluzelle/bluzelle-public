@@ -4,18 +4,18 @@ import {SigningStargateClientOptions} from "@cosmjs/stargate/build/signingstarga
 import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 import {
     QueryClientImpl as StorageQueryClientImpl
-} from "./curium/lib/generated/bluzelle/curium/bluzelle.curium.storage/module/types/storage/query";
+} from "./curium/lib/generated/storage/query";
 import {
     QueryClientImpl as BankQueryClientImpl
-} from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.bank.v1beta1/module/types/cosmos/bank/v1beta1/query";
+} from "./curium/lib/generated/cosmos/bank/v1beta1/query";
 import {
     QueryClientImpl as FaucetQueryClientImpl
-} from './curium/lib/generated/bluzelle/curium/bluzelle.curium.faucet/module/types/faucet/query'
+} from './curium/lib/generated/faucet/query'
 import {BluzelleWallet} from "./wallets/BluzelleWallet";
 
 import {
     QueryClientImpl as TaxQueryClientImpl
-} from './curium/lib/generated/bluzelle/curium/bluzelle.curium.tax/module/types/tax/query'
+} from './curium/lib/generated/tax/query'
 
 type QueryClientImpl = {
     storage: StorageQueryClientImpl;

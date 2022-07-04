@@ -1,5 +1,5 @@
 import {pinCid, setGasTaxBp, setTaxCollector, setTransferTaxBp, withTransaction} from "./tx";
-import {startSwarmWithClient} from "@bluzelle/testing/src/swarmUtils";
+import {startSwarmWithClient} from "@bluzelle/testing"
 import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {getAccountBalance, getTaxInfo} from "./query";
 import {passThroughAwait} from "promise-passthrough";
@@ -9,6 +9,7 @@ import {Swarm} from "daemon-manager/src/Swarm";
 import {mint} from "./faucet";
 import * as chai from 'chai'
 import * as asPromised from 'chai-as-promised'
+
 
 chai.use(asPromised)
 
@@ -49,29 +50,6 @@ describe('sending transactions', function () {
                 pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000});
             }))
     });
-
-    it('should store pin to state in a pin tx', () =>
-        startSwarmWithClient()
-            .then(passThroughAwait(({bzSdk}) => pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000})))
-            .then(withCtxAwait('whitelist',({swarm}) => getWhiteListForGenesisExport(swarm)))
-            .then(withCtxAwait('sentry',({swarm}) => Promise.resolve(swarm.getSentries()[0])))
-            .then(withCtxAwait('exportedGenesis', ({sentry, whitelist}) => sentry.exportGenesis(whitelist)))
-            .then(withCtxAwait('genesis', ({exportedGenesis}) => Promise.resolve(exportedGenesis as {
-                app_state: {
-                    storage: {
-                        pins: {
-                            cid: string,
-                            creator: string
-                        }[]
-                    }
-                }
-            })))
-            .then(({genesis, auth}) => expect(genesis.app_state.storage.pins[0]).to.deep.equal({
-                cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR',
-                creator: auth.address
-            }))
-    );
-
 
 
     // skipping because we don't want to add admin info to repo right now
