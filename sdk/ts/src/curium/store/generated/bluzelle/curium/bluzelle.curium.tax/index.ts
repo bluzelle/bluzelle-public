@@ -133,18 +133,18 @@ export default {
 		},
 		
 		
-		async sendMsgSetTransferTaxBp({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgSetGasTaxBp({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSetTransferTaxBp(value)
+				const msg = await txClient.msgSetGasTaxBp(value)
 				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
 	gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSetTransferTaxBp:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgSetGasTaxBp:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSetTransferTaxBp:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgSetGasTaxBp:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -163,32 +163,32 @@ export default {
 				}
 			}
 		},
-		async sendMsgSetGasTaxBp({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgSetTransferTaxBp({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSetGasTaxBp(value)
+				const msg = await txClient.msgSetTransferTaxBp(value)
 				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
 	gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSetGasTaxBp:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgSetTransferTaxBp:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSetGasTaxBp:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgSetTransferTaxBp:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
 		
-		async MsgSetTransferTaxBp({ rootGetters }, { value }) {
+		async MsgSetGasTaxBp({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSetTransferTaxBp(value)
+				const msg = await txClient.msgSetGasTaxBp(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSetTransferTaxBp:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgSetGasTaxBp:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSetTransferTaxBp:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgSetGasTaxBp:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -205,16 +205,16 @@ export default {
 				}
 			}
 		},
-		async MsgSetGasTaxBp({ rootGetters }, { value }) {
+		async MsgSetTransferTaxBp({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSetGasTaxBp(value)
+				const msg = await txClient.msgSetTransferTaxBp(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSetGasTaxBp:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgSetTransferTaxBp:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSetGasTaxBp:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgSetTransferTaxBp:Create Could not create message: ' + e.message)
 				}
 			}
 		},
