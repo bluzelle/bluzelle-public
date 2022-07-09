@@ -53,7 +53,6 @@ function makePath(idx: number =  0, coinType: number = 483): HdPath {
     return [
         Slip10RawIndex.hardened(44),
         Slip10RawIndex.hardened(coinType),  // BNT
-        // Slip10RawIndex.hardened(118),
         Slip10RawIndex.hardened(0),
         Slip10RawIndex.normal(0),
         Slip10RawIndex.normal(idx),

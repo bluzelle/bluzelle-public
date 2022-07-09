@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Bluzelle sdk test</title>
+    <!-- charset must be in the head or you get an error in the library -->
+    <meta charset="UTF-8">
+    <script src="lib-web/index.js"></script>
+</head>
+<body>
+    <button id="balance">Check balance</button>
+    <button id="pin">Pin Cid</button>
+    <button id="send">Send Tx</button>
+    <div id="message" style="border: 1px solid black; height: 200px"></div>
+
+    <script>
+    let client;
+
+    Promise.resolve(() => writeMessage('starting client...'))
+    bluzelle.newBluzelleClient({
+        /*** Set the URL that you get from Neeraj ***/
+        url: 'http://localhost:26657',
+        /*** Set the host address you get from neeraj minus the port number ***/
+        wallet: bluzelle.newKeplrWallet('localhost'),
+        /*** Use this if you want to test transactions until I get the kepler stuff fully working **/
+//        wallet: bluzelle.newLocalWallet('MNEMONIC_YOU_GET_FROM_NEERAJ')
+    })
+        .then(c => client = c)
+        .then(c => writeMessage(`client started for address ${c.address}`));
+
+    document.querySelector('#balance').addEventListener('click', () => {
+        writeMessage('checking balance...', client.address);
+        bluzelle.getAccountBalance(client, client.address)
+            .then(writeMessage);
+    });
+
+    document.querySelector('#pin').addEventListener('click', () => {
+        writeMessage('pinning cid...')
+        bluzelle.pinCid(client, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {maxGas: 1000000, gasPrice: 0.002})
+            .then(JSON.stringify)
+            .then(writeMessage)
+    });
+
+    document.querySelector('#send').addEventListener('click', () => {
+        writeMessage('sending...')
+        bluzelle.send(client, 'bluzelle1xxkl5wddr5l6aact0mrlqx4vghdz752ccws5ke', 100, {
+            maxGas: 100000000,
+            gasPrice: 0.002
+        })
+            .then(JSON.stringify)
+            .then(writeMessage)
+    })
+
+    const writeMessage = (message) =>
+        document.querySelector('#message').innerHTML = message;
+
+</script>
+</body>
+</html>

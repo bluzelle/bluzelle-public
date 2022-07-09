@@ -15,57 +15,64 @@ interface SignDoc {
     accountNumber: Long;
 }
 
-export const newKeplrWallet = (nodeAddress: string) => (): Promise<BluzelleWallet> =>
-    generateMnemonic()
-        .then(mnemonic => newBluzelleClient({
-            url: `${nodeAddress}:26657`,
-            wallet: newLocalWallet(mnemonic)
-        })).then(client => getStatus(client))
-        .then(passThroughAwait( status => (window as Window).keplr?.experimentalSuggestChain({
-            chainId: status.chainId,
-            chainName: "Bluzelle",
-            rpc: `http://${nodeAddress}:26657`,
-            rest: `http://${nodeAddress}:1317`,
-            bip44: {
-                coinType: 483,
-            },
-            bech32Config: {
-                bech32PrefixAccAddr: "bluzelle",
-                bech32PrefixAccPub: "bluzelle" + "pub",
-                bech32PrefixValAddr: "bluzelle" + "valoper",
-                bech32PrefixValPub: "bluzelle" + "valoperpub",
-                bech32PrefixConsAddr: "bluzelle" + "valcons",
-                bech32PrefixConsPub: "bluzelle" + "valconspub",
-            },
-            currencies: [
-                {
-                    coinDenom: "BLZ",
-                    coinMinimalDenom: "ubnt",
-                    coinDecimals: 6,
-                    coinGeckoId: "bluzelle",
-                },
-            ],
-            feeCurrencies: [
-                {
-                    coinDenom: "BLZ",
-                    coinMinimalDenom: "ubnt",
-                    coinDecimals: 6,
-                    coinGeckoId: "bluzelle",
-                },
-            ],
-            stakeCurrency: {
+const addBluzelleChain = (chainId: string, nodeAddress: string) =>
+    (window as Window).keplr?.experimentalSuggestChain({
+        chainId: chainId,
+        chainName: `Bluzelle:${chainId}`,
+        rpc: `http://${nodeAddress}:26657`,
+        rest: `http://${nodeAddress}:1317`,
+        bip44: {
+            coinType: 483,
+        },
+        bech32Config: {
+            bech32PrefixAccAddr: "bluzelle",
+            bech32PrefixAccPub: "bluzelle" + "pub",
+            bech32PrefixValAddr: "bluzelle" + "valoper",
+            bech32PrefixValPub: "bluzelle" + "valoperpub",
+            bech32PrefixConsAddr: "bluzelle" + "valcons",
+            bech32PrefixConsPub: "bluzelle" + "valconspub",
+        },
+        currencies: [
+            {
                 coinDenom: "BLZ",
                 coinMinimalDenom: "ubnt",
                 coinDecimals: 6,
                 coinGeckoId: "bluzelle",
             },
-            coinType: 483,
-            gasPriceStep: {
-                low: 0.01,
-                average: 0.025,
-                high: 0.03,
-            }
-        })))
+        ],
+        feeCurrencies: [
+            {
+                coinDenom: "BLZ",
+                coinMinimalDenom: "ubnt",
+                coinDecimals: 6,
+                coinGeckoId: "bluzelle",
+            },
+        ],
+        stakeCurrency: {
+            coinDenom: "BLZ",
+            coinMinimalDenom: "ubnt",
+            coinDecimals: 6,
+            coinGeckoId: "bluzelle",
+        },
+        coinType: 483,
+        gasPriceStep: {
+            low: 0.002,
+            average: 0.002,
+            high: 0.002,
+        }
+    });
+
+export const newKeplrWallet = (nodeAddress: string) => (): Promise<BluzelleWallet> =>
+    generateMnemonic()
+        .then(mnemonic => newBluzelleClient({
+            url: `${nodeAddress}:26657`,
+            wallet: newLocalWallet(mnemonic)
+        }))
+        .then(client => getStatus(client))
+        .then(passThroughAwait(status =>
+            (window as Window).keplr?.enable(status.chainId)
+                .catch(e => {console.log(e); return addBluzelleChain(status.chainId, nodeAddress)})
+        ))
         .then(status => (window as Window).keplr?.getOfflineSigner(status.chainId))
         .then((keplrOfflineSigner) => new BluzelleKeplrWallet(keplrOfflineSigner as OfflineDirectSigner))
 

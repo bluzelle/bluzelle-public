@@ -10,7 +10,7 @@ client:
   openapi:
     path: "docs/static/openapi.yml"
   vuex:
-    path: "../sdk/ts/src/curium/store"
+    path: "../sdk/ts/src/curium/store"f
 init:
   app:
     api:
