@@ -5,12 +5,16 @@ import { QueryClientImpl as BankQueryClientImpl } from "./curium/lib/generated/c
 import { QueryClientImpl as FaucetQueryClientImpl } from './curium/lib/generated/faucet/query';
 import { BluzelleWallet } from "./wallets/BluzelleWallet";
 import { QueryClientImpl as TaxQueryClientImpl } from './curium/lib/generated/tax/query';
+import { QueryClientImpl as StakingQueryClientImpl } from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.staking.v1beta1/module/types/cosmos/staking/v1beta1/query";
+import { QueryClientImpl as DistributionQueryClientImpl } from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.distribution.v1beta1/module/types/cosmos/distribution/v1beta1/query";
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 declare type QueryClientImpl = {
     storage: StorageQueryClientImpl;
     bank: BankQueryClientImpl;
     faucet: FaucetQueryClientImpl;
     tax: TaxQueryClientImpl;
+    staking: StakingQueryClientImpl;
+    distribution: DistributionQueryClientImpl;
 };
 export interface BluzelleConfig {
     url: string;

@@ -13,4 +13,8 @@ export declare const send: (client: BluzelleClient, toAddress: string, amount: n
 export declare const setGasTaxBp: (client: BluzelleClient, bp: number, options: BroadcastOptions) => undefined;
 export declare const setTransferTaxBp: (client: BluzelleClient, bp: number, options: BroadcastOptions) => undefined;
 export declare const setTaxCollector: (client: BluzelleClient, taxCollector: string, options: BroadcastOptions) => undefined;
+export declare const delegate: (client: BluzelleClient, delegatorAddress: string, validatorAddress: string, amount: number, options: BroadcastOptions) => undefined;
+export declare const undelegate: (client: BluzelleClient, delegatorAddress: string, validatorAddress: string, amount: number, options: BroadcastOptions) => undefined;
+export declare const redelegate: (client: BluzelleClient, delegatorAddress: string, validatorSrcAddress: string, validatorDstAddress: string, amount: number, options: BroadcastOptions) => undefined;
+export declare const withdrawDelegatorReward: (client: BluzelleClient, delegatorAddress: string, validatorAddress: string, options: BroadcastOptions) => undefined;
 //# sourceMappingURL=tx.d.ts.map

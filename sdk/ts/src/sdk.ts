@@ -11,17 +11,25 @@ import {
     QueryClientImpl as FaucetQueryClientImpl
 } from './curium/lib/generated/faucet/query'
 import {BluzelleWallet} from "./wallets/BluzelleWallet";
-
 import {
     QueryClientImpl as TaxQueryClientImpl
-} from './curium/lib/generated/tax/query'
+} from './curium/lib/generated/tax/query';
+import {
+    QueryClientImpl as StakingQueryClientImpl
+} from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.staking.v1beta1/module/types/cosmos/staking/v1beta1/query";
+import {
+    QueryClientImpl as DistributionQueryClientImpl
+} from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.distribution.v1beta1/module/types/cosmos/distribution/v1beta1/query";
 import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
+
 
 type QueryClientImpl = {
     storage: StorageQueryClientImpl;
     bank: BankQueryClientImpl;
     faucet: FaucetQueryClientImpl;
     tax: TaxQueryClientImpl;
+    staking: StakingQueryClientImpl;
+    distribution: DistributionQueryClientImpl;
 }
 
 export interface BluzelleConfig {
@@ -64,7 +72,9 @@ const getRpcClient = (url: string): Promise<QueryClientImpl> =>
             storage: new StorageQueryClientImpl(rpcClient),
             bank: new BankQueryClientImpl(rpcClient),
             faucet: new FaucetQueryClientImpl(rpcClient),
-            tax: new TaxQueryClientImpl(rpcClient)
+            tax: new TaxQueryClientImpl(rpcClient),
+            staking: new StakingQueryClientImpl(rpcClient),
+            distribution: new DistributionQueryClientImpl(rpcClient)
         }));
 
 export class SigningBluzelleClient extends SigningStargateClient {

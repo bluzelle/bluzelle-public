@@ -11,6 +11,8 @@ import {
     MsgSetTaxCollector,
     MsgSetTransferTaxBp
 } from "./curium/lib/generated/tax/tx";
+import {MsgDelegate, MsgUndelegate, MsgBeginRedelegate} from "./curium/lib/generated/cosmos/staking/v1beta1/tx";
+import {MsgWithdrawDelegatorReward} from "./curium/lib/generated/cosmos/distribution/v1beta1/tx";
 import {DeliverTxResponse} from "@cosmjs/stargate";
 
 interface MsgQueueItem<T> {
@@ -33,7 +35,7 @@ export const withTransaction = (client: BluzelleClient, fn: () => unknown) => {
             it.deferred.resolve({...response, rawLog: response.rawLog?.[idx]})
         )))
 
-}
+};
 
 const startTransaction = () => msgQueue = [];
 const endTransaction = (queue: MsgQueue, client: BluzelleClient) => {
@@ -47,7 +49,7 @@ const endTransaction = (queue: MsgQueue, client: BluzelleClient) => {
             gasPrice: item.options.gasPrice
         }), {maxGas: 0} as BroadcastOptions)
     }
-}
+};
 
 
 export const registerMessages = (registry: Registry) => {
@@ -56,8 +58,12 @@ export const registerMessages = (registry: Registry) => {
     registry.register('/bluzelle.curium.tax.MsgSetGasTaxBp', MsgSetGasTaxBp)
     registry.register('/bluzelle.curium.tax.MsgSetTransferTaxBp', MsgSetTransferTaxBp)
     registry.register('/bluzelle.curium.tax.MsgSetTaxCollector', MsgSetTaxCollector)
+    registry.register('/cosmos.staking.v1beta1.MsgDelegate', MsgDelegate)
+    registry.register('/cosmos.staking.v1beta1.MsgUndelegate', MsgUndelegate)
+    registry.register('/cosmos.staking.v1beta1.MsgBeginRedelegate', MsgBeginRedelegate)
+    registry.register('/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward', MsgWithdrawDelegatorReward)
     return registry
-}
+};
 
 export interface BroadcastOptions {
     gasPrice: number,
@@ -69,7 +75,7 @@ const queueMessage = (msg: EncodeObject, options: BroadcastOptions) =>
     Some<MsgQueueItem<unknown>>({
         msg, options, deferred: newDeferred()
     })
-        .map(passThrough(item => msgQueue?.push(item)))
+        .map(passThrough(item => msgQueue?.push(item)));
 
 
 export const pinCid = (client: BluzelleClient, cid: string, options: BroadcastOptions) =>
@@ -83,13 +89,41 @@ export const send = (client: BluzelleClient, toAddress: string, amount: number, 
     } as MsgSend, options);
 
 export const setGasTaxBp = (client: BluzelleClient, bp: number, options: BroadcastOptions) =>
-    sendTx(client, '/bluzelle.curium.tax.MsgSetGasTaxBp', {bp, creator: client.address}, options)
+    sendTx(client, '/bluzelle.curium.tax.MsgSetGasTaxBp', {bp, creator: client.address}, options);
 
 export const setTransferTaxBp = (client: BluzelleClient, bp: number, options: BroadcastOptions) =>
-    sendTx(client, '/bluzelle.curium.tax.MsgSetTransferTaxBp', {bp, creator: client.address}, options)
+    sendTx(client, '/bluzelle.curium.tax.MsgSetTransferTaxBp', {bp, creator: client.address}, options);
 
 export const setTaxCollector = (client: BluzelleClient, taxCollector: string, options: BroadcastOptions) =>
-    sendTx(client, '/bluzelle.curium.tax.MsgSetTaxCollector', {taxCollector, creator: client.address}, options)
+    sendTx(client, '/bluzelle.curium.tax.MsgSetTaxCollector', {taxCollector, creator: client.address}, options);
+
+export const delegate = (client: BluzelleClient, delegatorAddress: string, validatorAddress: string, amount: number, options: BroadcastOptions) =>
+    sendTx(client, '/cosmos.staking.v1beta1.MsgDelegate', {
+        delegatorAddress,
+        validatorAddress,
+        amount: {denom: 'ubnt', amount: amount.toString()},
+    } as MsgDelegate, options);
+
+export const undelegate = (client: BluzelleClient, delegatorAddress: string, validatorAddress: string, amount: number, options: BroadcastOptions) =>
+    sendTx(client, '/cosmos.staking.v1beta1.MsgUndelegate', {
+        delegatorAddress,
+        validatorAddress,
+        amount: {denom: 'ubnt', amount: amount.toString()},
+    } as MsgUndelegate, options);
+
+export const redelegate = (client: BluzelleClient, delegatorAddress: string, validatorSrcAddress: string, validatorDstAddress: string, amount: number, options: BroadcastOptions) =>
+    sendTx(client, '/cosmos.staking.v1beta1.MsgBeginRedelegate', {
+        delegatorAddress,
+        validatorSrcAddress,
+        validatorDstAddress,
+        amount: {denom: 'ubnt', amount: amount.toString()},
+    } as MsgBeginRedelegate, options);
+
+export const withdrawDelegatorReward = (client: BluzelleClient, delegatorAddress: string, validatorAddress: string, options: BroadcastOptions) =>
+    sendTx(client, '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward', {
+        delegatorAddress,
+        validatorAddress,
+    } as MsgWithdrawDelegatorReward, options);
 
 const sendTx = <T>(client: BluzelleClient, type: string, msg: T, options: BroadcastOptions) =>
     Right(msg)
@@ -116,10 +150,10 @@ const broadcastTx = <T>(client: BluzelleClient, msgs: EncodeObject[], options: B
         .then(response => ({
             ...response,
             rawLog: tryJson(response.rawLog)
-        }))
+        }));
 
 const tryJson = (s: string = '') => {
     try {
         return JSON.parse(s)
     } catch(e) {return s}
-}
+};
