@@ -141,6 +141,7 @@ func SpawnStorageIpfsNode(ctx context.Context, repoPath string) (*StorageIpfsNod
 		// You can add more nodes here, for example, another IPFS node you might have running locally, mine was:
 		// "/ip4/127.0.0.1/tcp/4010/p2p/QmZp2fhDLxjYue2RiUvLwT9MWdnbDxam32qYFnGmxZDh5L",
 		// "/ip4/127.0.0.1/udp/4010/quic/p2p/QmZp2fhDLxjYue2RiUvLwT9MWdnbDxam32qYFnGmxZDh5L",
+		"/ip4/52.204.207.70/tcp/4001/p2p/12D3KooWCp6VFUtssr9JiJGCamzNmctDYPjVEicAW1EpY2aDNhnr",
 	}
 
 	go func() {
