@@ -11,6 +11,7 @@
     "@cosmjs/tendermint-rpc": "^0.26.5",
     "@keplr-wallet/cosmos": "^0.9.16",
     "@keplr-wallet/types": "^0.10.0",
+    "@protobuf-ts/protoc": "^2.7.0",
     "@scottburch/with-context": "^1.0.4",
     "@types/bech32": "^1.1.4",
     "@types/bip32": "^2.0.0",
@@ -58,6 +59,9 @@
     "webpack-cli": "^4.9.2",
     "webpack-node-externals": "^3.0.0",
     "zx": "^4.3.0"
+  },
+  "config": {
+    "protocVersion": "21.4"
   },
   "scripts": {
     "build": "ts-node scripts/build-sdk.ts",
