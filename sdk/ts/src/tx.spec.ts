@@ -7,11 +7,7 @@ import {expect} from "chai";
 import {withCtxAwait} from "@scottburch/with-context";
 import {Swarm} from "daemon-manager/src/Swarm";
 import {mint} from "./faucet";
-import * as chai from 'chai'
-import * as asPromised from 'chai-as-promised'
 
-
-chai.use(asPromised)
 
 const MAX_GAS = 200000;
 const GAS_PRICE = 2;
@@ -20,7 +16,7 @@ describe('sending transactions', function () {
     this.timeout(2_000_000);
 
     it('should be able to mint tokens to a new account', () =>
-        startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})
+        startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true}, {url: 'http://localhost:26667'})
             .then(info => ({client: info.bzSdk}))
             .then(withCtxAwait('mintResult', ctx => mint(ctx.client)))
             .then(ctx => getAccountBalance(ctx.client, ctx.mintResult.address))
