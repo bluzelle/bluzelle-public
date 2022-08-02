@@ -1,6 +1,6 @@
 import {mkdir, writeFile, cp} from "fs/promises";
 import fetch from 'node-fetch'
-import {getCosmosProtoDependencies, getThirdPartyDependencies} from "./getProto";
+import {getCosmosProtoDependencies, getGoogleDependencies, getThirdPartyDependencies} from "./getProto";
 import {readdirSync, statSync} from "fs";
 import * as path from 'path'
 
@@ -25,15 +25,19 @@ export const createDir = (dir: string, parent: string = 'proto') =>
 export const getPathFromLink = (link: string): string =>
     link.replace(/.*?\/v0.44.3\/(.*)/, "$1");
 
-export const getProtoFile = (link: string) =>
+export const getGooglePathFromLink = (link: string): string =>
+    'third_party/proto/' + link.replace(/.*?\/src\/(.*)/, "$1");
+
+export const getProtoFile = (link: string, getPathFn: (_: string) => string) =>
     fetch(link)
-        .then(resp => writeProtoFile(getPathFromLink(link), resp.body));
+        .then(resp => writeProtoFile(getPathFn(link), resp.body, getDirFromPath));
+
 
 export const getDirFromPath = (path: string) =>
     path.replace(/(.*\/).*\.proto/, '$1');
 
-export const writeProtoFile = (path: string, response: NodeJS.ReadableStream): Promise<void> =>
-    createDir(getDirFromPath(path))
+export const writeProtoFile = (path: string, response: NodeJS.ReadableStream, getDirFn: (_: string) => string): Promise<void> =>
+    createDir(getDirFn(path))
         .then(() => writeFile('proto' + '/' + path, response));
 
 const getCuriumProto = () =>
@@ -42,8 +46,9 @@ const getCuriumProto = () =>
             cp(file, 'proto' + '/' + file.replace(/.*?\/curium\/(proto\/.*)/, '$1'))))
 
 export const downloadAllProto = () =>
-    Promise.all(getCosmosProtoDependencies().map(getProtoFile))
-        .then(() => Promise.all(getThirdPartyDependencies().map(getProtoFile)))
+    Promise.all(getCosmosProtoDependencies().map(link => getProtoFile(link, getPathFromLink)))
+        .then(() => Promise.all(getThirdPartyDependencies().map(link => getProtoFile(link, getPathFromLink))))
+        .then(() => Promise.all(getGoogleDependencies().map(link => getProtoFile(link, getGooglePathFromLink))))
         .then(() => getCuriumProto());
 
 

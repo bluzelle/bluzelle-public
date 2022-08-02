@@ -45,9 +45,6 @@ export const getThirdPartyDependencies = () => [
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.44.3/third_party/proto/google/api/http.proto',
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.44.3/third_party/proto/google/api/httpbody.proto',
 
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.44.3/third_party/proto/google/protobuf/any.proto',
-
-
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.44.3/third_party/proto/tendermint/abci/types.proto',
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.44.3/third_party/proto/tendermint/crypto/keys.proto',
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.44.3/third_party/proto/tendermint/crypto/proof.proto',
@@ -58,5 +55,13 @@ export const getThirdPartyDependencies = () => [
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.44.3/third_party/proto/tendermint/types/block.proto',
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.44.3/third_party/proto/tendermint/version/types.proto'
 
+];
+
+export const getGoogleDependencies = () => [
+    'https://raw.githubusercontent.com/protocolbuffers/protobuf/main/src/google/protobuf/descriptor.proto',
+    'https://raw.githubusercontent.com/protocolbuffers/protobuf/main/src/google/protobuf/any.proto',
+    'https://raw.githubusercontent.com/protocolbuffers/protobuf/main/src/google/protobuf/timestamp.proto',
+    'https://raw.githubusercontent.com/protocolbuffers/protobuf/main/src/google/protobuf/duration.proto'
 ]
+//third_party/google/protobuf/duration.proto
 
