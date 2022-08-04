@@ -1,8 +1,8 @@
-import {$} from 'zx';
 import {mkdir} from "fs/promises";
 import {getAllFiles} from "./buildProtoDir";
 import {exec} from "@scottburch/exec";
 
+process.setMaxListeners(100);
 
 export const ensureDirExists = (dir: string) =>
     mkdir(dir, {recursive: true});
