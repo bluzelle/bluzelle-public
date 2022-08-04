@@ -14,7 +14,7 @@ describe('tendermint queries', () => {
                 expect(response.caughtUp).to.be.true
                 expect(response.chainId).to.equal('my-chain')
                 expect(response.blockHeight).to.be.greaterThan(0)
-                expect(response.moniker).to.equal('test-sentry-client-0')
+                expect(response.moniker).to.equal('a.client.sentry')
             })
     )
 
@@ -23,7 +23,7 @@ describe('tendermint queries', () => {
             .then(({bzSdk}) => getValidators(bzSdk))
             .then(response => {
                 expect(response[0].address.length).to.equal(40)
-                expect(response[0].votingPower).to.equal(100000000)
+                expect(response[0].votingPower).to.equal(defaultSwarmConfig.genesisTokenBalance? defaultSwarmConfig.genesisTokenBalance / 10: 0)
             })
     )
 })

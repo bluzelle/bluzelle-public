@@ -48,6 +48,7 @@
     "daemon-manager": "^1.0.4",
     "dts-bundle-generator": "^6.9.0",
     "mocha": "^9.1.3",
+    "mocha-jenkins-reporter": "^0.4.7",
     "protobufjs": "6.11.3",
     "stream-browserify": "^3.0.0",
     "ts-loader": "^9.2.7",
@@ -63,6 +64,7 @@
     "build": "ts-node scripts/build-sdk.ts",
     "build-web": "webpack -c browser.webpack.config.js",
     "build-curium-store": "ts-node scripts/build-curium-store.ts",
-    "publish-npm": "ts-node scripts/publish-npm.ts"
+    "publish-npm": "ts-node scripts/publish-npm.ts",
+    "run-sdk-tests": "ts-node scripts/run-sdk-tests.ts"
   }
 }

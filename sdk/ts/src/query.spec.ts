@@ -38,7 +38,8 @@ describe('query', function () {
                 hasContent(ctx.client, addResult.path)
                     .then((confirm) => expect(confirm).to.be.true)
             )))
-    )
+    );
+
 
     it('hasContent should return false if content is NOT pinned', () =>
         Promise.all(times(2).map(() =>
