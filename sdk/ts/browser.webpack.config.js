@@ -5,7 +5,7 @@ module.exports = {
     entry: './src/index.ts',
     output: {
         filename: 'index.js',
-        path: path.resolve(__dirname, 'lib-web'),
+        path: path.resolve(__dirname, 'lib'),
          library: "bluzelle",
          libraryTarget: "umd",
     },
