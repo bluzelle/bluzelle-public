@@ -2,9 +2,14 @@ import {startSwarmWithClient} from "@bluzelle/testing/src/swarmUtils";
 import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {getStatus, getValidators} from "./queryTendermint";
 import {expect} from "chai";
+import {Swarm} from "daemon-manager";
 
 
 describe('tendermint queries', () => {
+
+    beforeEach(() =>
+        Swarm.stopDaemons({...defaultSwarmConfig})
+    )
 
     it('should get the status of a node', () =>
         startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})

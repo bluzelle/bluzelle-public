@@ -2,10 +2,15 @@ import {startSwarmWithClient} from "@bluzelle/testing/src/swarmUtils";
 import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {expect} from "chai";
 import {createAddress, mint} from "./faucet";
+import {Swarm} from "daemon-manager";
 
 describe('faucet', function () {
 
     this.timeout(1_800_000);
+
+    beforeEach(() =>
+        Swarm.stopDaemons(({...defaultSwarmConfig}))
+    );
 
     it('should create an address', () => {
         return Promise.resolve(createAddress())

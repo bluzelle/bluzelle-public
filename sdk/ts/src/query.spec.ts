@@ -22,7 +22,7 @@ describe('query', function () {
             .then((swarmMnemonic) => mnemonic.next(swarmMnemonic))
     )
 
-    it('hasContent should return true if content is pinned', () =>
+    it.skip('hasContent should return true if content is pinned', () =>
         Promise.all(times(2).map(() =>
             Promise.resolve(generateContent(0.01))
                 .then((content) => ipfsClient.add(content))

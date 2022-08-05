@@ -3,17 +3,20 @@ import {startSwarmWithClient} from "@bluzelle/testing"
 import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {getAccountBalance, getTaxInfo} from "./query";
 import {passThroughAwait} from "promise-passthrough";
-import {expect} from "chai";
 import {withCtxAwait} from "@scottburch/with-context";
-import {Swarm} from "daemon-manager/src/Swarm";
 import {mint} from "./faucet";
-
+import {expect} from "chai";
+import {Swarm} from "daemon-manager";
 
 const MAX_GAS = 200000;
 const GAS_PRICE = 2;
 
 describe('sending transactions', function () {
     this.timeout(2_000_000);
+
+    beforeEach(() =>
+        Swarm.stopDaemons({...defaultSwarmConfig})
+    )
 
     it('should be able to mint tokens to a new account', () =>
         startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true}, {url: 'http://localhost:26667'})
@@ -34,7 +37,8 @@ describe('sending transactions', function () {
 
     it('should not mint if bluzelleFaucet is not turned on', () =>
         startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: false})
-            .then(info => expect(mint(info.bzSdk)).to.be.rejected)
+            .then(info => mint(info.bzSdk))
+            .catch(err => expect(err.message.includes('invalid request')).to.be.true)
     )
 
 
@@ -109,8 +113,3 @@ describe('sending transactions', function () {
 
 });
 
-const getWhiteListForGenesisExport = (swarm: Swarm): Promise<string[]> =>
-    Promise.resolve(swarm.getValidators()[0])
-        .then(validator => validator.exec('curiumd query staking validators'))
-        .then(validators => validators as {validators: { operator_address: string }[]})
-        .then(addresses => addresses.validators.map(addr => addr.operator_address));
