@@ -1,7 +1,6 @@
 import {createProtobufRpcClient, QueryClient, SequenceResponse, SigningStargateClient} from "@cosmjs/stargate";
 import {getRegistry} from "./registry";
 import {SigningStargateClientOptions} from "@cosmjs/stargate/build/signingstargateclient";
-import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 import {
     QueryClientImpl as StorageQueryClientImpl
 } from "./curium/lib/generated/storage/query";
@@ -16,6 +15,7 @@ import {BluzelleWallet} from "./wallets/BluzelleWallet";
 import {
     QueryClientImpl as TaxQueryClientImpl
 } from './curium/lib/generated/tax/query'
+import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 
 type QueryClientImpl = {
     storage: StorageQueryClientImpl;

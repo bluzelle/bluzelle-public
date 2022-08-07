@@ -5,13 +5,13 @@ import {Deferred, newDeferred} from './utils/Deferred'
 import {Left, Right, Some} from "monet";
 import {passThrough} from "promise-passthrough";
 import {identity} from "lodash";
-import {BroadcastTxResponse} from "@cosmjs/stargate/build/stargateclient";
 import {MsgSend} from "./curium/lib/generated/cosmos/bank/v1beta1/tx";
 import {
     MsgSetGasTaxBp,
     MsgSetTaxCollector,
     MsgSetTransferTaxBp
 } from "./curium/lib/generated/tax/tx";
+import {DeliverTxResponse} from "@cosmjs/stargate";
 
 interface MsgQueueItem<T> {
     msg: EncodeObject;
@@ -102,7 +102,7 @@ const sendTx = <T>(client: BluzelleClient, type: string, msg: T, options: Broadc
         .leftMap(msg => queueMessage(msg as EncodeObject, options))
         .cata(identity, identity);
 
-const broadcastTx = <T>(client: BluzelleClient, msgs: EncodeObject[], options: BroadcastOptions): Promise<BroadcastTxResponse> =>
+const broadcastTx = <T>(client: BluzelleClient, msgs: EncodeObject[], options: BroadcastOptions): Promise<DeliverTxResponse> =>
     client.sgClient.signAndBroadcast(
         client.address,
         msgs,
@@ -115,5 +115,11 @@ const broadcastTx = <T>(client: BluzelleClient, msgs: EncodeObject[], options: B
         options.memo)
         .then(response => ({
             ...response,
-            rawLog: typeof response.rawLog === "string" ? response.rawLog : JSON.parse(response.rawLog || '[]')
+            rawLog: tryJson(response.rawLog)
         }))
+
+const tryJson = (s: string = '') => {
+    try {
+        return JSON.parse(s)
+    } catch(e) {return s}
+}

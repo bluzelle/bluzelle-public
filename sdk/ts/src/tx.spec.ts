@@ -111,5 +111,6 @@ describe('sending transactions', function () {
 
 
 
-});
+})
+
 
