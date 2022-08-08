@@ -1,23 +1,22 @@
 const path = require('path');
-const nodeExternals = require('webpack-node-externals');
-
+const webpack = require('webpack');
 
 module.exports = {
     entry: './src/index.ts',
     output: {
         filename: 'index.js',
         path: path.resolve(__dirname, 'lib'),
-        // library: "sdk",
+         library: "bluzelle",
          libraryTarget: "umd",
     },
     target: 'web',
-    externalsPresets: {node: true},
-    externals: [nodeExternals({
-        allowlist: [
-//            '@bluzelle/wallet/src/wallet',
-//            "deferred/src/Deferred",
-        ]
-    })],
+//     externalsPresets: {node: true},
+//     externals: [nodeExternals({
+//         allowlist: [
+// //            '@bluzelle/wallet/src/wallet',
+// //            "deferred/src/Deferred",
+//         ]
+//     })],
     mode: 'production',
     module: {
         rules: [
@@ -31,9 +30,20 @@ module.exports = {
     resolve: {
         extensions: ['.ts', '.js'],
         fallback: {
-            fs: false,
-            os: false
+            path: false,
+            crypto: require.resolve("crypto-browserify"),
+            stream: require.resolve("stream-browserify"),
+            buffer: require.resolve('buffer/'),
+            // fs: false,
+            // os: false
         }
     },
     devtool: 'source-map',
+    plugins: [
+        new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+        }),
+    ],
+
+    experiments: {asyncWebAssembly: true}
 };
