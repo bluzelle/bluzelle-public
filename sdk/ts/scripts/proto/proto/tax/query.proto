@@ -1,0 +1,32 @@
+syntax = "proto3";
+package bluzelle.curium.tax;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+// this line is used by starport scaffolding # 1
+
+option go_package = "github.com/bluzelle/curium/x/tax/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Queries a list of GetTaxInfo items.
+	rpc GetTaxInfo(QueryGetTaxInfoRequest) returns (QueryGetTaxInfoResponse) {
+		option (google.api.http).get = "/bluzelle/curium/tax/get_tax_info";
+	}
+
+// this line is used by starport scaffolding # 2
+
+}
+
+
+message QueryGetTaxInfoRequest {
+}
+
+message QueryGetTaxInfoResponse {
+  int64 gasTaxBp = 1;
+  int64 transferTaxBp = 2;
+  string taxCollector = 3;
+}
+
+// this line is used by starport scaffolding # 3

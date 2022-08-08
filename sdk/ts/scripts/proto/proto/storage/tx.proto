@@ -1,0 +1,22 @@
+syntax = "proto3";
+package bluzelle.curium.storage;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/bluzelle/curium/x/storage/types";
+
+// Msg defines the Msg service.
+service Msg {
+      rpc Pin(MsgPin) returns (MsgPinResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
+}
+
+message MsgPin {
+  string creator = 1;
+  string cid = 2;
+}
+
+message MsgPinResponse {
+}
+
+// this line is used by starport scaffolding # proto/tx/message
