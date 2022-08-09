@@ -3,6 +3,7 @@ import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {expect} from "chai";
 import {createAddress, mint} from "./faucet";
 import {Swarm} from "daemon-manager";
+import {describe} from 'mocha';
 
 describe('faucet', function () {
 

@@ -8,7 +8,8 @@ module.exports = {
         path: path.resolve(__dirname, 'lib'),
          library: "bluzelle",
          libraryTarget: "umd",
-         globalObject: 'this'
+         globalObject: 'this',
+         publicPath: path.resolve(__dirname, 'lib')
     },
     target: 'web',
 //     externalsPresets: {node: true},
