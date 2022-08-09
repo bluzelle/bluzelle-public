@@ -8,6 +8,7 @@ module.exports = {
         path: path.resolve(__dirname, 'lib'),
          library: "bluzelle",
          libraryTarget: "umd",
+         globalObject: 'this'
     },
     target: 'web',
 //     externalsPresets: {node: true},
@@ -17,7 +18,7 @@ module.exports = {
 // //            "deferred/src/Deferred",
 //         ]
 //     })],
-    mode: 'production',
+    mode: 'development',
     module: {
         rules: [
             {

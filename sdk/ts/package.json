@@ -1,7 +1,7 @@
 {
   "name": "@bluzelle/sdk",
   "version": "1.0.8",
-  "main": "index.js",
+  "main": "lib/index.js",
   "license": "MIT",
   "dependencies": {
     "@cosmjs/crypto": "0.28.11",
