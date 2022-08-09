@@ -2,6 +2,7 @@
   "name": "@bluzelle/sdk",
   "version": "1.0.8",
   "main": "lib/index.js",
+  "browser": "./browser.js",
   "license": "MIT",
   "dependencies": {
     "@cosmjs/crypto": "0.28.11",
@@ -18,7 +19,7 @@
     "@types/find-remove": "^2.0.1",
     "@types/lodash": "^4.14.178",
     "@types/mocha": "^9.1.1",
-    "@types/node": "^16.11.11",
+    "@types/node": "^18.6.5",
     "@types/tiny-secp256k1": "^2.0.1",
     "async-wait-until": "^2.0.12",
     "bech32": "^2.0.0",
@@ -31,6 +32,7 @@
     "ipfs-http-client": "^55.0.0",
     "lodash": "^4.17.21",
     "monet": "^0.9.3",
+    "node-fetch": "2",
     "promise-passthrough": "^1.0.5",
     "rxjs": "^7.4.0",
     "tiny-secp256k1": "^2.2.1"
@@ -62,6 +64,7 @@
   },
   "scripts": {
     "build": "ts-node scripts/build-sdk.ts",
+    "build-web": "ts-node scripts/build-web-sdk.ts",
     "build-curium-store": "ts-node scripts/build-curium-store.ts",
     "run-sdk-tests": "ts-node scripts/run-sdk-tests.ts"
   }
