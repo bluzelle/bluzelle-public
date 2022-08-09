@@ -4,13 +4,13 @@ import {QueryGetTaxInfoResponse} from "./curium/lib/generated/tax/query";
 import {
     QueryDelegatorDelegationsResponse,
     QueryValidatorsResponse
-} from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.staking.v1beta1/module/types/cosmos/staking/v1beta1/query";
+} from "./curium/lib/generated/cosmos/staking/v1beta1/query";
 import {
     DelegationResponse
-} from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.staking.v1beta1/module/types/cosmos/staking/v1beta1/staking";
+} from "./curium/lib/generated/cosmos/staking/v1beta1/staking";
 import {Coin} from "@cosmjs/proto-signing";
-import {Delegation} from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.staking.v1beta1/module/types/cosmos/staking/v1beta1/staking";
-import {PageRequest, PageResponse} from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.staking.v1beta1/module/types/cosmos/base/query/v1beta1/pagination";
+import {Delegation} from "./curium/lib/generated/cosmos/staking/v1beta1/staking";
+import {PageRequest, PageResponse} from "./curium/lib/generated/cosmos/base/query/v1beta1/pagination";
 
 export type BluzelleDelegatorDelegationsResponse = {
     pagination: PageResponse,
@@ -37,7 +37,7 @@ const defaultPaginationOptions = (): PageRequest => ({
     key: new Uint8Array(),
     offset: 0,
     limit: 10,
-    count_total: true,
+    countTotal: true,
     reverse: false,
 });
 
@@ -64,12 +64,12 @@ export const getDelegations = (
     options: PageRequest = defaultPaginationOptions()
 ): Promise<BluzelleDelegatorDelegationsResponse> =>
     client.queryClient.staking.DelegatorDelegations({
-        delegator_addr: delegatorAddress,
+        delegatorAddr: delegatorAddress,
         pagination: {
             key: options.key,
             offset: options.offset,
             limit: options.limit,
-            count_total: options.count_total,
+            countTotal: options.countTotal,
             reverse: options.reverse
         }
     })
@@ -81,13 +81,13 @@ export const getDelegation = (
     validatorAddress: string
 ): Promise<BluzelleDelegationResponse> =>
     client.queryClient.staking.Delegation({
-        delegator_addr: delegatorAddress,
-        validator_addr: validatorAddress
+        delegatorAddr: delegatorAddress,
+        validatorAddr: validatorAddress
     })
-        .then(res => res.delegation_response ? parseDelegationResponse(res.delegation_response) : {
+        .then(res => res.delegationResponse ? parseDelegationResponse(res.delegationResponse) : {
             delegation: {
-                validatorAddress: validatorAddress,
-                delegatorAddress: delegatorAddress,
+                validatorAddress,
+                delegatorAddress,
                 shares: 0
             },
             balance: {
@@ -107,7 +107,7 @@ export const getValidatorsInfo = (
             key: options.key,
             offset: options.offset,
             limit: options.limit,
-            count_total: options.count_total,
+            countTotal: options.countTotal,
             reverse: options.reverse
         }
     });
@@ -118,16 +118,16 @@ export const getDelegationRewards = (
     validatorAddress: string
 ): Promise<BluzelleCoin[]> =>
     client.queryClient.distribution.DelegationRewards({
-        delegator_address: delegatorAddress,
-        validator_address: validatorAddress
+        delegatorAddress,
+        validatorAddress
     })
         .then(res => res.rewards ? res.rewards.map(parseCoin) : []);
 
 
 const parseQueryDelegatorDelegationsResponse = (res: QueryDelegatorDelegationsResponse): Promise<BluzelleDelegatorDelegationsResponse> =>
-    Promise.resolve(res.delegation_responses.map(parseDelegationResponse))
+    Promise.resolve(res.delegationResponses.map(parseDelegationResponse))
         .then(delegations => ({
-            pagination: res.pagination ? res.pagination : {next_key: new Uint8Array(), total: 0},
+            pagination: res.pagination ? res.pagination : {nextKey: new Uint8Array(), total: 0},
             delegations,
         }));
 
@@ -137,8 +137,8 @@ const parseDelegationResponse = (res: DelegationResponse): BluzelleDelegationRes
 });
 
 const parseDelegation = (delegation: Delegation): BluzelleDelegation => ({
-    validatorAddress: delegation.validator_address,
-    delegatorAddress: delegation.delegator_address,
+    validatorAddress: delegation.validatorAddress,
+    delegatorAddress: delegation.delegatorAddress,
     shares: Number(delegation.shares)
 });
 

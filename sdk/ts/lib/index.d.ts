@@ -5,7 +5,7 @@ export { newKeplrWallet, BluzelleKeplrWallet } from './wallets/keplrWallet';
 export { mint, createAddress } from "./faucet";
 export { newBluzelleClient } from "./sdk";
 export type { BluzelleClient } from "./sdk";
-export { getAccountBalance, hasContent, getTaxInfo } from "./query";
+export { getAccountBalance, hasContent, getTaxInfo, getDelegations, getDelegation, getValidatorsInfo, getDelegationRewards, BluzelleCoin, BluzelleDelegation, BluzelleDelegationResponse, BluzelleDelegatorDelegationsResponse } from "./query";
 export { getStatus, getValidators } from "./queryTendermint";
-export { send, pinCid, withTransaction } from "./tx";
+export { send, pinCid, withTransaction, delegate, undelegate, redelegate, withdrawDelegatorReward } from "./tx";
 //# sourceMappingURL=index.d.ts.map

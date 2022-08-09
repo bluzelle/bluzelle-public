@@ -1,7 +1,7 @@
 import { BluzelleClient } from "./sdk";
 import { QueryGetTaxInfoResponse } from "./curium/lib/generated/tax/query";
-import { QueryValidatorsResponse } from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.staking.v1beta1/module/types/cosmos/staking/v1beta1/query";
-import { PageRequest, PageResponse } from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.staking.v1beta1/module/types/cosmos/base/query/v1beta1/pagination";
+import { QueryValidatorsResponse } from "./curium/lib/generated/cosmos/staking/v1beta1/query";
+import { PageRequest, PageResponse } from "./curium/lib/generated/cosmos/base/query/v1beta1/pagination";
 export declare type BluzelleDelegatorDelegationsResponse = {
     pagination: PageResponse;
     delegations: BluzelleDelegationResponse[];
@@ -16,7 +16,7 @@ export declare type BluzelleDelegation = {
     shares: number;
 };
 export declare type BluzelleCoin = {
-    denom: string;
+    denom: 'ubnt';
     amount: number;
 };
 export declare const waitForContent: (client: BluzelleClient, path: string, waitTime?: number) => Promise<boolean>;

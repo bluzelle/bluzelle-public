@@ -16,10 +16,10 @@ import {
 } from './curium/lib/generated/tax/query';
 import {
     QueryClientImpl as StakingQueryClientImpl
-} from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.staking.v1beta1/module/types/cosmos/staking/v1beta1/query";
+} from "./curium/lib/generated/cosmos/staking/v1beta1/query";
 import {
     QueryClientImpl as DistributionQueryClientImpl
-} from "./curium/lib/generated/cosmos/cosmos-sdk/cosmos.distribution.v1beta1/module/types/cosmos/distribution/v1beta1/query";
+} from "./curium/lib/generated/cosmos/distribution/v1beta1/query";
 import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 
 
