@@ -1,6 +1,6 @@
 import {getBlzClient, restartIpfsServerAndSwarm} from "@bluzelle/testing/src/commonUtils";
 import {generateContent} from "@bluzelle/testing/src/fileUtils";
-import {hasContent, getAccountBalance} from "./query";
+import {hasContent, getAccountBalance, parseDecTypeToNumber} from "./query";
 import {pinCid, withTransaction} from "./tx";
 import {BehaviorSubject} from "rxjs";
 import {times} from "lodash";
@@ -75,4 +75,11 @@ describe('query', function () {
             .then((ctx) => expect(ctx.balanceAfter).equal(ctx.balanceBefore))
     );
 
-})
+    it("should parse dec type to number", () => {
+        expect(parseDecTypeToNumber("100000000000000000")).to.equal(0.1)
+        expect(parseDecTypeToNumber("10000000000000000")).to.equal(0.01)
+        expect(parseDecTypeToNumber("100500000000000")).to.equal(0.0001005)
+        expect(parseDecTypeToNumber("20500000000000000000")).to.equal(20.5)
+    });
+
+});

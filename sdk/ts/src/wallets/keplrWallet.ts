@@ -2,7 +2,7 @@ import {newBluzelleClient, SigningBluzelleClient} from "../sdk";
 import {SequenceResponse} from "@cosmjs/stargate";
 import {passThrough, passThroughAwait} from "promise-passthrough";
 import {BluzelleWallet} from "./BluzelleWallet";
-import {Window} from '@keplr-wallet/types'
+import {Window} from '@keplr-wallet/types';
 import {AccountData, DirectSignResponse, OfflineDirectSigner} from "@cosmjs/proto-signing/build/signer";
 import {getStatus} from "../queryTendermint";
 import {newLocalWallet} from "./localWallet";
@@ -15,12 +15,17 @@ interface SignDoc {
     accountNumber: Long;
 }
 
-const addBluzelleChain = (chainId: string, nodeAddress: string) =>
+export type Ports = {
+    rpcPort: number,
+    restPort: number
+}
+
+const addBluzelleChain = (chainId: string, nodeAddress: string, ports: Ports) =>
     (window as Window).keplr?.experimentalSuggestChain({
         chainId: chainId,
         chainName: `Bluzelle:${chainId}`,
-        rpc: `http://${nodeAddress}:26657`,
-        rest: `http://${nodeAddress}:1317`,
+        rpc: `http://${nodeAddress}:${ports.rpcPort}`,
+        rest: `http://${nodeAddress}:${ports.restPort}`,
         bip44: {
             coinType: 483,
         },
@@ -62,19 +67,22 @@ const addBluzelleChain = (chainId: string, nodeAddress: string) =>
         }
     });
 
-export const newKeplrWallet = (nodeAddress: string) => (): Promise<BluzelleWallet> =>
+export const newKeplrWallet = (
+    nodeAddress: string,
+    ports: Ports = {rpcPort: 26657, restPort: 1317}
+) => (): Promise<BluzelleWallet> =>
     generateMnemonic()
         .then(mnemonic => newBluzelleClient({
-            url: `${nodeAddress}:26657`,
+            url: `${nodeAddress}:${ports.rpcPort}`,
             wallet: newLocalWallet(mnemonic)
         }))
         .then(client => getStatus(client))
         .then(passThroughAwait(status =>
             (window as Window).keplr?.enable(status.chainId)
-                .catch(e => {console.log(e); return addBluzelleChain(status.chainId, nodeAddress)})
+                .catch(e => {console.log(e); return addBluzelleChain(status.chainId, nodeAddress, ports)})
         ))
         .then(status => (window as Window).keplr?.getOfflineSigner(status.chainId))
-        .then((keplrOfflineSigner) => new BluzelleKeplrWallet(keplrOfflineSigner as OfflineDirectSigner))
+        .then((keplrOfflineSigner) => new BluzelleKeplrWallet(keplrOfflineSigner as OfflineDirectSigner));
 
 type AccountAddress = string;
 

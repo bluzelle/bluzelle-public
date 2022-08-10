@@ -6,11 +6,15 @@ import {
     QueryValidatorsResponse
 } from "./curium/lib/generated/cosmos/staking/v1beta1/query";
 import {
-    DelegationResponse
+    DelegationResponse,
+    Validator
 } from "./curium/lib/generated/cosmos/staking/v1beta1/staking";
 import {Coin} from "@cosmjs/proto-signing";
 import {Delegation} from "./curium/lib/generated/cosmos/staking/v1beta1/staking";
 import {PageRequest, PageResponse} from "./curium/lib/generated/cosmos/base/query/v1beta1/pagination";
+import * as Long from "long";
+import {padStart} from "lodash";
+import {Some} from "monet";
 
 export type BluzelleDelegatorDelegationsResponse = {
     pagination: PageResponse,
@@ -33,13 +37,49 @@ export type BluzelleCoin = {
     amount: number
 }
 
-const defaultPaginationOptions = (): PageRequest => ({
+export type BluzelleValidatorsResponse = {
+    pagination: PageResponse,
+    validators: BluzelleValidator[]
+}
+
+export type BluzelleValidator = {
+    operatorAddress: string,
+    description: {
+        moniker: string,
+        details: string,
+        website: string,
+        securityContact: string,
+    },
+    commission: {
+        commissionRates: {
+            rate: number,
+            maxRate: number,
+            maxChangeRate: number,
+        },
+        updateTime: Date
+    },
+    minSelfDelegation: number,
+    delegatorShares: number,
+    jailed: boolean
+}
+
+export type BluzellePageRequest = {
+    key: Uint8Array,
+    offset: number,
+    limit: number,
+    countTotal: boolean,
+    reverse: boolean,
+}
+
+const defaultPaginationOptions = (): BluzellePageRequest => ({
     key: new Uint8Array(),
     offset: 0,
     limit: 10,
     countTotal: true,
     reverse: false,
 });
+
+const defaultPaginationResponse = (): PageResponse => ({nextKey: new Uint8Array(), total: 0});
 
 export const waitForContent = (client: BluzelleClient, path: string, waitTime: number = 5000) =>
     waitUntil(
@@ -61,17 +101,17 @@ export const getTaxInfo = (client: BluzelleClient): Promise<QueryGetTaxInfoRespo
 export const getDelegations = (
     client: BluzelleClient,
     delegatorAddress: string,
-    options: PageRequest = defaultPaginationOptions()
+    options: BluzellePageRequest = defaultPaginationOptions()
 ): Promise<BluzelleDelegatorDelegationsResponse> =>
     client.queryClient.staking.DelegatorDelegations({
         delegatorAddr: delegatorAddress,
         pagination: {
             key: options.key,
-            offset: options.offset,
-            limit: options.limit,
+            offset: new Long(options.offset),
+            limit: new Long(options.limit),
             countTotal: options.countTotal,
             reverse: options.reverse
-        }
+        } as PageRequest
     })
         .then(parseQueryDelegatorDelegationsResponse);
 
@@ -99,18 +139,19 @@ export const getDelegation = (
 export const getValidatorsInfo = (
     client: BluzelleClient,
     status: 'BOND_STATUS_UNBONDED' | 'BOND_STATUS_UNBONDING' | 'BOND_STATUS_BONDED' = 'BOND_STATUS_BONDED',
-    options: PageRequest = defaultPaginationOptions()
-): Promise<QueryValidatorsResponse> =>
+    options: BluzellePageRequest = defaultPaginationOptions()
+): Promise<BluzelleValidatorsResponse> =>
     client.queryClient.staking.Validators({
         status,
         pagination: {
             key: options.key,
-            offset: options.offset,
-            limit: options.limit,
+            offset: new Long(options.offset),
+            limit: new Long(options.limit),
             countTotal: options.countTotal,
             reverse: options.reverse
-        }
-    });
+        } as PageRequest
+    })
+        .then(parseQueryValidatorsResponse);
 
 export const getDelegationRewards = (
     client: BluzelleClient,
@@ -127,12 +168,16 @@ export const getDelegationRewards = (
 const parseQueryDelegatorDelegationsResponse = (res: QueryDelegatorDelegationsResponse): Promise<BluzelleDelegatorDelegationsResponse> =>
     Promise.resolve(res.delegationResponses.map(parseDelegationResponse))
         .then(delegations => ({
-            pagination: res.pagination ? res.pagination : {nextKey: new Uint8Array(), total: 0},
+            pagination: res.pagination ? res.pagination : defaultPaginationResponse(),
             delegations,
         }));
 
 const parseDelegationResponse = (res: DelegationResponse): BluzelleDelegationResponse => ({
-    delegation: res.delegation ? parseDelegation(res.delegation) : {validatorAddress: '', delegatorAddress: '', shares: 0},
+    delegation: res.delegation ? parseDelegation(res.delegation) : {
+        validatorAddress: '',
+        delegatorAddress: '',
+        shares: 0
+    },
     balance: res.balance ? parseCoin(res.balance) : {denom: 'ubnt', amount: 0}
 });
 
@@ -143,3 +188,35 @@ const parseDelegation = (delegation: Delegation): BluzelleDelegation => ({
 });
 
 const parseCoin = (coin: Coin): BluzelleCoin => ({denom: 'ubnt', amount: Number(coin.amount)});
+
+const parseQueryValidatorsResponse = (res: QueryValidatorsResponse): BluzelleValidatorsResponse => ({
+    pagination: res.pagination ? res.pagination : defaultPaginationResponse(),
+    validators: res.validators ? res.validators.map(parseValidator) : []
+});
+
+const parseValidator = (validator: Validator) => ({
+    operatorAddress: validator.operatorAddress,
+    description: {
+        moniker: validator.description?.moniker || '',
+        details: validator.description?.details || '',
+        website: validator.description?.website || '',
+        securityContact: validator.description?.securityContact || '',
+    },
+    commission: {
+        commissionRates: {
+            rate: parseDecTypeToNumber(validator.commission?.commissionRates?.rate || '0'),
+            maxRate: parseDecTypeToNumber(validator.commission?.commissionRates?.maxRate || '0'),
+            maxChangeRate: parseDecTypeToNumber(validator.commission?.commissionRates?.maxChangeRate || '0'),
+        },
+        updateTime: validator.commission?.updateTime || new Date(0)
+    },
+    minSelfDelegation: Number(validator.minSelfDelegation),
+    delegatorShares: Number(validator.delegatorShares),
+    jailed: validator.jailed
+});
+
+export const parseDecTypeToNumber = (dec: string): number =>
+    Some(padStart(dec, 18, '0'))
+        .map(dec => `${dec.slice(0, dec.length - 18)}.${dec.slice(-18)}`)
+        .map(Number)
+        .join();

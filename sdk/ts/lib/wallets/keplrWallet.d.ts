@@ -9,7 +9,11 @@ interface SignDoc {
     chainId: string;
     accountNumber: Long;
 }
-export declare const newKeplrWallet: (nodeAddress: string) => () => Promise<BluzelleWallet>;
+export declare type Ports = {
+    rpcPort: number;
+    restPort: number;
+};
+export declare const newKeplrWallet: (nodeAddress: string, ports?: Ports) => () => Promise<BluzelleWallet>;
 declare type AccountAddress = string;
 export declare class BluzelleKeplrWallet implements BluzelleWallet {
     getAccounts: () => Promise<readonly AccountData[]>;
