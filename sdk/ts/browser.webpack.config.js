@@ -1,21 +1,14 @@
 const webpack = require('webpack');
-
+const path = require('path');
 module.exports = {
     entry: './src/index.ts',
     output: {
         filename: 'browser.js',
-        path: __dirname,
+        path: path.join(__dirname, 'lib-web'),
          library: "bluzelle",
          libraryTarget: "umd",
     },
     target: 'web',
-//     externalsPresets: {node: true},
-//     externals: [nodeExternals({
-//         allowlist: [
-// //            '@bluzelle/wallet/src/wallet',
-// //            "deferred/src/Deferred",
-//         ]
-//     })],
     mode: 'development',
     module: {
         rules: [
@@ -33,8 +26,6 @@ module.exports = {
             crypto: require.resolve("crypto-browserify"),
             stream: require.resolve("stream-browserify"),
             buffer: require.resolve('buffer/'),
-            // fs: false,
-            // os: false
         }
     },
     devtool: 'source-map',
