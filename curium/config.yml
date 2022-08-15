@@ -9,8 +9,6 @@ validator:
 client:
   openapi:
     path: "docs/static/openapi.yml"
-  vuex:
-    path: "../sdk/ts/src/curium/store"
 init:
   app:
     api:
