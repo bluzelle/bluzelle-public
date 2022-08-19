@@ -20,10 +20,15 @@ const generateSdkCurium = () =>
 
 const buildCuriumStore = () =>
     Promise.resolve(cd(rootDir() + '/sdk/ts/src/curium'))
+        .then(() => removeCuriumLibDir())
         .then(() => exec`yarn`.toPromise())
         .then(() => exec`yarn tsc`.toPromise());
 
 function removeCuriumStoreDir() {
     return exec`rm -rf ${rootDir() + '/sdk/ts/src/curium/store'}`.toPromise();
+}
+
+function removeCuriumLibDir() {
+    return exec`rm -rf ${rootDir() + '/sdk/ts/src/curium/lib'}`.toPromise();
 }
 
