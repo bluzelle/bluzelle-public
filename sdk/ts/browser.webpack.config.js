@@ -5,7 +5,7 @@ module.exports = {
     output: {
         filename: 'browser.js',
         path: path.join(__dirname, 'lib-web'),
-         library: "bluzelle",
+         library: "web-socket-client",
          libraryTarget: "umd",
         publicPath: 'lib-web/'
     },
