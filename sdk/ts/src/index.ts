@@ -13,13 +13,16 @@ export {
     getDelegation,
     getValidatorsInfo,
     getDelegationRewards,
+    getDelegationTotalRewards,
     BluzelleCoin,
     BluzelleDelegation,
     BluzelleDelegationResponse,
     BluzelleDelegatorDelegationsResponse,
     BluzelleValidator,
     BluzelleValidatorsResponse,
-    BluzellePageRequest
+    BluzellePageRequest,
+    BluzelleDelegationTotalRewardsResponse,
+    BluzelleDelegationDelegatorReward
 } from "./query";
 export {getStatus, getValidators} from "./queryTendermint";
 export {

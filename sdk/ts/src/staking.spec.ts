@@ -3,7 +3,13 @@ import {withCtxAwait} from "@scottburch/with-context";
 import {DaemonConfig, Environment, SwarmConfig, SwarmTypes} from "daemon-manager/src/SwarmConfig";
 import {passThroughAwait} from "promise-passthrough";
 import {delegate, redelegate, send, undelegate, withdrawDelegatorReward} from "./tx";
-import {getDelegation, getDelegationRewards, getDelegations, getValidatorsInfo} from "./query";
+import {
+    getDelegation,
+    getDelegationRewards,
+    getDelegations,
+    getDelegationTotalRewards,
+    getValidatorsInfo
+} from "./query";
 import {expect} from "chai";
 import {newBluzelleClient} from "./sdk";
 import {newLocalWallet} from "./wallets/localWallet";
@@ -104,6 +110,15 @@ describe('staking', function () {
             .then(passThroughAwait(ctx => delegate(ctx.sentry, ctx.sentry.address, ctx.valoper, 100_000_000, {maxGas: 200_000, gasPrice: 10})))
             .then(passThroughAwait(ctx => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 10_000_000_000, {maxGas: 200_000, gasPrice: 10})))
             .then(passThroughAwait(ctx => withdrawDelegatorReward(ctx.sentry, ctx.sentry.address, ctx.valoper, {maxGas: 200_000, gasPrice: 10})))
+    );
+
+    it('should get total delegation rewards', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(withCtxAwait('valoper2', ctx => ctx.swarm.getValidators()[2].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper2, 4_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => getDelegationTotalRewards(ctx.bzSdk, ctx.auth.address))
     );
 
 });

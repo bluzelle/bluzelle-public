@@ -6,9 +6,15 @@ import {
     QueryValidatorsResponse
 } from "./curium/lib/generated/cosmos/staking/v1beta1/query";
 import {
+    QueryDelegationTotalRewardsResponse,
+} from "./curium/lib/generated/cosmos/distribution/v1beta1/query";
+import {
     DelegationResponse,
     Validator
 } from "./curium/lib/generated/cosmos/staking/v1beta1/staking";
+import {
+    DelegationDelegatorReward
+} from "./curium/lib/generated/cosmos/distribution/v1beta1/distribution";
 import {Coin} from "@cosmjs/proto-signing";
 import {Delegation} from "./curium/lib/generated/cosmos/staking/v1beta1/staking";
 import {PageRequest, PageResponse} from "./curium/lib/generated/cosmos/base/query/v1beta1/pagination";
@@ -69,6 +75,17 @@ export type BluzellePageRequest = {
     limit: number,
     countTotal: boolean,
     reverse: boolean,
+}
+
+export type BluzelleDelegationTotalRewardsResponse = {
+    rewards: BluzelleDelegationDelegatorReward[],
+    total: BluzelleCoin[]
+}
+
+export type BluzelleDelegationDelegatorReward = {
+    reward: BluzelleCoin[],
+    validatorAddress: string,
+    totalReward: BluzelleCoin
 }
 
 const defaultPaginationOptions = (): BluzellePageRequest => ({
@@ -164,6 +181,36 @@ export const getDelegationRewards = (
     })
         .then(res => res.rewards ? res.rewards.map(parseCoin) : []);
 
+
+export const getDelegationTotalRewards = (
+    client: BluzelleClient,
+    delegatorAddress: string
+): Promise<BluzelleDelegationTotalRewardsResponse> =>
+    client.queryClient.distribution.DelegationTotalRewards({
+        delegatorAddress
+    })
+        .then(parseQueryDelegationTotalRewardsResponse);
+
+const parseQueryDelegationTotalRewardsResponse = (res: QueryDelegationTotalRewardsResponse): Promise<BluzelleDelegationTotalRewardsResponse> =>
+    Promise.all(res.rewards.map(parseDelegationDelegatorReward))
+        .then(rewards => ({
+            rewards,
+            total: res.total.map(parseCoin)
+        }));
+
+const parseDelegationDelegatorReward = (delegatorReward: DelegationDelegatorReward): Promise<BluzelleDelegationDelegatorReward> =>
+    Promise.resolve(delegatorReward.reward.map(parseCoin))
+        .then(reward => ({
+            reward: reward,
+            validatorAddress: delegatorReward.validatorAddress,
+            totalReward: sumBluzelleCoins(reward)
+        }));
+
+const sumBluzelleCoins = (coins: BluzelleCoin[]): BluzelleCoin =>
+    coins.reduce((total, coin) => ({
+        denom: "ubnt",
+        amount: total.amount + coin.amount
+    }), {denom: 'ubnt', amount: 0});
 
 const parseQueryDelegatorDelegationsResponse = (res: QueryDelegatorDelegationsResponse): Promise<BluzelleDelegatorDelegationsResponse> =>
     Promise.resolve(res.delegationResponses.map(parseDelegationResponse))
