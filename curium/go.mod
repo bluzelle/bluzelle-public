@@ -23,10 +23,9 @@ require (
 	github.com/tendermint/spm v0.1.8
 	github.com/tendermint/tendermint v0.34.14
 	github.com/tendermint/tm-db v0.6.4
-	golang.org/x/oauth2 v0.0.0-20220722155238-128564f6959c // indirect
-	google.golang.org/genproto v0.0.0-20220805133916-01dd62135a58
+	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094 // indirect
+	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc
 	google.golang.org/grpc v1.48.0
-	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
