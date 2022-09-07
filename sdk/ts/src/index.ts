@@ -34,7 +34,7 @@ export {
     redelegate,
     withdrawDelegatorReward
 } from "./tx";
-export {generateMnemonic} from "./generator";
+export {generateMnemonic} from "./generateMnemonic";
 
 // export {newKeplrWallet, BluzelleKeplrWallet}
 //

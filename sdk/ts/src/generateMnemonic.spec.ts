@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {generateMnemonic} from "./generator";
+import {generateMnemonic} from "./generateMnemonic";
 
 describe("generator", () => {
 
