@@ -11,7 +11,7 @@
     "@cosmjs/stargate": "^0.28.11",
     "@keplr-wallet/cosmos": "^0.9.16",
     "@keplr-wallet/types": "^0.10.0",
-    "@scottburch/with-context": "^1.0.4",
+    "@scottburch/with-context": "^1.0.7",
     "@types/bech32": "^1.1.4",
     "@types/bip32": "^2.0.0",
     "@types/bip39": "^3.0.0",
