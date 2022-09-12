@@ -179,7 +179,7 @@ export const getDelegationRewards = (
         delegatorAddress,
         validatorAddress
     })
-        .then(res => res.rewards ? res.rewards.map(parseCoin) : []);
+        .then(res => res.rewards ? res.rewards.map(parseLongCoin) : []);
 
 
 export const getDelegationTotalRewards = (
@@ -195,11 +195,11 @@ const parseQueryDelegationTotalRewardsResponse = (res: QueryDelegationTotalRewar
     Promise.all(res.rewards.map(parseDelegationDelegatorReward))
         .then(rewards => ({
             rewards,
-            total: res.total.map(parseCoin)
+            total: res.total.map(parseLongCoin)
         }));
 
 const parseDelegationDelegatorReward = (delegatorReward: DelegationDelegatorReward): Promise<BluzelleDelegationDelegatorReward> =>
-    Promise.resolve(delegatorReward.reward.map(parseCoin))
+    Promise.resolve(delegatorReward.reward.map(parseLongCoin))
         .then(reward => ({
             reward: reward,
             validatorAddress: delegatorReward.validatorAddress,
@@ -235,6 +235,8 @@ const parseDelegation = (delegation: Delegation): BluzelleDelegation => ({
 });
 
 const parseCoin = (coin: Coin): BluzelleCoin => ({denom: 'ubnt', amount: Number(coin.amount)});
+
+const parseLongCoin = (coin: Coin): BluzelleCoin => ({denom: 'ubnt', amount: parseDecTypeToNumber(coin.amount)});
 
 const parseQueryValidatorsResponse = (res: QueryValidatorsResponse): BluzelleValidatorsResponse => ({
     pagination: res.pagination ? res.pagination : defaultPaginationResponse(),
