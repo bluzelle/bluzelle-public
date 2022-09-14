@@ -4,7 +4,7 @@ import {generateMnemonic} from "./generateMnemonic";
 describe("generator", () => {
 
     it('should generate mnemonic of 12 words', () =>
-        Promise.resolve(generateMnemonic())
+        Promise.resolve(generateMnemonic(12))
             .then(mnemonic => expect(mnemonic.split(" ").length).to.equal(12))
     );
 
