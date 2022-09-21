@@ -231,7 +231,7 @@ const parseDelegationResponse = (res: DelegationResponse): BluzelleDelegationRes
 const parseDelegation = (delegation: Delegation): BluzelleDelegation => ({
     validatorAddress: delegation.validatorAddress,
     delegatorAddress: delegation.delegatorAddress,
-    shares: Number(delegation.shares)
+    shares: parseDecTypeToNumber(delegation.shares)
 });
 
 const parseCoin = (coin: Coin): BluzelleCoin => ({denom: 'ubnt', amount: Number(coin.amount)});
@@ -260,7 +260,7 @@ const parseValidator = (validator: Validator) => ({
         updateTime: validator.commission?.updateTime || new Date(0)
     },
     minSelfDelegation: Number(validator.minSelfDelegation),
-    delegatorShares: Number(validator.delegatorShares),
+    delegatorShares: parseDecTypeToNumber(validator.delegatorShares),
     jailed: validator.jailed
 });
 
