@@ -108,8 +108,8 @@ export const hasContent = (client: BluzelleClient, cid: string) =>
     client.queryClient.storage.HasContent({cid})
         .then(x => x.hasContent);
 
-export const getAccountBalance = (client: BluzelleClient, address: string): Promise<number> =>
-    client.queryClient.bank.Balance({address: address, denom: "ubnt"})
+export const getAccountBalance = (client: BluzelleClient, address: string, denom: string = "ubnt"): Promise<number> =>
+    client.queryClient.bank.Balance({address: address, denom})
         .then(res => Number(res.balance?.amount));
 
 export const getTaxInfo = (client: BluzelleClient): Promise<QueryGetTaxInfoResponse> =>

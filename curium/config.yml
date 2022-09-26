@@ -3,6 +3,8 @@ accounts:
     coins: ["20000000000ubnt"]
   - name: minter
     coins: ["10000ubnt"]
+  - name: treasury
+    coins: ["500000000000000uelt","500000000000000ug4","20000000000ubnt"]
 validator:
   name: vuser
   staked: "100000000ubnt"
