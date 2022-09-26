@@ -68,6 +68,15 @@ describe('query', function () {
             .then(ctx => getAccountBalance(ctx.client, ctx.client.address))
     );
 
+    it('getAccountBalance should return account balance for the elt and g4 denoms', () =>
+        getBlzClient(curiumUrl, mnemonic.getValue())
+            .then(client => Promise.all([getAccountBalance(client, client.address, "uelt"), getAccountBalance(client, client.address, "ug4")]))
+            .then(([ueltBal, ug4Bal]) => {
+                expect(ueltBal).to.equal(500000000000000);
+                expect(ug4Bal).to.equal(500000000000000);
+            })
+    );
+
     it("getAccountBalance should not charge gas", () =>
         Promise.resolve(createCtxAwait('client', () => getBlzClient(curiumUrl, mnemonic.getValue())))
             .then(withCtxAwait('balanceBefore', (ctx) => getAccountBalance(ctx.client, ctx.client.address)))
