@@ -9678,7 +9678,7 @@ export declare type BluzelleDelegationDelegatorReward = {
 	totalReward: BluzelleCoin;
 };
 export declare const hasContent: (client: BluzelleClient, cid: string) => Promise<boolean>;
-export declare const getAccountBalance: (client: BluzelleClient, address: string) => Promise<number>;
+export declare const getAccountBalance: (client: BluzelleClient, address: string, denom?: string) => Promise<number>;
 export declare const getTaxInfo: (client: BluzelleClient) => Promise<QueryGetTaxInfoResponse>;
 export declare const getDelegations: (client: BluzelleClient, delegatorAddress: string, options?: BluzellePageRequest) => Promise<BluzelleDelegatorDelegationsResponse>;
 export declare const getDelegation: (client: BluzelleClient, delegatorAddress: string, validatorAddress: string) => Promise<BluzelleDelegationResponse>;
@@ -9705,7 +9705,7 @@ export interface BroadcastOptions {
 	memo?: string;
 }
 export declare const pinCid: (client: BluzelleClient, cid: string, options: BroadcastOptions) => undefined;
-export declare const send: (client: BluzelleClient, toAddress: string, amount: number, options: BroadcastOptions) => undefined;
+export declare const send: (client: BluzelleClient, toAddress: string, amount: number, options: BroadcastOptions, denom?: string) => undefined;
 export declare const delegate: (client: BluzelleClient, delegatorAddress: string, validatorAddress: string, amount: number, options: BroadcastOptions) => undefined;
 export declare const undelegate: (client: BluzelleClient, delegatorAddress: string, validatorAddress: string, amount: number, options: BroadcastOptions) => undefined;
 export declare const redelegate: (client: BluzelleClient, delegatorAddress: string, validatorSrcAddress: string, validatorDstAddress: string, amount: number, options: BroadcastOptions) => undefined;

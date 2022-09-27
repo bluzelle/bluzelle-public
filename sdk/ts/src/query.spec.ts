@@ -15,7 +15,7 @@ const curiumUrl = 'http://localhost:26667';
 const mnemonic = new BehaviorSubject<string>("");
 
 describe('query', function () {
-    this.timeout(120_000);
+    this.timeout(600_000);
 
     beforeEach(() =>
         restartIpfsServerAndSwarm()
