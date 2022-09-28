@@ -1,4 +1,4 @@
-import {pinCid, setGasTaxBp, setTaxCollector, setTransferTaxBp, withTransaction} from "./tx";
+import {pinCid, send, setGasTaxBp, setTaxCollector, setTransferTaxBp, withTransaction} from "./tx";
 import {startSwarmWithClient} from "@bluzelle/testing"
 import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {getAccountBalance, getTaxInfo} from "./query";
@@ -7,6 +7,7 @@ import {withCtxAwait} from "@scottburch/with-context";
 import {mint} from "./faucet";
 import {expect} from "chai";
 import {Swarm} from "daemon-manager";
+import {newBluzelleClient} from "./sdk";
 
 const MAX_GAS = 200000;
 const GAS_PRICE = 2;
@@ -50,6 +51,32 @@ describe('sending transactions', function () {
                 pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000});
             }))
     });
+
+    it('should send tokens in uelt and ug4', () =>
+        startSwarmWithClient()
+            .then(withCtxAwait('toAddress', ctx => mint(ctx.bzSdk).then(res => res.address)))
+            .then(withCtxAwait('preBalances', ctx => Promise.all([
+                getAccountBalance(ctx.bzSdk, ctx.bzSdk.address, 'uelt'),
+                getAccountBalance(ctx.bzSdk, ctx.bzSdk.address, 'ug4'),
+            ])))
+            .then(withCtxAwait('toPreBalances', ctx => Promise.all([
+                getAccountBalance(ctx.bzSdk, ctx.toAddress, 'uelt'),
+                getAccountBalance(ctx.bzSdk, ctx.toAddress, 'ug4'),
+            ])))
+            .then(passThroughAwait(ctx => send(ctx.bzSdk, ctx.toAddress, 10000, {gasPrice: 0.002, maxGas: 200000}, 'uelt')))
+            .then(passThroughAwait(ctx => send(ctx.bzSdk, ctx.toAddress, 10000, {gasPrice: 0.002, maxGas: 200000}, 'ug4')))
+            .then(withCtxAwait('postBalances', ctx => Promise.all([
+                getAccountBalance(ctx.bzSdk, ctx.bzSdk.address, 'uelt'),
+                getAccountBalance(ctx.bzSdk, ctx.bzSdk.address, 'ug4'),
+            ])))
+            .then(withCtxAwait('toPostBalances', ctx => Promise.all([
+                getAccountBalance(ctx.bzSdk, ctx.toAddress, 'uelt'),
+                getAccountBalance(ctx.bzSdk, ctx.toAddress, 'ug4'),
+            ])))
+            .then(passThroughAwait(ctx => expect(ctx.postBalances).to.deep.equal(ctx.preBalances.map(b => b - 10000))))
+            .then(ctx => expect(ctx.toPostBalances).to.deep.equal(ctx.toPreBalances.map(b => b + 10000)))
+
+    )
 
 
     // skipping because we don't want to add admin info to repo right now
