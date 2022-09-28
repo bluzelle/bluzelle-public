@@ -2,7 +2,7 @@
   "name": "@bluzelle/sdk",
   "version": "1.0.8",
   "main": "lib/index.js",
-  "browser": "./browser.js",
+  "browser": "lib-web/browser.js",
   "license": "MIT",
   "dependencies": {
     "@cosmjs/crypto": "0.28.11",
