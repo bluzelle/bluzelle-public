@@ -16,6 +16,7 @@ import {newLocalWallet} from "./wallets/localWallet";
 import * as bip39 from "bip39";
 import {mint} from "./faucet";
 import {stopSwarm} from "@bluzelle/testing/src/swarmUtils";
+import {getOtherTokenDefaults} from "@bluzelle/testing/src/commonUtils";
 
 describe('staking', function () {
     this.timeout(2_000_000);
@@ -165,6 +166,7 @@ describe('staking', function () {
 
 const swarmConfig = (): SwarmConfig => ({
     denom: 'bnt',
+    otherTokens: getOtherTokenDefaults(),
     genesisTokenBalance: 500_000_000,
     monikerBase: 'test',
     chainId: 'my-chain',

@@ -75,7 +75,6 @@ describe('sending transactions', function () {
             ])))
             .then(passThroughAwait(ctx => expect(ctx.postBalances).to.deep.equal(ctx.preBalances.map(b => b - 10000))))
             .then(ctx => expect(ctx.toPostBalances).to.deep.equal(ctx.toPreBalances.map(b => b + 10000)))
-
     )
 
 

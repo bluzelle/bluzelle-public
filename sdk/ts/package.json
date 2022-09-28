@@ -1,6 +1,6 @@
 {
   "name": "@bluzelle/sdk",
-  "version": "1.0.8",
+  "version": "1.0.10",
   "main": "lib/index.js",
   "browser": "lib-web/browser.js",
   "license": "MIT",
@@ -26,7 +26,6 @@
     "bip39": "^3.0.4",
     "cids": "^1.1.9",
     "delay": "^5.0.0",
-    "infra-control": "^1.0.0",
     "ipfs-http-client": "^55.0.0",
     "lodash": "^4.17.21",
     "mocha": "^10.0.0",
