@@ -30,6 +30,13 @@ describe('staking', function () {
             .then(delegation => expect(delegation?.balance?.amount).to.equal(5_000_000))
     );
 
+    it("should return bluzelle tx response on delegate", () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10}))
+            .then(res => expect(res.code).to.equal(0))
+    );
+
     it("should be able to undelegate", () =>
         startSwarmWithClient({...swarmConfig()})
             .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
@@ -37,6 +44,14 @@ describe('staking', function () {
             .then(passThroughAwait(ctx => undelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 2_000_000, {maxGas: 200_000, gasPrice: 10})))
             .then(ctx => getDelegation(ctx.bzSdk, ctx.auth.address, ctx.valoper))
             .then(delegation => expect(delegation?.balance?.amount).to.equal(3_000_000))
+    );
+
+    it("should return bluzelle tx response on undelegate", () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => undelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 2_000_000, {maxGas: 200_000, gasPrice: 10}))
+            .then(res => expect(res.code).to.equal(0))
     );
 
 
@@ -50,6 +65,15 @@ describe('staking', function () {
             .then(withCtxAwait('delegationToValidator2',ctx => getDelegation(ctx.bzSdk, ctx.auth.address, ctx.valoper2)))
             .then(passThroughAwait(ctx => expect(ctx.delegationToValidator1?.balance?.amount).to.equal(3_000_000)))
             .then(passThroughAwait(ctx => expect(ctx.delegationToValidator2?.balance?.amount).to.equal(2_000_000)))
+    );
+
+    it("should return bluzelle tx response on redelegate", () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(withCtxAwait('valoper2', ctx => ctx.swarm.getValidators()[2].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => redelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, ctx.valoper2, 2_000_000, {maxGas: 200_000, gasPrice: 10}))
+            .then(res => expect(res.code).to.equal(0))
     );
 
     it('should get all delegations of the delegator with the correct amount', () =>
@@ -109,7 +133,8 @@ describe('staking', function () {
             .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.sentry, ctx.sentry.address, ctx.valoper, 100_000_000, {maxGas: 200_000, gasPrice: 10})))
             .then(passThroughAwait(ctx => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 10_000_000_000, {maxGas: 200_000, gasPrice: 10})))
-            .then(passThroughAwait(ctx => withdrawDelegatorReward(ctx.sentry, ctx.sentry.address, ctx.valoper, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => withdrawDelegatorReward(ctx.sentry, ctx.sentry.address, ctx.valoper, {maxGas: 200_000, gasPrice: 10}))
+            .then(res => expect(res.code).to.equal(0))
     );
 
     it('should not throw error when get total delegation rewards', () =>
@@ -123,7 +148,7 @@ describe('staking', function () {
 
     it('should get total delegation rewards', () =>
         startSwarmWithClient({...swarmConfig()})
-            .then(withCtxAwait('sentry', ctx => newBluzelleClient({
+            .then(withCtxAwait('sentry', () => newBluzelleClient({
                 url: 'http://localhost:26667',
                 wallet: newLocalWallet('forget era scatter fiction write what final correct pause purchase argue scheme fire cattle play eight flag trust rely hello brick decline avoid any')
             })))
@@ -149,6 +174,7 @@ const swarmConfig = (): SwarmConfig => ({
     swarmType: SwarmTypes.Docker,
     bluzelleFaucet: true,
     storageBaseDir: '',
+    otherTokens: [],
     daemons: [{
         host: `local:a.validator`,
         restPort: 1317,

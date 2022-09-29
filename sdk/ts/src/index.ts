@@ -32,7 +32,8 @@ export {
     delegate,
     undelegate,
     redelegate,
-    withdrawDelegatorReward
+    withdrawDelegatorReward,
+    BluzelleTxResponse
 } from "./tx";
 export {generateMnemonic} from "./generateMnemonic";
 
