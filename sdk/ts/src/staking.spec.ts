@@ -176,7 +176,6 @@ const swarmConfig = (): SwarmConfig => ({
     swarmType: SwarmTypes.Docker,
     bluzelleFaucet: true,
     storageBaseDir: '',
-    otherTokens: [],
     daemons: [{
         host: `local:a.validator`,
         restPort: 1317,
