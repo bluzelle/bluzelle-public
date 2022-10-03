@@ -18,7 +18,7 @@ import {
 import {Coin} from "@cosmjs/proto-signing";
 import {Delegation} from "./curium/lib/generated/cosmos/staking/v1beta1/staking";
 import {PageRequest, PageResponse} from "./curium/lib/generated/cosmos/base/query/v1beta1/pagination";
-import * as Long from "long";
+const Long = require("long");
 import {padStart} from "lodash";
 import {Some} from "monet";
 
@@ -96,7 +96,7 @@ const defaultPaginationOptions = (): BluzellePageRequest => ({
     reverse: false,
 });
 
-const defaultPaginationResponse = (): PageResponse => ({nextKey: new Uint8Array(), total: 0});
+const defaultPaginationResponse = (): PageResponse => ({nextKey: new Uint8Array(), total: Long.fromValue(0)});
 
 export const waitForContent = (client: BluzelleClient, path: string, waitTime: number = 5000) =>
     waitUntil(
