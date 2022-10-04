@@ -6,8 +6,9 @@ import {delegate, pinCid, redelegate, send, undelegate, withdrawDelegatorReward}
 import {
     getDelegation,
     getDelegationRewards,
-    getDelegations,
+    getDelegatorDelegations,
     getDelegationTotalRewards,
+    getDelegatorUnbondingDelegations,
     getValidatorsInfo
 } from "./query";
 import {expect} from "chai";
@@ -83,7 +84,7 @@ describe('staking', function () {
             .then(withCtxAwait('valoper2', ctx => ctx.swarm.getValidators()[2].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper2, 4_000_000, {maxGas: 200_000, gasPrice: 10})))
-            .then(ctx => getDelegations(ctx.bzSdk, ctx.auth.address))
+            .then(ctx => getDelegatorDelegations(ctx.bzSdk, ctx.auth.address))
             .then(res => res.delegations.flatMap(delegation => delegation.balance?.amount))
             .then(passThroughAwait(amounts => expect(amounts).to.include(5_000_000)))
             .then(passThroughAwait(amounts => expect(amounts).to.include(4_000_000)))
@@ -160,6 +161,21 @@ describe('staking', function () {
             .then(passThroughAwait(ctx => pinCid(ctx.bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {maxGas: 200_000, gasPrice: 50})))
             .then(ctx => getDelegationTotalRewards(ctx.sentry, ctx.sentry.address))
             .then(res => expect(res.rewards[0].totalReward.amount).to.be.greaterThan(0))
+    );
+
+    it("should query unbonding delegations of a delegator", () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(withCtxAwait('valoper2', ctx => ctx.swarm.getValidators()[2].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper2, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(passThroughAwait(ctx => undelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 2_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(passThroughAwait(ctx => undelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 1_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(passThroughAwait(ctx => undelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper2, 4_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => getDelegatorUnbondingDelegations(ctx.bzSdk, ctx.auth.address))
+            .then(res => res.unbondingDelegations.flatMap(unbondingDelegation => unbondingDelegation.totalBalance))
+            .then(passThroughAwait(totalBalances => expect(totalBalances).to.include(3_000_000)))
+            .then(passThroughAwait(totalBalances => expect(totalBalances).to.include(4_000_000)))
     );
 
 });

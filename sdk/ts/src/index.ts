@@ -10,11 +10,12 @@ export {
     getAccountBalance,
     hasContent,
     getTaxInfo,
-    getDelegations,
+    getDelegatorDelegations,
     getDelegation,
     getValidatorsInfo,
     getDelegationRewards,
     getDelegationTotalRewards,
+    getDelegatorUnbondingDelegations,
     BluzelleCoin,
     BluzelleDelegation,
     BluzelleDelegationResponse,
@@ -23,7 +24,8 @@ export {
     BluzelleValidatorsResponse,
     BluzellePageRequest,
     BluzelleDelegationTotalRewardsResponse,
-    BluzelleDelegationDelegatorReward
+    BluzelleDelegationDelegatorReward,
+    BluzelleDelegatorUnbondingDelegationsResponse
 } from "./query";
 export {getStatus, getValidators} from "./queryTendermint";
 export {

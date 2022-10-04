@@ -3,14 +3,17 @@ import {BluzelleClient} from "./sdk";
 import {QueryGetTaxInfoResponse} from "./curium/lib/generated/tax/query";
 import {
     QueryDelegatorDelegationsResponse,
-    QueryValidatorsResponse
+    QueryValidatorsResponse,
+    QueryDelegatorUnbondingDelegationsResponse
 } from "./curium/lib/generated/cosmos/staking/v1beta1/query";
 import {
     QueryDelegationTotalRewardsResponse,
 } from "./curium/lib/generated/cosmos/distribution/v1beta1/query";
 import {
     DelegationResponse,
-    Validator
+    Validator,
+    UnbondingDelegationEntry,
+    UnbondingDelegation
 } from "./curium/lib/generated/cosmos/staking/v1beta1/staking";
 import {
     DelegationDelegatorReward
@@ -88,6 +91,25 @@ export type BluzelleDelegationDelegatorReward = {
     totalReward: BluzelleCoin
 }
 
+export type BluzelleDelegatorUnbondingDelegationsResponse = {
+    unbondingDelegations: BluzelleUnbondingDelegation[],
+    pagination: PageResponse,
+}
+
+export type BluzelleUnbondingDelegation = {
+    delegatorAddress: string,
+    validatorAddress: string,
+    entries: BluzelleUnbondingDelegationEntry[],
+    totalBalance: number
+}
+
+export type BluzelleUnbondingDelegationEntry = {
+    creationHeight: number,
+    completionTime: Date,
+    initialBalance: number,
+    balance: number
+}
+
 const defaultPaginationOptions = (): BluzellePageRequest => ({
     key: new Uint8Array(),
     offset: 0,
@@ -118,7 +140,7 @@ export const getAccountBalance = (client: BluzelleClient, address: string, denom
 export const getTaxInfo = (client: BluzelleClient): Promise<QueryGetTaxInfoResponse> =>
     client.queryClient.tax.GetTaxInfo({});
 
-export const getDelegations = (
+export const getDelegatorDelegations = (
     client: BluzelleClient,
     delegatorAddress: string,
     options: BluzellePageRequest = defaultPaginationOptions()
@@ -155,6 +177,23 @@ export const getDelegation = (
                 amount: 0
             }
         });
+
+export const getDelegatorUnbondingDelegations = (
+    client: BluzelleClient,
+    delegatorAddress: string,
+    options: BluzellePageRequest = defaultPaginationOptions()
+): Promise<BluzelleDelegatorUnbondingDelegationsResponse> =>
+    client.queryClient.staking.DelegatorUnbondingDelegations({
+        delegatorAddr: delegatorAddress,
+        pagination: {
+            key: options.key,
+            offset: new Long(options.offset),
+            limit: new Long(options.limit),
+            countTotal: options.countTotal,
+            reverse: options.reverse
+        } as PageRequest
+    })
+        .then(parseQueryDelegatorUnbondingDelegationsResponse);
 
 export const getValidatorsInfo = (
     client: BluzelleClient,
@@ -265,6 +304,30 @@ const parseValidator = (validator: Validator) => ({
     minSelfDelegation: Number(validator.minSelfDelegation),
     delegatorShares: parseDecTypeToNumber(validator.delegatorShares),
     jailed: validator.jailed
+});
+
+const parseQueryDelegatorUnbondingDelegationsResponse = (
+    res: QueryDelegatorUnbondingDelegationsResponse
+): BluzelleDelegatorUnbondingDelegationsResponse => ({
+    unbondingDelegations: res.unbondingResponses.map(parseUnbondingDelegation),
+    pagination: res.pagination ? res.pagination : defaultPaginationResponse(),
+});
+
+const parseUnbondingDelegation = (res: UnbondingDelegation): BluzelleUnbondingDelegation => ({
+    delegatorAddress: res.delegatorAddress,
+    validatorAddress: res.validatorAddress,
+    entries: res.entries.map(parseUnbondingDelegationEntry),
+    totalBalance: getTotalUnbondingDelegationBalance(res.entries)
+});
+
+const getTotalUnbondingDelegationBalance = (entries: UnbondingDelegationEntry[]): number =>
+    entries.map(parseUnbondingDelegationEntry).reduce((total, entry) => total + entry.balance, 0);
+
+const parseUnbondingDelegationEntry = (res: UnbondingDelegationEntry): BluzelleUnbondingDelegationEntry => ({
+    creationHeight: Number(res.creationHeight),
+    completionTime: res.completionTime || new Date(0),
+    initialBalance: Number(res.initialBalance),
+    balance: Number(res.balance)
 });
 
 export const parseDecTypeToNumber = (dec: string): number =>
