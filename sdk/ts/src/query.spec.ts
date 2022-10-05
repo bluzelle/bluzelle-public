@@ -1,6 +1,6 @@
 import {getBlzClient, restartIpfsServerAndSwarm} from "@bluzelle/testing/src/commonUtils";
 import {generateContent} from "@bluzelle/testing/src/fileUtils";
-import {hasContent, getAccountBalance, parseDecTypeToNumber} from "./query";
+import {hasContent, getAccountBalance, parseDecTypeToNumber, getTx} from "./query";
 import {pinCid, withTransaction} from "./tx";
 import {BehaviorSubject} from "rxjs";
 import {times} from "lodash";
@@ -90,5 +90,17 @@ describe('query', function () {
         expect(parseDecTypeToNumber("100500000000000")).to.equal(0.0001005)
         expect(parseDecTypeToNumber("20500000000000000000")).to.equal(20.5)
     });
+
+    it('should query a transaction by hash', () => {
+        return getBlzClient(curiumUrl, mnemonic.getValue())
+            .then(bzSdk =>
+                (pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {maxGas: 10000000, gasPrice: 0.002}) as any)
+                    .then((resp: any) => ({
+                        resp,
+                        bzSdk
+                    }))
+            )
+            .then(({resp, bzSdk}) => getTx(bzSdk, resp.transactionHash))
+    })
 
 });

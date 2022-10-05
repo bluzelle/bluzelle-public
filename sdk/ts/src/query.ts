@@ -98,6 +98,9 @@ const defaultPaginationOptions = (): BluzellePageRequest => ({
 
 const defaultPaginationResponse = (): PageResponse => ({nextKey: new Uint8Array(), total: Long.fromValue(0)});
 
+export const getTx = (client: BluzelleClient, hash: string) =>
+    client.queryClient.tx.GetTx({hash});
+
 export const waitForContent = (client: BluzelleClient, path: string, waitTime: number = 5000) =>
     waitUntil(
         () => hasContent(client, path),

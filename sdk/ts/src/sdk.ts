@@ -20,6 +20,9 @@ import {
 import {
     QueryClientImpl as DistributionQueryClientImpl
 } from "./curium/lib/generated/cosmos/distribution/v1beta1/query";
+import {
+    ServiceClientImpl
+} from "./curium/lib/generated/cosmos/tx/v1beta1/service";
 import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 
 
@@ -30,7 +33,9 @@ type QueryClientImpl = {
     tax: TaxQueryClientImpl;
     staking: StakingQueryClientImpl;
     distribution: DistributionQueryClientImpl;
+    tx: ServiceClientImpl;
 }
+
 
 export interface BluzelleConfig {
     url: string;
@@ -74,7 +79,8 @@ const getRpcClient = (url: string): Promise<QueryClientImpl> =>
             faucet: new FaucetQueryClientImpl(rpcClient),
             tax: new TaxQueryClientImpl(rpcClient),
             staking: new StakingQueryClientImpl(rpcClient),
-            distribution: new DistributionQueryClientImpl(rpcClient)
+            distribution: new DistributionQueryClientImpl(rpcClient),
+            tx: new ServiceClientImpl(rpcClient)
         }));
 
 export class SigningBluzelleClient extends SigningStargateClient {
