@@ -6,6 +6,7 @@ export {mint, createAddress} from "./faucet";
 export {newBluzelleClient} from "./sdk";
 export type {BluzelleClient} from "./sdk";
 export {
+    getTx,
     getAccountBalance,
     hasContent,
     getTaxInfo,
