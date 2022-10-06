@@ -1,55 +1,68 @@
+version: 1
+build:
+  proto:
+    path: proto
+    third_party_paths:
+    - third_party/proto
+    - proto_vendor
 accounts:
-  - name: vuser
-    coins: ["20000000000ubnt","500000000000000uelt","500000000000000ug4"]
-  - name: minter
-    coins: ["10000ubnt"]
-validator:
-  name: vuser
-  staked: "100000000ubnt"
+- name: vuser
+  coins:
+  - 20000000000ubnt
+  - 500000000000000uelt
+  - 500000000000000ug4
+- name: minter
+  coins:
+  - 10000ubnt
+faucet:
+  name: null
+  coins: []
+  host: 0.0.0.0:4500
 client:
   openapi:
-    path: "docs/static/openapi.yml"
-init:
-  app:
-    api:
-      enable: true
-    storage-dir: "~/.curium/storage"
-    minimum-gas-prices: "0ubnt"
-  client:
-    output: "json"
-    keyring-backend: "test"
-
-  config:
-    consensus:
-      timeout_commit: "5s"
-    p2p:
-      addr_book_strict: false
-    rpc:
-      cors_allowed_origins:
-        - "*"
+    path: docs/static/openapi.yml
 genesis:
   app_state:
-    tax:
-      gasTaxBp: 100
-      transferTaxBp: 1
-      taxCollector: 'bluzelle1dvc2u4l84hyfeem5fmfm9eyjlndpsycwwfhtln'
-    staking:
-      params:
-        bond_denom: "ubnt"
     crisis:
       constant_fee:
-        denom: "ubnt"
-
+        denom: ubnt
     gov:
       deposit_params:
         min_deposit:
-          - denom: "ubnt"
-            amount: "1000000"
+        - amount: "1000000"
+          denom: ubnt
     mint:
       minter:
         inflation: "0.0"
       params:
-        mint_denom: "ubnt"
-        inflation_min: "0.0"
         inflation_max: "0.0"
+        inflation_min: "0.0"
         inflation_rate_change: "0.0"
+        mint_denom: ubnt
+    staking:
+      params:
+        bond_denom: ubnt
+    tax:
+      gasTaxBp: 100
+      taxCollector: bluzelle1dvc2u4l84hyfeem5fmfm9eyjlndpsycwwfhtln
+      transferTaxBp: 1
+validators:
+- name: vuser
+  bonded: 100000000ubnt
+  app:
+    api:
+      enable: true
+      enabled-unsafe-cors: true
+    minimum-gas-prices: 0ubnt
+    storage-dir: ~/.curium/storage
+  config:
+    consensus:
+      timeout_commit: 5s
+    p2p:
+      addr_book_strict: false
+    rpc:
+      cors_allowed_origins:
+      - '*'
+  client:
+    keyring-backend: test
+    output: json

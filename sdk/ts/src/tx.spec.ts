@@ -7,9 +7,10 @@ import {withCtxAwait} from "@scottburch/with-context";
 import {mint} from "./faucet";
 import {expect} from "chai";
 import {Swarm} from "daemon-manager";
-import {newBluzelleClient} from "./sdk";
+import {BluzelleClient, newBluzelleClient} from "./sdk";
 import {newLocalWallet} from "./wallets/localWallet";
 import {generateMnemonic} from "./generateMnemonic";
+import delay from "delay";
 
 const MAX_GAS = 200000;
 const GAS_PRICE = 2;
@@ -48,9 +49,9 @@ describe('sending transactions', function () {
     it('should have a withTransaction that can bundle messages', () => {
         return startSwarmWithClient({...defaultSwarmConfig})
             .then(({bzSdk}) => withTransaction(bzSdk, () => {
-                pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000});
-                pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000});
-                pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000});
+                pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000, mode: 'sync'});
+                pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000, mode: 'sync'});
+                pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000, mode: 'sync'});
             }))
     });
 
@@ -67,11 +68,13 @@ describe('sending transactions', function () {
             ])))
             .then(passThroughAwait(ctx => send(ctx.bzSdk, ctx.toAddress, 10000, {
                 gasPrice: 0.002,
-                maxGas: 200000
+                maxGas: 200000,
+                mode: 'sync'
             }, 'uelt')))
             .then(passThroughAwait(ctx => send(ctx.bzSdk, ctx.toAddress, 10000, {
                 gasPrice: 0.002,
-                maxGas: 200000
+                maxGas: 200000,
+                mode: 'sync'
             }, 'ug4')))
             .then(withCtxAwait('postBalances', ctx => Promise.all([
                 getAccountBalance(ctx.bzSdk, ctx.bzSdk.address, 'uelt'),
@@ -110,7 +113,27 @@ describe('sending transactions', function () {
                 expect(response.txResponse.rawLog).to.contain('fail');
                 expect(response.txResponse.code).to.not.equal(0);
             })
-    )
+    );
+
+    it('should be able to broadcast a transaction asynchronously', () => {
+        let hash: string;
+        let client: BluzelleClient;
+        return startSwarmWithClient()
+            .then(({bzSdk}) =>
+                (pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {
+                    gasPrice: 0.02,
+                    maxGas: 1000000,
+                    mode: 'async'
+                }) as any)
+                    .then((resp: string) => {
+                        hash = resp;
+                        client = bzSdk
+             }))
+            .then(() => getTx(client, hash))
+            .catch(passThroughAwait(err => expect(err.message).to.include('not found')))
+            .then(passThroughAwait(() => delay(6_000)))
+            .then(() => getTx(client, hash))
+    })
 
 
     // skipping because we don't want to add admin info to repo right now
@@ -121,7 +144,7 @@ describe('sending transactions', function () {
 
         it("setGasTaxBp should set gas tax bp", () =>
             startSwarmWithClient()
-                .then(passThroughAwait(client => setGasTaxBp(client.bzSdk, BP, {maxGas: MAX_GAS, gasPrice: GAS_PRICE})))
+                .then(passThroughAwait(client => setGasTaxBp(client.bzSdk, BP, {maxGas: MAX_GAS, gasPrice: GAS_PRICE, mode: 'sync'})))
                 .then(client => getTaxInfo(client.bzSdk))
                 .then(taxInfo => expect(taxInfo.gasTaxBp).equal(BP))
         );
@@ -130,7 +153,8 @@ describe('sending transactions', function () {
             startSwarmWithClient()
                 .then(passThroughAwait(client => setTransferTaxBp(client.bzSdk, BP, {
                     maxGas: MAX_GAS,
-                    gasPrice: GAS_PRICE
+                    gasPrice: GAS_PRICE,
+                    mode: 'sync'
                 })))
                 .then(client => getTaxInfo(client.bzSdk))
                 .then(taxInfo => expect(taxInfo.transferTaxBp).equal(BP))
@@ -140,7 +164,8 @@ describe('sending transactions', function () {
             startSwarmWithClient()
                 .then(passThroughAwait(client => setTaxCollector(client.bzSdk, TAX_COLLECTOR, {
                     maxGas: MAX_GAS,
-                    gasPrice: GAS_PRICE
+                    gasPrice: GAS_PRICE,
+                    mode: 'sync'
                 })))
                 .then(client => getTaxInfo(client.bzSdk))
                 .then(taxInfo => expect(taxInfo.taxCollector).equal(TAX_COLLECTOR))
@@ -155,7 +180,7 @@ describe('sending transactions', function () {
 
         it("setGasTaxBp should not set gas tax bp", () =>
             startSwarmWithClient()
-                .then(passThroughAwait(client => setGasTaxBp(client.bzSdk, BP, {maxGas: MAX_GAS, gasPrice: GAS_PRICE})))
+                .then(passThroughAwait(client => setGasTaxBp(client.bzSdk, BP, {maxGas: MAX_GAS, gasPrice: GAS_PRICE, mode: 'sync'})))
                 .then(client => getTaxInfo(client.bzSdk))
                 .then(taxInfo => expect(taxInfo.gasTaxBp).not.equal(BP))
         );
@@ -164,7 +189,8 @@ describe('sending transactions', function () {
             startSwarmWithClient()
                 .then(passThroughAwait(client => setTransferTaxBp(client.bzSdk, BP, {
                     maxGas: MAX_GAS,
-                    gasPrice: GAS_PRICE
+                    gasPrice: GAS_PRICE,
+                    mode: 'sync'
                 })))
                 .then(client => getTaxInfo(client.bzSdk))
                 .then(taxInfo => expect(taxInfo.transferTaxBp).not.equal(BP))
@@ -174,7 +200,8 @@ describe('sending transactions', function () {
             startSwarmWithClient()
                 .then(passThroughAwait(client => setTaxCollector(client.bzSdk, TAX_COLLECTOR, {
                     maxGas: MAX_GAS,
-                    gasPrice: GAS_PRICE
+                    gasPrice: GAS_PRICE,
+                    mode: 'sync'
                 })))
                 .then(client => getTaxInfo(client.bzSdk))
                 .then(taxInfo => expect(taxInfo.taxCollector).not.equal(TAX_COLLECTOR))

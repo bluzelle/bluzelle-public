@@ -31,7 +31,7 @@ describe('query', function () {
             .then(withCtxAwait('client', () => getBlzClient(curiumUrl, mnemonic.getValue())))
             .then(passThroughAwait((ctx) =>
                 Promise.all(ctx.addResults.map((addResult) =>
-                    pinCid(ctx.client, addResult.path, {maxGas: 200000, gasPrice: 0.002})
+                    pinCid(ctx.client, addResult.path, {maxGas: 200000, gasPrice: 0.002, mode: 'sync'})
                 ))
             ))
             .then(ctx => Promise.all(ctx.addResults.map(addResult =>
@@ -63,7 +63,7 @@ describe('query', function () {
             .then((contents) => createCtx('contents',() => contents))
             .then(withCtxAwait('client', () => getBlzClient(curiumUrl, mnemonic.getValue())))
             .then(passThroughAwait(ctx => withTransaction(ctx.client, () =>
-                ctx.contents.forEach((contentObj) => pinCid(ctx.client, contentObj.cid, {maxGas: 200000, gasPrice: 0.002}))
+                ctx.contents.forEach((contentObj) => pinCid(ctx.client, contentObj.cid, {maxGas: 200000, gasPrice: 0.002, mode: 'sync'}))
             )))
             .then(ctx => getAccountBalance(ctx.client, ctx.client.address))
     );
@@ -94,7 +94,7 @@ describe('query', function () {
     it('should query a transaction by hash', () => {
         return getBlzClient(curiumUrl, mnemonic.getValue())
             .then(bzSdk =>
-                (pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {maxGas: 10000000, gasPrice: 0.002}) as any)
+                (pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {maxGas: 10000000, gasPrice: 0.002, mode: 'sync'}) as any)
                     .then((resp: any) => ({
                         resp,
                         bzSdk

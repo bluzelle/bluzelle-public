@@ -14,7 +14,8 @@ import {
 import {MsgDelegate, MsgUndelegate, MsgBeginRedelegate} from "./curium/lib/generated/cosmos/staking/v1beta1/tx";
 import {MsgWithdrawDelegatorReward} from "./curium/lib/generated/cosmos/distribution/v1beta1/tx";
 import {DeliverTxResponse} from "@cosmjs/stargate";
-
+import {toHex} from '@cosmjs/encoding'
+import {TxRaw} from "./curium/lib/generated/cosmos/tx/v1beta1/tx"
 interface MsgQueueItem<T> {
     msg: EncodeObject;
     options: BroadcastOptions;
@@ -24,6 +25,16 @@ interface MsgQueueItem<T> {
 type MsgQueue = MsgQueueItem<unknown>[] | undefined;
 
 let msgQueue: MsgQueue;
+
+export interface BroadcastMode {
+    async: (client: BluzelleClient, msgs: EncodeObject[], options: BroadcastOptions) => Promise<string>
+    sync: (client: BluzelleClient, msgs: EncodeObject[], options: BroadcastOptions) => Promise<DeliverTxResponse>
+}
+
+const getDefaultBroadcastMode = () => ({
+    async: broadcastTxAsync,
+    sync: broadcastTx
+})
 
 export type BluzelleTxResponse = DeliverTxResponse;
 
@@ -67,9 +78,10 @@ export const registerMessages = (registry: Registry) => {
     return registry
 };
 
-export interface BroadcastOptions {
+ export interface BroadcastOptions {
     gasPrice: number,
     maxGas: number,
+    mode?: 'async' | 'sync',
     memo?: string
 }
 
@@ -154,14 +166,14 @@ export const withdrawDelegatorReward = (
     } as MsgWithdrawDelegatorReward, options))
         .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
-const sendTx = <T>(client: BluzelleClient, type: string, msg: T, options: BroadcastOptions) =>
+const sendTx = <T>(client: BluzelleClient, type: string, msg: T, options: BroadcastOptions, mode: BroadcastMode = getDefaultBroadcastMode()) =>
     Right(msg)
         .map(msg => ({
             typeUrl: type,
             value: msg
         } as EncodeObject))
         .bind(msg => msgQueue ? Left(msg) : Right(msg))
-        .map(msg => broadcastTx(client, [msg as EncodeObject], options))
+        .map(msg => options.mode? mode[options.mode](client, [msg as EncodeObject], options): mode['sync'](client, [msg as EncodeObject], options))
         .leftMap(msg => queueMessage(msg as EncodeObject, options))
         .cata(identity, identity);
 
@@ -180,6 +192,24 @@ const broadcastTx = <T>(client: BluzelleClient, msgs: EncodeObject[], options: B
             ...response,
             rawLog: tryJson(response.rawLog)
         }));
+
+const broadcastTxAsync = <T>(client: BluzelleClient, msgs: EncodeObject[], options: BroadcastOptions): Promise<string> =>
+    client.sgClient.sign(
+        client.address,
+        msgs,
+        {
+            gas: options.maxGas.toFixed(0), amount: [{
+                denom: 'ubnt',
+                amount: (options.gasPrice * options.maxGas).toFixed(0)
+            }]
+        },
+        options.memo || ""
+        )
+        .then(txRaw => TxRaw.encode(txRaw).finish())
+        .then(txBytes =>
+            client.tmClient.broadcastTxAsync({
+            tx: txBytes}))
+        .then(({hash}) => toHex(hash).toUpperCase());
 
 const tryJson = (s: string = '') => {
     try {
