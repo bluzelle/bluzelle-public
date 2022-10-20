@@ -12,12 +12,7 @@ module.exports = {
     },
     target: 'node',
     externalsPresets: {node: true},
-    externals: [nodeExternals({
-        allowlist: [
-//            '@bluzelle/wallet/src/wallet',
-//            "deferred/src/Deferred",
-        ]
-    })],
+    externals: ['tiny-secp256k1'],
     mode: 'development',
     module: {
         rules: [
