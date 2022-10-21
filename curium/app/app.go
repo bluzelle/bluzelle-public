@@ -101,6 +101,9 @@ import (
 	faucetmodule "github.com/bluzelle/curium/x/faucet"
 	faucetmodulekeeper "github.com/bluzelle/curium/x/faucet/keeper"
 	faucetmoduletypes "github.com/bluzelle/curium/x/faucet/types"
+	"github.com/bluzelle/curium/x/nft"
+	nftkeeper "github.com/bluzelle/curium/x/nft/keeper"
+	nfttypes "github.com/bluzelle/curium/x/nft/types"
 	storagemodule "github.com/bluzelle/curium/x/storage"
 	storagemodulekeeper "github.com/bluzelle/curium/x/storage/keeper"
 	storagemoduletypes "github.com/bluzelle/curium/x/storage/types"
@@ -156,6 +159,7 @@ var (
 		storagemodule.AppModuleBasic{},
 		faucetmodule.AppModuleBasic{},
 		taxmodule.AppModuleBasic{},
+		nft.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -168,6 +172,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		nfttypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
 		faucetmoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		taxmoduletypes.ModuleName:      nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
@@ -229,6 +234,8 @@ type App struct {
 
 	CuriumKeeper curiummodulekeeper.Keeper
 
+	NFTKeeper nftkeeper.Keeper
+
 	StorageKeeper storagemodulekeeper.Keeper
 
 	FaucetKeeper faucetmodulekeeper.Keeper
@@ -271,6 +278,7 @@ func New(
 		storagemoduletypes.StoreKey,
 		faucetmoduletypes.StoreKey,
 		taxmoduletypes.StoreKey,
+		nfttypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -421,6 +429,8 @@ func New(
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
+	app.NFTKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey], app.GetSubspace(nfttypes.ModuleName), app.BankKeeper)
+
 	/****  Module Options ****/
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -448,6 +458,7 @@ func New(
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		upgrade.NewAppModule(app.UpgradeKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
+		nft.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
@@ -465,10 +476,10 @@ func New(
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
-		feegrant.ModuleName,
+		feegrant.ModuleName, nfttypes.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, curiummoduletypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, curiummoduletypes.ModuleName, nfttypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -489,6 +500,7 @@ func New(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
+		nfttypes.ModuleName,
 		curiummoduletypes.ModuleName,
 		storagemoduletypes.ModuleName,
 		faucetmoduletypes.ModuleName,
@@ -702,6 +714,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(storagemoduletypes.ModuleName)
 	paramsKeeper.Subspace(faucetmoduletypes.ModuleName)
 	paramsKeeper.Subspace(taxmoduletypes.ModuleName)
+	paramsKeeper.Subspace(nfttypes.ModuleName)
+
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper

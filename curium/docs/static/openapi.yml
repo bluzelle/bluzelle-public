@@ -4,7 +4,7 @@ info:
   name: ''
   description: ''
 paths:
-  '/bluzelle/curium/faucet/mint/{address}':
+  /bluzelle/curium/faucet/mint/{address}:
     get:
       summary: Queries a list of Mint items.
       operationId: BluzelleCuriumFaucetMint
@@ -80,6 +80,403 @@ paths:
                     '@type':
                       type: string
                   additionalProperties: {}
+      tags:
+        - Query
+  /bluzelle/nft/collection/{id}:
+    get:
+      summary: Collection returns collection information
+      operationId: BluzelleCuriumNftCollection
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              collection:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                  symbol:
+                    type: string
+                    title: The symbol for the asset
+                  name:
+                    type: string
+                  uri:
+                    type: string
+                  is_mutable:
+                    type: boolean
+                    title: Whether or not the data struct is mutable, default is not
+                  update_authority:
+                    type: string
+                    title: who can update metadata (if is_mutable is true)
+              nfts:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    coll_id:
+                      type: string
+                      format: uint64
+                    metadata_id:
+                      type: string
+                      format: uint64
+                    seq:
+                      type: string
+                      format: uint64
+                      title: edition nr (0 mean normal nft)
+                    owner:
+                      type: string
+            title: >-
+              QueryCollectionResponse is response type for the Query/Collection
+              RPC method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /bluzelle/nft/metadata/{id}:
+    get:
+      summary: Metadata returns Metadata
+      operationId: BluzelleCuriumNftMetadata
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              metadata:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                  name:
+                    type: string
+                    title: The name of the asset
+                  uri:
+                    type: string
+                    title: URI pointing to JSON representing the asset
+                  seller_fee_basis_points:
+                    type: integer
+                    format: int64
+                    title: >-
+                      Royalty basis points that goes to creators in secondary
+                      sales (0-10000)
+                  primary_sale_happened:
+                    type: boolean
+                    description: >-
+                      Immutable, once flipped, all sales of this metadata are
+                      considered
+
+                      secondary.
+                  is_mutable:
+                    type: boolean
+                    title: Whether or not the data struct is mutable, default is not
+                  creators:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        verified:
+                          type: boolean
+                        share:
+                          type: integer
+                          format: int64
+                          title: In percentages, NOT basis points ;) Watch out!
+                    title: Array of creators, optional
+                  metadata_authority:
+                    type: string
+                    title: who can update metadata (if is_mutable is true)
+                  mint_authority:
+                    type: string
+                    title: who can mint the editions
+                  master_edition:
+                    type: object
+                    properties:
+                      supply:
+                        type: string
+                        format: uint64
+                      max_supply:
+                        type: string
+                        format: uint64
+            title: >-
+              QueryMetadataResponse is response type for the Query/Metadata RPC
+              method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /bluzelle/nft/nft_info/{id}:
+    get:
+      summary: NFTInfo returns NFT information
+      operationId: BluzelleCuriumNftNFTInfo
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              nft:
+                type: object
+                properties:
+                  coll_id:
+                    type: string
+                    format: uint64
+                  metadata_id:
+                    type: string
+                    format: uint64
+                  seq:
+                    type: string
+                    format: uint64
+                    title: edition nr (0 mean normal nft)
+                  owner:
+                    type: string
+              metadata:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                  name:
+                    type: string
+                    title: The name of the asset
+                  uri:
+                    type: string
+                    title: URI pointing to JSON representing the asset
+                  seller_fee_basis_points:
+                    type: integer
+                    format: int64
+                    title: >-
+                      Royalty basis points that goes to creators in secondary
+                      sales (0-10000)
+                  primary_sale_happened:
+                    type: boolean
+                    description: >-
+                      Immutable, once flipped, all sales of this metadata are
+                      considered
+
+                      secondary.
+                  is_mutable:
+                    type: boolean
+                    title: Whether or not the data struct is mutable, default is not
+                  creators:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        verified:
+                          type: boolean
+                        share:
+                          type: integer
+                          format: int64
+                          title: In percentages, NOT basis points ;) Watch out!
+                    title: Array of creators, optional
+                  metadata_authority:
+                    type: string
+                    title: who can update metadata (if is_mutable is true)
+                  mint_authority:
+                    type: string
+                    title: who can mint the editions
+                  master_edition:
+                    type: object
+                    properties:
+                      supply:
+                        type: string
+                        format: uint64
+                      max_supply:
+                        type: string
+                        format: uint64
+            title: >-
+              QueryNFTInfoResponse is response type for the Query/NFTInfo RPC
+              method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /bluzelle/nft/nfts_by_owner/{owner}:
+    get:
+      summary: NFTsByOwner returns NFTs information by owner
+      operationId: BluzelleCuriumNftNFTsByOwner
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              nfts:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    coll_id:
+                      type: string
+                      format: uint64
+                    metadata_id:
+                      type: string
+                      format: uint64
+                    seq:
+                      type: string
+                      format: uint64
+                      title: edition nr (0 mean normal nft)
+                    owner:
+                      type: string
+              metadata:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uint64
+                    name:
+                      type: string
+                      title: The name of the asset
+                    uri:
+                      type: string
+                      title: URI pointing to JSON representing the asset
+                    seller_fee_basis_points:
+                      type: integer
+                      format: int64
+                      title: >-
+                        Royalty basis points that goes to creators in secondary
+                        sales (0-10000)
+                    primary_sale_happened:
+                      type: boolean
+                      description: >-
+                        Immutable, once flipped, all sales of this metadata are
+                        considered
+
+                        secondary.
+                    is_mutable:
+                      type: boolean
+                      title: >-
+                        Whether or not the data struct is mutable, default is
+                        not
+                    creators:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          verified:
+                            type: boolean
+                          share:
+                            type: integer
+                            format: int64
+                            title: In percentages, NOT basis points ;) Watch out!
+                      title: Array of creators, optional
+                    metadata_authority:
+                      type: string
+                      title: who can update metadata (if is_mutable is true)
+                    mint_authority:
+                      type: string
+                      title: who can mint the editions
+                    master_edition:
+                      type: object
+                      properties:
+                        supply:
+                          type: string
+                          format: uint64
+                        max_supply:
+                          type: string
+                          format: uint64
+            title: >-
+              QueryNFTInfoResponse is response type for the Query/NFTsByOwner
+              RPC method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          type: string
       tags:
         - Query
   /bluzelle/curium/storage/hasContent:
@@ -604,7 +1001,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/auth/v1beta1/accounts/{address}':
+  /cosmos/auth/v1beta1/accounts/{address}:
     get:
       summary: Account returns account details based on address.
       operationId: CosmosAuthV1Beta1Account
@@ -1198,7 +1595,7 @@ paths:
                         }
       tags:
         - Query
-  '/cosmos/bank/v1beta1/balances/{address}':
+  /cosmos/bank/v1beta1/balances/{address}:
     get:
       summary: AllBalances queries the balance of all coins for a single account.
       operationId: CosmosBankV1Beta1AllBalances
@@ -1328,7 +1725,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/bank/v1beta1/balances/{address}/{denom}':
+  /cosmos/bank/v1beta1/balances/{address}/{denom}:
     get:
       summary: Balance queries the balance of a single coin for a single account.
       operationId: CosmosBankV1Beta1Balance
@@ -1568,7 +1965,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/bank/v1beta1/denoms_metadata/{denom}':
+  /cosmos/bank/v1beta1/denoms_metadata/{denom}:
     get:
       summary: DenomsMetadata queries the client metadata of a given coin denomination.
       operationId: CosmosBankV1Beta1DenomMetadata
@@ -1854,7 +2251,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/bank/v1beta1/supply/{denom}':
+  /cosmos/bank/v1beta1/supply/{denom}:
     get:
       summary: SupplyOf queries the supply of a single coin.
       operationId: CosmosBankV1Beta1SupplyOf
@@ -1987,33 +2384,44 @@ paths:
                       last_commit_hash:
                         type: string
                         format: byte
+                        description: commit from validators from the last block
                         title: hashes of block data
                       data_hash:
                         type: string
                         format: byte
+                        title: transactions
                       validators_hash:
                         type: string
                         format: byte
+                        description: validators for the current block
                         title: hashes from the app output from the prev block
                       next_validators_hash:
                         type: string
                         format: byte
+                        title: validators for the next block
                       consensus_hash:
                         type: string
                         format: byte
+                        title: consensus params for current block
                       app_hash:
                         type: string
                         format: byte
+                        title: state after txs from the previous block
                       last_results_hash:
                         type: string
                         format: byte
+                        title: >-
+                          root hash of all results from the txs from the
+                          previous block
                       evidence_hash:
                         type: string
                         format: byte
+                        description: evidence included in the block
                         title: consensus info
                       proposer_address:
                         type: string
                         format: byte
+                        title: original proposer of the block
                     description: Header defines the structure of a Tendermint block header.
                   data:
                     type: object
@@ -2085,6 +2493,7 @@ paths:
                                               format: byte
                                           title: PartsetHeader
                                       title: BlockID
+                                      description: zero if vote is nil.
                                     timestamp:
                                       type: string
                                       format: date-time
@@ -2142,6 +2551,7 @@ paths:
                                               format: byte
                                           title: PartsetHeader
                                       title: BlockID
+                                      description: zero if vote is nil.
                                     timestamp:
                                       type: string
                                       format: date-time
@@ -2230,35 +2640,48 @@ paths:
                                             last_commit_hash:
                                               type: string
                                               format: byte
+                                              description: >-
+                                                commit from validators from the last
+                                                block
                                               title: hashes of block data
                                             data_hash:
                                               type: string
                                               format: byte
+                                              title: transactions
                                             validators_hash:
                                               type: string
                                               format: byte
+                                              description: validators for the current block
                                               title: >-
                                                 hashes from the app output from the prev
                                                 block
                                             next_validators_hash:
                                               type: string
                                               format: byte
+                                              title: validators for the next block
                                             consensus_hash:
                                               type: string
                                               format: byte
+                                              title: consensus params for current block
                                             app_hash:
                                               type: string
                                               format: byte
+                                              title: state after txs from the previous block
                                             last_results_hash:
                                               type: string
                                               format: byte
+                                              title: >-
+                                                root hash of all results from the txs
+                                                from the previous block
                                             evidence_hash:
                                               type: string
                                               format: byte
+                                              description: evidence included in the block
                                               title: consensus info
                                             proposer_address:
                                               type: string
                                               format: byte
+                                              title: original proposer of the block
                                           description: >-
                                             Header defines the structure of a
                                             Tendermint block header.
@@ -2662,7 +3085,7 @@ paths:
                         }
       tags:
         - Service
-  '/cosmos/base/tendermint/v1beta1/blocks/{height}':
+  /cosmos/base/tendermint/v1beta1/blocks/{height}:
     get:
       summary: GetBlockByHeight queries block for given height.
       operationId: CosmosBaseTendermintV1Beta1GetBlockByHeight
@@ -2741,33 +3164,44 @@ paths:
                       last_commit_hash:
                         type: string
                         format: byte
+                        description: commit from validators from the last block
                         title: hashes of block data
                       data_hash:
                         type: string
                         format: byte
+                        title: transactions
                       validators_hash:
                         type: string
                         format: byte
+                        description: validators for the current block
                         title: hashes from the app output from the prev block
                       next_validators_hash:
                         type: string
                         format: byte
+                        title: validators for the next block
                       consensus_hash:
                         type: string
                         format: byte
+                        title: consensus params for current block
                       app_hash:
                         type: string
                         format: byte
+                        title: state after txs from the previous block
                       last_results_hash:
                         type: string
                         format: byte
+                        title: >-
+                          root hash of all results from the txs from the
+                          previous block
                       evidence_hash:
                         type: string
                         format: byte
+                        description: evidence included in the block
                         title: consensus info
                       proposer_address:
                         type: string
                         format: byte
+                        title: original proposer of the block
                     description: Header defines the structure of a Tendermint block header.
                   data:
                     type: object
@@ -2839,6 +3273,7 @@ paths:
                                               format: byte
                                           title: PartsetHeader
                                       title: BlockID
+                                      description: zero if vote is nil.
                                     timestamp:
                                       type: string
                                       format: date-time
@@ -2896,6 +3331,7 @@ paths:
                                               format: byte
                                           title: PartsetHeader
                                       title: BlockID
+                                      description: zero if vote is nil.
                                     timestamp:
                                       type: string
                                       format: date-time
@@ -2984,35 +3420,48 @@ paths:
                                             last_commit_hash:
                                               type: string
                                               format: byte
+                                              description: >-
+                                                commit from validators from the last
+                                                block
                                               title: hashes of block data
                                             data_hash:
                                               type: string
                                               format: byte
+                                              title: transactions
                                             validators_hash:
                                               type: string
                                               format: byte
+                                              description: validators for the current block
                                               title: >-
                                                 hashes from the app output from the prev
                                                 block
                                             next_validators_hash:
                                               type: string
                                               format: byte
+                                              title: validators for the next block
                                             consensus_hash:
                                               type: string
                                               format: byte
+                                              title: consensus params for current block
                                             app_hash:
                                               type: string
                                               format: byte
+                                              title: state after txs from the previous block
                                             last_results_hash:
                                               type: string
                                               format: byte
+                                              title: >-
+                                                root hash of all results from the txs
+                                                from the previous block
                                             evidence_hash:
                                               type: string
                                               format: byte
+                                              description: evidence included in the block
                                               title: consensus info
                                             proposer_address:
                                               type: string
                                               format: byte
+                                              title: original proposer of the block
                                           description: >-
                                             Header defines the structure of a
                                             Tendermint block header.
@@ -4356,7 +4805,7 @@ paths:
           type: boolean
       tags:
         - Service
-  '/cosmos/base/tendermint/v1beta1/validatorsets/{height}':
+  /cosmos/base/tendermint/v1beta1/validatorsets/{height}:
     get:
       summary: GetValidatorSetByHeight queries validator-set at a given height.
       operationId: CosmosBaseTendermintV1Beta1GetValidatorSetByHeight
@@ -4879,7 +5328,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards':
+  /cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards:
     get:
       summary: |-
         DelegationTotalRewards queries the total rewards accrued by a each
@@ -4968,7 +5417,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards/{validator_address}':
+  /cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards/{validator_address}:
     get:
       summary: DelegationRewards queries the total rewards accrued by a delegation.
       operationId: CosmosDistributionV1Beta1DelegationRewards
@@ -5031,7 +5480,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/delegators/{delegator_address}/validators':
+  /cosmos/distribution/v1beta1/delegators/{delegator_address}/validators:
     get:
       summary: DelegatorValidators queries the validators of a delegator.
       operationId: CosmosDistributionV1Beta1DelegatorValidators
@@ -5077,7 +5526,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/delegators/{delegator_address}/withdraw_address':
+  /cosmos/distribution/v1beta1/delegators/{delegator_address}/withdraw_address:
     get:
       summary: DelegatorWithdrawAddress queries withdraw address of a delegator.
       operationId: CosmosDistributionV1Beta1DelegatorWithdrawAddress
@@ -5164,7 +5613,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/validators/{validator_address}/commission':
+  /cosmos/distribution/v1beta1/validators/{validator_address}/commission:
     get:
       summary: ValidatorCommission queries accumulated commission for a validator.
       operationId: CosmosDistributionV1Beta1ValidatorCommission
@@ -5225,7 +5674,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards':
+  /cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards:
     get:
       summary: ValidatorOutstandingRewards queries rewards of a validator address.
       operationId: CosmosDistributionV1Beta1ValidatorOutstandingRewards
@@ -5293,7 +5742,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/distribution/v1beta1/validators/{validator_address}/slashes':
+  /cosmos/distribution/v1beta1/validators/{validator_address}/slashes:
     get:
       summary: ValidatorSlashes queries slash events of a validator.
       operationId: CosmosDistributionV1Beta1ValidatorSlashes
@@ -5890,7 +6339,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/evidence/v1beta1/evidence/{evidence_hash}':
+  /cosmos/evidence/v1beta1/evidence/{evidence_hash}:
     get:
       summary: Evidence queries evidence based on evidence hash.
       operationId: CosmosEvidenceV1Beta1Evidence
@@ -6266,7 +6715,7 @@ paths:
           format: byte
       tags:
         - Query
-  '/cosmos/feegrant/v1beta1/allowance/{granter}/{grantee}':
+  /cosmos/feegrant/v1beta1/allowance/{granter}/{grantee}:
     get:
       summary: Allowance returns fee granted to the grantee by the granter.
       operationId: CosmosFeegrantV1Beta1Allowance
@@ -6561,7 +7010,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/feegrant/v1beta1/allowances/{grantee}':
+  /cosmos/feegrant/v1beta1/allowances/{grantee}:
     get:
       summary: Allowances returns all the grants for address.
       operationId: CosmosFeegrantV1Beta1Allowances
@@ -6921,7 +7370,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/gov/v1beta1/params/{params_type}':
+  /cosmos/gov/v1beta1/params/{params_type}:
     get:
       summary: Params queries all parameters of the gov module.
       operationId: CosmosGovV1Beta1Params
@@ -7755,7 +8204,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/gov/v1beta1/proposals/{proposal_id}':
+  /cosmos/gov/v1beta1/proposals/{proposal_id}:
     get:
       summary: Proposal queries proposal details based on ProposalID.
       operationId: CosmosGovV1Beta1Proposal
@@ -8212,7 +8661,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits':
+  /cosmos/gov/v1beta1/proposals/{proposal_id}/deposits:
     get:
       summary: Deposits queries all deposits of a single proposal.
       operationId: CosmosGovV1Beta1Deposits
@@ -8523,7 +8972,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}':
+  /cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}:
     get:
       summary: >-
         Deposit queries single deposit information based proposalID,
@@ -8767,7 +9216,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/gov/v1beta1/proposals/{proposal_id}/tally':
+  /cosmos/gov/v1beta1/proposals/{proposal_id}/tally:
     get:
       summary: TallyResult queries the tally of a proposal vote.
       operationId: CosmosGovV1Beta1TallyResult
@@ -8988,7 +9437,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/cosmos/gov/v1beta1/proposals/{proposal_id}/votes':
+  /cosmos/gov/v1beta1/proposals/{proposal_id}/votes:
     get:
       summary: Votes queries votes of a given proposal.
       operationId: CosmosGovV1Beta1Votes
@@ -9328,9 +9777,9 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}':
+  /cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}:
     get:
-      summary: 'Vote queries voted information based on proposalID, voterAddr.'
+      summary: Vote queries voted information based on proposalID, voterAddr.
       operationId: CosmosGovV1Beta1Vote
       responses:
         '200':
@@ -10011,7 +10460,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/slashing/v1beta1/signing_infos/{cons_address}':
+  /cosmos/slashing/v1beta1/signing_infos/{cons_address}:
     get:
       summary: SigningInfo queries the signing info of given cons address
       operationId: CosmosSlashingV1Beta1SigningInfo
@@ -10105,7 +10554,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/staking/v1beta1/delegations/{delegator_addr}':
+  /cosmos/staking/v1beta1/delegations/{delegator_addr}:
     get:
       summary: >-
         DelegatorDelegations queries all delegations of a given delegator
@@ -10437,7 +10886,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/staking/v1beta1/delegators/{delegator_addr}/redelegations':
+  /cosmos/staking/v1beta1/delegators/{delegator_addr}/redelegations:
     get:
       summary: Redelegations queries redelegations of given address.
       operationId: CosmosStakingV1Beta1Redelegations
@@ -10501,7 +10950,10 @@ paths:
                             description: >-
                               RedelegationEntry defines a redelegation object
                               with relevant metadata.
-                          description: entries are the redelegation entries.
+                          description: |-
+                            entries are the redelegation entries.
+
+                            redelegation entries
                       description: >-
                         Redelegation contains the list of a particular
                         delegator's redelegating bonds
@@ -10839,7 +11291,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/staking/v1beta1/delegators/{delegator_addr}/unbonding_delegations':
+  /cosmos/staking/v1beta1/delegators/{delegator_addr}/unbonding_delegations:
     get:
       summary: >-
         DelegatorUnbondingDelegations queries all unbonding delegations of a
@@ -10898,7 +11350,10 @@ paths:
                         description: >-
                           UnbondingDelegationEntry defines an unbonding object
                           with relevant metadata.
-                      description: entries are the unbonding delegation entries.
+                      description: |-
+                        entries are the unbonding delegation entries.
+
+                        unbonding delegation entries
                   description: >-
                     UnbondingDelegation stores all of a single delegator's
                     unbonding bonds
@@ -11173,7 +11628,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators':
+  /cosmos/staking/v1beta1/delegators/{delegator_addr}/validators:
     get:
       summary: |-
         DelegatorValidators queries all validators info for given delegator
@@ -11763,7 +12218,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/{validator_addr}':
+  /cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/{validator_addr}:
     get:
       summary: |-
         DelegatorValidator queries validator info for given delegator validator
@@ -12281,7 +12736,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/staking/v1beta1/historical_info/{height}':
+  /cosmos/staking/v1beta1/historical_info/{height}:
     get:
       summary: HistoricalInfo queries the historical info for given height.
       operationId: CosmosStakingV1Beta1HistoricalInfo
@@ -12344,33 +12799,44 @@ paths:
                       last_commit_hash:
                         type: string
                         format: byte
+                        description: commit from validators from the last block
                         title: hashes of block data
                       data_hash:
                         type: string
                         format: byte
+                        title: transactions
                       validators_hash:
                         type: string
                         format: byte
+                        description: validators for the current block
                         title: hashes from the app output from the prev block
                       next_validators_hash:
                         type: string
                         format: byte
+                        title: validators for the next block
                       consensus_hash:
                         type: string
                         format: byte
+                        title: consensus params for current block
                       app_hash:
                         type: string
                         format: byte
+                        title: state after txs from the previous block
                       last_results_hash:
                         type: string
                         format: byte
+                        title: >-
+                          root hash of all results from the txs from the
+                          previous block
                       evidence_hash:
                         type: string
                         format: byte
+                        description: evidence included in the block
                         title: consensus info
                       proposer_address:
                         type: string
                         format: byte
+                        title: original proposer of the block
                     description: Header defines the structure of a Tendermint block header.
                   valset:
                     type: array
@@ -13903,7 +14369,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/staking/v1beta1/validators/{validator_addr}':
+  /cosmos/staking/v1beta1/validators/{validator_addr}:
     get:
       summary: Validator queries validator info for given validator address.
       operationId: CosmosStakingV1Beta1Validator
@@ -14414,7 +14880,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations':
+  /cosmos/staking/v1beta1/validators/{validator_addr}/delegations:
     get:
       summary: ValidatorDelegations queries delegate info for given validator.
       operationId: CosmosStakingV1Beta1ValidatorDelegations
@@ -14741,7 +15207,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}':
+  /cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}:
     get:
       summary: Delegation queries delegate info for given validator delegator pair.
       operationId: CosmosStakingV1Beta1Delegation
@@ -15000,7 +15466,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}/unbonding_delegation':
+  /cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}/unbonding_delegation:
     get:
       summary: |-
         UnbondingDelegation queries unbonding info for given validator delegator
@@ -15053,7 +15519,10 @@ paths:
                       description: >-
                         UnbondingDelegationEntry defines an unbonding object
                         with relevant metadata.
-                    description: entries are the unbonding delegation entries.
+                    description: |-
+                      entries are the unbonding delegation entries.
+
+                      unbonding delegation entries
                 description: >-
                   UnbondingDelegation stores all of a single delegator's
                   unbonding bonds
@@ -15262,7 +15731,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/staking/v1beta1/validators/{validator_addr}/unbonding_delegations':
+  /cosmos/staking/v1beta1/validators/{validator_addr}/unbonding_delegations:
     get:
       summary: >-
         ValidatorUnbondingDelegations queries unbonding delegations of a
@@ -15319,7 +15788,10 @@ paths:
                         description: >-
                           UnbondingDelegationEntry defines an unbonding object
                           with relevant metadata.
-                      description: entries are the unbonding delegation entries.
+                      description: |-
+                        entries are the unbonding delegation entries.
+
+                        unbonding delegation entries
                   description: >-
                     UnbondingDelegation stores all of a single delegator's
                     unbonding bonds
@@ -15656,6 +16128,7 @@ paths:
                                 format: byte
                               index:
                                 type: boolean
+                                title: nondeterministic
                             description: >-
                               EventAttribute is a single key-value pair,
                               associated with an event.
@@ -16170,7 +16643,7 @@ paths:
                     description: Response code.
                   data:
                     type: string
-                    description: 'Result bytes, if any.'
+                    description: Result bytes, if any.
                   raw_log:
                     type: string
                     description: >-
@@ -16655,7 +17128,7 @@ paths:
               RPC method.
       tags:
         - Service
-  '/cosmos/tx/v1beta1/txs/{hash}':
+  /cosmos/tx/v1beta1/txs/{hash}:
     get:
       summary: GetTx fetches a tx by hash.
       operationId: CosmosTxV1Beta1GetTx
@@ -16851,13 +17324,13 @@ paths:
                         }
       parameters:
         - name: hash
-          description: 'hash is the tx hash to query, encoded as a hex string.'
+          description: hash is the tx hash to query, encoded as a hex string.
           in: path
           required: true
           type: string
       tags:
         - Service
-  '/cosmos/upgrade/v1beta1/applied_plan/{name}':
+  /cosmos/upgrade/v1beta1/applied_plan/{name}:
     get:
       summary: AppliedPlan queries a previously applied upgrade plan by its name.
       operationId: CosmosUpgradeV1Beta1AppliedPlan
@@ -17721,7 +18194,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/upgrade/v1beta1/upgraded_consensus_state/{last_height}':
+  /cosmos/upgrade/v1beta1/upgraded_consensus_state/{last_height}:
     get:
       summary: >-
         UpgradedConsensusState queries the consensus state that will serve
@@ -18234,7 +18707,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/ibc/apps/transfer/v1/denom_traces/{hash}':
+  /ibc/apps/transfer/v1/denom_traces/{hash}:
     get:
       summary: DenomTrace queries a denomination trace information.
       operationId: IbcApplicationsTransferV1DenomTrace
@@ -19062,7 +19535,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}:
     get:
       summary: Channel queries an IBC Channel.
       operationId: IbcCoreChannelV1Channel
@@ -19385,7 +19858,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/client_state':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/client_state:
     get:
       summary: >-
         ChannelClientState queries for the client state for the channel
@@ -19819,7 +20292,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}:
     get:
       summary: |-
         ChannelConsensusState queries for the consensus state for the channel
@@ -20250,7 +20723,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/next_sequence':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/next_sequence:
     get:
       summary: >-
         NextSequenceReceive returns the next receive sequence for a given
@@ -20500,7 +20973,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements:
     get:
       summary: >-
         PacketAcknowledgements returns all the packet acknowledgements
@@ -20856,7 +21329,7 @@ paths:
           collectionFormat: multi
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}:
     get:
       summary: PacketAcknowledgement queries a stored packet acknowledgement hash.
       operationId: IbcCoreChannelV1PacketAcknowledgement
@@ -21114,7 +21587,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments:
     get:
       summary: |-
         PacketCommitments returns all the packet commitments hashes associated
@@ -21459,7 +21932,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks:
     get:
       summary: >-
         UnreceivedAcks returns all the unreceived IBC acknowledgements
@@ -21719,7 +22192,7 @@ paths:
           minItems: 1
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets:
     get:
       summary: >-
         UnreceivedPackets returns all the unreceived IBC packets associated with
@@ -21979,7 +22452,7 @@ paths:
           minItems: 1
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}:
     get:
       summary: PacketCommitment queries a stored packet commitment hash.
       operationId: IbcCoreChannelV1PacketCommitment
@@ -22238,7 +22711,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}:
     get:
       summary: >-
         PacketReceipt queries if a given packet sequence has been received on
@@ -22500,7 +22973,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/ibc/core/channel/v1/connections/{connection}/channels':
+  /ibc/core/channel/v1/connections/{connection}/channels:
     get:
       summary: |-
         ConnectionChannels queries all the channels associated with a connection
@@ -23571,7 +24044,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/ibc/core/client/v1/client_states/{client_id}':
+  /ibc/core/client/v1/client_states/{client_id}:
     get:
       summary: ClientState queries an IBC light client.
       operationId: IbcCoreClientV1ClientState
@@ -23985,7 +24458,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/client/v1/client_status/{client_id}':
+  /ibc/core/client/v1/client_status/{client_id}:
     get:
       summary: Status queries the status of an IBC client.
       operationId: IbcCoreClientV1ClientStatus
@@ -24195,7 +24668,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/client/v1/consensus_states/{client_id}':
+  /ibc/core/client/v1/consensus_states/{client_id}:
     get:
       summary: |-
         ConsensusStates queries all the consensus state associated with a given
@@ -24693,7 +25166,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/ibc/core/client/v1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}':
+  /ibc/core/client/v1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}:
     get:
       summary: >-
         ConsensusState queries a consensus state associated with a client state
@@ -25871,7 +26344,7 @@ paths:
                         }
       tags:
         - Query
-  '/ibc/core/connection/v1/client_connections/{client_id}':
+  /ibc/core/connection/v1/client_connections/{client_id}:
     get:
       summary: |-
         ClientConnections queries the connection paths associated with a client
@@ -26510,7 +26983,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/ibc/core/connection/v1/connections/{connection_id}':
+  /ibc/core/connection/v1/connections/{connection_id}:
     get:
       summary: Connection queries an IBC connection end.
       operationId: IbcCoreConnectionV1Connection
@@ -26847,7 +27320,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/connection/v1/connections/{connection_id}/client_state':
+  /ibc/core/connection/v1/connections/{connection_id}/client_state:
     get:
       summary: |-
         ConnectionClientState queries the client state associated with the
@@ -27274,7 +27747,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/connection/v1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}':
+  /ibc/core/connection/v1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}:
     get:
       summary: |-
         ConnectionConsensusState queries the consensus state associated with the
@@ -28050,6 +28523,404 @@ definitions:
           testnet:
             type: string
     description: QueryParamsResponse is response type for the Query/Params RPC method.
+  bluzelle.curium.nft.Collection:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+      symbol:
+        type: string
+        title: The symbol for the asset
+      name:
+        type: string
+      uri:
+        type: string
+      is_mutable:
+        type: boolean
+        title: Whether or not the data struct is mutable, default is not
+      update_authority:
+        type: string
+        title: who can update metadata (if is_mutable is true)
+  bluzelle.curium.nft.Creator:
+    type: object
+    properties:
+      address:
+        type: string
+      verified:
+        type: boolean
+      share:
+        type: integer
+        format: int64
+        title: In percentages, NOT basis points ;) Watch out!
+  bluzelle.curium.nft.MasterEdition:
+    type: object
+    properties:
+      supply:
+        type: string
+        format: uint64
+      max_supply:
+        type: string
+        format: uint64
+  bluzelle.curium.nft.Metadata:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+      name:
+        type: string
+        title: The name of the asset
+      uri:
+        type: string
+        title: URI pointing to JSON representing the asset
+      seller_fee_basis_points:
+        type: integer
+        format: int64
+        title: >-
+          Royalty basis points that goes to creators in secondary sales
+          (0-10000)
+      primary_sale_happened:
+        type: boolean
+        description: |-
+          Immutable, once flipped, all sales of this metadata are considered
+          secondary.
+      is_mutable:
+        type: boolean
+        title: Whether or not the data struct is mutable, default is not
+      creators:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            verified:
+              type: boolean
+            share:
+              type: integer
+              format: int64
+              title: In percentages, NOT basis points ;) Watch out!
+        title: Array of creators, optional
+      metadata_authority:
+        type: string
+        title: who can update metadata (if is_mutable is true)
+      mint_authority:
+        type: string
+        title: who can mint the editions
+      master_edition:
+        type: object
+        properties:
+          supply:
+            type: string
+            format: uint64
+          max_supply:
+            type: string
+            format: uint64
+  bluzelle.curium.nft.MsgCreateCollectionResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+  bluzelle.curium.nft.MsgCreateNFTResponse:
+    type: object
+    properties:
+      id:
+        type: string
+      metadata_id:
+        type: string
+        format: uint64
+  bluzelle.curium.nft.MsgPrintEditionResponse:
+    type: object
+    properties:
+      id:
+        type: string
+      metadata_id:
+        type: string
+        format: uint64
+  bluzelle.curium.nft.MsgSignMetadataResponse:
+    type: object
+  bluzelle.curium.nft.MsgTransferNFTResponse:
+    type: object
+  bluzelle.curium.nft.MsgUpdateCollectionAuthorityResponse:
+    type: object
+  bluzelle.curium.nft.MsgUpdateMetadataAuthorityResponse:
+    type: object
+  bluzelle.curium.nft.MsgUpdateMetadataResponse:
+    type: object
+  bluzelle.curium.nft.MsgUpdateMintAuthorityResponse:
+    type: object
+  bluzelle.curium.nft.NFT:
+    type: object
+    properties:
+      coll_id:
+        type: string
+        format: uint64
+      metadata_id:
+        type: string
+        format: uint64
+      seq:
+        type: string
+        format: uint64
+        title: edition nr (0 mean normal nft)
+      owner:
+        type: string
+  bluzelle.curium.nft.QueryCollectionResponse:
+    type: object
+    properties:
+      collection:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          symbol:
+            type: string
+            title: The symbol for the asset
+          name:
+            type: string
+          uri:
+            type: string
+          is_mutable:
+            type: boolean
+            title: Whether or not the data struct is mutable, default is not
+          update_authority:
+            type: string
+            title: who can update metadata (if is_mutable is true)
+      nfts:
+        type: array
+        items:
+          type: object
+          properties:
+            coll_id:
+              type: string
+              format: uint64
+            metadata_id:
+              type: string
+              format: uint64
+            seq:
+              type: string
+              format: uint64
+              title: edition nr (0 mean normal nft)
+            owner:
+              type: string
+    title: >-
+      QueryCollectionResponse is response type for the Query/Collection RPC
+      method
+  bluzelle.curium.nft.QueryMetadataResponse:
+    type: object
+    properties:
+      metadata:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          name:
+            type: string
+            title: The name of the asset
+          uri:
+            type: string
+            title: URI pointing to JSON representing the asset
+          seller_fee_basis_points:
+            type: integer
+            format: int64
+            title: >-
+              Royalty basis points that goes to creators in secondary sales
+              (0-10000)
+          primary_sale_happened:
+            type: boolean
+            description: |-
+              Immutable, once flipped, all sales of this metadata are considered
+              secondary.
+          is_mutable:
+            type: boolean
+            title: Whether or not the data struct is mutable, default is not
+          creators:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                verified:
+                  type: boolean
+                share:
+                  type: integer
+                  format: int64
+                  title: In percentages, NOT basis points ;) Watch out!
+            title: Array of creators, optional
+          metadata_authority:
+            type: string
+            title: who can update metadata (if is_mutable is true)
+          mint_authority:
+            type: string
+            title: who can mint the editions
+          master_edition:
+            type: object
+            properties:
+              supply:
+                type: string
+                format: uint64
+              max_supply:
+                type: string
+                format: uint64
+    title: QueryMetadataResponse is response type for the Query/Metadata RPC method
+  bluzelle.curium.nft.QueryNFTInfoResponse:
+    type: object
+    properties:
+      nft:
+        type: object
+        properties:
+          coll_id:
+            type: string
+            format: uint64
+          metadata_id:
+            type: string
+            format: uint64
+          seq:
+            type: string
+            format: uint64
+            title: edition nr (0 mean normal nft)
+          owner:
+            type: string
+      metadata:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          name:
+            type: string
+            title: The name of the asset
+          uri:
+            type: string
+            title: URI pointing to JSON representing the asset
+          seller_fee_basis_points:
+            type: integer
+            format: int64
+            title: >-
+              Royalty basis points that goes to creators in secondary sales
+              (0-10000)
+          primary_sale_happened:
+            type: boolean
+            description: |-
+              Immutable, once flipped, all sales of this metadata are considered
+              secondary.
+          is_mutable:
+            type: boolean
+            title: Whether or not the data struct is mutable, default is not
+          creators:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                verified:
+                  type: boolean
+                share:
+                  type: integer
+                  format: int64
+                  title: In percentages, NOT basis points ;) Watch out!
+            title: Array of creators, optional
+          metadata_authority:
+            type: string
+            title: who can update metadata (if is_mutable is true)
+          mint_authority:
+            type: string
+            title: who can mint the editions
+          master_edition:
+            type: object
+            properties:
+              supply:
+                type: string
+                format: uint64
+              max_supply:
+                type: string
+                format: uint64
+    title: QueryNFTInfoResponse is response type for the Query/NFTInfo RPC method
+  bluzelle.curium.nft.QueryNFTsByOwnerResponse:
+    type: object
+    properties:
+      nfts:
+        type: array
+        items:
+          type: object
+          properties:
+            coll_id:
+              type: string
+              format: uint64
+            metadata_id:
+              type: string
+              format: uint64
+            seq:
+              type: string
+              format: uint64
+              title: edition nr (0 mean normal nft)
+            owner:
+              type: string
+      metadata:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uint64
+            name:
+              type: string
+              title: The name of the asset
+            uri:
+              type: string
+              title: URI pointing to JSON representing the asset
+            seller_fee_basis_points:
+              type: integer
+              format: int64
+              title: >-
+                Royalty basis points that goes to creators in secondary sales
+                (0-10000)
+            primary_sale_happened:
+              type: boolean
+              description: >-
+                Immutable, once flipped, all sales of this metadata are
+                considered
+
+                secondary.
+            is_mutable:
+              type: boolean
+              title: Whether or not the data struct is mutable, default is not
+            creators:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  verified:
+                    type: boolean
+                  share:
+                    type: integer
+                    format: int64
+                    title: In percentages, NOT basis points ;) Watch out!
+              title: Array of creators, optional
+            metadata_authority:
+              type: string
+              title: who can update metadata (if is_mutable is true)
+            mint_authority:
+              type: string
+              title: who can mint the editions
+            master_edition:
+              type: object
+              properties:
+                supply:
+                  type: string
+                  format: uint64
+                max_supply:
+                  type: string
+                  format: uint64
+    title: QueryNFTInfoResponse is response type for the Query/NFTsByOwner RPC method
   bluzelle.curium.storage.MsgPinResponse:
     type: object
   bluzelle.curium.storage.QueryHasContentResponse:
@@ -29096,33 +29967,42 @@ definitions:
               last_commit_hash:
                 type: string
                 format: byte
+                description: commit from validators from the last block
                 title: hashes of block data
               data_hash:
                 type: string
                 format: byte
+                title: transactions
               validators_hash:
                 type: string
                 format: byte
+                description: validators for the current block
                 title: hashes from the app output from the prev block
               next_validators_hash:
                 type: string
                 format: byte
+                title: validators for the next block
               consensus_hash:
                 type: string
                 format: byte
+                title: consensus params for current block
               app_hash:
                 type: string
                 format: byte
+                title: state after txs from the previous block
               last_results_hash:
                 type: string
                 format: byte
+                title: root hash of all results from the txs from the previous block
               evidence_hash:
                 type: string
                 format: byte
+                description: evidence included in the block
                 title: consensus info
               proposer_address:
                 type: string
                 format: byte
+                title: original proposer of the block
             description: Header defines the structure of a Tendermint block header.
           data:
             type: object
@@ -29191,6 +30071,7 @@ definitions:
                                       format: byte
                                   title: PartsetHeader
                               title: BlockID
+                              description: zero if vote is nil.
                             timestamp:
                               type: string
                               format: date-time
@@ -29248,6 +30129,7 @@ definitions:
                                       format: byte
                                   title: PartsetHeader
                               title: BlockID
+                              description: zero if vote is nil.
                             timestamp:
                               type: string
                               format: date-time
@@ -29336,35 +30218,48 @@ definitions:
                                     last_commit_hash:
                                       type: string
                                       format: byte
+                                      description: >-
+                                        commit from validators from the last
+                                        block
                                       title: hashes of block data
                                     data_hash:
                                       type: string
                                       format: byte
+                                      title: transactions
                                     validators_hash:
                                       type: string
                                       format: byte
+                                      description: validators for the current block
                                       title: >-
                                         hashes from the app output from the prev
                                         block
                                     next_validators_hash:
                                       type: string
                                       format: byte
+                                      title: validators for the next block
                                     consensus_hash:
                                       type: string
                                       format: byte
+                                      title: consensus params for current block
                                     app_hash:
                                       type: string
                                       format: byte
+                                      title: state after txs from the previous block
                                     last_results_hash:
                                       type: string
                                       format: byte
+                                      title: >-
+                                        root hash of all results from the txs
+                                        from the previous block
                                     evidence_hash:
                                       type: string
                                       format: byte
+                                      description: evidence included in the block
                                       title: consensus info
                                     proposer_address:
                                       type: string
                                       format: byte
+                                      title: original proposer of the block
                                   description: >-
                                     Header defines the structure of a Tendermint
                                     block header.
@@ -29647,33 +30542,42 @@ definitions:
               last_commit_hash:
                 type: string
                 format: byte
+                description: commit from validators from the last block
                 title: hashes of block data
               data_hash:
                 type: string
                 format: byte
+                title: transactions
               validators_hash:
                 type: string
                 format: byte
+                description: validators for the current block
                 title: hashes from the app output from the prev block
               next_validators_hash:
                 type: string
                 format: byte
+                title: validators for the next block
               consensus_hash:
                 type: string
                 format: byte
+                title: consensus params for current block
               app_hash:
                 type: string
                 format: byte
+                title: state after txs from the previous block
               last_results_hash:
                 type: string
                 format: byte
+                title: root hash of all results from the txs from the previous block
               evidence_hash:
                 type: string
                 format: byte
+                description: evidence included in the block
                 title: consensus info
               proposer_address:
                 type: string
                 format: byte
+                title: original proposer of the block
             description: Header defines the structure of a Tendermint block header.
           data:
             type: object
@@ -29742,6 +30646,7 @@ definitions:
                                       format: byte
                                   title: PartsetHeader
                               title: BlockID
+                              description: zero if vote is nil.
                             timestamp:
                               type: string
                               format: date-time
@@ -29799,6 +30704,7 @@ definitions:
                                       format: byte
                                   title: PartsetHeader
                               title: BlockID
+                              description: zero if vote is nil.
                             timestamp:
                               type: string
                               format: date-time
@@ -29887,35 +30793,48 @@ definitions:
                                     last_commit_hash:
                                       type: string
                                       format: byte
+                                      description: >-
+                                        commit from validators from the last
+                                        block
                                       title: hashes of block data
                                     data_hash:
                                       type: string
                                       format: byte
+                                      title: transactions
                                     validators_hash:
                                       type: string
                                       format: byte
+                                      description: validators for the current block
                                       title: >-
                                         hashes from the app output from the prev
                                         block
                                     next_validators_hash:
                                       type: string
                                       format: byte
+                                      title: validators for the next block
                                     consensus_hash:
                                       type: string
                                       format: byte
+                                      title: consensus params for current block
                                     app_hash:
                                       type: string
                                       format: byte
+                                      title: state after txs from the previous block
                                     last_results_hash:
                                       type: string
                                       format: byte
+                                      title: >-
+                                        root hash of all results from the txs
+                                        from the previous block
                                     evidence_hash:
                                       type: string
                                       format: byte
+                                      description: evidence included in the block
                                       title: consensus info
                                     proposer_address:
                                       type: string
                                       format: byte
+                                      title: original proposer of the block
                                   description: >-
                                     Header defines the structure of a Tendermint
                                     block header.
@@ -30955,33 +31874,42 @@ definitions:
           last_commit_hash:
             type: string
             format: byte
+            description: commit from validators from the last block
             title: hashes of block data
           data_hash:
             type: string
             format: byte
+            title: transactions
           validators_hash:
             type: string
             format: byte
+            description: validators for the current block
             title: hashes from the app output from the prev block
           next_validators_hash:
             type: string
             format: byte
+            title: validators for the next block
           consensus_hash:
             type: string
             format: byte
+            title: consensus params for current block
           app_hash:
             type: string
             format: byte
+            title: state after txs from the previous block
           last_results_hash:
             type: string
             format: byte
+            title: root hash of all results from the txs from the previous block
           evidence_hash:
             type: string
             format: byte
+            description: evidence included in the block
             title: consensus info
           proposer_address:
             type: string
             format: byte
+            title: original proposer of the block
         description: Header defines the structure of a Tendermint block header.
       data:
         type: object
@@ -31050,6 +31978,7 @@ definitions:
                                   format: byte
                               title: PartsetHeader
                           title: BlockID
+                          description: zero if vote is nil.
                         timestamp:
                           type: string
                           format: date-time
@@ -31107,6 +32036,7 @@ definitions:
                                   format: byte
                               title: PartsetHeader
                           title: BlockID
+                          description: zero if vote is nil.
                         timestamp:
                           type: string
                           format: date-time
@@ -31194,35 +32124,46 @@ definitions:
                                 last_commit_hash:
                                   type: string
                                   format: byte
+                                  description: commit from validators from the last block
                                   title: hashes of block data
                                 data_hash:
                                   type: string
                                   format: byte
+                                  title: transactions
                                 validators_hash:
                                   type: string
                                   format: byte
+                                  description: validators for the current block
                                   title: >-
                                     hashes from the app output from the prev
                                     block
                                 next_validators_hash:
                                   type: string
                                   format: byte
+                                  title: validators for the next block
                                 consensus_hash:
                                   type: string
                                   format: byte
+                                  title: consensus params for current block
                                 app_hash:
                                   type: string
                                   format: byte
+                                  title: state after txs from the previous block
                                 last_results_hash:
                                   type: string
                                   format: byte
+                                  title: >-
+                                    root hash of all results from the txs from
+                                    the previous block
                                 evidence_hash:
                                   type: string
                                   format: byte
+                                  description: evidence included in the block
                                   title: consensus info
                                 proposer_address:
                                   type: string
                                   format: byte
+                                  title: original proposer of the block
                               description: >-
                                 Header defines the structure of a Tendermint
                                 block header.
@@ -31589,6 +32530,7 @@ definitions:
                     format: byte
                 title: PartsetHeader
             title: BlockID
+            description: zero if vote is nil.
           timestamp:
             type: string
             format: date-time
@@ -31645,6 +32587,7 @@ definitions:
                     format: byte
                 title: PartsetHeader
             title: BlockID
+            description: zero if vote is nil.
           timestamp:
             type: string
             format: date-time
@@ -31719,6 +32662,7 @@ definitions:
                         format: byte
                     title: PartsetHeader
                 title: BlockID
+                description: zero if vote is nil.
               timestamp:
                 type: string
                 format: date-time
@@ -31775,6 +32719,7 @@ definitions:
                         format: byte
                     title: PartsetHeader
                 title: BlockID
+                description: zero if vote is nil.
               timestamp:
                 type: string
                 format: date-time
@@ -31862,33 +32807,44 @@ definitions:
                       last_commit_hash:
                         type: string
                         format: byte
+                        description: commit from validators from the last block
                         title: hashes of block data
                       data_hash:
                         type: string
                         format: byte
+                        title: transactions
                       validators_hash:
                         type: string
                         format: byte
+                        description: validators for the current block
                         title: hashes from the app output from the prev block
                       next_validators_hash:
                         type: string
                         format: byte
+                        title: validators for the next block
                       consensus_hash:
                         type: string
                         format: byte
+                        title: consensus params for current block
                       app_hash:
                         type: string
                         format: byte
+                        title: state after txs from the previous block
                       last_results_hash:
                         type: string
                         format: byte
+                        title: >-
+                          root hash of all results from the txs from the
+                          previous block
                       evidence_hash:
                         type: string
                         format: byte
+                        description: evidence included in the block
                         title: consensus info
                       proposer_address:
                         type: string
                         format: byte
+                        title: original proposer of the block
                     description: Header defines the structure of a Tendermint block header.
                   commit:
                     type: object
@@ -32092,6 +33048,7 @@ definitions:
                               format: byte
                           title: PartsetHeader
                       title: BlockID
+                      description: zero if vote is nil.
                     timestamp:
                       type: string
                       format: date-time
@@ -32149,6 +33106,7 @@ definitions:
                               format: byte
                           title: PartsetHeader
                       title: BlockID
+                      description: zero if vote is nil.
                     timestamp:
                       type: string
                       format: date-time
@@ -32236,33 +33194,44 @@ definitions:
                             last_commit_hash:
                               type: string
                               format: byte
+                              description: commit from validators from the last block
                               title: hashes of block data
                             data_hash:
                               type: string
                               format: byte
+                              title: transactions
                             validators_hash:
                               type: string
                               format: byte
+                              description: validators for the current block
                               title: hashes from the app output from the prev block
                             next_validators_hash:
                               type: string
                               format: byte
+                              title: validators for the next block
                             consensus_hash:
                               type: string
                               format: byte
+                              title: consensus params for current block
                             app_hash:
                               type: string
                               format: byte
+                              title: state after txs from the previous block
                             last_results_hash:
                               type: string
                               format: byte
+                              title: >-
+                                root hash of all results from the txs from the
+                                previous block
                             evidence_hash:
                               type: string
                               format: byte
+                              description: evidence included in the block
                               title: consensus info
                             proposer_address:
                               type: string
                               format: byte
+                              title: original proposer of the block
                           description: >-
                             Header defines the structure of a Tendermint block
                             header.
@@ -32466,33 +33435,42 @@ definitions:
       last_commit_hash:
         type: string
         format: byte
+        description: commit from validators from the last block
         title: hashes of block data
       data_hash:
         type: string
         format: byte
+        title: transactions
       validators_hash:
         type: string
         format: byte
+        description: validators for the current block
         title: hashes from the app output from the prev block
       next_validators_hash:
         type: string
         format: byte
+        title: validators for the next block
       consensus_hash:
         type: string
         format: byte
+        title: consensus params for current block
       app_hash:
         type: string
         format: byte
+        title: state after txs from the previous block
       last_results_hash:
         type: string
         format: byte
+        title: root hash of all results from the txs from the previous block
       evidence_hash:
         type: string
         format: byte
+        description: evidence included in the block
         title: consensus info
       proposer_address:
         type: string
         format: byte
+        title: original proposer of the block
     description: Header defines the structure of a Tendermint block header.
   tendermint.types.LightBlock:
     type: object
@@ -32549,33 +33527,42 @@ definitions:
               last_commit_hash:
                 type: string
                 format: byte
+                description: commit from validators from the last block
                 title: hashes of block data
               data_hash:
                 type: string
                 format: byte
+                title: transactions
               validators_hash:
                 type: string
                 format: byte
+                description: validators for the current block
                 title: hashes from the app output from the prev block
               next_validators_hash:
                 type: string
                 format: byte
+                title: validators for the next block
               consensus_hash:
                 type: string
                 format: byte
+                title: consensus params for current block
               app_hash:
                 type: string
                 format: byte
+                title: state after txs from the previous block
               last_results_hash:
                 type: string
                 format: byte
+                title: root hash of all results from the txs from the previous block
               evidence_hash:
                 type: string
                 format: byte
+                description: evidence included in the block
                 title: consensus info
               proposer_address:
                 type: string
                 format: byte
+                title: original proposer of the block
             description: Header defines the structure of a Tendermint block header.
           commit:
             type: object
@@ -32744,33 +33731,44 @@ definitions:
                   last_commit_hash:
                     type: string
                     format: byte
+                    description: commit from validators from the last block
                     title: hashes of block data
                   data_hash:
                     type: string
                     format: byte
+                    title: transactions
                   validators_hash:
                     type: string
                     format: byte
+                    description: validators for the current block
                     title: hashes from the app output from the prev block
                   next_validators_hash:
                     type: string
                     format: byte
+                    title: validators for the next block
                   consensus_hash:
                     type: string
                     format: byte
+                    title: consensus params for current block
                   app_hash:
                     type: string
                     format: byte
+                    title: state after txs from the previous block
                   last_results_hash:
                     type: string
                     format: byte
+                    title: >-
+                      root hash of all results from the txs from the previous
+                      block
                   evidence_hash:
                     type: string
                     format: byte
+                    description: evidence included in the block
                     title: consensus info
                   proposer_address:
                     type: string
                     format: byte
+                    title: original proposer of the block
                 description: Header defines the structure of a Tendermint block header.
               commit:
                 type: object
@@ -32983,33 +33981,42 @@ definitions:
           last_commit_hash:
             type: string
             format: byte
+            description: commit from validators from the last block
             title: hashes of block data
           data_hash:
             type: string
             format: byte
+            title: transactions
           validators_hash:
             type: string
             format: byte
+            description: validators for the current block
             title: hashes from the app output from the prev block
           next_validators_hash:
             type: string
             format: byte
+            title: validators for the next block
           consensus_hash:
             type: string
             format: byte
+            title: consensus params for current block
           app_hash:
             type: string
             format: byte
+            title: state after txs from the previous block
           last_results_hash:
             type: string
             format: byte
+            title: root hash of all results from the txs from the previous block
           evidence_hash:
             type: string
             format: byte
+            description: evidence included in the block
             title: consensus info
           proposer_address:
             type: string
             format: byte
+            title: original proposer of the block
         description: Header defines the structure of a Tendermint block header.
       commit:
         type: object
@@ -33196,6 +34203,7 @@ definitions:
                 format: byte
             title: PartsetHeader
         title: BlockID
+        description: zero if vote is nil.
       timestamp:
         type: string
         format: date-time
@@ -35823,7 +36831,7 @@ definitions:
         properties:
           rate:
             type: string
-            description: 'rate is the commission rate charged to delegators, as a fraction.'
+            description: rate is the commission rate charged to delegators, as a fraction.
           max_rate:
             type: string
             description: >-
@@ -35844,7 +36852,7 @@ definitions:
     properties:
       rate:
         type: string
-        description: 'rate is the commission rate charged to delegators, as a fraction.'
+        description: rate is the commission rate charged to delegators, as a fraction.
       max_rate:
         type: string
         description: >-
@@ -35983,33 +36991,42 @@ definitions:
           last_commit_hash:
             type: string
             format: byte
+            description: commit from validators from the last block
             title: hashes of block data
           data_hash:
             type: string
             format: byte
+            title: transactions
           validators_hash:
             type: string
             format: byte
+            description: validators for the current block
             title: hashes from the app output from the prev block
           next_validators_hash:
             type: string
             format: byte
+            title: validators for the next block
           consensus_hash:
             type: string
             format: byte
+            title: consensus params for current block
           app_hash:
             type: string
             format: byte
+            title: state after txs from the previous block
           last_results_hash:
             type: string
             format: byte
+            title: root hash of all results from the txs from the previous block
           evidence_hash:
             type: string
             format: byte
+            description: evidence included in the block
             title: consensus info
           proposer_address:
             type: string
             format: byte
+            title: original proposer of the block
         description: Header defines the structure of a Tendermint block header.
       valset:
         type: array
@@ -36542,7 +37559,10 @@ definitions:
                 description: >-
                   UnbondingDelegationEntry defines an unbonding object with
                   relevant metadata.
-              description: entries are the unbonding delegation entries.
+              description: |-
+                entries are the unbonding delegation entries.
+
+                unbonding delegation entries
           description: >-
             UnbondingDelegation stores all of a single delegator's unbonding
             bonds
@@ -37230,33 +38250,42 @@ definitions:
               last_commit_hash:
                 type: string
                 format: byte
+                description: commit from validators from the last block
                 title: hashes of block data
               data_hash:
                 type: string
                 format: byte
+                title: transactions
               validators_hash:
                 type: string
                 format: byte
+                description: validators for the current block
                 title: hashes from the app output from the prev block
               next_validators_hash:
                 type: string
                 format: byte
+                title: validators for the next block
               consensus_hash:
                 type: string
                 format: byte
+                title: consensus params for current block
               app_hash:
                 type: string
                 format: byte
+                title: state after txs from the previous block
               last_results_hash:
                 type: string
                 format: byte
+                title: root hash of all results from the txs from the previous block
               evidence_hash:
                 type: string
                 format: byte
+                description: evidence included in the block
                 title: consensus info
               proposer_address:
                 type: string
                 format: byte
+                title: original proposer of the block
             description: Header defines the structure of a Tendermint block header.
           valset:
             type: array
@@ -37658,7 +38687,10 @@ definitions:
                     description: >-
                       RedelegationEntry defines a redelegation object with
                       relevant metadata.
-                  description: entries are the redelegation entries.
+                  description: |-
+                    entries are the redelegation entries.
+
+                    redelegation entries
               description: >-
                 Redelegation contains the list of a particular delegator's
                 redelegating bonds
@@ -37777,7 +38809,10 @@ definitions:
               description: >-
                 UnbondingDelegationEntry defines an unbonding object with
                 relevant metadata.
-            description: entries are the unbonding delegation entries.
+            description: |-
+              entries are the unbonding delegation entries.
+
+              unbonding delegation entries
         description: |-
           UnbondingDelegation stores all of a single delegator's unbonding bonds
           for a single validator in an time-ordered list.
@@ -38189,7 +39224,10 @@ definitions:
                 description: >-
                   UnbondingDelegationEntry defines an unbonding object with
                   relevant metadata.
-              description: entries are the unbonding delegation entries.
+              description: |-
+                entries are the unbonding delegation entries.
+
+                unbonding delegation entries
           description: >-
             UnbondingDelegation stores all of a single delegator's unbonding
             bonds
@@ -38578,7 +39616,10 @@ definitions:
           description: >-
             RedelegationEntry defines a redelegation object with relevant
             metadata.
-        description: entries are the redelegation entries.
+        description: |-
+          entries are the redelegation entries.
+
+          redelegation entries
     description: >-
       Redelegation contains the list of a particular delegator's redelegating
       bonds
@@ -38691,7 +39732,10 @@ definitions:
               description: >-
                 RedelegationEntry defines a redelegation object with relevant
                 metadata.
-            description: entries are the redelegation entries.
+            description: |-
+              entries are the redelegation entries.
+
+              redelegation entries
         description: >-
           Redelegation contains the list of a particular delegator's
           redelegating bonds
@@ -38781,7 +39825,10 @@ definitions:
           description: >-
             UnbondingDelegationEntry defines an unbonding object with relevant
             metadata.
-        description: entries are the unbonding delegation entries.
+        description: |-
+          entries are the unbonding delegation entries.
+
+          unbonding delegation entries
     description: |-
       UnbondingDelegation stores all of a single delegator's unbonding bonds
       for a single validator in an time-ordered list.
@@ -39176,6 +40223,7 @@ definitions:
                     format: byte
                   index:
                     type: boolean
+                    title: nondeterministic
                 description: >-
                   EventAttribute is a single key-value pair, associated with an
                   event.
@@ -39232,7 +40280,7 @@ definitions:
         description: Response code.
       data:
         type: string
-        description: 'Result bytes, if any.'
+        description: Result bytes, if any.
       raw_log:
         type: string
         description: |-
@@ -39653,7 +40701,7 @@ definitions:
             description: Response code.
           data:
             type: string
-            description: 'Result bytes, if any.'
+            description: Result bytes, if any.
           raw_log:
             type: string
             description: |-
@@ -39978,7 +41026,7 @@ definitions:
             description: Response code.
           data:
             type: string
-            description: 'Result bytes, if any.'
+            description: Result bytes, if any.
           raw_log:
             type: string
             description: |-
@@ -40251,7 +41299,7 @@ definitions:
               description: Response code.
             data:
               type: string
-              description: 'Result bytes, if any.'
+              description: Result bytes, if any.
             raw_log:
               type: string
               description: |-
@@ -40876,6 +41924,7 @@ definitions:
                         format: byte
                       index:
                         type: boolean
+                        title: nondeterministic
                     description: >-
                       EventAttribute is a single key-value pair, associated with
                       an event.
@@ -42034,7 +43083,8 @@ definitions:
               format: byte
             index:
               type: boolean
-          description: 'EventAttribute is a single key-value pair, associated with an event.'
+              title: nondeterministic
+          description: EventAttribute is a single key-value pair, associated with an event.
     description: >-
       Event allows application developers to attach additional information to
 
@@ -42053,7 +43103,8 @@ definitions:
         format: byte
       index:
         type: boolean
-    description: 'EventAttribute is a single key-value pair, associated with an event.'
+        title: nondeterministic
+    description: EventAttribute is a single key-value pair, associated with an event.
   cosmos.upgrade.v1beta1.ModuleVersion:
     type: object
     properties:
@@ -42764,7 +43815,7 @@ definitions:
           this channel will travel
       version:
         type: string
-        title: 'opaque channel version, which is agreed upon during the handshake'
+        title: opaque channel version, which is agreed upon during the handshake
     description: |-
       Channel defines pipeline for exactly-once packet delivery between specific
       modules on separate blockchains, which has at least one end capable of
@@ -42839,7 +43890,7 @@ definitions:
           this channel will travel
       version:
         type: string
-        title: 'opaque channel version, which is agreed upon during the handshake'
+        title: opaque channel version, which is agreed upon during the handshake
       port_id:
         type: string
         title: port identifier
@@ -43461,7 +44512,7 @@ definitions:
               this channel will travel
           version:
             type: string
-            title: 'opaque channel version, which is agreed upon during the handshake'
+            title: opaque channel version, which is agreed upon during the handshake
         description: >-
           Channel defines pipeline for exactly-once packet delivery between
           specific

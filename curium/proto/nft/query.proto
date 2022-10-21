@@ -1,0 +1,66 @@
+syntax = "proto3";
+package bluzelle.curium.nft;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "nft/nft.proto";
+
+option go_package = "github.com/bluzelle/curium/x/nft/types";
+
+// Query creates service with nft as RPC
+service Query {
+  // NFTInfo returns NFT information
+  rpc NFTInfo(QueryNFTInfoRequest) returns (QueryNFTInfoResponse) {
+    option (google.api.http).get = "/bluzelle/nft/nft_info/{id}";
+  }
+  // NFTsByOwner returns NFTs information by owner
+  rpc NFTsByOwner(QueryNFTsByOwnerRequest) returns (QueryNFTsByOwnerResponse) {
+    option (google.api.http).get = "/bluzelle/nft/nfts_by_owner/{owner}";
+  }
+  // Metadata returns Metadata
+  rpc Metadata(QueryMetadataRequest) returns (QueryMetadataResponse) {
+    option (google.api.http).get = "/bluzelle/nft/metadata/{id}";
+  }
+  // Collection returns collection information
+  rpc Collection(QueryCollectionRequest) returns (QueryCollectionResponse) {
+    option (google.api.http).get = "/bluzelle/nft/collection/{id}";
+  }
+}
+
+// QueryNFTInfoRequest is request type for the nft
+message QueryNFTInfoRequest { string id = 1; }
+
+// QueryNFTInfoResponse is response type for the Query/NFTInfo RPC method
+message QueryNFTInfoResponse {
+  bluzelle.curium.nft.NFT nft = 1 [ (gogoproto.nullable) = false ];
+  bluzelle.curium.nft.Metadata metadata = 2 [ (gogoproto.nullable) = false ];
+}
+
+// QueryNFTInfoRequest is request type for the nft
+message QueryNFTsByOwnerRequest { string owner = 1; }
+
+// QueryNFTInfoResponse is response type for the Query/NFTsByOwner RPC method
+message QueryNFTsByOwnerResponse {
+  repeated bluzelle.curium.nft.NFT nfts = 1 [ (gogoproto.nullable) = false ];
+  repeated bluzelle.curium.nft.Metadata metadata = 2
+      [ (gogoproto.nullable) = false ];
+}
+
+// QueryMetadataRequest is request type for the metadata
+message QueryMetadataRequest { uint64 id = 1; }
+
+// QueryMetadataResponse is response type for the Query/Metadata RPC method
+message QueryMetadataResponse {
+  bluzelle.curium.nft.Metadata metadata = 1 [ (gogoproto.nullable) = false ];
+}
+
+// QueryCollectionRequest is request type for the collection
+message QueryCollectionRequest { uint64 id = 1; }
+
+// QueryCollectionResponse is response type for the Query/Collection RPC method
+message QueryCollectionResponse {
+  bluzelle.curium.nft.Collection collection = 1 [ (gogoproto.nullable) = false ];
+  repeated bluzelle.curium.nft.NFT nfts = 2 [ (gogoproto.nullable) = false ];
+}

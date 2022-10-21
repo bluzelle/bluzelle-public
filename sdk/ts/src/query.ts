@@ -335,3 +335,14 @@ export const parseDecTypeToNumber = (dec: string): number =>
         .map(dec => `${dec.slice(0, dec.length - 18)}.${dec.slice(-18)}`)
         .map(Number)
         .join();
+
+export const getNftInfo = (client: BluzelleClient, id: string) =>
+    client.queryClient.nft.NFTInfo({id});
+
+export const getCollectionInfo = (client: BluzelleClient, id: number) =>
+    client.queryClient.nft.Collection({id: new Long(id)});
+
+export const getNftMetadata = (client: BluzelleClient, id: number) =>
+    client.queryClient.nft.Metadata({id: new Long(id)});
+
+

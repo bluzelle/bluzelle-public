@@ -7,6 +7,16 @@ import {passThrough} from "promise-passthrough";
 import {identity} from "lodash";
 import {MsgSend} from "./curium/lib/generated/cosmos/bank/v1beta1/tx";
 import {
+    MsgCreateNFT,
+    MsgPrintEdition,
+    MsgCreateCollection,
+    MsgSignMetadata,
+    MsgTransferNFT,
+    MsgUpdateMetadata,
+    MsgUpdateMetadataAuthority,
+    MsgUpdateMintAuthority
+} from "./curium/lib/generated/nft/tx";
+import {
     MsgSetGasTaxBp,
     MsgSetTaxCollector,
     MsgSetTransferTaxBp
@@ -16,6 +26,9 @@ import {MsgWithdrawDelegatorReward} from "./curium/lib/generated/cosmos/distribu
 import {DeliverTxResponse} from "@cosmjs/stargate";
 import {toHex} from '@cosmjs/encoding'
 import {TxRaw} from "./curium/lib/generated/cosmos/tx/v1beta1/tx"
+import {Creator, Metadata} from "./curium/lib/generated/nft/nft";
+import * as Long from "long";
+
 interface MsgQueueItem<T> {
     msg: EncodeObject;
     options: BroadcastOptions;
@@ -75,10 +88,18 @@ export const registerMessages = (registry: Registry) => {
     registry.register('/cosmos.staking.v1beta1.MsgUndelegate', MsgUndelegate)
     registry.register('/cosmos.staking.v1beta1.MsgBeginRedelegate', MsgBeginRedelegate)
     registry.register('/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward', MsgWithdrawDelegatorReward)
+    registry.register('/bluzelle.curium.nft.MsgCreateNFT', MsgCreateNFT)
+    registry.register('/bluzelle.curium.nft.MsgCreateCollection', MsgCreateCollection)
+    registry.register('/bluzelle.curium.nft.MsgTransferNFT', MsgTransferNFT)
+    registry.register('/bluzelle.curium.nft.MsgUpdateMintAuthority', MsgUpdateMintAuthority)
+    registry.register('/bluzelle.curium.nft.MsgUpdateMetadata', MsgUpdateMetadata)
+    registry.register('/bluzelle.curium.nft.MsgUpdateMetadataAuthority', MsgUpdateMetadataAuthority)
+    registry.register('/bluzelle.curium.nft.MsgPrintEdition', MsgPrintEdition)
+    registry.register('/bluzelle.curium.nft.MsgSignMetadata', MsgSignMetadata)
     return registry
 };
 
- export interface BroadcastOptions {
+export interface BroadcastOptions {
     gasPrice: number,
     maxGas: number,
     mode?: 'async' | 'sync',
@@ -166,6 +187,70 @@ export const withdrawDelegatorReward = (
     } as MsgWithdrawDelegatorReward, options))
         .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
+export const createNft = (client: BluzelleClient, props: {collId: string, metadata?: Metadata}, options: BroadcastOptions) =>
+    Promise.resolve(sendTx<MsgCreateNFT>(client, '/bluzelle.curium.nft.MsgCreateNFT', {
+        sender: client.address,
+        collId: props.collId,
+        metadata: props.metadata,
+    }, options));
+
+export const createCollection = (
+    client: BluzelleClient,
+    sender: string,
+    symbol: string,
+    name: string,
+    uri: string,
+    isMutable: boolean,
+    updateAuthority: string,
+    options: BroadcastOptions) =>
+    Promise.resolve(sendTx<MsgCreateCollection>(client, '/bluzelle.curium.nft.MsgCreateCollection', {
+        sender,
+        symbol,
+        name,
+        uri,
+        isMutable,
+        updateAuthority,
+    }, options));
+
+export const transferNft = (client: BluzelleClient, id: string, toAddress: string, broadcastOptions: BroadcastOptions) =>
+    Promise.resolve(sendTx<MsgTransferNFT>(client, '/bluzelle.curium.nft.MsgTransferNFT', {
+        sender: client.address,
+        id,
+        newOwner: toAddress
+    }, broadcastOptions));
+
+export const printNftEdition = (client: BluzelleClient, metadataId: number, collId: number, owner: string, broadcastOptions: BroadcastOptions) =>
+    Promise.resolve(sendTx<MsgPrintEdition>(client, '/bluzelle.curium.nft.MsgPrintEdition', {
+        sender: client.address,
+        metadataId,
+        collId,
+        owner,
+    }, broadcastOptions));
+
+export const updateMetadata = (client: BluzelleClient, props: MsgUpdateMetadata, broadcastOptions: BroadcastOptions) =>
+    Promise.resolve(sendTx<MsgUpdateMetadata>(client, '/bluzelle.curium.nft.MsgUpdateMetadata', props, broadcastOptions));
+
+export const updateMetadataAuthority = (client: BluzelleClient, metadataId: number, newAuthority: string, broadcastOptions: BroadcastOptions) =>
+    Promise.resolve(sendTx<MsgUpdateMetadataAuthority>(client, '/bluzelle.curium.nft.MsgUpdateMetadataAuthority', {
+        sender: client.address,
+        metadataId: new Long(metadataId),
+        newAuthority
+    }, broadcastOptions));
+
+export const updateMintAuthority = (client: BluzelleClient, metadataId: number, newAuthority: string, broadcastOptions: BroadcastOptions) =>
+    Promise.resolve(sendTx<MsgUpdateMintAuthority>(client, '/bluzelle.curium.nft.MsgUpdateMintAuthority', {
+        sender: client.address,
+        metadataId: new Long(metadataId),
+        newAuthority
+    }, broadcastOptions));
+
+export const signMetadata = (client: BluzelleClient, metadataId: number, broadcastOptions: BroadcastOptions) =>
+    Promise.resolve(sendTx<MsgSignMetadata>(client, '/bluzelle.curium.nft.MsgSignMetadata', {
+        sender: client.address,
+        metadataId: new Long(metadataId)
+    }, broadcastOptions));
+
+
 const sendTx = <T>(client: BluzelleClient, type: string, msg: T, options: BroadcastOptions, mode: BroadcastMode = getDefaultBroadcastMode()) =>
     Right(msg)
         .map(msg => ({
@@ -173,7 +258,7 @@ const sendTx = <T>(client: BluzelleClient, type: string, msg: T, options: Broadc
             value: msg
         } as EncodeObject))
         .bind(msg => msgQueue ? Left(msg) : Right(msg))
-        .map(msg => options.mode? mode[options.mode](client, [msg as EncodeObject], options): mode['sync'](client, [msg as EncodeObject], options))
+        .map(msg => options.mode ? mode[options.mode](client, [msg as EncodeObject], options) : mode['sync'](client, [msg as EncodeObject], options))
         .leftMap(msg => queueMessage(msg as EncodeObject, options))
         .cata(identity, identity);
 
@@ -204,15 +289,18 @@ const broadcastTxAsync = <T>(client: BluzelleClient, msgs: EncodeObject[], optio
             }]
         },
         options.memo || ""
-        )
+    )
         .then(txRaw => TxRaw.encode(txRaw).finish())
         .then(txBytes =>
             client.tmClient.broadcastTxAsync({
-            tx: txBytes}))
+                tx: txBytes
+            }))
         .then(({hash}) => toHex(hash).toUpperCase());
 
 const tryJson = (s: string = '') => {
     try {
         return JSON.parse(s)
-    } catch(e) {return s}
+    } catch (e) {
+        return s
+    }
 };

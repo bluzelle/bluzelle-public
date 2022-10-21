@@ -21,6 +21,9 @@ import {
     QueryClientImpl as DistributionQueryClientImpl
 } from "./curium/lib/generated/cosmos/distribution/v1beta1/query";
 import {
+    QueryClientImpl as NftQueryClientImpl
+} from "./curium/lib/generated/nft/query";
+import {
     ServiceClientImpl
 } from "./curium/lib/generated/cosmos/tx/v1beta1/service";
 import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
@@ -34,13 +37,9 @@ type QueryClientImpl = {
     staking: StakingQueryClientImpl;
     distribution: DistributionQueryClientImpl;
     tx: ServiceClientImpl;
+    nft: NftQueryClientImpl;
 }
 
-
-export interface BluzelleConfig {
-    url: string;
-    wallet: () => Promise<BluzelleWallet>;
-}
 
 export interface BluzelleClient {
     url: string;
@@ -80,7 +79,8 @@ const getRpcClient = (url: string): Promise<QueryClientImpl> =>
             tax: new TaxQueryClientImpl(rpcClient),
             staking: new StakingQueryClientImpl(rpcClient),
             distribution: new DistributionQueryClientImpl(rpcClient),
-            tx: new ServiceClientImpl(rpcClient)
+            tx: new ServiceClientImpl(rpcClient),
+            nft: new NftQueryClientImpl(rpcClient)
         }));
 
 export class SigningBluzelleClient extends SigningStargateClient {
