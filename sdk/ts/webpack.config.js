@@ -7,12 +7,12 @@ module.exports = {
     output: {
         filename: 'index.js',
         path: path.resolve(__dirname, 'lib'),
-         library: "bluzelle",
-         libraryTarget: "umd",
+        library: "bluzelle",
+        libraryTarget: "umd",
     },
     target: 'node',
     externalsPresets: {node: true},
-    externals: ['tiny-secp256k1'],
+    externals: 'tiny-secp256k1',
     mode: 'development',
     module: {
         rules: [
