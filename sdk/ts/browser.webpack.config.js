@@ -10,7 +10,7 @@ module.exports = {
         publicPath: 'lib-web/'
     },
     target: 'web',
-    mode: 'development',
+    mode: 'production',
     module: {
         rules: [
             {

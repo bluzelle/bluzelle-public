@@ -13,8 +13,8 @@ const hdPath = "m/44'/483'/0'/0/0";
 const bech32Prefix = "bluzelle"
 
 
-export function createAddress(): Promise<{ mnemonic: string, address: string }> {
-    return Some({mnemonic: bip39.generateMnemonic(256)})
+export function createAddress(mnemonic: string = bip39.generateMnemonic(256)): ({address: string, mnemonic: string}) {
+    return Some({mnemonic})
         .map(ctx => [ctx, bip39.mnemonicToSeedSync(ctx.mnemonic)])
         .map(([ctx, seed]) => [ctx, BIP32Factory(ecc).fromSeed(seed as Buffer)])
         .map(([ctx, node]) => [ctx, (node as BIP32Interface).derivePath(hdPath)])
