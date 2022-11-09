@@ -345,4 +345,6 @@ export const getCollectionInfo = (client: BluzelleClient, id: number) =>
 export const getNftMetadata = (client: BluzelleClient, id: number) =>
     client.queryClient.nft.Metadata({id: new Long(id)});
 
+export const getNftByOwner = (client: BluzelleClient, owner: string) =>
+    client.queryClient.nft.NFTsByOwner({owner})
 

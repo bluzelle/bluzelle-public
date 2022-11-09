@@ -1,7 +1,7 @@
 import {defaultSwarmConfig, startSwarmWithClient} from "@bluzelle/testing";
 import {stopSwarm} from "@bluzelle/testing/src/swarmUtils";
 import {BluzelleClient, newBluzelleClient} from "./sdk";
-import {getCollectionInfo, getNftInfo, getNftMetadata} from "./query";
+import {getCollectionInfo, getNftByOwner, getNftInfo, getNftMetadata} from "./query";
 import {expect} from 'chai';
 import {
     createCollection,
@@ -64,11 +64,29 @@ describe('nft module', function () {
             .then(({nfts}) => expect(nfts).to.be.empty)
     );
 
+    it('should get the info of a collection', () =>
+        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
+            .then(() => getCollectionInfo(client, 1))
+            .then(resp => {
+                expect(resp.collection?.id.toNumber()).to.equal(1);
+                expect(resp.collection?.uri).to.deep.equal('http://temp.com');
+                expect(resp.collection?.name).to.deep.equal('Temp');
+                expect(resp.collection?.symbol).to.deep.equal("TMP");
+            })
+    );
+
     it('should get the info of an nft', () =>
         createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
             .then(() => createNft(client, {collId: '1', metadata: defaultMetadata(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
             .then(x => getNftInfo(client, '1:1:0'))
-            .then(console.log)
+            .then(info => {
+                expect(info.nft?.owner).to.deep.equal(client.address);
+                expect(info.nft?.collId.toNumber()).to.equal(1);
+                expect(info.nft?.metadataId.toNumber()).to.equal(1);
+                expect(info.metadata?.name).to.deep.equal('TMPMeta');
+                expect(info.metadata?.uri).to.deep.equal('https://tmp.com');
+                expect(info.metadata?.creators[0].address).to.deep.equal(client.address);
+            })
     );
 
     it('should update the metadata of an nft', () =>
@@ -139,7 +157,24 @@ describe('nft module', function () {
                 expect(info.metadata?.creators[0].address).to.deep.equal(client.address);
             })
 
-    })
+    });
+
+    it('should query the nfts owned by given address', () => {
+        return createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
+            .then(() => createNft(client, {collId: '1', metadata: defaultMetadata(0, 'NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => createNft(client, {collId: '1', metadata: defaultMetadata(1, 'NFT2', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => getNftByOwner(client, client.address))
+            .then(resp => {
+                expect(resp.nfts).to.have.length(2);
+                expect(resp.nfts[0].owner).to.deep.equal(client.address);
+                expect(resp.nfts[1].owner).to.deep.equal(client.address);
+                expect(resp.metadata[0].name).to.deep.equal('NFT1');
+                expect(resp.metadata[1].name).to.deep.equal('NFT2');
+                }
+            )
+
+
+    });
 
 
 })
