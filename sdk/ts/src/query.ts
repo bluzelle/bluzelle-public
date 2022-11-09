@@ -24,6 +24,7 @@ import {PageRequest, PageResponse} from "./curium/lib/generated/cosmos/base/quer
 const Long = require("long");
 import {padStart} from "lodash";
 import {Some} from "monet";
+import {NFT} from "./curium/lib/generated/nft/nft";
 
 export type BluzelleDelegatorDelegationsResponse = {
     pagination: PageResponse,

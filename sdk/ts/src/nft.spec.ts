@@ -19,29 +19,7 @@ import {newLocalWallet} from "./wallets/localWallet";
 import {generateMnemonic} from "./generateMnemonic";
 import {passThroughAwait} from "promise-passthrough";
 
-const defaultCreators = (address: string): Creator => ({
-    address,
-    verified: true,
-    share: 10,
-});
 
-const defaultMasterEdition: MasterEdition = ({
-    supply: new Long(100_000),
-    maxSupply: new Long(1_000_000)
-});
-
-const defaultMetadata = (id: number, name: string, isMutable: boolean, address: string): Metadata => ({
-    id: new Long(id),
-    name,
-    uri: 'https://tmp.com',
-    sellerFeeBasisPoints: 100,
-    primarySaleHappened: false,
-    isMutable,
-    creators: [defaultCreators(address)],
-    metadataAuthority: address,
-    mintAuthority: address,
-    masterEdition: defaultMasterEdition
-})
 
 describe('nft module', function () {
     this.timeout(800_000)
@@ -177,4 +155,28 @@ describe('nft module', function () {
     });
 
 
+});
+
+export const defaultCreators = (address: string): Creator => ({
+    address,
+    verified: true,
+    share: 10,
+});
+
+export const defaultMasterEdition: MasterEdition = ({
+    supply: new Long(100_000),
+    maxSupply: new Long(1_000_000)
+});
+
+export const defaultMetadata = (id: number, name: string, isMutable: boolean, address: string): Metadata => ({
+    id: new Long(id),
+    name,
+    uri: 'https://tmp.com',
+    sellerFeeBasisPoints: 100,
+    primarySaleHappened: false,
+    isMutable,
+    creators: [defaultCreators(address)],
+    metadataAuthority: address,
+    mintAuthority: address,
+    masterEdition: defaultMasterEdition
 })
