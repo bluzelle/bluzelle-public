@@ -67,6 +67,17 @@ describe('nft module', function () {
             })
     );
 
+    it('should create an nft without metadata', () =>
+        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
+            .then(() => createNft(client, {collId: '1'}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(x => getNftInfo(client, '1:1:0'))
+            .then(info => {
+                expect(info.nft?.owner).to.deep.equal(client.address);
+                expect(info.nft?.collId).to.equal(1);
+                expect(info.nft?.metadataId).to.equal(1);
+            })
+    )
+
     it('should update the metadata of an nft', () =>
         createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
             .then(() => createNft(client, {collId: '1', metadata: defaultMetadata(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
