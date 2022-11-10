@@ -22,7 +22,7 @@ import {passThroughAwait} from "promise-passthrough";
 
 
 describe('nft module', function () {
-    this.timeout(800_000)
+    this.timeout(10_800_000)
     let client: BluzelleClient;
     beforeEach(() =>
         stopSwarm()
@@ -46,7 +46,7 @@ describe('nft module', function () {
         createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
             .then(() => getCollectionInfo(client, 1))
             .then(resp => {
-                expect(resp.collection?.id.toNumber()).to.equal(1);
+                expect(resp.collection?.id).to.equal(1);
                 expect(resp.collection?.uri).to.deep.equal('http://temp.com');
                 expect(resp.collection?.name).to.deep.equal('Temp');
                 expect(resp.collection?.symbol).to.deep.equal("TMP");
@@ -59,8 +59,8 @@ describe('nft module', function () {
             .then(x => getNftInfo(client, '1:1:0'))
             .then(info => {
                 expect(info.nft?.owner).to.deep.equal(client.address);
-                expect(info.nft?.collId.toNumber()).to.equal(1);
-                expect(info.nft?.metadataId.toNumber()).to.equal(1);
+                expect(info.nft?.collId).to.equal(1);
+                expect(info.nft?.metadataId).to.equal(1);
                 expect(info.metadata?.name).to.deep.equal('TMPMeta');
                 expect(info.metadata?.uri).to.deep.equal('https://tmp.com');
                 expect(info.metadata?.creators[0].address).to.deep.equal(client.address);
@@ -114,7 +114,7 @@ describe('nft module', function () {
             .then(x => getCollectionInfo(client, 1))
             .then(info => {
                 expect(info.nfts).to.have.length(2);
-                expect(info.nfts[1].seq.toNumber()).to.equal(1)
+                expect(info.nfts[1].seq).to.equal(1)
             })
     );
 
