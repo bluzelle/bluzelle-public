@@ -25,7 +25,11 @@ export {
     BluzellePageRequest,
     BluzelleDelegationTotalRewardsResponse,
     BluzelleDelegationDelegatorReward,
-    BluzelleDelegatorUnbondingDelegationsResponse
+    BluzelleDelegatorUnbondingDelegationsResponse,
+    getNftInfo,
+    getCollectionInfo,
+    getNftByOwner,
+    getNftMetadata
 } from "./query";
 export {getStatus, getValidators} from "./queryTendermint";
 export {
@@ -36,7 +40,16 @@ export {
     undelegate,
     redelegate,
     withdrawDelegatorReward,
-    BluzelleTxResponse
+    BluzelleTxResponse,
+    transferNft,
+    createNft,
+    createCollection,
+    updateMetadataAuthority,
+    updateMetadata,
+    updateMintAuthority,
+    printNftEdition,
+    signMetadata,
+
 } from "./tx";
 export {generateMnemonic} from "./generateMnemonic";
 
