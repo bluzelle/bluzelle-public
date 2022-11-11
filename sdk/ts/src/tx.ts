@@ -202,16 +202,16 @@ export function createNft (client: BluzelleClient, props: {collId: number, metad
     return Promise.resolve(sendTx<MsgCreateNFT>(client, '/bluzelle.curium.nft.MsgCreateNFT', {
         sender: client.address,
         collId: new Long(props.collId),
-        metadata: props.metadata && adaptMetadataProps(props.metadata.id, props.metadata),
+        metadata: props.metadata && adaptMetadataProps(props.metadata.id, props.metadata, props.metadata.masterEdition),
     }, options));
 
-    function adaptMetadataProps (id: number, props: Omit<Metadata, 'id'>): Metadata {
+    function adaptMetadataProps (id: number, props: Omit<Metadata, 'id' & 'masterEdition'>, masterEdition?: {supply: number, maxSupply: number}): Metadata {
         return ({
             ...props,
             id: new Long(id),
-            masterEdition: {
-                supply: new Long(props.masterEdition?.supply),
-                maxSupply: new Long(props.masterEdition?.maxSupply)
+            masterEdition: masterEdition && {
+                supply: new Long(masterEdition.supply),
+                maxSupply: new Long(masterEdition.maxSupply)
             }
         })
     }
