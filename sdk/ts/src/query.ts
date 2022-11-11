@@ -340,8 +340,8 @@ export const parseDecTypeToNumber = (dec: string): number =>
 export const getNftInfo = (client: BluzelleClient, id: string) =>
     client.queryClient.nft.NFTInfo({id})
         .then(resp => ({
-            ...resp,
-            nft: resp.nft && longToNumberNFT(resp.nft)
+            nft: resp.nft && longToNumberNFT(resp.nft),
+            metadata: resp.metadata && longToNumberMetadata(resp.metadata)
         }))
 
 export const getCollectionInfo = (client: BluzelleClient, id: number) =>

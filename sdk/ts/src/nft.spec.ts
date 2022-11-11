@@ -55,7 +55,7 @@ describe('nft module', function () {
 
     it('should get the info of an nft', () =>
         createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
-            .then(() => createNft(client, {collId: '1', metadata: defaultMetadata(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
             .then(x => getNftInfo(client, '1:1:0'))
             .then(info => {
                 expect(info.nft?.owner).to.deep.equal(client.address);
@@ -69,7 +69,7 @@ describe('nft module', function () {
 
     it('should create an nft without metadata', () =>
         createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
-            .then(() => createNft(client, {collId: '1'}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => createNft(client, {collId: 1}, {maxGas: 1000000, gasPrice: 0.002}))
             .then(x => getNftInfo(client, '1:1:0'))
             .then(info => {
                 expect(info.nft?.owner).to.deep.equal(client.address);
@@ -80,7 +80,7 @@ describe('nft module', function () {
 
     it('should update the metadata of an nft', () =>
         createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
-            .then(() => createNft(client, {collId: '1', metadata: defaultMetadata(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => updateMetadata(client, {
                 name: 'TMP2',
                 uri: 'http://temp2.com',
@@ -99,7 +99,7 @@ describe('nft module', function () {
     it('should update the metadata authority of an nft', () => {
         let newAuthority = createAddress().address;
         return createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
-            .then(() => createNft(client, {collId: '1', metadata: defaultMetadata(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => updateMetadataAuthority(client, 1, newAuthority, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => getNftMetadata(client, 1))
             .then(resp => {
@@ -110,7 +110,7 @@ describe('nft module', function () {
     it('should update the mint authority of an nft', () => {
         let newAuthority = createAddress().address;
         return createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
-            .then(() => createNft(client, {collId: '1', metadata: defaultMetadata(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => updateMintAuthority(client, 1, newAuthority, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => getNftMetadata(client, 1))
             .then(resp => {
@@ -120,7 +120,7 @@ describe('nft module', function () {
 
     it('should print an edition of an nft', () =>
         createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
-            .then(() => createNft(client, {collId: '1', metadata: defaultMetadata(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => printNftEdition(client, 1, 1, client.address, {maxGas: 1000000, gasPrice: 0.002}))
             .then(x => getCollectionInfo(client, 1))
             .then(info => {
@@ -131,7 +131,7 @@ describe('nft module', function () {
 
     it('should transfer an nft from one user to another', () => {
         return createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
-            .then(() => createNft(client, {collId: '1', metadata: defaultMetadata(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps(0, 'TMPMeta', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => newBluzelleClient({
                 url: 'http://localhost:26667',
                 wallet: newLocalWallet(generateMnemonic())
@@ -150,8 +150,8 @@ describe('nft module', function () {
 
     it('should query the nfts owned by given address', () => {
         return createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {maxGas: 100000000, gasPrice: 0.002})
-            .then(() => createNft(client, {collId: '1', metadata: defaultMetadata(0, 'NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
-            .then(() => createNft(client, {collId: '1', metadata: defaultMetadata(1, 'NFT2', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps(0, 'NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps(1, 'NFT2', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => getNftByOwner(client, client.address))
             .then(resp => {
                 expect(resp.nfts).to.have.length(2);
@@ -174,13 +174,13 @@ export const defaultCreators = (address: string): Creator => ({
     share: 10,
 });
 
-export const defaultMasterEdition: MasterEdition = ({
-    supply: new Long(100_000),
-    maxSupply: new Long(1_000_000)
+export const defaultMasterEditionProps = ({
+    supply: 100_000,
+    maxSupply: 1_000_000
 });
 
-export const defaultMetadata = (id: number, name: string, isMutable: boolean, address: string): Metadata => ({
-    id: new Long(id),
+export const defaultMetadataProps = (id: number, name: string, isMutable: boolean, address: string)=> ({
+    id,
     name,
     uri: 'https://tmp.com',
     sellerFeeBasisPoints: 100,
@@ -189,5 +189,5 @@ export const defaultMetadata = (id: number, name: string, isMutable: boolean, ad
     creators: [defaultCreators(address)],
     metadataAuthority: address,
     mintAuthority: address,
-    masterEdition: defaultMasterEdition
+    masterEdition: defaultMasterEditionProps
 })

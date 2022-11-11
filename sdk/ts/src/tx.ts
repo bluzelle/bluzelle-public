@@ -26,7 +26,7 @@ import {MsgWithdrawDelegatorReward} from "./curium/lib/generated/cosmos/distribu
 import {DeliverTxResponse} from "@cosmjs/stargate";
 import {toHex} from '@cosmjs/encoding'
 import {TxRaw} from "./curium/lib/generated/cosmos/tx/v1beta1/tx"
-import {Creator, Metadata} from "./curium/lib/generated/nft/nft";
+import {Creator, MasterEdition, Metadata} from "./curium/lib/generated/nft/nft";
 import * as Long from "long";
 
 interface MsgQueueItem<T> {
@@ -187,12 +187,36 @@ export const withdrawDelegatorReward = (
     } as MsgWithdrawDelegatorReward, options))
         .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
-export const createNft = (client: BluzelleClient, props: {collId: string, metadata?: Metadata}, options: BroadcastOptions) =>
-    Promise.resolve(sendTx<MsgCreateNFT>(client, '/bluzelle.curium.nft.MsgCreateNFT', {
+export function createNft (client: BluzelleClient, props: {collId: number, metadata?: {
+        id: number,
+        name: string;
+        uri: string;
+        sellerFeeBasisPoints: number;
+        primarySaleHappened: boolean;
+        isMutable: boolean;
+        creators: Creator[];
+        metadataAuthority: string;
+        mintAuthority: string;
+        masterEdition?: {supply: number, maxSupply: number};
+    }}, options: BroadcastOptions) {
+    return Promise.resolve(sendTx<MsgCreateNFT>(client, '/bluzelle.curium.nft.MsgCreateNFT', {
         sender: client.address,
-        collId: props.collId,
-        metadata: props.metadata,
+        collId: new Long(props.collId),
+        metadata: props.metadata && adaptMetadataProps(props.metadata.id, props.metadata),
     }, options));
+
+    function adaptMetadataProps (id: number, props: Omit<Metadata, 'id'>): Metadata {
+        return ({
+            ...props,
+            id: new Long(id),
+            masterEdition: {
+                supply: new Long(props.masterEdition?.supply),
+                maxSupply: new Long(props.masterEdition?.maxSupply)
+            }
+        })
+    }
+
+}
 
 export const createCollection = (
     client: BluzelleClient,
@@ -227,8 +251,22 @@ export const printNftEdition = (client: BluzelleClient, metadataId: number, coll
         owner,
     }, broadcastOptions));
 
-export const updateMetadata = (client: BluzelleClient, props: MsgUpdateMetadata, broadcastOptions: BroadcastOptions) =>
-    Promise.resolve(sendTx<MsgUpdateMetadata>(client, '/bluzelle.curium.nft.MsgUpdateMetadata', props, broadcastOptions));
+export function updateMetadata (client: BluzelleClient, props: {
+    sender: string;
+    metadataId: number;
+    name: string;
+    uri: string;
+    sellerFeeBasisPoints: number;
+    creators: Creator[]}, broadcastOptions: BroadcastOptions) {
+    return Promise.resolve(sendTx<MsgUpdateMetadata>(client, '/bluzelle.curium.nft.MsgUpdateMetadata', adaptUpdateMetadataProps(props.metadataId, props), broadcastOptions))
+
+    function adaptUpdateMetadataProps (id: number, props: Omit<MsgUpdateMetadata, 'metadataId'>): MsgUpdateMetadata {
+        return ({
+            ...props,
+            metadataId: new Long(id)
+        })
+    }
+};
 
 export const updateMetadataAuthority = (client: BluzelleClient, metadataId: number, newAuthority: string, broadcastOptions: BroadcastOptions) =>
     Promise.resolve(sendTx<MsgUpdateMetadataAuthority>(client, '/bluzelle.curium.nft.MsgUpdateMetadataAuthority', {
