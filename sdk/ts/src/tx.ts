@@ -27,7 +27,7 @@ import {DeliverTxResponse} from "@cosmjs/stargate";
 import {toHex} from '@cosmjs/encoding'
 import {TxRaw} from "./curium/lib/generated/cosmos/tx/v1beta1/tx"
 import {Creator, Metadata} from "./curium/lib/generated/nft/nft";
-import Long from 'long';
+const Long = require('long');
 
 interface MsgQueueItem<T> {
     msg: EncodeObject;
