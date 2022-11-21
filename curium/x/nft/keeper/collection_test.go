@@ -4,25 +4,25 @@ import "github.com/bluzelle/curium/x/nft/types"
 
 func (suite *KeeperTestSuite) TestLastCollectionIdGetSet() {
 	// get default last collection id
-	lastCollectionId := suite.app.NFTKeeper.GetLastCollectionId(suite.ctx)
+	lastCollectionId := suite.NFTKeeper.GetLastCollectionId(suite.ctx)
 	suite.Require().Equal(lastCollectionId, uint64(0))
 
 	// set last collection id to new value
 	newCollectionId := uint64(2)
-	suite.app.NFTKeeper.SetLastCollectionId(suite.ctx, newCollectionId)
+	suite.NFTKeeper.SetLastCollectionId(suite.ctx, newCollectionId)
 
 	// check last collection id update
-	lastCollectionId = suite.app.NFTKeeper.GetLastCollectionId(suite.ctx)
+	lastCollectionId = suite.NFTKeeper.GetLastCollectionId(suite.ctx)
 	suite.Require().Equal(lastCollectionId, newCollectionId)
 }
 
 func (suite *KeeperTestSuite) TestCollectionGetSet() {
 	// get collection by not available id
-	_, err := suite.app.NFTKeeper.GetCollectionById(suite.ctx, 0)
+	_, err := suite.NFTKeeper.GetCollectionById(suite.ctx, 0)
 	suite.Require().Error(err)
 
 	// get all collections when not available
-	allCollections := suite.app.NFTKeeper.GetAllCollections(suite.ctx)
+	allCollections := suite.NFTKeeper.GetAllCollections(suite.ctx)
 	suite.Require().Len(allCollections, 0)
 
 	// create a new collection
@@ -60,16 +60,16 @@ func (suite *KeeperTestSuite) TestCollectionGetSet() {
 	}
 
 	for _, collection := range collections {
-		suite.app.NFTKeeper.SetCollection(suite.ctx, collection)
+		suite.NFTKeeper.SetCollection(suite.ctx, collection)
 	}
 
 	for _, collection := range collections {
-		c, err := suite.app.NFTKeeper.GetCollectionById(suite.ctx, collection.Id)
+		c, err := suite.NFTKeeper.GetCollectionById(suite.ctx, collection.Id)
 		suite.Require().NoError(err)
 		suite.Require().Equal(collection, c)
 	}
 
-	allCollections = suite.app.NFTKeeper.GetAllCollections(suite.ctx)
+	allCollections = suite.NFTKeeper.GetAllCollections(suite.ctx)
 	suite.Require().Len(allCollections, 5)
 	suite.Require().Equal(collections, allCollections)
 }
@@ -78,7 +78,7 @@ func (suite *KeeperTestSuite) TestCollectionNftsCreationAndQuery() {
 	collectionId := uint64(1)
 
 	// check nft ids by collection id query
-	nftIds := suite.app.NFTKeeper.GetCollectionNfts(suite.ctx, collectionId)
+	nftIds := suite.NFTKeeper.GetCollectionNfts(suite.ctx, collectionId)
 	suite.Require().Len(nftIds, 0)
 
 	// TODO: add further tests on GetCollectionNftIds

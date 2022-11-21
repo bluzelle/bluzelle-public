@@ -12,6 +12,9 @@ const (
 
 	// RouterKey is the msg router key for the module
 	RouterKey string = ModuleName
+
+	// MemStoreKey defines the in-memory store key
+	MemStoreKey = "mem_nft"
 )
 
 var (

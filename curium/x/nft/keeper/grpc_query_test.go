@@ -9,6 +9,21 @@ import (
 func (suite *KeeperTestSuite) TestGRPCNFTInfo() {
 	// create nfts
 	creator := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+
+	// set params for issue fee
+	issuePrice := sdk.NewInt64Coin("stake", 1000000)
+	fundAccnt := sdk.NewInt64Coin("stake", 1000000 * 2)
+	suite.NFTKeeper.SetParamSet(suite.ctx, types.Params{
+		IssuePrice: issuePrice,
+	})
+
+
+	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator, sdk.Coins{fundAccnt})
+
+	if err != nil {
+		return
+	}
+
 	collInfo := suite.CreateCollection(creator)
 	nftInfo1 := suite.CreateNFT(creator, collInfo.Id)
 	nftInfo2 := suite.CreateNFT(creator, collInfo.Id)
@@ -44,7 +59,7 @@ func (suite *KeeperTestSuite) TestGRPCNFTInfo() {
 	}
 
 	for _, tc := range tests {
-		resp, err := suite.app.NFTKeeper.NFTInfo(sdk.WrapSDKContext(suite.ctx), &types.QueryNFTInfoRequest{
+		resp, err := suite.NFTKeeper.NFTInfo(sdk.WrapSDKContext(suite.ctx), &types.QueryNFTInfoRequest{
 			Id: tc.nftId,
 		})
 		if tc.expectPass {
@@ -62,6 +77,27 @@ func (suite *KeeperTestSuite) TestGRPCNFTsByOwner() {
 	creator1 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
 	creator2 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
 	creator3 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+
+	// set params for issue fee
+	issuePrice := sdk.NewInt64Coin("stake", 1000000)
+	fundAccnt := sdk.NewInt64Coin("stake", 1000000)
+	suite.NFTKeeper.SetParamSet(suite.ctx, types.Params{
+		IssuePrice: issuePrice,
+	})
+
+
+	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator1, sdk.Coins{fundAccnt.Add(fundAccnt)})
+
+	if err != nil {
+		return
+	}
+
+	err = suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator2, sdk.Coins{fundAccnt})
+
+	if err != nil {
+		return
+	}
+
 	collInfo1 := suite.CreateCollection(creator1)
 	suite.CreateNFT(creator1, collInfo1.Id)
 	suite.CreateNFT(creator1, collInfo1.Id)
@@ -107,7 +143,7 @@ func (suite *KeeperTestSuite) TestGRPCNFTsByOwner() {
 	}
 
 	for _, tc := range tests {
-		resp, err := suite.app.NFTKeeper.NFTsByOwner(sdk.WrapSDKContext(suite.ctx), &types.QueryNFTsByOwnerRequest{
+		resp, err := suite.NFTKeeper.NFTsByOwner(sdk.WrapSDKContext(suite.ctx), &types.QueryNFTsByOwnerRequest{
 			Owner: tc.owner,
 		})
 		if tc.expectPass {
@@ -124,6 +160,27 @@ func (suite *KeeperTestSuite) TestGRPCMetadata() {
 	// create nfts
 	creator1 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
 	creator2 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+
+	// set params for issue fee
+	issuePrice := sdk.NewInt64Coin("stake", 1000000)
+	fundAccnt := sdk.NewInt64Coin("stake", 1000000)
+	suite.NFTKeeper.SetParamSet(suite.ctx, types.Params{
+		IssuePrice: issuePrice,
+	})
+
+
+	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator1, sdk.Coins{fundAccnt})
+
+	if err != nil {
+		return
+	}
+
+	err = suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator2, sdk.Coins{fundAccnt})
+
+	if err != nil {
+		return
+	}
+
 	collInfo1 := suite.CreateCollection(creator1)
 	nftInfo1 := suite.CreateNFT(creator1, collInfo1.Id)
 
@@ -157,7 +214,7 @@ func (suite *KeeperTestSuite) TestGRPCMetadata() {
 	}
 
 	for _, tc := range tests {
-		resp, err := suite.app.NFTKeeper.Metadata(sdk.WrapSDKContext(suite.ctx), &types.QueryMetadataRequest{
+		resp, err := suite.NFTKeeper.Metadata(sdk.WrapSDKContext(suite.ctx), &types.QueryMetadataRequest{
 			Id: tc.id,
 		})
 		if tc.expectPass {
@@ -172,6 +229,22 @@ func (suite *KeeperTestSuite) TestGRPCMetadata() {
 func (suite *KeeperTestSuite) TestGRPCCollection() {
 	// create nfts
 	creator := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+
+
+	// set params for issue fee
+	issuePrice := sdk.NewInt64Coin("stake", 1000000)
+	fundAccnt := sdk.NewInt64Coin("stake", 1000000 * 2)
+	suite.NFTKeeper.SetParamSet(suite.ctx, types.Params{
+		IssuePrice: issuePrice,
+	})
+
+
+	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator, sdk.Coins{fundAccnt})
+
+	if err != nil {
+		return
+	}
+
 	collectionInfo1 := suite.CreateCollection(creator)
 	collectionInfo2 := suite.CreateCollection(creator)
 	suite.CreateNFT(creator, collectionInfo1.Id)
@@ -208,13 +281,13 @@ func (suite *KeeperTestSuite) TestGRPCCollection() {
 	}
 
 	for _, tc := range tests {
-		resp, err := suite.app.NFTKeeper.Collection(sdk.WrapSDKContext(suite.ctx), &types.QueryCollectionRequest{
+		resp, err := suite.NFTKeeper.Collection(sdk.WrapSDKContext(suite.ctx), &types.QueryCollectionRequest{
 			Id: tc.id,
 		})
 		if tc.expectPass {
 			suite.Require().NoError(err)
 			suite.Require().Equal(resp.Collection.UpdateAuthority, tc.expectedAuthority)
-			suite.Require().Equal(len(resp.NftIds), tc.expectedNftsCount)
+			suite.Require().Equal(len(resp.Nfts), tc.expectedNftsCount)
 		} else {
 			suite.Require().Error(err)
 		}

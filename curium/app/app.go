@@ -102,6 +102,7 @@ import (
 	faucetmodulekeeper "github.com/bluzelle/curium/x/faucet/keeper"
 	faucetmoduletypes "github.com/bluzelle/curium/x/faucet/types"
 	"github.com/bluzelle/curium/x/nft"
+	nftmodule "github.com/bluzelle/curium/x/nft"
 	nftkeeper "github.com/bluzelle/curium/x/nft/keeper"
 	nfttypes "github.com/bluzelle/curium/x/nft/types"
 	storagemodule "github.com/bluzelle/curium/x/storage"
@@ -429,8 +430,8 @@ func New(
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
-	app.NFTKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey], app.GetSubspace(nfttypes.ModuleName), app.BankKeeper)
-
+	app.NFTKeeper = *nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey], app.GetSubspace(nfttypes.ModuleName), app.BankKeeper)
+	nftModule := nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper)
 	/****  Module Options ****/
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -466,13 +467,15 @@ func New(
 		storageModule,
 		faucetModule,
 		taxModule,
+		nftModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the
 	// CanWithdrawInvariant invariant.
-	// NOTE: staking module is required if HistoricalEntries param > 0
+	// NOTE: staking module is required if HistoricalEntrie
+	//s param > 0
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,

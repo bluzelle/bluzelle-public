@@ -1,38 +1,73 @@
 package keeper_test
 
 import (
+	"github.com/bluzelle/curium/app"
+	"github.com/bluzelle/curium/x/nft/keeper"
+	"github.com/cosmos/cosmos-sdk/simapp"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	"github.com/tendermint/spm/cosmoscmd"
+	"github.com/tendermint/tendermint/crypto/tmhash"
 	"testing"
 
-	"github.com/stretchr/testify/suite"
-
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-
+	testkeeper "github.com/bluzelle/curium/testutil/keeper"
+	testutil "github.com/bluzelle/curium/testutil/simapp"
+	"github.com/bluzelle/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	simapp "github.com/bluzelle/curium/app"
+	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	"github.com/stretchr/testify/suite"
 )
 
 const (
 	isCheckTx = false
 )
 
+var (
+	owner    = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest")))
+	uri      = "ipfs://"
+	initAmt  = sdk.NewIntWithDecimal(100000000, int(6))
+	initCoin = sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, initAmt)}
+	symbol   = "btc"
+	name     = "Bitcoin Network"
+
+	maxSupply = sdk.NewInt(200000000)
+
+)
+
 type KeeperTestSuite struct {
 	suite.Suite
-
 	legacyAmino *codec.LegacyAmino
-	ctx         sdk.Context
-	app         *simapp.BluzelleApp
+	NFTKeeper  *keeper.Keeper
+	BankKeeper *bankkeeper.BaseKeeper
+	AccountKeeper *acctypes.AccountKeeper
+	ctx        sdk.Context
+	app         *simapp.SimApp
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(isCheckTx)
+	suite.app, _, _ = testutil.CreateTestApp(false)
+	suite.legacyAmino = cosmoscmd.MakeEncodingConfig(app.ModuleBasics).Amino
+	suite.NFTKeeper, suite.BankKeeper, suite.AccountKeeper, suite.ctx = testkeeper.NftKeeper()
+	suite.NFTKeeper.SetParamSet(suite.ctx, types.NewParams(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1_000_000_000))))
 
-	suite.legacyAmino = app.LegacyAmino()
-	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
-	suite.app = app
+	err := suite.BankKeeper.MintCoins(suite.ctx, types.ModuleName, initCoin)
+	suite.NoError(err)
+
 }
 
 func TestKeeperSuite(t *testing.T) {
 	suite.Run(t, new(KeeperTestSuite))
+}
+
+func (suite *KeeperTestSuite) FundAccount(addr sdk.AccAddress, amount int64) error {
+
+	sendAmount := sdk.NewInt64Coin("stake", amount)
+
+	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, addr, sdk.Coins{sendAmount})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
