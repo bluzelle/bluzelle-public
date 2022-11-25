@@ -38,5 +38,14 @@ describe('faucet', function () {
                 expect(response.address).to.match(/^bluzelle/)
                 expect(response.address).to.have.length(47)
             })
+    });
+
+    it('should not be able to mint tokens when faucet is off', () => {
+        return startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: false})
+            .then(({bzSdk}) => mint(bzSdk, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
+            .then(response => {
+                expect(response.mnemonic).to.be.empty
+                expect(response.address).to.equal('bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd')
+            })
     })
 })
