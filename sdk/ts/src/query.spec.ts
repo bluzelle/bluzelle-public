@@ -60,10 +60,14 @@ describe('query', function () {
                 .then(ctx => ipfsClient.add(ctx.content)
                     .then((addResult) => ({content: ctx.content, cid: addResult.path})))
         ))
-            .then((contents) => createCtx('contents',() => contents))
+            .then((contents) => createCtx('contents', () => contents))
             .then(withCtxAwait('client', () => getBlzClient(curiumUrl, mnemonic.getValue())))
             .then(passThroughAwait(ctx => withTransaction(ctx.client, () =>
-                ctx.contents.forEach((contentObj) => pinCid(ctx.client, contentObj.cid, {maxGas: 200000, gasPrice: 0.002, mode: 'sync'}))
+                ctx.contents.forEach((contentObj) => pinCid(ctx.client, contentObj.cid, {
+                    maxGas: 200000,
+                    gasPrice: 0.002,
+                    mode: 'sync'
+                }))
             )))
             .then(ctx => getAccountBalance(ctx.client, ctx.client.address))
     );
@@ -84,6 +88,19 @@ describe('query', function () {
             .then((ctx) => expect(ctx.balanceAfter).equal(ctx.balanceBefore))
     );
 
+    it('should query for v1 cids', () =>
+        getBlzClient(curiumUrl, mnemonic.getValue())
+            .then(passThroughAwait(bzSdk =>
+                pinCid(bzSdk, 'bafybeigcmqqtwhrjgehcpwdd6nb2r7pooojoqk5j4umom4tysu4jb2xg4e', {
+                    maxGas: 10000000,
+                    gasPrice: 0.002,
+                    mode: 'sync'
+                })
+            ))
+            .then(bzSdk => hasContent(bzSdk, 'bafybeigcmqqtwhrjgehcpwdd6nb2r7pooojoqk5j4umom4tysu4jb2xg4e'))
+            .then(resp => expect(resp).to.be.true)
+    )
+
     it("should parse dec type to number", () => {
         expect(parseDecTypeToNumber("100000000000000000")).to.equal(0.1)
         expect(parseDecTypeToNumber("10000000000000000")).to.equal(0.01)
@@ -94,7 +111,11 @@ describe('query', function () {
     it('should query a transaction by hash', () => {
         return getBlzClient(curiumUrl, mnemonic.getValue())
             .then(bzSdk =>
-                (pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {maxGas: 10000000, gasPrice: 0.002, mode: 'sync'}) as any)
+                (pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {
+                    maxGas: 10000000,
+                    gasPrice: 0.002,
+                    mode: 'sync'
+                }) as any)
                     .then((resp: any) => ({
                         resp,
                         bzSdk

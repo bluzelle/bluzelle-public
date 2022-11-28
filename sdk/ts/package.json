@@ -31,6 +31,7 @@
     "lodash": "^4.17.21",
     "mocha": "^10.0.0",
     "monet": "^0.9.3",
+    "multiformats": "^10.0.2",
     "node-fetch": "2",
     "promise-passthrough": "^1.0.5",
     "rxjs": "^7.4.0",
