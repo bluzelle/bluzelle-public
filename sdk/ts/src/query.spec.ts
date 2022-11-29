@@ -118,6 +118,21 @@ describe('query', function () {
             .then(resp => expect(resp).to.be.true)
     );
 
+    it('should query for the same cid with either v0 or v1 other direction', () =>
+        getBlzClient(curiumUrl, mnemonic.getValue())
+            .then(passThroughAwait(bzSdk =>
+                (pinCid(bzSdk, 'bafybeigcmqqtwhrjgehcpwdd6nb2r7pooojoqk5j4umom4tysu4jb2xg4e', {
+                    maxGas: 10000000,
+                    gasPrice: 0.002,
+                    mode: 'sync'
+                }) as any)
+                    .then(console.log)
+            ))
+            .then(passThroughAwait(() => delay(12_000)))
+            .then(bzSdk => hasContent(bzSdk, CID.parse('bafybeigcmqqtwhrjgehcpwdd6nb2r7pooojoqk5j4umom4tysu4jb2xg4e').toV0().toString()))
+            .then(resp => expect(resp).to.be.true)
+    );
+
     it("should parse dec type to number", () => {
         expect(parseDecTypeToNumber("100000000000000000")).to.equal(0.1)
         expect(parseDecTypeToNumber("10000000000000000")).to.equal(0.01)

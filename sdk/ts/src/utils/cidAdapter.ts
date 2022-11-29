@@ -7,7 +7,7 @@ export const ensureCidV0 = (cid: CID) =>
 
 export const adaptCid = (value: string): string =>
     Either
-        .fromTry(() => CID.parse(value))
+        .fromTry(() => ensureCidV0(CID.parse(value)))
         .catchMap(() => Left(value))
-        .cata<string>(identity, ensureCidV0);
+        .cata<string>(identity, identity);
 
