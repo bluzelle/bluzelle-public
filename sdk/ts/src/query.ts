@@ -23,8 +23,9 @@ import {Delegation} from "./curium/lib/generated/cosmos/staking/v1beta1/staking"
 import {PageRequest, PageResponse} from "./curium/lib/generated/cosmos/base/query/v1beta1/pagination";
 const Long = require("long");
 import {padStart} from "lodash";
-import {Some} from "monet";
+import {Either, Left, Right, Some} from "monet";
 import {Collection, MasterEdition, Metadata, NFT} from "./curium/lib/generated/nft/nft";
+import { CID } from 'multiformats/cid'
 
 export type BluzelleDelegatorDelegationsResponse = {
     pagination: PageResponse,
@@ -131,8 +132,17 @@ export const waitForContent = (client: BluzelleClient, path: string, waitTime: n
     );
 
 export const hasContent = (client: BluzelleClient, cid: string) =>
-    client.queryClient.storage.HasContent({cid})
+    client.queryClient.storage.HasContent({cid: doConversion(cid)})
         .then(x => x.hasContent);
+
+export const cidIsV0 = (cid: string) => /^Qm/.test(cid);
+
+export const doConversion = (cid: string) =>
+    Some(cid)
+        .map(x => cidIsV0(x)? x : CID.parse(x).toV0().toString())
+        .map(x => x)
+        .join()
+
 
 export const getAccountBalance = (client: BluzelleClient, address: string, denom: string = "ubnt"): Promise<number> =>
     client.queryClient.bank.Balance({address: address, denom})

@@ -8,6 +8,8 @@ import {passThroughAwait} from "promise-passthrough";
 import {createCtx, createCtxAwait, withCtxAwait} from "@scottburch/with-context";
 import {create} from "ipfs-http-client";
 import {expect} from "chai";
+import {CID} from "multiformats/cid";
+import delay from "delay";
 
 const ipfsClient = create({host: '127.0.0.1', port: 5001, protocol: 'http'})
 
@@ -97,9 +99,24 @@ describe('query', function () {
                     mode: 'sync'
                 })
             ))
+            .then(passThroughAwait(() => delay(6_000)))
             .then(bzSdk => hasContent(bzSdk, 'bafybeigcmqqtwhrjgehcpwdd6nb2r7pooojoqk5j4umom4tysu4jb2xg4e'))
             .then(resp => expect(resp).to.be.true)
-    )
+    );
+
+    it('should query for the same cid with either v0 or v1', () =>
+        getBlzClient(curiumUrl, mnemonic.getValue())
+            .then(passThroughAwait(bzSdk =>
+                pinCid(bzSdk, CID.parse('bafybeigcmqqtwhrjgehcpwdd6nb2r7pooojoqk5j4umom4tysu4jb2xg4e').toV0().toString(), {
+                    maxGas: 10000000,
+                    gasPrice: 0.002,
+                    mode: 'sync'
+                })
+            ))
+            .then(passThroughAwait(() => delay(6_000)))
+            .then(bzSdk => hasContent(bzSdk, 'bafybeigcmqqtwhrjgehcpwdd6nb2r7pooojoqk5j4umom4tysu4jb2xg4e'))
+            .then(resp => expect(resp).to.be.true)
+    );
 
     it("should parse dec type to number", () => {
         expect(parseDecTypeToNumber("100000000000000000")).to.equal(0.1)

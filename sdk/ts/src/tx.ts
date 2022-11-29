@@ -27,6 +27,8 @@ import {DeliverTxResponse} from "@cosmjs/stargate";
 import {toHex} from '@cosmjs/encoding'
 import {TxRaw} from "./curium/lib/generated/cosmos/tx/v1beta1/tx"
 import {Creator, Metadata} from "./curium/lib/generated/nft/nft";
+import {cidIsV0, doConversion} from "./query";
+import {CID} from "multiformats/cid";
 const Long = require('long');
 
 interface MsgQueueItem<T> {
@@ -127,7 +129,13 @@ const queueMessage = (msg: EncodeObject, options: BroadcastOptions) =>
 
 
 export const pinCid = (client: BluzelleClient, cid: string, options: BroadcastOptions) =>
-    sendTx(client, '/bluzelle.curium.storage.MsgPin', {cid, creator: client.address}, options);
+    sendTx(client, '/bluzelle.curium.storage.MsgPin', {cid: doTxConversion(cid), creator: client.address}, options);
+
+export const doTxConversion = (cid: string) =>
+    Some(cid)
+        .map(x => cidIsV0(x)? x : CID.parse(x).toV0().toString())
+        .map(x => x)
+        .join()
 
 export const send = (client: BluzelleClient, toAddress: string, amount: number, options: BroadcastOptions, denom: string = "ubnt") =>
     sendTx(client, '/cosmos.bank.v1beta1.MsgSend', {
