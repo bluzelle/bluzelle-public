@@ -2,11 +2,9 @@ package keeper
 
 import (
 	"context"
-	"github.com/ipfs/go-cid"
-	"github.com/multiformats/go-multihash"
-
 	"github.com/bluzelle/curium/x/storage/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ipfs/go-cid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -18,12 +16,12 @@ func (k Keeper) HasContent(goCtx context.Context, req *types.QueryHasContentRequ
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	mh, err := multihash.FromB58String(req.Cid)
+	c, err := cid.Decode(req.Cid)
+
 	if err != nil {
 		return nil, err
 	}
 
-	c := cid.NewCidV0(mh)
 	has, err := k.storageNode.IpfsNode.Blockstore.Has(c)
 	if err != nil {
 		return nil, err
