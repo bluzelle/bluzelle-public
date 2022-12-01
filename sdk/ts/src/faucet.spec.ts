@@ -3,6 +3,10 @@ import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {expect} from "chai";
 import {createAddress, mint} from "./faucet";
 import {Swarm} from "daemon-manager";
+import {BluzelleClient, newBluzelleClient} from "./sdk";
+import {getBalance} from "infra-control-test/utils/swarmUtils";
+import {balance} from "staking-wallet/src/helpers/accountHelper";
+import {getAccountBalance} from "./query";
 
 describe('faucet', function () {
 
@@ -41,11 +45,13 @@ describe('faucet', function () {
     });
 
     it('should not be able to mint tokens when faucet is off', () => {
+        let client: BluzelleClient;
         return startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: false})
-            .then(({bzSdk}) => mint(bzSdk, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
-            .then(response => {
-                expect(response.mnemonic).to.be.empty
-                expect(response.address).to.equal('bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd')
-            })
+            .then(({bzSdk}) => client = bzSdk)
+            .then(() => mint(client, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
+            .then(resp => expect(true).to.be.false)
+            .catch(err => expect(err.stack).to.contain('invalid request'))
+            .then(() => getAccountBalance(client, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
+            .then(bal => expect(bal).to.equal(0))
     })
 })
