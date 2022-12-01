@@ -132,7 +132,7 @@ export const waitForContent = (client: BluzelleClient, path: string, waitTime: n
     );
 
 export const hasContent = (client: BluzelleClient, cid: string) =>
-    client.queryClient.storage.HasContent({cid: adaptCid(cid)})
+    client.queryClient.storage.HasContent({cid})
         .then(x => x.hasContent);
 
 

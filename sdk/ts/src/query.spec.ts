@@ -10,6 +10,7 @@ import {create} from "ipfs-http-client";
 import {expect} from "chai";
 import {CID} from "multiformats/cid";
 import delay from "delay";
+import {defaultSwarmConfig} from "@bluzelle/testing";
 
 const ipfsClient = create({host: '127.0.0.1', port: 5001, protocol: 'http'})
 
@@ -20,7 +21,7 @@ describe('query', function () {
     this.timeout(600_000);
 
     beforeEach(() =>
-        restartIpfsServerAndSwarm()
+        restartIpfsServerAndSwarm(({...defaultSwarmConfig, targetBranch: 'experimental'}))
             .then((swarmMnemonic) => mnemonic.next(swarmMnemonic))
     )
 

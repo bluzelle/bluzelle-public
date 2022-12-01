@@ -128,7 +128,7 @@ const queueMessage = (msg: EncodeObject, options: BroadcastOptions) =>
 
 
 export const pinCid = (client: BluzelleClient, cid: string, options: BroadcastOptions) =>
-    sendTx(client, '/bluzelle.curium.storage.MsgPin', {cid: adaptCid(cid), creator: client.address}, options);
+    sendTx(client, '/bluzelle.curium.storage.MsgPin', {cid, creator: client.address}, options);
 
 export const send = (client: BluzelleClient, toAddress: string, amount: number, options: BroadcastOptions, denom: string = "ubnt") =>
     sendTx(client, '/cosmos.bank.v1beta1.MsgSend', {
