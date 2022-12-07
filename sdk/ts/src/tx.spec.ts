@@ -11,6 +11,9 @@ import {BluzelleClient, newBluzelleClient} from "./sdk";
 import {newLocalWallet} from "./wallets/localWallet";
 import {generateMnemonic} from "./generateMnemonic";
 import delay from "delay";
+import {startProxy} from "infra-control/src/builder/reverseProxyBuilder/reverseProxyBuilder";
+import {createNetwork, newDockerContext} from "explorer-manager/docker-helpers/dockerHelpers";
+import {firstValueFrom, of} from "rxjs";
 
 const MAX_GAS = 200000;
 const GAS_PRICE = 2;
@@ -133,7 +136,16 @@ describe('sending transactions', function () {
             .catch(passThroughAwait(err => expect(err.message).to.include('not found')))
             .then(passThroughAwait(() => delay(6_000)))
             .then(() => getTx(client, hash))
-    })
+    });
+
+    it('should build a masked swarm', () => {
+        const date = Date.now().toString();
+        return firstValueFrom(of(1).pipe(newDockerContext('local:clientProxy', ''), createNetwork(`proxyNetwork-${date}`)))
+            .then(() => new Swarm({...defaultSwarmConfig, dockerNetwork: `proxyNetwork-${date}`}).start())
+            .then(() => firstValueFrom(startProxy('local:clientProxy', '', `proxyNetwork-${date}`)))
+    }
+
+    )
 
 
     // skipping because we don't want to add admin info to repo right now

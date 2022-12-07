@@ -14,7 +14,7 @@ import {defaultSwarmConfig} from "@bluzelle/testing";
 
 const ipfsClient = create({host: '127.0.0.1', port: 5001, protocol: 'http'})
 
-const curiumUrl = 'http://localhost:26667';
+const curiumUrl = 'https://localhost:26657';
 const mnemonic = new BehaviorSubject<string>("");
 
 describe('query', function () {
