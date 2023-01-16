@@ -2,7 +2,7 @@ package cli
 
 import (
 	"fmt"
-	"github.com/bluzelle/curium/x/tax/types"
+	"github.com/bluzelle/bluzelle/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/spf13/cobra"
 	"time"

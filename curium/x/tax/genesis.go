@@ -1,8 +1,8 @@
 package tax
 
 import (
-	"github.com/bluzelle/curium/x/tax/keeper"
-	"github.com/bluzelle/curium/x/tax/types"
+	"github.com/bluzelle/bluzelle/curium/x/tax/keeper"
+	"github.com/bluzelle/bluzelle/curium/x/tax/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

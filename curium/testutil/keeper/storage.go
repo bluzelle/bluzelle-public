@@ -3,8 +3,8 @@ package keeper
 import (
 	"testing"
 
-	"github.com/bluzelle/curium/x/storage/keeper"
-	"github.com/bluzelle/curium/x/storage/types"
+	"github.com/bluzelle/bluzelle/curium/x/storage/keeper"
+	"github.com/bluzelle/bluzelle/curium/x/storage/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -34,7 +34,6 @@ func StorageKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 		"",
 		nil,
 	)
-
 
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 	return k, ctx

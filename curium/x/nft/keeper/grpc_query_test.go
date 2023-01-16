@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/bluzelle/curium/x/nft/types"
+	"github.com/bluzelle/bluzelle/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -12,11 +12,10 @@ func (suite *KeeperTestSuite) TestGRPCNFTInfo() {
 
 	// set params for issue fee
 	issuePrice := sdk.NewInt64Coin("stake", 1000000)
-	fundAccnt := sdk.NewInt64Coin("stake", 1000000 * 2)
+	fundAccnt := sdk.NewInt64Coin("stake", 1000000*2)
 	suite.NFTKeeper.SetParamSet(suite.ctx, types.Params{
 		IssuePrice: issuePrice,
 	})
-
 
 	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator, sdk.Coins{fundAccnt})
 
@@ -84,7 +83,6 @@ func (suite *KeeperTestSuite) TestGRPCNFTsByOwner() {
 	suite.NFTKeeper.SetParamSet(suite.ctx, types.Params{
 		IssuePrice: issuePrice,
 	})
-
 
 	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator1, sdk.Coins{fundAccnt.Add(fundAccnt)})
 
@@ -168,7 +166,6 @@ func (suite *KeeperTestSuite) TestGRPCMetadata() {
 		IssuePrice: issuePrice,
 	})
 
-
 	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator1, sdk.Coins{fundAccnt})
 
 	if err != nil {
@@ -230,14 +227,12 @@ func (suite *KeeperTestSuite) TestGRPCCollection() {
 	// create nfts
 	creator := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
 
-
 	// set params for issue fee
 	issuePrice := sdk.NewInt64Coin("stake", 1000000)
-	fundAccnt := sdk.NewInt64Coin("stake", 1000000 * 2)
+	fundAccnt := sdk.NewInt64Coin("stake", 1000000*2)
 	suite.NFTKeeper.SetParamSet(suite.ctx, types.Params{
 		IssuePrice: issuePrice,
 	})
-
 
 	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator, sdk.Coins{fundAccnt})
 

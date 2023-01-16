@@ -4,7 +4,7 @@ package bluzelle.curium.nft;
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/bluzelle/curium/x/nft/types";
+option go_package = "github.com/bluzelle/bluzelle/curium/x/nft/types";
 
 message MasterEdition {
   uint64 supply = 1;

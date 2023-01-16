@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"github.com/bluzelle/curium/x/curium/types"
+	"github.com/bluzelle/bluzelle/curium/x/curium/types"
 	"github.com/stretchr/testify/require"
 )
 

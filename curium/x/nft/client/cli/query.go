@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/spf13/cobra"
 
-	"github.com/bluzelle/curium/x/nft/types"
+	"github.com/bluzelle/bluzelle/curium/x/nft/types"
 )
 
 // GetQueryCmd returns the query commands for the nft module.

@@ -6,7 +6,7 @@ import "storage/tx.proto";
 
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "github.com/bluzelle/curium/x/storage/types";
+option go_package = "github.com/bluzelle/bluzelle/curium/x/storage/types";
 
 // GenesisState defines the storage module's genesis state.
 message GenesisState {

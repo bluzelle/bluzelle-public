@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
-	"github.com/bluzelle/curium/x/nft/types"
+	"github.com/bluzelle/bluzelle/curium/x/nft/types"
 )
 
 type Keeper struct {

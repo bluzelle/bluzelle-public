@@ -1,8 +1,8 @@
 package ante_test
 
 import (
-	"github.com/bluzelle/curium/app/ante"
-	testutil "github.com/bluzelle/curium/testutil/keeper"
+	"github.com/bluzelle/bluzelle/curium/app/ante"
+	testutil "github.com/bluzelle/bluzelle/curium/testutil/keeper"
 	"github.com/stretchr/testify/require"
 	"testing"
 )

@@ -2,7 +2,7 @@ package ante
 
 import (
 	"fmt"
-	taxmodulekeeper "github.com/bluzelle/curium/x/tax/keeper"
+	taxmodulekeeper "github.com/bluzelle/bluzelle/curium/x/tax/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"

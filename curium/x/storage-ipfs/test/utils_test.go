@@ -3,7 +3,7 @@ package storage_test
 import (
 	"context"
 	"fmt"
-	"github.com/bluzelle/curium/x/storage-ipfs/ipfs"
+	"github.com/bluzelle/bluzelle/curium/x/storage-ipfs/ipfs"
 	"github.com/ipfs/go-ipfs-files"
 	"github.com/ipfs/interface-go-ipfs-core/path"
 	"io"

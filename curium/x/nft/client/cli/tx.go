@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"github.com/bluzelle/curium/x/nft/types"
+	"github.com/bluzelle/bluzelle/curium/x/nft/types"
 )
 
 // NewTxCmd returns the transaction commands for the nft module.

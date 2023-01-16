@@ -4,7 +4,7 @@ package bluzelle.curium.tax;
 import "gogoproto/gogo.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "github.com/bluzelle/curium/x/tax/types";
+option go_package = "github.com/bluzelle/bluzelle/curium/x/tax/types";
 
 // GenesisState defines the tax module's genesis state.
 message GenesisState {

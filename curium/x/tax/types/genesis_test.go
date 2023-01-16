@@ -1,7 +1,7 @@
 package types_test
 
 import (
-	taxTypes "github.com/bluzelle/curium/x/tax/types"
+	taxTypes "github.com/bluzelle/bluzelle/curium/x/tax/types"
 	"github.com/stretchr/testify/require"
 	"testing"
 )

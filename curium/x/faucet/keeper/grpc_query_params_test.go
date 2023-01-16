@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"testing"
 
-	testkeeper "github.com/bluzelle/curium/testutil/keeper"
-	"github.com/bluzelle/curium/x/faucet/types"
+	testkeeper "github.com/bluzelle/bluzelle/curium/testutil/keeper"
+	"github.com/bluzelle/bluzelle/curium/x/faucet/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )

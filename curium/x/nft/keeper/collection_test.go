@@ -1,6 +1,6 @@
 package keeper_test
 
-import "github.com/bluzelle/curium/x/nft/types"
+import "github.com/bluzelle/bluzelle/curium/x/nft/types"
 
 func (suite *KeeperTestSuite) TestLastCollectionIdGetSet() {
 	// get default last collection id

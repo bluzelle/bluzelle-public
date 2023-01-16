@@ -1,8 +1,8 @@
 package ante
 
 import (
-	appTypes "github.com/bluzelle/curium/app/types"
-	"github.com/bluzelle/curium/app/types/global"
+	appTypes "github.com/bluzelle/bluzelle/curium/app/types"
+	"github.com/bluzelle/bluzelle/curium/app/types/global"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"

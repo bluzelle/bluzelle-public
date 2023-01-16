@@ -1,8 +1,8 @@
 package keeper
 
 import (
-	"github.com/bluzelle/curium/app/types/global"
-	"github.com/bluzelle/curium/x/tax/types"
+	"github.com/bluzelle/bluzelle/curium/app/types/global"
+	"github.com/bluzelle/bluzelle/curium/x/tax/types"
 )
 
 type msgServer struct {

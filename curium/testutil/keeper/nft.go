@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	curiumapp "github.com/bluzelle/curium/app"
-	"github.com/bluzelle/curium/x/nft/keeper"
-	"github.com/bluzelle/curium/x/nft/types"
+	curiumapp "github.com/bluzelle/bluzelle/curium/app"
+	"github.com/bluzelle/bluzelle/curium/x/nft/keeper"
+	"github.com/bluzelle/bluzelle/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	simapp "github.com/cosmos/cosmos-sdk/simapp"
@@ -20,9 +20,6 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmdb "github.com/tendermint/tm-db"
 )
-
-
-
 
 func NftKeeper() (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.AccountKeeper, sdk.Context) {
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
@@ -47,14 +44,11 @@ func NftKeeper() (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.AccountKeepe
 
 	//accKey := app.GetKey(authtypes.StoreKey)
 	accountKeeper := acctypes.NewAccountKeeper(cdc, storeKey, app.GetSubspace(authtypes.ModuleName),
-	authtypes.ProtoBaseAccount, curiumapp.GetMaccPerms())
-
+		authtypes.ProtoBaseAccount, curiumapp.GetMaccPerms())
 
 	bankKeeper := bankkeeper.NewBaseKeeper(
 		cdc, storeKey, accountKeeper, app.GetSubspace(banktypes.ModuleName), app.ModuleAccountAddrs(),
 	)
-
-
 
 	k := keeper.NewKeeper(
 		cdc,

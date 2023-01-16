@@ -3,10 +3,10 @@ package tax_test
 import (
 	"testing"
 
-	keepertest "github.com/bluzelle/curium/testutil/keeper"
-	"github.com/bluzelle/curium/testutil/nullify"
-	"github.com/bluzelle/curium/x/tax"
-	"github.com/bluzelle/curium/x/tax/types"
+	keepertest "github.com/bluzelle/bluzelle/curium/testutil/keeper"
+	"github.com/bluzelle/bluzelle/curium/testutil/nullify"
+	"github.com/bluzelle/bluzelle/curium/x/tax"
+	"github.com/bluzelle/bluzelle/curium/x/tax/types"
 	"github.com/stretchr/testify/require"
 )
 

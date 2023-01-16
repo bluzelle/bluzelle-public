@@ -1,4 +1,4 @@
-module github.com/bluzelle/curium
+module github.com/bluzelle/bluzelle/curium
 
 go 1.16
 

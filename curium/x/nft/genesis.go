@@ -1,8 +1,8 @@
 package nft
 
 import (
-	"github.com/bluzelle/curium/x/nft/keeper"
-	"github.com/bluzelle/curium/x/nft/types"
+	"github.com/bluzelle/bluzelle/curium/x/nft/keeper"
+	"github.com/bluzelle/bluzelle/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

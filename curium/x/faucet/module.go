@@ -11,9 +11,9 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/bluzelle/curium/x/faucet/client/cli"
-	"github.com/bluzelle/curium/x/faucet/keeper"
-	"github.com/bluzelle/curium/x/faucet/types"
+	"github.com/bluzelle/bluzelle/curium/x/faucet/client/cli"
+	"github.com/bluzelle/bluzelle/curium/x/faucet/keeper"
+	"github.com/bluzelle/bluzelle/curium/x/faucet/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"

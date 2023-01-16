@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	nftcli "github.com/bluzelle/curium/x/nft/client/cli"
+	nftcli "github.com/bluzelle/bluzelle/curium/x/nft/client/cli"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 )
 

@@ -18,7 +18,7 @@ import (
 	tmrand "github.com/tendermint/tendermint/libs/rand"
 	tmdb "github.com/tendermint/tm-db"
 
-	"github.com/bluzelle/curium/app"
+	"github.com/bluzelle/bluzelle/curium/app"
 )
 
 type (

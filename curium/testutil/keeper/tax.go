@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	"github.com/bluzelle/curium/x/tax"
-	"github.com/bluzelle/curium/x/tax/keeper"
-	"github.com/bluzelle/curium/x/tax/types"
+	"github.com/bluzelle/bluzelle/curium/x/tax"
+	"github.com/bluzelle/bluzelle/curium/x/tax/keeper"
+	"github.com/bluzelle/bluzelle/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
