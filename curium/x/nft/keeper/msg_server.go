@@ -27,6 +27,11 @@ func (m msgServer) CreateNFT(goCtx context.Context, msg *types.MsgCreateNFT) (*t
 		return nil, err
 	}
 
+	ctx.EventManager().EmitTypedEvent(&types.EventNFTCreation{
+		Creator: msg.Sender,
+		NftId:   nftId,
+	})
+
 	return &types.MsgCreateNFTResponse{
 		Id:         nftId,
 		MetadataId: metadataId,
@@ -54,6 +59,12 @@ func (m msgServer) TransferNFT(goCtx context.Context, msg *types.MsgTransferNFT)
 	if err != nil {
 		return nil, err
 	}
+
+	ctx.EventManager().EmitTypedEvent(&types.EventNFTTransfer{
+		NftId:    msg.Id,
+		Sender:   msg.Sender,
+		Receiver: msg.NewOwner,
+	})
 
 	return &types.MsgTransferNFTResponse{}, nil
 }

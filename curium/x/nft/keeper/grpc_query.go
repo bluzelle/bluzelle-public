@@ -11,6 +11,11 @@ import (
 	"github.com/bluzelle/curium/x/nft/types"
 )
 
+// Querier is used as Keeper will have duplicate methods if used directly, and gRPC names take precedence over keeper
+type Querier struct {
+	Keeper
+}
+
 var _ types.QueryServer = Keeper{}
 
 func (k Keeper) NFTInfo(c context.Context, req *types.QueryNFTInfoRequest) (*types.QueryNFTInfoResponse, error) {
