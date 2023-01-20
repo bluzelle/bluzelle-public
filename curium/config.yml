@@ -60,9 +60,6 @@ validators:
       timeout_commit: 5s
     p2p:
       addr_book_strict: false
-    rpc:
-      cors_allowed_origins:
-      - '*'
   client:
     keyring-backend: test
     output: json
