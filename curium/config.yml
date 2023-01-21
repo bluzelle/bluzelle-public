@@ -52,7 +52,6 @@ validators:
   app:
     api:
       enable: true
-      enabled-unsafe-cors: true
     minimum-gas-prices: 0ubnt
     storage-dir: ~/.curium/storage
   config:
