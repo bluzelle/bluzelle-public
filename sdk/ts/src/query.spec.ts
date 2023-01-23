@@ -14,7 +14,7 @@ import {defaultSwarmConfig} from "@bluzelle/testing";
 
 const ipfsClient = create({host: '127.0.0.1', port: 5001, protocol: 'http'})
 
-const curiumUrl = 'https://localhost:26657';
+const curiumUrl = 'http://localhost:26667';
 const mnemonic = new BehaviorSubject<string>("");
 
 describe('query', function () {
@@ -94,35 +94,35 @@ describe('query', function () {
     it('should query for v1 cids', () =>
         getBlzClient(curiumUrl, mnemonic.getValue())
             .then(passThroughAwait(bzSdk =>
-                pinCid(bzSdk, 'bafybeigcmqqtwhrjgehcpwdd6nb2r7pooojoqk5j4umom4tysu4jb2xg4e', {
+                pinCid(bzSdk, 'bafybeigsk4rb7soyyipuiyuhcaje5chgha25gwc7k5hgalexft5m2gi6ua', {
                     maxGas: 10000000,
                     gasPrice: 0.002,
                     mode: 'sync'
                 })
             ))
             .then(passThroughAwait(() => delay(6_000)))
-            .then(bzSdk => hasContent(bzSdk, 'bafybeigcmqqtwhrjgehcpwdd6nb2r7pooojoqk5j4umom4tysu4jb2xg4e'))
+            .then(bzSdk => hasContent(bzSdk, 'bafybeigsk4rb7soyyipuiyuhcaje5chgha25gwc7k5hgalexft5m2gi6ua'))
             .then(resp => expect(resp).to.be.true)
     );
 
     it('should query for the same cid with either v0 or v1', () =>
         getBlzClient(curiumUrl, mnemonic.getValue())
             .then(passThroughAwait(bzSdk =>
-                pinCid(bzSdk, CID.parse('bafybeigcmqqtwhrjgehcpwdd6nb2r7pooojoqk5j4umom4tysu4jb2xg4e').toV0().toString(), {
+                pinCid(bzSdk, CID.parse('bafybeigsk4rb7soyyipuiyuhcaje5chgha25gwc7k5hgalexft5m2gi6ua').toV0().toString(), {
                     maxGas: 10000000,
                     gasPrice: 0.002,
                     mode: 'sync'
                 })
             ))
             .then(passThroughAwait(() => delay(6_000)))
-            .then(bzSdk => hasContent(bzSdk, 'bafybeigcmqqtwhrjgehcpwdd6nb2r7pooojoqk5j4umom4tysu4jb2xg4e'))
+            .then(bzSdk => hasContent(bzSdk, 'QmcVjPQnaQN2bgGG6gbA4G88JPp7BZuT3BpMLj9G3ufcxF'))
             .then(resp => expect(resp).to.be.true)
     );
 
     it('should query for the same cid with either v0 or v1 other direction', () =>
         getBlzClient(curiumUrl, mnemonic.getValue())
             .then(passThroughAwait(bzSdk =>
-                (pinCid(bzSdk, 'bafybeigcmqqtwhrjgehcpwdd6nb2r7pooojoqk5j4umom4tysu4jb2xg4e', {
+                (pinCid(bzSdk, 'bafybeigsk4rb7soyyipuiyuhcaje5chgha25gwc7k5hgalexft5m2gi6ua', {
                     maxGas: 10000000,
                     gasPrice: 0.002,
                     mode: 'sync'
@@ -130,7 +130,7 @@ describe('query', function () {
                     .then(console.log)
             ))
             .then(passThroughAwait(() => delay(12_000)))
-            .then(bzSdk => hasContent(bzSdk, CID.parse('bafybeigcmqqtwhrjgehcpwdd6nb2r7pooojoqk5j4umom4tysu4jb2xg4e').toV0().toString()))
+            .then(bzSdk => hasContent(bzSdk, CID.parse('bafybeigsk4rb7soyyipuiyuhcaje5chgha25gwc7k5hgalexft5m2gi6ua').toV0().toString()))
             .then(resp => expect(resp).to.be.true)
     );
 
