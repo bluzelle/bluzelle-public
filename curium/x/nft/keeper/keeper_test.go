@@ -5,7 +5,6 @@ import (
 	"github.com/bluzelle/bluzelle/curium/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	"github.com/tendermint/spm/cosmoscmd"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	"testing"
 
@@ -45,7 +44,7 @@ type KeeperTestSuite struct {
 
 func (suite *KeeperTestSuite) SetupTest() {
 	suite.app, _, _ = testutil.CreateTestApp(false)
-	suite.legacyAmino = cosmoscmd.MakeEncodingConfig(app.ModuleBasics).Amino
+	suite.legacyAmino = app.MakeEncodingConfig().Amino
 	suite.NFTKeeper, suite.BankKeeper, suite.AccountKeeper, suite.ctx = testkeeper.NftKeeper()
 	suite.NFTKeeper.SetParamSet(suite.ctx, types.NewParams(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1_000_000_000))))
 
