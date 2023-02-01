@@ -104,8 +104,15 @@ func (k Keeper) calculateTransferTax(ctx sdk.Context, msg sdk.Msg) sdk.Coins {
 	for _, coin := range bankMsg.Amount {
 		feeAmt := coin.Amount.Int64() * info.TransferTaxBp / 10_000
 		if feeAmt > 0 {
-			transferTax := sdk.NewInt64Coin(taxTypes.Denom, feeAmt)
-			transferTaxes = append(transferTaxes, transferTax)
+			if coin.Denom == taxTypes.Denom {
+				transferTaxes = append(transferTaxes, sdk.NewInt64Coin(taxTypes.Denom, feeAmt))
+			}
+			if coin.Denom == taxTypes.DenomUg4 {
+				transferTaxes = append(transferTaxes, sdk.NewInt64Coin(taxTypes.DenomUg4, feeAmt))
+			}
+			if coin.Denom == taxTypes.DenomUelt {
+				transferTaxes = append(transferTaxes, sdk.NewInt64Coin(taxTypes.DenomUelt, feeAmt))
+			}
 		}
 	}
 	return transferTaxes

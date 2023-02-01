@@ -5,6 +5,8 @@ import sdk "github.com/cosmos/cosmos-sdk/types"
 const (
 	AccountAddressPrefix = "bluzelle"
 	Denom                = "ubnt"
+	DenomUg4             = "ug4"
+	DenomUelt            = "uelt"
 	KeyTaxInfo           = "taxinfo"
 )
 
