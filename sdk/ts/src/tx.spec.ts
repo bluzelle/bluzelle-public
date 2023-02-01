@@ -136,8 +136,8 @@ describe('sending transactions', function () {
     });
 
     it('should reject a transaction if the gas price is too low', () =>
-        startSwarmWithClient({...defaultSwarmConfig, minGasPrice: defaultSwarmConfig.minGasPrice * 10000})
-            .then(({bzSdk}) => pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: defaultSwarmConfig.minGasPrice * 1000, maxGas: 200000, mode: 'sync'}))
+        startSwarmWithClient({...defaultSwarmConfig, minGasPrice: defaultSwarmConfig.minGasPrice * 10})
+            .then(({bzSdk}) => pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: defaultSwarmConfig.minGasPrice, maxGas: 200000, mode: 'sync'}))
             .then(x =>
                 {throw x}
             )
