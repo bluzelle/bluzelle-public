@@ -135,6 +135,17 @@ describe('sending transactions', function () {
             .then(() => getTx(client, hash))
     });
 
+    it('should reject a transaction if the gas price is too low', () =>
+        startSwarmWithClient({...defaultSwarmConfig, minGasPrice: defaultSwarmConfig.minGasPrice * 10000})
+            .then(({bzSdk}) => pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: defaultSwarmConfig.minGasPrice * 1000, maxGas: 200000, mode: 'sync'}))
+            .then(x =>
+                {throw x}
+            )
+            .catch(err =>
+                expect(err.message).to.include('insufficient fees')
+            )
+    )
+
 
     // skipping because we don't want to add admin info to repo right now
     describe.skip('as admin', () => {
