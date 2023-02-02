@@ -52,7 +52,6 @@ validators:
   app:
     api:
       enable: true
-      enabled-unsafe-cors: true
     minimum-gas-prices: 0ubnt
     storage-dir: ~/.curium/storage
   config:
@@ -60,9 +59,6 @@ validators:
       timeout_commit: 5s
     p2p:
       addr_book_strict: false
-    rpc:
-      cors_allowed_origins:
-        - '*'
   client:
     keyring-backend: test
     output: json

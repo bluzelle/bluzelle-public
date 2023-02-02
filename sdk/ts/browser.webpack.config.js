@@ -7,7 +7,7 @@ module.exports = {
         path: path.join(__dirname, 'lib-web'),
          library: "bluzelle",
          libraryTarget: "umd",
-        publicPath: 'lib-web/'
+        publicPath: 'auto'
     },
     target: 'web',
     mode: 'production',

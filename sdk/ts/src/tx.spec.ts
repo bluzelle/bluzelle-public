@@ -144,6 +144,9 @@ describe('sending transactions', function () {
             .catch(err =>
                 expect(err.message).to.include('insufficient fees')
             )
+    );
+    it('should throw an error when creating nft after forking from old network', () =>
+        startSwarmWithClient({...defaultSwarmConfig, targetBranch: '7bc61cc', genesis: getOldGenesis()})
     )
 
 
@@ -222,5 +225,8 @@ describe('sending transactions', function () {
 
 
 })
+
+const getOldGenesis = () =>
+
 
 

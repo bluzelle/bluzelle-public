@@ -20,12 +20,12 @@ export type Ports = {
     restPort: number
 }
 
-const addBluzelleChain = (chainId: string, nodeAddress: string, ports: Ports) =>
+const addBluzelleChain = (chainId: string, nodeAddress: string, ports: Ports, protocol: 'https' | 'http') =>
     (window as Window).keplr?.experimentalSuggestChain({
         chainId: chainId,
         chainName: `Bluzelle:${chainId}`,
-        rpc: `http://${nodeAddress}:${ports.rpcPort}`,
-        rest: `http://${nodeAddress}:${ports.restPort}`,
+        rpc: `${protocol}://${nodeAddress}:${ports.rpcPort}`,
+        rest: `${protocol}://${nodeAddress}:${ports.restPort}`,
         bip44: {
             coinType: 483,
         },
@@ -69,17 +69,17 @@ const addBluzelleChain = (chainId: string, nodeAddress: string, ports: Ports) =>
 
 export const newKeplrWallet = (
     nodeAddress: string,
-    ports: Ports = {rpcPort: 26657, restPort: 1317}
+    connectionParams: {ports: Ports, protocol: 'http' | 'https'} = {ports: {rpcPort: 26657, restPort: 1317}, protocol: 'https'}
 ) => (): Promise<BluzelleWallet> =>
     generateMnemonic()
         .then(mnemonic => newBluzelleClient({
-            url: `${nodeAddress}:${ports.rpcPort}`,
+            url: `${connectionParams.protocol}://${nodeAddress}:${connectionParams.ports.rpcPort}`,
             wallet: newLocalWallet(mnemonic)
         }))
         .then(client => getStatus(client))
         .then(passThroughAwait(status =>
             (window as Window).keplr?.enable(status.chainId)
-                .catch(e => {console.log(e); return addBluzelleChain(status.chainId, nodeAddress, ports)})
+                .catch(e => {console.log(e); return addBluzelleChain(status.chainId, nodeAddress, connectionParams.ports, connectionParams.protocol)})
         ))
         .then(status => (window as Window).keplr?.getOfflineSigner(status.chainId))
         .then((keplrOfflineSigner) => new BluzelleKeplrWallet(keplrOfflineSigner as OfflineDirectSigner));
