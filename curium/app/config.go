@@ -2,10 +2,11 @@ package app
 
 import (
 	"github.com/cosmos/cosmos-sdk/client"
-	codec "github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/std"
-	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
+	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 )
 
 type EncodingConfig struct {
@@ -15,19 +16,25 @@ type EncodingConfig struct {
 	Amino             *codec.LegacyAmino
 }
 
-func MakeEncodingConfig() EncodingConfig {
-	cdc := codec.NewLegacyAmino()
+func MakeEncodingConfig(moduleBasics module.BasicManager) EncodingConfig {
+	encodingConfig := makeEncodingConfig()
+	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
+	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	moduleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
+	moduleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	return encodingConfig
+}
+
+func makeEncodingConfig() EncodingConfig {
+	amino := codec.NewLegacyAmino()
 	interfaceRegistry := types.NewInterfaceRegistry()
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
-	std.RegisterLegacyAminoCodec(cdc)
-	std.RegisterInterfaces(interfaceRegistry)
-	ModuleBasics.RegisterLegacyAminoCodec(cdc)
-	ModuleBasics.RegisterInterfaces(interfaceRegistry)
+	txCfg := tx.NewTxConfig(marshaler, tx.DefaultSignModes)
 
 	return EncodingConfig{
 		InterfaceRegistry: interfaceRegistry,
 		Marshaler:         marshaler,
-		TxConfig:          authtx.NewTxConfig(marshaler, authtx.DefaultSignModes),
-		Amino:             cdc,
+		TxConfig:          txCfg,
+		Amino:             amino,
 	}
 }

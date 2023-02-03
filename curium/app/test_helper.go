@@ -14,7 +14,7 @@ import (
 	dbm "github.com/tendermint/tm-db"
 )
 
-func Setup(isCheckTx bool) App {
+func Setup(isCheckTx bool) CuriumApp {
 	db := dbm.NewMemDB()
 	app := New(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, MakeEncodingConfig(), simapp.EmptyAppOptions{})
 	if !isCheckTx {
