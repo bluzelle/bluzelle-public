@@ -1,22 +1,31 @@
 package main
 
 import (
-	"github.com/bluzelle/bluzelle/curium/app"
-	"github.com/cosmos/cosmos-sdk/server"
-	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
+	appTypes "github.com/bluzelle/bluzelle/curium/app/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"os"
+
+	"github.com/bluzelle/bluzelle/curium/app"
+	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
+	"github.com/tendermint/spm/cosmoscmd"
 )
 
 func main() {
-	rootCmd, _ := NewRootCmd()
+	config := sdk.GetConfig()
+	config.SetCoinType(appTypes.CoinType)
+
+	rootCmd, _ := cosmoscmd.NewRootCmd(
+		appTypes.Name,
+		appTypes.AccountAddressPrefix,
+		app.DefaultNodeHome,
+		appTypes.Name,
+		app.ModuleBasics,
+		app.New,
+		// this line is used by starport scaffolding # root/arguments
+	)
 
 	if err := svrcmd.Execute(rootCmd, app.DefaultNodeHome); err != nil {
-		switch e := err.(type) {
-		case server.ErrorCode:
-			os.Exit(e.Code)
-
-		default:
-			os.Exit(1)
-		}
+		os.Exit(1)
 	}
+
 }
