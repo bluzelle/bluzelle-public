@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/bluzelle/ipfs-kubo v0.18.1-0.20230127160642-b64709676940
 	github.com/cosmos/cosmos-sdk v0.45.10
-	github.com/cosmos/ibc-go/v3 v3.4.0
+	github.com/cosmos/ibc-go v1.5.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
