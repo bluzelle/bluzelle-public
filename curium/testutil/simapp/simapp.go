@@ -18,13 +18,13 @@ import (
 )
 
 // New creates application instance with in-memory database and disabled logging.
-func New(dir string) app.CuriumApp {
+func New(dir string) cosmoscmd.App {
 	db := tmdb.NewMemDB()
 	logger := log.NewNopLogger()
 
 	encoding := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
 
-	a := app.NewCuriumApp(logger, db, nil, true, map[int64]bool{}, dir, 0, encoding,
+	a := app.New(logger, db, nil, true, map[int64]bool{}, dir, 0, encoding,
 		simapp.EmptyAppOptions{})
 	// InitChain updates deliverState which is required when app.NewContext is called
 	a.InitChain(abci.RequestInitChain{
@@ -32,7 +32,7 @@ func New(dir string) app.CuriumApp {
 		AppStateBytes:   []byte("{}"),
 	})
 
-	return *a
+	return a
 }
 
 var defaultConsensusParams = &abci.ConsensusParams{

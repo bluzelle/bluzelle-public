@@ -15,9 +15,9 @@ import (
 	dbm "github.com/tendermint/tm-db"
 )
 
-func Setup(isCheckTx bool) CuriumApp {
+func Setup(isCheckTx bool) cosmoscmd.App {
 	db := dbm.NewMemDB()
-	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, cosmoscmd.MakeEncodingConfig(ModuleBasics), simapp.EmptyAppOptions{})
+	app := New(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, cosmoscmd.MakeEncodingConfig(ModuleBasics), simapp.EmptyAppOptions{})
 	if !isCheckTx {
 		genesisState := NewDefaultGenesisState(cosmoscmd.MakeEncodingConfig(ModuleBasics).Marshaler)
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
@@ -34,7 +34,7 @@ func Setup(isCheckTx bool) CuriumApp {
 		)
 	}
 
-	return *app
+	return app
 }
 
 func QueryBalanceExec(clientCtx client.Context, address string, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
