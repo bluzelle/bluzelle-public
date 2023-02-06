@@ -15,6 +15,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/bluzelle/bluzelle/curium/cmd/cosmoscmd"
 )
 
 const (
@@ -44,7 +46,7 @@ type KeeperTestSuite struct {
 
 func (suite *KeeperTestSuite) SetupTest() {
 	suite.app, _, _ = testutil.CreateTestApp(false)
-	suite.legacyAmino = app.MakeEncodingConfig().Amino
+	suite.legacyAmino = cosmoscmd.MakeEncodingConfig(app.ModuleBasics).Amino
 	suite.NFTKeeper, suite.BankKeeper, suite.AccountKeeper, suite.ctx = testkeeper.NftKeeper()
 	suite.NFTKeeper.SetParamSet(suite.ctx, types.NewParams(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1_000_000_000))))
 

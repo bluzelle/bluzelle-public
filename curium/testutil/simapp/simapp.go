@@ -14,6 +14,7 @@ import (
 	tmdb "github.com/tendermint/tm-db"
 
 	"github.com/bluzelle/bluzelle/curium/app"
+	"github.com/bluzelle/bluzelle/curium/cmd/cosmoscmd"
 )
 
 // New creates application instance with in-memory database and disabled logging.
@@ -21,9 +22,9 @@ func New(dir string) app.CuriumApp {
 	db := tmdb.NewMemDB()
 	logger := log.NewNopLogger()
 
-	encoding := app.MakeEncodingConfig()
+	encoding := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
 
-	a := app.New(logger, db, nil, true, map[int64]bool{}, dir, 0, encoding,
+	a := app.NewCuriumApp(logger, db, nil, true, map[int64]bool{}, dir, 0, encoding,
 		simapp.EmptyAppOptions{})
 	// InitChain updates deliverState which is required when app.NewContext is called
 	a.InitChain(abci.RequestInitChain{

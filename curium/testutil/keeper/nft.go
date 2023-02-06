@@ -3,11 +3,12 @@ package keeper
 import (
 	"github.com/bluzelle/bluzelle/curium/app"
 	curiumapp "github.com/bluzelle/bluzelle/curium/app"
+	"github.com/bluzelle/bluzelle/curium/cmd/cosmoscmd"
 	"github.com/bluzelle/bluzelle/curium/x/nft/keeper"
 	"github.com/bluzelle/bluzelle/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	simapp "github.com/cosmos/cosmos-sdk/simapp"
+	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/store"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -35,7 +36,7 @@ func NftKeeper() (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.AccountKeepe
 	registry.RegisterImplementations((*authtypes.AccountI)(nil), &authtypes.BaseAccount{}, &authtypes.ModuleAccount{})
 	cdc := codec.NewProtoCodec(registry)
 	paramsSubspace := typesparams.NewSubspace(cdc,
-		app.MakeEncodingConfig().Amino,
+		cosmoscmd.MakeEncodingConfig(app.ModuleBasics).Amino,
 		storeKey,
 		memStoreKey,
 		types.ModuleName,

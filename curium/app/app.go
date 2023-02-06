@@ -75,7 +75,7 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	transfer "github.com/cosmos/ibc-go/v3/modules/apps/transfer"
+	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v3/modules/core"
@@ -90,7 +90,8 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	//"github.com/tendermint/spm/openapiconsole"
+	"github.com/bluzelle/bluzelle/curium/cmd/cosmoscmd"
+	"github.com/bluzelle/bluzelle/curium/cmd/openapiconsole"
 
 	"github.com/bluzelle/bluzelle/curium/docs"
 
@@ -180,7 +181,7 @@ var (
 )
 
 var (
-	//_ cosmoscmd.CosmosApp     = (*CuriumApp)(nil)
+	_ cosmoscmd.CosmosApp     = (*CuriumApp)(nil)
 	_ servertypes.Application = (*CuriumApp)(nil)
 )
 
@@ -255,7 +256,7 @@ func NewCuriumApp(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig EncodingConfig,
+	encodingConfig cosmoscmd.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *CuriumApp {
@@ -569,10 +570,10 @@ func New(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig EncodingConfig,
+	encodingConfig cosmoscmd.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
-) App {
+) cosmoscmd.App {
 	return NewCuriumApp(
 		logger,
 		db,
@@ -709,7 +710,7 @@ func (app *CuriumApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.API
 
 	// register app's OpenAPI routes.
 	apiSvr.Router.Handle("/static/openapi.yml", http.FileServer(http.FS(docs.Docs)))
-	//apiSvr.Router.HandleFunc("/", openapiconsole.Handler(appTypes.Name, "/static/openapi.yml"))
+	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(appTypes.Name, "/static/openapi.yml"))
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.

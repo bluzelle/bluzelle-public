@@ -3,6 +3,7 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bluzelle/bluzelle/curium/cmd/cosmoscmd"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil"
@@ -16,9 +17,9 @@ import (
 
 func Setup(isCheckTx bool) CuriumApp {
 	db := dbm.NewMemDB()
-	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, MakeEncodingConfig(ModuleBasics), simapp.EmptyAppOptions{})
+	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, cosmoscmd.MakeEncodingConfig(ModuleBasics), simapp.EmptyAppOptions{})
 	if !isCheckTx {
-		genesisState := NewDefaultGenesisState(MakeEncodingConfig(ModuleBasics).Marshaler)
+		genesisState := NewDefaultGenesisState(cosmoscmd.MakeEncodingConfig(ModuleBasics).Marshaler)
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 		if err != nil {
 			panic(err)
