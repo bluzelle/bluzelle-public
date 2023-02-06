@@ -16,9 +16,9 @@ import (
 
 func Setup(isCheckTx bool) CuriumApp {
 	db := dbm.NewMemDB()
-	app := New(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, MakeEncodingConfig(), simapp.EmptyAppOptions{})
+	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, MakeEncodingConfig(ModuleBasics), simapp.EmptyAppOptions{})
 	if !isCheckTx {
-		genesisState := NewDefaultGenesisState(MakeEncodingConfig().Marshaler)
+		genesisState := NewDefaultGenesisState(MakeEncodingConfig(ModuleBasics).Marshaler)
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 		if err != nil {
 			panic(err)
