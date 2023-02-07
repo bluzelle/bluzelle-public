@@ -32,6 +32,7 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
+	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -75,23 +76,14 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	//"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
-	//ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
-	//ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
-	//ibc "github.com/cosmos/ibc-go/v3/modules/core"
-	//ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
-	//ibcporttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
-	//ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
-	//ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
-	"github.com/cosmos/ibc-go/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/modules/core/02-client"
-	ibcporttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
-
+	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v3/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/v3/modules/core"
+	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
+	ibcporttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
+	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 	"github.com/spf13/cast"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -367,24 +359,19 @@ func NewCuriumApp(
 		AddRoute(ibchost.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
 
 	// Create Transfer Keepers
-	//app.TransferKeeper = ibctransferkeeper.NewKeeper(
-	//	appCodec,
-	//	keys[ibctransfertypes.StoreKey],
-	//	app.GetSubspace(ibctransfertypes.ModuleName),
-	//	app.IBCKeeper.ChannelKeeper,
-	//	app.IBCKeeper.ChannelKeeper,
-	//	&app.IBCKeeper.PortKeeper,
-	//	app.AccountKeeper,
-	//	app.BankKeeper,
-	//	scopedTransferKeeper,
-	//)
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
+		appCodec,
+		keys[ibctransfertypes.StoreKey],
+		app.GetSubspace(ibctransfertypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		scopedTransferKeeper,
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
-	//transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
+	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
 
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
@@ -446,8 +433,7 @@ func NewCuriumApp(
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
-	//ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -498,12 +484,23 @@ func NewCuriumApp(
 	// NOTE: staking module is required if HistoricalEntrie
 	//s param > 0
 	app.mm.SetOrderBeginBlockers(
+		curiummoduletypes.ModuleName, genutiltypes.ModuleName, authtypes.ModuleName, vestingtypes.ModuleName,
+		crisistypes.ModuleName, govtypes.ModuleName, ibctransfertypes.ModuleName, faucetmoduletypes.ModuleName,
+		storagemoduletypes.ModuleName, banktypes.ModuleName, paramstypes.ModuleName, taxmoduletypes.ModuleName,
+
 		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
 		feegrant.ModuleName, nfttypes.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, curiummoduletypes.ModuleName, nfttypes.ModuleName)
+	app.mm.SetOrderEndBlockers(
+		evidencetypes.ModuleName, paramstypes.ModuleName, genutiltypes.ModuleName, capabilitytypes.ModuleName,
+		minttypes.ModuleName, slashingtypes.ModuleName, distrtypes.ModuleName, upgradetypes.ModuleName, authtypes.ModuleName,
+		ibctransfertypes.ModuleName, faucetmoduletypes.ModuleName, storagemoduletypes.ModuleName, ibchost.ModuleName,
+		banktypes.ModuleName, feegrant.ModuleName, taxmoduletypes.ModuleName, vestingtypes.ModuleName,
+
+		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, curiummoduletypes.ModuleName, nfttypes.ModuleName,
+	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -529,6 +526,11 @@ func NewCuriumApp(
 		storagemoduletypes.ModuleName,
 		faucetmoduletypes.ModuleName,
 		taxmoduletypes.ModuleName,
+
+		vestingtypes.ModuleName,
+		feegrant.ModuleName,
+		paramstypes.ModuleName,
+		upgradetypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
