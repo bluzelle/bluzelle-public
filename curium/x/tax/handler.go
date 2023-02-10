@@ -3,8 +3,8 @@ package tax
 import (
 	"fmt"
 
-	"github.com/bluzelle/bluzelle/curium/x/tax/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/tax/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )

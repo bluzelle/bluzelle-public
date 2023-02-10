@@ -3,8 +3,8 @@ package keeper
 import (
 	"testing"
 
-	"github.com/bluzelle/bluzelle/curium/x/faucet/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/faucet/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/faucet/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"

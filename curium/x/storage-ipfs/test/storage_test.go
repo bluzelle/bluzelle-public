@@ -2,7 +2,7 @@ package storage_test
 
 import (
 	"context"
-	curiumipfs "github.com/bluzelle/bluzelle/curium/x/storage-ipfs/ipfs"
+	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"

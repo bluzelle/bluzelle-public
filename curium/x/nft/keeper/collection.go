@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/bluzelle/bluzelle/curium/x/nft/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )

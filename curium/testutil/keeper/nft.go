@@ -1,11 +1,11 @@
 package keeper
 
 import (
-	"github.com/bluzelle/bluzelle/curium/app"
-	curiumapp "github.com/bluzelle/bluzelle/curium/app"
-	"github.com/bluzelle/bluzelle/curium/cmd/cosmoscmd"
-	"github.com/bluzelle/bluzelle/curium/x/nft/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/nft/types"
+	"github.com/bluzelle/bluzelle-public/curium/app"
+	curiumapp "github.com/bluzelle/bluzelle-public/curium/app"
+	"github.com/bluzelle/bluzelle-public/curium/cmd/cosmoscmd"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/simapp"

@@ -13,8 +13,8 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	tmdb "github.com/tendermint/tm-db"
 
-	"github.com/bluzelle/bluzelle/curium/app"
-	"github.com/bluzelle/bluzelle/curium/cmd/cosmoscmd"
+	"github.com/bluzelle/bluzelle-public/curium/app"
+	"github.com/bluzelle/bluzelle-public/curium/cmd/cosmoscmd"
 )
 
 // New creates application instance with in-memory database and disabled logging.

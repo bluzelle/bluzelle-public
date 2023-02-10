@@ -1,22 +1,22 @@
 package keeper_test
 
 import (
-	"github.com/bluzelle/bluzelle/curium/app"
-	"github.com/bluzelle/bluzelle/curium/x/nft/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/app"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	"testing"
 
-	testkeeper "github.com/bluzelle/bluzelle/curium/testutil/keeper"
-	testutil "github.com/bluzelle/bluzelle/curium/testutil/simapp"
-	"github.com/bluzelle/bluzelle/curium/x/nft/types"
+	testkeeper "github.com/bluzelle/bluzelle-public/curium/testutil/keeper"
+	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/bluzelle/bluzelle/curium/cmd/cosmoscmd"
+	"github.com/bluzelle/bluzelle-public/curium/cmd/cosmoscmd"
 )
 
 const (

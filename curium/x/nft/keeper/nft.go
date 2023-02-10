@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/bluzelle/bluzelle/curium/x/nft/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -170,7 +170,7 @@ func (k Keeper) CreateNFT(ctx sdk.Context, msg *types.MsgCreateNFT) (uint64, str
 		Creator: msg.Sender,
 		NftId:   nft.Id(),
 	})
-	
+
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		types.EventTypeNftRecord,
 		sdk.NewAttribute(types.AttributeKeyNftId, nft.Id()),

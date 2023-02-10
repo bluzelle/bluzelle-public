@@ -3,7 +3,7 @@ package app
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bluzelle/bluzelle/curium/cmd/cosmoscmd"
+	"github.com/bluzelle/bluzelle-public/curium/cmd/cosmoscmd"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil"

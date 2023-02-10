@@ -19,10 +19,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/bluzelle/bluzelle/curium/x/nft/client/cli"
-	"github.com/bluzelle/bluzelle/curium/x/nft/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/nft/simulation"
-	"github.com/bluzelle/bluzelle/curium/x/nft/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/client/cli"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/simulation"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 )
 
 var (

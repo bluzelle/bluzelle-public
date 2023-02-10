@@ -2,8 +2,8 @@ package gasmeter
 
 import (
 	"fmt"
-	"github.com/bluzelle/bluzelle/curium/app/types/global"
-	taxmodulekeeper "github.com/bluzelle/bluzelle/curium/x/tax/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
+	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"

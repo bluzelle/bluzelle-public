@@ -10,7 +10,7 @@ import (
 	// "github.com/cosmos/cosmos-sdk/client/flags"
 	// sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/bluzelle/bluzelle/curium/x/faucet/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module

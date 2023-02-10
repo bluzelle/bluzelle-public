@@ -3,7 +3,7 @@ package bluzelle.curium.tax;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/bluzelle/bluzelle/curium/x/tax/types";
+option go_package = "github.com/bluzelle/bluzelle-public/curium/x/tax/types";
 
 // Params defines the parameters for the module.
 //message Params {

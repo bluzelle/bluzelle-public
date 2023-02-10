@@ -1,9 +1,9 @@
 package keeper_test
 
 import (
-	testutil "github.com/bluzelle/bluzelle/curium/testutil/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/tax"
-	taxTypes "github.com/bluzelle/bluzelle/curium/x/tax/types"
+	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/tax"
+	taxTypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	"github.com/stretchr/testify/require"
 	"testing"
 )

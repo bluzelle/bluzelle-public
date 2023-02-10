@@ -3,8 +3,8 @@ package keeper
 import (
 	"testing"
 
-	"github.com/bluzelle/bluzelle/curium/x/storage/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/storage/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/storage/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/storage/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"
