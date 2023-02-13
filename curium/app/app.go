@@ -32,7 +32,6 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
-	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -91,8 +90,8 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/bluzelle/bluzelle-public/curium/cmd/cosmoscmd"
-	"github.com/bluzelle/bluzelle-public/curium/cmd/openapiconsole"
+	"github.com/tendermint/spm/cosmoscmd"
+	"github.com/tendermint/spm/openapiconsole"
 
 	"github.com/bluzelle/bluzelle-public/curium/docs"
 
@@ -477,23 +476,12 @@ func NewCuriumApp(
 	// NOTE: staking module is required if HistoricalEntrie
 	//s param > 0
 	app.mm.SetOrderBeginBlockers(
-		curiummoduletypes.ModuleName, genutiltypes.ModuleName, authtypes.ModuleName, vestingtypes.ModuleName,
-		crisistypes.ModuleName, govtypes.ModuleName, ibctransfertypes.ModuleName, faucetmoduletypes.ModuleName,
-		storagemoduletypes.ModuleName, banktypes.ModuleName, paramstypes.ModuleName, taxmoduletypes.ModuleName,
-
 		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
 		feegrant.ModuleName, nfttypes.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(
-		evidencetypes.ModuleName, paramstypes.ModuleName, genutiltypes.ModuleName, capabilitytypes.ModuleName,
-		minttypes.ModuleName, slashingtypes.ModuleName, distrtypes.ModuleName, upgradetypes.ModuleName, authtypes.ModuleName,
-		ibctransfertypes.ModuleName, faucetmoduletypes.ModuleName, storagemoduletypes.ModuleName, ibchost.ModuleName,
-		banktypes.ModuleName, feegrant.ModuleName, taxmoduletypes.ModuleName, vestingtypes.ModuleName,
-
-		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, curiummoduletypes.ModuleName, nfttypes.ModuleName,
-	)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, curiummoduletypes.ModuleName, nfttypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -519,11 +507,6 @@ func NewCuriumApp(
 		storagemoduletypes.ModuleName,
 		faucetmoduletypes.ModuleName,
 		taxmoduletypes.ModuleName,
-
-		vestingtypes.ModuleName,
-		feegrant.ModuleName,
-		paramstypes.ModuleName,
-		upgradetypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 

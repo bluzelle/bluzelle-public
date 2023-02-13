@@ -3,17 +3,18 @@ package app
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bluzelle/bluzelle-public/curium/cmd/cosmoscmd"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	bankcli "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
+	"github.com/tendermint/spm/cosmoscmd"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 )
+
 
 func Setup(isCheckTx bool) cosmoscmd.App {
 	db := dbm.NewMemDB()

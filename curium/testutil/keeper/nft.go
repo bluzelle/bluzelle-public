@@ -1,14 +1,12 @@
 package keeper
 
 import (
-	"github.com/bluzelle/bluzelle-public/curium/app"
 	curiumapp "github.com/bluzelle/bluzelle-public/curium/app"
-	"github.com/bluzelle/bluzelle-public/curium/cmd/cosmoscmd"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/simapp"
+	simapp "github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/store"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -17,6 +15,7 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
+	"github.com/tendermint/spm/cosmoscmd"
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmdb "github.com/tendermint/tm-db"
@@ -36,7 +35,7 @@ func NftKeeper() (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.AccountKeepe
 	registry.RegisterImplementations((*authtypes.AccountI)(nil), &authtypes.BaseAccount{}, &authtypes.ModuleAccount{})
 	cdc := codec.NewProtoCodec(registry)
 	paramsSubspace := typesparams.NewSubspace(cdc,
-		cosmoscmd.MakeEncodingConfig(app.ModuleBasics).Amino,
+		cosmoscmd.MakeEncodingConfig(curiumapp.ModuleBasics).Amino,
 		storeKey,
 		memStoreKey,
 		types.ModuleName,

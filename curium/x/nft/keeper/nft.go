@@ -1,9 +1,10 @@
 package keeper
 
 import (
-	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 )
 
 func (k Keeper) GetNFTsByOwner(ctx sdk.Context, owner sdk.AccAddress) []types.NFT {
@@ -170,11 +171,6 @@ func (k Keeper) CreateNFT(ctx sdk.Context, msg *types.MsgCreateNFT) (uint64, str
 		Creator: msg.Sender,
 		NftId:   nft.Id(),
 	})
-
-	ctx.EventManager().EmitEvent(sdk.NewEvent(
-		types.EventTypeNftRecord,
-		sdk.NewAttribute(types.AttributeKeyNftId, nft.Id()),
-	))
 	return metadataId, nft.Id(), nil
 }
 

@@ -5,6 +5,7 @@ import (
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	"github.com/tendermint/spm/cosmoscmd"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	"testing"
 
@@ -15,8 +16,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/stretchr/testify/suite"
-
-	"github.com/bluzelle/bluzelle-public/curium/cmd/cosmoscmd"
 )
 
 const (

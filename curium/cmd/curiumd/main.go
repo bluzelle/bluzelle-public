@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/bluzelle/bluzelle-public/curium/app"
-	"github.com/bluzelle/bluzelle-public/curium/cmd/cosmoscmd"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
+	"github.com/tendermint/spm/cosmoscmd"
 )
 
 func main() {
