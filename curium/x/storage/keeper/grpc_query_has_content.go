@@ -22,7 +22,7 @@ func (k Keeper) HasContent(goCtx context.Context, req *types.QueryHasContentRequ
 		return nil, err
 	}
 
-	has, err := k.storageNode.IpfsNode.Blockstore.Has(goCtx, c)
+	has, err := k.storageNode.IpfsNode.Blockstore.Has(c)
 	if err != nil {
 		return nil, err
 	}
