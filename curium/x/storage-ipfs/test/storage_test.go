@@ -37,13 +37,13 @@ func Test(t *testing.T) {
 				return err
 			}
 
-			isLocal, err := nodes[0].HasLocal(cidPath.Cid())
+			isLocal, err := nodes[0].HasLocal(ctx, cidPath.Cid())
 			if err != nil {
 				return err
 			}
 			assert.True(t, isLocal)
 
-			if isLocal, err = nodes[1].HasLocal(cidPath.Cid()); err != nil {
+			if isLocal, err = nodes[1].HasLocal(ctx, cidPath.Cid()); err != nil {
 				return err
 			}
 			assert.False(t, isLocal)
@@ -56,7 +56,7 @@ func Test(t *testing.T) {
 				return err
 			}
 
-			if isLocal, err = nodes[1].HasLocal(cidPath.Cid()); err != nil {
+			if isLocal, err = nodes[1].HasLocal(ctx, cidPath.Cid()); err != nil {
 				return err
 			}
 			assert.True(t, isLocal)

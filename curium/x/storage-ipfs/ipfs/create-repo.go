@@ -3,8 +3,8 @@ package curiumipfs
 import (
 	"flag"
 	"fmt"
-	"github.com/ipfs/go-ipfs-config"
-	"github.com/ipfs/go-ipfs/repo/fsrepo"
+	"github.com/bluzelle/ipfs-kubo/config"
+	"github.com/bluzelle/ipfs-kubo/repo/fsrepo"
 	"github.com/tendermint/tendermint/libs/os"
 	"io/ioutil"
 	"sync"

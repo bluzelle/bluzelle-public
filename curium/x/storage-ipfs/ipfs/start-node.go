@@ -3,19 +3,19 @@ package curiumipfs
 import (
 	"context"
 	"fmt"
+	"github.com/bluzelle/ipfs-kubo/commands"
+	"github.com/bluzelle/ipfs-kubo/core"
+	"github.com/bluzelle/ipfs-kubo/core/coreapi"
+	"github.com/bluzelle/ipfs-kubo/core/corehttp"
+	"github.com/bluzelle/ipfs-kubo/core/node/libp2p"
+	"github.com/bluzelle/ipfs-kubo/plugin/loader"
+	"github.com/bluzelle/ipfs-kubo/repo"
+	"github.com/bluzelle/ipfs-kubo/repo/fsrepo"
 	"github.com/ipfs/go-cid"
-	config "github.com/ipfs/go-ipfs-config"
-	"github.com/ipfs/go-ipfs/commands"
-	"github.com/ipfs/go-ipfs/core"
-	"github.com/ipfs/go-ipfs/core/coreapi"
-	"github.com/ipfs/go-ipfs/core/corehttp"
-	"github.com/ipfs/go-ipfs/core/node/libp2p"
-	"github.com/ipfs/go-ipfs/plugin/loader"
-	"github.com/ipfs/go-ipfs/repo"
-	"github.com/ipfs/go-ipfs/repo/fsrepo"
 	"github.com/ipfs/interface-go-ipfs-core"
 	"github.com/ipfs/interface-go-ipfs-core/path"
-	"github.com/libp2p/go-libp2p-core/peer"
+	//"github.com/libp2p/go-libp2p-core/peer"
+	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multiaddr"
 	"log"
 	"path/filepath"
@@ -82,16 +82,16 @@ func (storageNode *StorageIpfsNode) Stop() error {
 	return storageNode.Repo.Close()
 }
 
-func (storageNode *StorageIpfsNode) HasLocal(cid cid.Cid) (bool, error) {
-	return storageNode.IpfsNode.Blockstore.Has(cid)
+func (storageNode *StorageIpfsNode) HasLocal(ctx context.Context, cid cid.Cid) (bool, error) {
+	return storageNode.IpfsNode.Blockstore.Has(ctx, cid)
 }
 
 func cmdCtx(node *StorageIpfsNode) commands.Context {
 	return commands.Context{
 		ConfigRoot: node.RepoPath,
-		LoadConfig: func(path string) (*config.Config, error) {
-			return node.Repo.Config()
-		},
+		//LoadConfig: func(path string) (*config.Config, error) {
+		//	return node.Repo.Config()
+		//},
 		ConstructNode: func() (*core.IpfsNode, error) {
 			return node.IpfsNode, nil
 		},
