@@ -9,8 +9,12 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
-	"github.com/cosmos/cosmos-sdk/x/staking"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	"github.com/cosmos/cosmos-sdk/x/staking/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	tmtypes "github.com/tendermint/tendermint/types"
+
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 )
 
 // ExportAppStateAndValidators exports the state of the application for a genesis
@@ -29,14 +33,15 @@ func (app *App) ExportAppStateAndValidators(
 		height = 0
 		app.prepForZeroHeightGenesis(ctx, jailAllowedAddrs)
 	}
-
 	genState := app.mm.ExportGenesis(ctx, app.appCodec)
+
+	genState["staking"] = app.appCodec.MustMarshalJSON(ExportStakingGenesis(ctx, app.StakingKeeper))
 	appState, err := json.MarshalIndent(genState, "", "  ")
 	if err != nil {
 		return servertypes.ExportedApp{}, err
 	}
 
-	validators, err := staking.WriteValidators(ctx, app.StakingKeeper)
+	validators, err := WriteUnjailedValidators(ctx, app.StakingKeeper)
 	if err != nil {
 		return servertypes.ExportedApp{}, err
 	}
@@ -46,6 +51,72 @@ func (app *App) ExportAppStateAndValidators(
 		Height:          height,
 		ConsensusParams: app.BaseApp.GetConsensusParams(ctx),
 	}, nil
+}
+
+func WriteUnjailedValidators(ctx sdk.Context, keeper stakingkeeper.Keeper) (vals []tmtypes.GenesisValidator, err error) {
+	keeper.IterateLastValidators(ctx, func(_ int64, validator types.ValidatorI) (stop bool) {
+
+		if validator.IsJailed() {
+			return false
+		}
+		pk, err := validator.ConsPubKey()
+		if err != nil {
+			return true
+		}
+		tmPk, err := cryptocodec.ToTmPubKeyInterface(pk)
+		if err != nil {
+			return true
+		}
+		vals = append(vals, tmtypes.GenesisValidator{
+			Address: sdk.ConsAddress(tmPk.Address()).Bytes(),
+			PubKey:  tmPk,
+			Power:   validator.GetConsensusPower(keeper.PowerReduction(ctx)),
+			Name:    validator.GetMoniker(),
+		})
+
+		return false
+	})
+
+	return
+}
+
+func ExportStakingGenesis(ctx sdk.Context, keeper stakingkeeper.Keeper) *stakingtypes.GenesisState {
+	var unbondingDelegations []stakingtypes.UnbondingDelegation
+
+	keeper.IterateUnbondingDelegations(ctx, func(_ int64, ubd stakingtypes.UnbondingDelegation) (stop bool) {
+		unbondingDelegations = append(unbondingDelegations, ubd)
+		return false
+	})
+
+	var redelegations []stakingtypes.Redelegation
+
+	keeper.IterateRedelegations(ctx, func(_ int64, red stakingtypes.Redelegation) (stop bool) {
+		redelegations = append(redelegations, red)
+		return false
+	})
+
+	var lastValidatorPowers []stakingtypes.LastValidatorPower
+	lastPower := sdk.NewInt(0)
+	keeper.IterateLastValidatorPowers(ctx, func(addr sdk.ValAddress, power int64) (stop bool) {
+		v, _ := keeper.GetValidator(ctx, addr)
+		if v.Jailed {
+			return false
+		}
+		lastPower = lastPower.Add(sdk.NewIntFromUint64(uint64(power)))
+		lastValidatorPowers = append(lastValidatorPowers, stakingtypes.LastValidatorPower{Address: addr.String(), Power: power})
+		return false
+	})
+	keeper.SetLastTotalPower(ctx, lastPower)
+	return &stakingtypes.GenesisState{
+		Params:               keeper.GetParams(ctx),
+		LastTotalPower:       keeper.GetLastTotalPower(ctx),
+		LastValidatorPowers:  lastValidatorPowers,
+		Validators:           keeper.GetAllValidators(ctx),
+		Delegations:          keeper.GetAllDelegations(ctx),
+		UnbondingDelegations: unbondingDelegations,
+		Redelegations:        redelegations,
+		Exported:             true,
+	}
 }
 
 // prepare for fresh start at zero height
@@ -76,9 +147,17 @@ func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []str
 
 	// withdraw all validator commission
 	app.StakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
-		_, err := app.DistrKeeper.WithdrawValidatorCommission(ctx, val.GetOperator())
-		if err != nil {
-			panic(err)
+		// only attempt to withdraw commission if it is non-zero. This is required to support
+		// use cases where you have validators who have been jailed since the start of the chain
+		// and therefore never earned commissions. These could be validators that died extremely
+		// early on prior to any transactions or validations that were jailed in the genesis,
+		// either a result of not being upgraded over to the new chain (and unjailed) or because
+		// they were taken down or slash-jailed in the previous chain.
+		if !app.DistrKeeper.GetValidatorAccumulatedCommission(ctx, val.GetOperator()).Commission.IsZero() {
+			_, err := app.DistrKeeper.WithdrawValidatorCommission(ctx, val.GetOperator())
+			if err != nil {
+				panic(err)
+			}
 		}
 		return false
 	})

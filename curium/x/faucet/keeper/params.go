@@ -19,6 +19,6 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 
 // Testnet returns the Testnet param
 func (k Keeper) Testnet(ctx sdk.Context) (res string) {
-	k.paramstore.Get(ctx, types.KeyTestnet, &res)
+	k.paramstore.GetIfExists(ctx, types.KeyTestnet, &res)
 	return
 }

@@ -8,7 +8,9 @@ import (
 // GetParamSet returns token params from the global param store
 func (k Keeper) GetParamSet(ctx sdk.Context) types.Params {
 	var p types.Params
-	k.paramSpace.GetParamSet(ctx, &p)
+	for _, pair := range p.ParamSetPairs() {
+		k.paramSpace.GetIfExists(ctx, pair.Key, pair.Value)
+	}
 	return p
 }
 
