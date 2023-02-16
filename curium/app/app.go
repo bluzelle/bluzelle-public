@@ -32,6 +32,7 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
+	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -480,9 +481,20 @@ func NewCuriumApp(
 		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
 		feegrant.ModuleName, nfttypes.ModuleName,
+
+		paramstypes.ModuleName, ibctransfertypes.ModuleName, vestingtypes.ModuleName, govtypes.ModuleName,
+		curiummoduletypes.ModuleName, genutiltypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName,
+		faucetmoduletypes.ModuleName, crisistypes.ModuleName, taxmoduletypes.ModuleName, storagemoduletypes.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, curiummoduletypes.ModuleName, nfttypes.ModuleName)
+	app.mm.SetOrderEndBlockers(
+		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, curiummoduletypes.ModuleName, nfttypes.ModuleName,
+
+		upgradetypes.ModuleName, ibchost.ModuleName, minttypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName,
+		slashingtypes.ModuleName, storagemoduletypes.ModuleName, taxmoduletypes.ModuleName, genutiltypes.ModuleName,
+		authtypes.ModuleName, ibctransfertypes.ModuleName, faucetmoduletypes.ModuleName, banktypes.ModuleName,
+		capabilitytypes.ModuleName, evidencetypes.ModuleName, vestingtypes.ModuleName, feegrant.ModuleName, paramstypes.ModuleName,
+	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -508,6 +520,11 @@ func NewCuriumApp(
 		storagemoduletypes.ModuleName,
 		faucetmoduletypes.ModuleName,
 		taxmoduletypes.ModuleName,
+
+		paramstypes.ModuleName,
+		feegrant.ModuleName,
+		vestingtypes.ModuleName,
+		upgradetypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
