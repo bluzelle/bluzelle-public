@@ -98,7 +98,7 @@ describe('sending transactions', function () {
                 mint(bzSdk, bzSdk.address)))
             .then(bzSdk =>
                 (send(bzSdk, 'bluzelle10dj35urh78dym3c24yzdmss8mxtcy8hqgqwmrn', 300000000, {
-                    gasPrice: 0,
+                    gasPrice: 0.02,
                     maxGas: 1000000000
                 }, 'bogus') as any)
                     .then((resp: any) => ({
