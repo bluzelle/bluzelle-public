@@ -3,6 +3,7 @@ module github.com/bluzelle/bluzelle/curium
 go 1.16
 
 require (
+	github.com/armon/go-metrics v0.3.9
 	github.com/cosmos/cosmos-sdk v0.44.3
 	github.com/cosmos/ibc-go v1.2.2
 	github.com/gogo/protobuf v1.3.3
@@ -16,6 +17,7 @@ require (
 	github.com/ipfs/interface-go-ipfs-core v0.5.1
 	github.com/libp2p/go-libp2p-core v0.9.0
 	github.com/multiformats/go-multiaddr v0.4.0
+	github.com/regen-network/cosmos-proto v0.3.1
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5
@@ -26,6 +28,7 @@ require (
 	golang.org/x/oauth2 v0.3.0 // indirect
 	google.golang.org/genproto v0.0.0-20221207170731-23e4bf6bdc37
 	google.golang.org/grpc v1.51.0
+	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v2 v2.4.0
 )
 

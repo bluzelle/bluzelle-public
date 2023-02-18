@@ -9,8 +9,8 @@ import (
 
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	"github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/bluzelle/bluzelle/curium/x/staking/keeper"
+	"github.com/bluzelle/bluzelle/curium/x/staking/types"
 )
 
 // InitGenesis sets the pool and parameters for the provided keeper.  For each

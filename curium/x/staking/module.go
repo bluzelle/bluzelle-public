@@ -18,11 +18,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	"github.com/cosmos/cosmos-sdk/x/staking/client/cli"
-	"github.com/cosmos/cosmos-sdk/x/staking/client/rest"
-	"github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	"github.com/cosmos/cosmos-sdk/x/staking/simulation"
-	"github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/bluzelle/bluzelle/curium/x/staking/client/cli"
+	"github.com/bluzelle/bluzelle/curium/x/staking/client/rest"
+	"github.com/bluzelle/bluzelle/curium/x/staking/keeper"
+	"github.com/bluzelle/bluzelle/curium/x/staking/simulation"
+	"github.com/bluzelle/bluzelle/curium/x/staking/types"
 )
 
 var (
