@@ -12,7 +12,7 @@ option go_package = "github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 service Query {
   // Validators queries all validators that match the given status.
   rpc Validators(QueryValidatorsRequest) returns (QueryValidatorsResponse) {
-    option (google.api.http).get = "taking/v1beta1/validators";
+    option (google.api.http).get = "/staking/v1beta1/validators";
   }
 
   // Validator queries validator info for given validator address.
