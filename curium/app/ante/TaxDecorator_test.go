@@ -1,10 +1,11 @@
 package ante_test
 
 import (
-	"github.com/bluzelle/bluzelle/curium/app/ante"
-	testutil "github.com/bluzelle/bluzelle/curium/testutil/keeper"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/bluzelle/bluzelle-public/curium/app/ante"
+	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/keeper"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewTaxDecorator(t *testing.T) {

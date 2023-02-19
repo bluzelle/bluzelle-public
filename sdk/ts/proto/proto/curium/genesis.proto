@@ -3,7 +3,7 @@ package bluzelle.curium.curium;
 
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "github.com/bluzelle/bluzelle/curium/x/curium/types";
+option go_package = "github.com/bluzelle/bluzelle-public/curium/x/curium/types";
 
 // GenesisState defines the curium module's genesis state.
 message GenesisState {

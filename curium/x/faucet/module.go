@@ -3,6 +3,7 @@ package faucet
 import (
 	"encoding/json"
 	"fmt"
+
 	// this line is used by starport scaffolding # 1
 
 	"github.com/gorilla/mux"
@@ -11,9 +12,9 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/bluzelle/bluzelle/curium/x/faucet/client/cli"
-	"github.com/bluzelle/bluzelle/curium/x/faucet/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/faucet/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/faucet/client/cli"
+	"github.com/bluzelle/bluzelle-public/curium/x/faucet/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"

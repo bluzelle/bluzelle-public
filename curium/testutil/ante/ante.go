@@ -1,7 +1,8 @@
 package ante
 
 import (
-	appTypes "github.com/bluzelle/bluzelle/curium/app/types"
+	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
+	stakingtypes "github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkante "github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -19,7 +20,6 @@ import (
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
-	stakingtypes "github.com/bluzelle/bluzelle/curium/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 

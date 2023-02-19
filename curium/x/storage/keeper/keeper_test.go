@@ -1,12 +1,13 @@
 package keeper_test
 
 import (
-	testUtilKeeper "github.com/bluzelle/bluzelle/curium/testutil/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/storage/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/storage/types"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	testUtilKeeper "github.com/bluzelle/bluzelle-public/curium/testutil/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/storage/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/storage/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestStorageKeeper(t *testing.T) {

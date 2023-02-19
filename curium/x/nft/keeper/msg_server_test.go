@@ -1,8 +1,8 @@
 package keeper_test
 
 import (
-	"github.com/bluzelle/bluzelle/curium/x/nft/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/nft/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"

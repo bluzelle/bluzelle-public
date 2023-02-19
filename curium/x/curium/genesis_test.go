@@ -3,9 +3,9 @@ package curium_test
 import (
 	"testing"
 
-	keepertest "github.com/bluzelle/bluzelle/curium/testutil/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/curium"
-	"github.com/bluzelle/bluzelle/curium/x/curium/types"
+	keepertest "github.com/bluzelle/bluzelle-public/curium/testutil/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/curium"
+	"github.com/bluzelle/bluzelle-public/curium/x/curium/types"
 	"github.com/stretchr/testify/require"
 )
 

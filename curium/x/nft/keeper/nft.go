@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/bluzelle/bluzelle/curium/x/nft/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 )
 
 func (k Keeper) GetNFTsByOwner(ctx sdk.Context, owner sdk.AccAddress) []types.NFT {

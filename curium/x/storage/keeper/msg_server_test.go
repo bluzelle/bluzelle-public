@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	keepertest "github.com/bluzelle/bluzelle/curium/testutil/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/storage/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/storage/types"
+	keepertest "github.com/bluzelle/bluzelle-public/curium/testutil/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/storage/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/storage/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

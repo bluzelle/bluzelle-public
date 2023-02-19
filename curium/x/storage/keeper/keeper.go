@@ -3,10 +3,11 @@ package keeper
 import (
 	"context"
 	"fmt"
-	curiumipfs "github.com/bluzelle/bluzelle/curium/x/storage-ipfs/ipfs"
+
+	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/bluzelle/bluzelle/curium/x/storage/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/storage/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

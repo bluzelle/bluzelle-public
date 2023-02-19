@@ -1,8 +1,8 @@
 package types
 
 import (
-	"github.com/bluzelle/bluzelle/curium/app/ante/gasmeter"
-	taxmodulekeeper "github.com/bluzelle/bluzelle/curium/x/tax/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
+	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	"github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"

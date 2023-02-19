@@ -1,10 +1,11 @@
 package ante_test
 
 import (
-	"github.com/bluzelle/bluzelle/curium/app/ante"
-	testutilante "github.com/bluzelle/bluzelle/curium/testutil/ante"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/bluzelle/bluzelle-public/curium/app/ante"
+	testutilante "github.com/bluzelle/bluzelle-public/curium/testutil/ante"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAnte(t *testing.T) {

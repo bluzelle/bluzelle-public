@@ -1,10 +1,12 @@
 package gasmeter_test
 
 import (
-	"github.com/bluzelle/bluzelle/curium/app/ante/gasmeter"
-	"github.com/bluzelle/bluzelle/curium/app/types/global"
-	taxmodulekeeper "github.com/bluzelle/bluzelle/curium/x/tax/keeper"
-	taxmoduletypes "github.com/bluzelle/bluzelle/curium/x/tax/types"
+	"testing"
+
+	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
+	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
+	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
+	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,7 +14,6 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/stretchr/testify/require"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	"testing"
 )
 
 func TestChargingGasMeter(t *testing.T) {

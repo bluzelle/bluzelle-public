@@ -3,8 +3,8 @@ package curium
 import (
 	"fmt"
 
-	"github.com/bluzelle/bluzelle/curium/x/curium/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/curium/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/curium/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/curium/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )

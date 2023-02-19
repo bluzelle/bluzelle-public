@@ -2,7 +2,8 @@ package keeper
 
 import (
 	"fmt"
-	taxTypes "github.com/bluzelle/bluzelle/curium/x/tax/types"
+
+	taxTypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"

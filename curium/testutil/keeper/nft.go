@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	curiumapp "github.com/bluzelle/bluzelle/curium/app"
-	"github.com/bluzelle/bluzelle/curium/x/nft/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/nft/types"
+	curiumapp "github.com/bluzelle/bluzelle-public/curium/app"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	simapp "github.com/cosmos/cosmos-sdk/simapp"
@@ -61,5 +61,3 @@ func NftKeeper() (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.AccountKeepe
 
 	return k, &bankKeeper, &accountKeeper, ctx
 }
-
-

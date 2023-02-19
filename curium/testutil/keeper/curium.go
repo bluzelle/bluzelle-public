@@ -1,11 +1,12 @@
 package keeper
 
 import (
-	"github.com/bluzelle/bluzelle/curium/app/ante/gasmeter"
 	"testing"
 
-	"github.com/bluzelle/bluzelle/curium/x/curium/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/curium/types"
+	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
+
+	"github.com/bluzelle/bluzelle-public/curium/x/curium/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/curium/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"

@@ -1,11 +1,12 @@
 package main
 
 import (
-	appTypes "github.com/bluzelle/bluzelle/curium/app/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"os"
 
-	"github.com/bluzelle/bluzelle/curium/app"
+	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/bluzelle/bluzelle-public/curium/app"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 	"github.com/tendermint/spm/cosmoscmd"
 )

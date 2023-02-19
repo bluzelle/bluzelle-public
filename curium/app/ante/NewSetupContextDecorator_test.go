@@ -1,16 +1,18 @@
 package ante_test
 
 import (
-	"github.com/bluzelle/bluzelle/curium/app/ante"
-	"github.com/bluzelle/bluzelle/curium/app/ante/gasmeter"
-	appTypes "github.com/bluzelle/bluzelle/curium/app/types"
-	"github.com/bluzelle/bluzelle/curium/app/types/global"
-	testutilante "github.com/bluzelle/bluzelle/curium/testutil/ante"
-	testutil "github.com/bluzelle/bluzelle/curium/testutil/simapp"
-	"github.com/bluzelle/bluzelle/curium/testutil/tx"
-	"github.com/bluzelle/bluzelle/curium/x/faucet/types"
-	taxmodulekeeper "github.com/bluzelle/bluzelle/curium/x/tax/keeper"
-	taxmoduletypes "github.com/bluzelle/bluzelle/curium/x/tax/types"
+	"testing"
+
+	"github.com/bluzelle/bluzelle-public/curium/app/ante"
+	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
+	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
+	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
+	testutilante "github.com/bluzelle/bluzelle-public/curium/testutil/ante"
+	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
+	"github.com/bluzelle/bluzelle-public/curium/testutil/tx"
+	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
+	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
+	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,7 +22,6 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestNewSetupContextDecorator(t *testing.T) {

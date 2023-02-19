@@ -6,7 +6,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/bluzelle/bluzelle/curium/x/nft/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 )
 
 // NewQuerier returns a new sdk.Keeper instance.

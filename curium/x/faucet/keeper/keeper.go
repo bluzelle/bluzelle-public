@@ -2,12 +2,13 @@ package keeper
 
 import (
 	"fmt"
-	"github.com/bluzelle/bluzelle/curium/x/curium"
-	"github.com/bluzelle/bluzelle/curium/x/curium/keeper"
+
+	"github.com/bluzelle/bluzelle-public/curium/x/curium"
+	"github.com/bluzelle/bluzelle-public/curium/x/curium/keeper"
 
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/bluzelle/bluzelle/curium/x/faucet/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"

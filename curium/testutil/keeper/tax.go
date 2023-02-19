@@ -1,9 +1,11 @@
 package keeper
 
 import (
-	"github.com/bluzelle/bluzelle/curium/x/tax"
-	"github.com/bluzelle/bluzelle/curium/x/tax/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/tax/types"
+	"testing"
+
+	"github.com/bluzelle/bluzelle-public/curium/x/tax"
+	"github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -19,7 +21,6 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmdb "github.com/tendermint/tm-db"
-	"testing"
 )
 
 func TaxKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {

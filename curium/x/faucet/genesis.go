@@ -1,8 +1,8 @@
 package faucet
 
 import (
-	"github.com/bluzelle/bluzelle/curium/x/faucet/keeper"
-	"github.com/bluzelle/bluzelle/curium/x/faucet/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/faucet/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

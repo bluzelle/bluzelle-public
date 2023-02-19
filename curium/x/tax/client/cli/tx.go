@@ -2,10 +2,11 @@ package cli
 
 import (
 	"fmt"
-	"github.com/bluzelle/bluzelle/curium/x/tax/types"
+	"time"
+
+	"github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/spf13/cobra"
-	"time"
 )
 
 var (

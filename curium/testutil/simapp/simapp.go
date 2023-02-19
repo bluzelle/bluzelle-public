@@ -1,10 +1,11 @@
 package simapp
 
 import (
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"time"
 
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/tendermint/spm/cosmoscmd"
@@ -14,7 +15,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	tmdb "github.com/tendermint/tm-db"
 
-	"github.com/bluzelle/bluzelle/curium/app"
+	"github.com/bluzelle/bluzelle-public/curium/app"
 )
 
 // New creates application instance with in-memory database and disabled logging.

@@ -8,7 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	// "github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/bluzelle/bluzelle/curium/x/curium/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/curium/types"
 )
 
 var (

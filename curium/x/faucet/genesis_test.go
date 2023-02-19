@@ -3,10 +3,10 @@ package faucet_test
 //import (
 //	"testing"
 //
-//	keepertest "github.com/bluzelle/bluzelle/curium/testutil/keeper"
-//	"github.com/bluzelle/bluzelle/curium/testutil/nullify"
-//	"github.com/bluzelle/bluzelle/curium/x/faucet"
-//	"github.com/bluzelle/bluzelle/curium/x/faucet/types"
+//	keepertest "github.com/bluzelle/bluzelle-public/curium/testutil/keeper"
+//	"github.com/bluzelle/bluzelle-public/curium/testutil/nullify"
+//	"github.com/bluzelle/bluzelle-public/curium/x/faucet"
+//	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 //	"github.com/stretchr/testify/require"
 //)
 //

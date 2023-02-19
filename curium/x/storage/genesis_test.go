@@ -1,9 +1,10 @@
 package storage_test
 
 import (
-	"github.com/bluzelle/bluzelle/curium/x/storage/types"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/bluzelle/bluzelle-public/curium/x/storage/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGenesis(t *testing.T) {
