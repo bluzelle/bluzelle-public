@@ -1,8 +1,8 @@
 package v043
 
 import (
-	v040staking "github.com/bluzelle/bluzelle-public/x/staking/legacy/v040"
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	v040staking "github.com/bluzelle/bluzelle-public/curium/x/staking/legacy/v040"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"

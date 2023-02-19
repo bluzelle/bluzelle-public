@@ -12,8 +12,8 @@ import (
 	"github.com/tendermint/tendermint/proto/tendermint/crypto"
 	"github.com/tendermint/tendermint/rpc/client/http"
 
-	"github.com/bluzelle/bluzelle-public/x/staking/client/cli"
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/client/cli"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"

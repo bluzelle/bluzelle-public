@@ -7,7 +7,7 @@ import (
 	abcitypes "github.com/tendermint/tendermint/abci/types"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )

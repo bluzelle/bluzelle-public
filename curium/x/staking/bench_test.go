@@ -3,9 +3,9 @@ package staking_test
 import (
 	"testing"
 
-	"github.com/bluzelle/bluzelle-public/x/staking"
-	"github.com/bluzelle/bluzelle-public/x/staking/teststaking"
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/teststaking"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

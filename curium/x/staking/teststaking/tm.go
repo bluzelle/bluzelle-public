@@ -4,7 +4,7 @@ import (
 	tmcrypto "github.com/tendermint/tendermint/crypto"
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

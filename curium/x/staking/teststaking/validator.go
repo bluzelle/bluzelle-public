@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

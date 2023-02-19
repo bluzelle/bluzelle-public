@@ -3,8 +3,8 @@ package v040
 import (
 	"fmt"
 
-	v034staking "github.com/bluzelle/bluzelle-public/x/staking/legacy/v034"
-	v038staking "github.com/bluzelle/bluzelle-public/x/staking/legacy/v038"
+	v034staking "github.com/bluzelle/bluzelle-public/curium/x/staking/legacy/v034"
+	v038staking "github.com/bluzelle/bluzelle-public/curium/x/staking/legacy/v038"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 )
 

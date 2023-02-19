@@ -7,8 +7,8 @@ package v038
 import (
 	"time"
 
-	v034staking "github.com/bluzelle/bluzelle-public/x/staking/legacy/v034"
-	v036staking "github.com/bluzelle/bluzelle-public/x/staking/legacy/v036"
+	v034staking "github.com/bluzelle/bluzelle-public/curium/x/staking/legacy/v034"
+	v036staking "github.com/bluzelle/bluzelle-public/curium/x/staking/legacy/v036"
 	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"

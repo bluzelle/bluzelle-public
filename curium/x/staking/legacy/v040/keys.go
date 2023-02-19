@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	v040auth "github.com/cosmos/cosmos-sdk/x/auth/legacy/v040"
 )

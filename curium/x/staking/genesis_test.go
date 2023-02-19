@@ -10,9 +10,9 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	"github.com/bluzelle/bluzelle-public/x/staking"
-	"github.com/bluzelle/bluzelle-public/x/staking/teststaking"
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/teststaking"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/simapp"

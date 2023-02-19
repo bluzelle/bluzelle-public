@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

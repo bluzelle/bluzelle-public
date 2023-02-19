@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	v043 "github.com/bluzelle/bluzelle-public/x/staking/legacy/v043"
+	v043 "github.com/bluzelle/bluzelle-public/curium/x/staking/legacy/v043"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

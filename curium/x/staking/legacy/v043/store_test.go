@@ -7,10 +7,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	v040staking "github.com/bluzelle/bluzelle-public/x/staking/legacy/v040"
-	v043staking "github.com/bluzelle/bluzelle-public/x/staking/legacy/v043"
-	"github.com/bluzelle/bluzelle-public/x/staking/teststaking"
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	v040staking "github.com/bluzelle/bluzelle-public/curium/x/staking/legacy/v040"
+	v043staking "github.com/bluzelle/bluzelle-public/curium/x/staking/legacy/v043"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/teststaking"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"

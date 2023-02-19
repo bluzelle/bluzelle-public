@@ -7,7 +7,7 @@ import (
 	metrics "github.com/armon/go-metrics"
 	tmstrings "github.com/tendermint/tendermint/libs/strings"
 
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"

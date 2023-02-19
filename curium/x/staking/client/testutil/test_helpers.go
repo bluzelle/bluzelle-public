@@ -3,7 +3,7 @@ package testutil
 import (
 	"fmt"
 
-	stakingcli "github.com/bluzelle/bluzelle-public/x/staking/client/cli"
+	stakingcli "github.com/bluzelle/bluzelle-public/curium/x/staking/client/cli"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil"

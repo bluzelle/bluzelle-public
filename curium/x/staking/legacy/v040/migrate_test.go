@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	v034staking "github.com/bluzelle/bluzelle-public/x/staking/legacy/v034"
-	v038staking "github.com/bluzelle/bluzelle-public/x/staking/legacy/v038"
-	v040staking "github.com/bluzelle/bluzelle-public/x/staking/legacy/v040"
+	v034staking "github.com/bluzelle/bluzelle-public/curium/x/staking/legacy/v034"
+	v038staking "github.com/bluzelle/bluzelle-public/curium/x/staking/legacy/v038"
+	v040staking "github.com/bluzelle/bluzelle-public/curium/x/staking/legacy/v040"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/simapp"

@@ -5,8 +5,8 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/bluzelle/bluzelle-public/x/staking/keeper"
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

@@ -3,7 +3,7 @@ package cli
 import (
 	flag "github.com/spf13/pflag"
 
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 )
 
 const (

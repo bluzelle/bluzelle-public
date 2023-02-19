@@ -6,8 +6,8 @@ import (
 
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	"github.com/bluzelle/bluzelle-public/x/staking/keeper"
-	"github.com/bluzelle/bluzelle-public/x/staking/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
