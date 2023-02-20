@@ -61,8 +61,8 @@ describe('staking', function () {
         startSwarmWithClient({...swarmConfig()})
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(withCtxAwait('valoper2', ctx => ctx.swarm.getValidators()[2].getValoper()))
-            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
-            .then(passThroughAwait(ctx => redelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, ctx.valoper2, 2_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, {maxGas: 500_000, gasPrice: 10})))
+            .then(passThroughAwait(ctx => redelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, ctx.valoper2, 2_000_000, {maxGas: 500_000, gasPrice: 10})))
             .then(withCtxAwait('delegationToValidator1',ctx => getDelegation(ctx.bzSdk, ctx.auth.address, ctx.valoper1)))
             .then(withCtxAwait('delegationToValidator2',ctx => getDelegation(ctx.bzSdk, ctx.auth.address, ctx.valoper2)))
             .then(passThroughAwait(ctx => expect(ctx.delegationToValidator1?.balance?.amount).to.equal(3_000_000)))
@@ -73,8 +73,8 @@ describe('staking', function () {
         startSwarmWithClient({...swarmConfig()})
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(withCtxAwait('valoper2', ctx => ctx.swarm.getValidators()[2].getValoper()))
-            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
-            .then(ctx => redelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, ctx.valoper2, 2_000_000, {maxGas: 200_000, gasPrice: 10}))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, {maxGas: 500_000, gasPrice: 10})))
+            .then(ctx => redelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, ctx.valoper2, 2_000_000, {maxGas: 500_000, gasPrice: 10}))
             .then(res => expect(res.code).to.equal(0))
     );
 

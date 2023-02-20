@@ -94,35 +94,35 @@ describe('query', function () {
     it('should query for v1 cids', () =>
         getBlzClient(curiumUrl, mnemonic.getValue())
             .then(passThroughAwait(bzSdk =>
-                pinCid(bzSdk, 'bafybeigsk4rb7soyyipuiyuhcaje5chgha25gwc7k5hgalexft5m2gi6ua', {
+                pinCid(bzSdk, 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi', {
                     maxGas: 10000000,
                     gasPrice: 0.002,
                     mode: 'sync'
                 })
             ))
             .then(passThroughAwait(() => delay(6_000)))
-            .then(bzSdk => hasContent(bzSdk, 'bafybeigsk4rb7soyyipuiyuhcaje5chgha25gwc7k5hgalexft5m2gi6ua'))
+            .then(bzSdk => hasContent(bzSdk, 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi'))
             .then(resp => expect(resp).to.be.true)
     );
 
     it('should query for the same cid with either v0 or v1', () =>
         getBlzClient(curiumUrl, mnemonic.getValue())
             .then(passThroughAwait(bzSdk =>
-                pinCid(bzSdk, CID.parse('bafybeigsk4rb7soyyipuiyuhcaje5chgha25gwc7k5hgalexft5m2gi6ua').toV0().toString(), {
+                pinCid(bzSdk, CID.parse('bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi').toV0().toString(), {
                     maxGas: 10000000,
                     gasPrice: 0.002,
                     mode: 'sync'
                 })
             ))
             .then(passThroughAwait(() => delay(6_000)))
-            .then(bzSdk => hasContent(bzSdk, 'QmcVjPQnaQN2bgGG6gbA4G88JPp7BZuT3BpMLj9G3ufcxF'))
+            .then(bzSdk => hasContent(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'))
             .then(resp => expect(resp).to.be.true)
     );
 
     it('should query for the same cid with either v0 or v1 other direction', () =>
         getBlzClient(curiumUrl, mnemonic.getValue())
             .then(passThroughAwait(bzSdk =>
-                (pinCid(bzSdk, 'bafybeigsk4rb7soyyipuiyuhcaje5chgha25gwc7k5hgalexft5m2gi6ua', {
+                (pinCid(bzSdk, 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi', {
                     maxGas: 10000000,
                     gasPrice: 0.002,
                     mode: 'sync'
@@ -130,7 +130,7 @@ describe('query', function () {
                     .then(console.log)
             ))
             .then(passThroughAwait(() => delay(12_000)))
-            .then(bzSdk => hasContent(bzSdk, CID.parse('bafybeigsk4rb7soyyipuiyuhcaje5chgha25gwc7k5hgalexft5m2gi6ua').toV0().toString()))
+            .then(bzSdk => hasContent(bzSdk, CID.parse('bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi').toV0().toString()))
             .then(resp => expect(resp).to.be.true)
     );
 
