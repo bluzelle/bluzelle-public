@@ -183,8 +183,7 @@ var (
 
 var (
 	_ cosmoscmd.CosmosApp = (*App)(nil)
-	//_ servertypes.Application = (*App)(nil)
-	_ ServerApplication = (*App)(nil)
+	_ ServerApplication   = (*App)(nil)
 )
 
 func init() {
