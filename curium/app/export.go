@@ -2,10 +2,13 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
+	faucetmoduletypes "github.com/bluzelle/curium/x/faucet/types"
+	nfttypes "github.com/bluzelle/curium/x/nft/types"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
@@ -69,6 +72,10 @@ func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []str
 		allowedAddrsMap[addr] = true
 	}
 
+	app.CrisisKeeper.SetConstantFee(ctx, sdk.NewInt64Coin("ubnt", 1000000))
+	app.NFTKeeper.SetParamSet(ctx, nfttypes.NewParams(sdk.NewInt64Coin("ubnt", 1000000)))
+	app.FaucetKeeper.SetParams(ctx, faucetmoduletypes.NewParams(""))
+
 	/* Just to be safe, assert the invariants on current state. */
 	app.CrisisKeeper.AssertInvariants(ctx)
 
@@ -76,20 +83,26 @@ func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []str
 
 	// withdraw all validator commission
 	app.StakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
-		_, err := app.DistrKeeper.WithdrawValidatorCommission(ctx, val.GetOperator())
+		cacheCtx, write := ctx.CacheContext()
+		_, err := app.DistrKeeper.WithdrawValidatorCommission(cacheCtx, val.GetOperator())
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			return false
 		}
+		write()
 		return false
 	})
 
 	// withdraw all delegator rewards
 	dels := app.StakingKeeper.GetAllDelegations(ctx)
 	for _, delegation := range dels {
-		_, err := app.DistrKeeper.WithdrawDelegationRewards(ctx, delegation.GetDelegatorAddr(), delegation.GetValidatorAddr())
+		cacheCtx, write := ctx.CacheContext()
+		_, err := app.DistrKeeper.WithdrawDelegationRewards(cacheCtx, delegation.GetDelegatorAddr(), delegation.GetValidatorAddr())
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			return
 		}
+		write()
 	}
 
 	// clear validator slash events
