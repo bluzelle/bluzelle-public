@@ -7,8 +7,8 @@ import (
 
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	faucetmoduletypes "github.com/bluzelle/bluzelle/curium/x/faucet/types"
-	nfttypes "github.com/bluzelle/bluzelle/curium/x/nft/types"
+	faucetmoduletypes "github.com/bluzelle/curium/x/faucet/types"
+	nfttypes "github.com/bluzelle/curium/x/nft/types"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
