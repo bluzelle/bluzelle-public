@@ -1,6 +1,8 @@
 package storage_test
 
 import (
+	testUtilKeeper "github.com/bluzelle/bluzelle-public/curium/testutil/keeper"
+	"github.com/bluzelle/bluzelle-public/curium/x/storage"
 	"github.com/bluzelle/bluzelle-public/curium/x/storage/types"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -34,6 +36,26 @@ func TestGenesis(t *testing.T) {
 		}
 
 		require.NotNil(t, genesisState)
+	})
+
+	t.Run("should import and pin cids from genesis", func(t *testing.T) {
+		storageKeeper, ctx := testUtilKeeper.StorageKeeper(t)
+		//store := ctx.KVStore(storageKeeper.StoreKey)
+
+		genesisState := types.GenesisState{
+			Pins: []types.MsgPin{
+				{
+					Creator: "my-creator-0",
+					Cid:     "my-cid-0",
+				},
+				{
+					Creator: "my-creator-1",
+					Cid:     "my-cid-1",
+				},
+			},
+		}
+
+		storage.InitGenesis(ctx, *storageKeeper, genesisState)
 	})
 
 }
