@@ -23,7 +23,7 @@ describe('query', function () {
     beforeEach(() =>
         restartIpfsServerAndSwarm(({...defaultSwarmConfig, targetBranch: 'experimental'}))
             .then((swarmMnemonic) => mnemonic.next(swarmMnemonic))
-    )
+    );
 
     it.skip('hasContent should return true if content is pinned', () =>
         Promise.all(times(2).map(() =>
@@ -155,6 +155,6 @@ describe('query', function () {
                     }))
             )
             .then(({resp, bzSdk}) => getTx(bzSdk, resp.transactionHash))
-    })
+    });
 
 });

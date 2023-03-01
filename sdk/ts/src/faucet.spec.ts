@@ -21,7 +21,7 @@ describe('faucet', function () {
                 expect(result.address).to.have.length(47)
                 expect(result.mnemonic.split(' ')).to.have.length(24)
             })
-    })
+    });
 
     it('should mint tokens to a given address', () => {
         return startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})
@@ -30,7 +30,7 @@ describe('faucet', function () {
                 expect(response.mnemonic).to.be.empty
                 expect(response.address).to.equal('bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd')
             })
-    })
+    });
 
     it('should mint tokens with no given address', () => {
         return startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})
@@ -51,5 +51,5 @@ describe('faucet', function () {
             .catch(err => expect(err.stack).to.contain('invalid request'))
             .then(() => getAccountBalance(client, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
             .then(bal => expect(bal).to.equal(0))
-    })
-})
+    });
+});
