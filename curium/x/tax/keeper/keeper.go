@@ -89,33 +89,43 @@ func (k Keeper) ChargeTransferTax(ctx sdk.Context, taxPayer sdk.AccAddress, msg 
 	if taxPayerAcc == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "fee payer address: %s does not exist", taxPayer)
 	}
-	transferTaxes := k.calculateTransferTax(ctx, msg)
+	transferTaxes, err := k.CalculateTransferTax(ctx, taxPayer, msg)
+	if err != nil {
+		return err
+	}
 	return k.chargeTax(ctx, taxPayer, transferTaxes)
 }
 
-func (k Keeper) calculateTransferTax(ctx sdk.Context, msg sdk.Msg) sdk.Coins {
+func (k Keeper) CalculateTransferTax(ctx sdk.Context, taxPayer sdk.AccAddress, msg sdk.Msg) (sdk.Coins, error) {
 	info, err := k.GetTaxInfoKeep(ctx)
 	if err != nil {
-		return sdk.NewCoins(sdk.NewInt64Coin(taxTypes.Denom, 0))
+		return sdk.NewCoins(sdk.NewInt64Coin(taxTypes.Denom, 0)), err
 	}
 
 	bankMsg := msg.(*banktypes.MsgSend)
 	transferTaxes := sdk.Coins{}
 	for _, coin := range bankMsg.Amount {
 		feeAmt := coin.Amount.Int64() * info.TransferTaxBp / 10_000
+
+		balance := k.BankKeeper.GetBalance(ctx, taxPayer, coin.Denom)
+		if balance.Amount.Int64() < coin.Amount.Int64()+feeAmt {
+			return nil, fmt.Errorf("insufficient funds to send transfer tax")
+		}
+
 		if feeAmt > 0 {
-			if coin.Denom == taxTypes.Denom {
+			switch coin.Denom {
+			case taxTypes.Denom:
 				transferTaxes = append(transferTaxes, sdk.NewInt64Coin(taxTypes.Denom, feeAmt))
-			}
-			if coin.Denom == taxTypes.DenomUg4 {
+			case taxTypes.DenomUg4:
 				transferTaxes = append(transferTaxes, sdk.NewInt64Coin(taxTypes.DenomUg4, feeAmt))
-			}
-			if coin.Denom == taxTypes.DenomUelt {
+			case taxTypes.DenomUelt:
 				transferTaxes = append(transferTaxes, sdk.NewInt64Coin(taxTypes.DenomUelt, feeAmt))
+			default:
+				fmt.Println("unidentified coin denom, transfer tax is not charged")
 			}
 		}
 	}
-	return transferTaxes
+	return transferTaxes, nil
 }
 
 func (k Keeper) chargeTax(ctx sdk.Context, taxPayer sdk.AccAddress, taxes sdk.Coins) error {

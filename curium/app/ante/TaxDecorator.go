@@ -48,23 +48,39 @@ func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 	return next(ctx, tx, simulate)
 }
 
+func validateTx(ctx sdk.Context, td TaxDecorator, taxPayer sdk.AccAddress, msg sdk.Msg) error {
+	if _, err := td.taxKeeper.CalculateTransferTax(ctx, taxPayer, msg); err != nil {
+		return err
+	}
+	return nil
+}
+
 func handleTx(ctx sdk.Context, td TaxDecorator, tx FeeTx) error {
 	msgs := tx.GetMsgs()
 	taxPayer := tx.FeePayer()
-	forSendMessagesOnly(msgs, func(msg sdk.Msg) {
-		err := td.taxKeeper.ChargeTransferTax(ctx, taxPayer, msg)
-		if err != nil {
-			fmt.Println("ERROR: Can not charge tax")
+	err := forSendMessagesOnly(msgs, func(msg sdk.Msg) error {
+		if err := validateTx(ctx, td, taxPayer, msg); err != nil {
+			return err
 		}
+		if err := td.taxKeeper.ChargeTransferTax(ctx, taxPayer, msg); err != nil {
+			return fmt.Errorf("ERROR: Can not charge tax")
+		}
+		return nil
 	})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func forSendMessagesOnly(msgs []sdk.Msg, fn func(msg sdk.Msg)) {
+func forSendMessagesOnly(msgs []sdk.Msg, fn func(msg sdk.Msg) error) error {
 	for _, msg := range msgs {
 		if sdk.MsgTypeURL(msg) == sdk.MsgTypeURL(&banktypes.MsgSend{}) {
-			fn(msg)
+			if err := fn(msg); err != nil {
+				return err
+			}
 		}
 	}
+	return nil
 }
