@@ -29,6 +29,15 @@ func Test(t *testing.T) {
 		assert.True(t, curiumipfs.RepoExists("./testrepo1"))
 	})
 
+	t.Run("should be able to know if a properly intialized ipfs repo exists", func(t *testing.T) {
+		os.RemoveAll("./testrepo3")
+		assert.False(t, curiumipfs.RepoExists("./testrepo3"))
+		d1 := []byte("hello\ngo\n")
+		_ = os.Mkdir("./testrepo3", 0777)
+		_ = os.WriteFile("./testrepo3/lost+found", d1, 0644)
+		assert.False(t, curiumipfs.RepoExists("./testrepo3"))
+	})
+
 	t.Run("should replicate between nodes", func(t *testing.T) {
 		err := withIpfsNodes(func(ctx context.Context, nodes []*curiumipfs.StorageIpfsNode) error {
 

@@ -17,7 +17,7 @@ type CreateRepoOptions struct {
 }
 
 func RepoExists(repoPath string) bool {
-	return os.FileExists(repoPath)
+	return os.FileExists(repoPath) && os.FileExists(repoPath+"/"+"config")
 }
 
 var onceSetupPlugins = new(sync.Once)
