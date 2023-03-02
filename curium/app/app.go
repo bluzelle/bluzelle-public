@@ -1,6 +1,12 @@
 package app
 
 import (
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+
 	appAnte "github.com/bluzelle/bluzelle-public/curium/app/ante"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
@@ -8,11 +14,6 @@ import (
 	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	"io"
-	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -33,6 +34,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
+	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
+	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -112,7 +116,9 @@ import (
 	taxmodule "github.com/bluzelle/bluzelle-public/curium/x/tax"
 	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
+	icahosttypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
 )
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
@@ -157,6 +163,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		authzmodule.AppModuleBasic{},
 		curiummodule.AppModuleBasic{},
 		storagemodule.AppModuleBasic{},
 		faucetmodule.AppModuleBasic{},
@@ -229,7 +236,7 @@ type App struct {
 	TransferKeeper   ibctransferkeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
 	GasMeterKeeper   *gasmeter.Keeper
-
+	AuthzKeeper      authzkeeper.Keeper
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
@@ -280,6 +287,7 @@ func NewCuriumApp(
 		faucetmoduletypes.StoreKey,
 		taxmoduletypes.StoreKey,
 		nfttypes.StoreKey,
+		authzkeeper.StoreKey, icahosttypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -349,6 +357,9 @@ func NewCuriumApp(
 	app.IBCKeeper = ibckeeper.NewKeeper(
 		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.StakingKeeper, app.UpgradeKeeper, scopedIBCKeeper,
 	)
+
+	//create authz Keeper
+	app.AuthzKeeper = authzkeeper.NewKeeper(keys[authzkeeper.StoreKey], appCodec, app.BaseApp.MsgServiceRouter())
 
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
@@ -469,6 +480,7 @@ func NewCuriumApp(
 		nft.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
+		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		transferModule,
 		&curiumModule,
 		storageModule,
@@ -484,22 +496,56 @@ func NewCuriumApp(
 	// NOTE: staking module is required if HistoricalEntrie
 	//s param > 0
 	app.mm.SetOrderBeginBlockers(
-		upgradetypes.ModuleName, capabilitytypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
-		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
-		feegrant.ModuleName, nfttypes.ModuleName,
-
-		paramstypes.ModuleName, ibctransfertypes.ModuleName, vestingtypes.ModuleName, govtypes.ModuleName,
-		curiummoduletypes.ModuleName, genutiltypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName,
-		faucetmoduletypes.ModuleName, crisistypes.ModuleName, taxmoduletypes.ModuleName, storagemoduletypes.ModuleName,
+		upgradetypes.ModuleName,
+		capabilitytypes.ModuleName,
+		minttypes.ModuleName,
+		distrtypes.ModuleName,
+		slashingtypes.ModuleName,
+		evidencetypes.ModuleName,
+		stakingtypes.ModuleName,
+		ibchost.ModuleName,
+		feegrant.ModuleName,
+		nfttypes.ModuleName,
+		paramstypes.ModuleName,
+		ibctransfertypes.ModuleName,
+		vestingtypes.ModuleName,
+		govtypes.ModuleName,
+		curiummoduletypes.ModuleName,
+		genutiltypes.ModuleName,
+		authtypes.ModuleName,
+		banktypes.ModuleName,
+		faucetmoduletypes.ModuleName,
+		crisistypes.ModuleName,
+		taxmoduletypes.ModuleName,
+		storagemoduletypes.ModuleName,
+		authz.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
-		crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, curiummoduletypes.ModuleName, nfttypes.ModuleName,
-
-		upgradetypes.ModuleName, ibchost.ModuleName, minttypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName,
-		slashingtypes.ModuleName, storagemoduletypes.ModuleName, taxmoduletypes.ModuleName, genutiltypes.ModuleName,
-		authtypes.ModuleName, ibctransfertypes.ModuleName, faucetmoduletypes.ModuleName, banktypes.ModuleName,
-		capabilitytypes.ModuleName, evidencetypes.ModuleName, vestingtypes.ModuleName, feegrant.ModuleName, paramstypes.ModuleName,
+		crisistypes.ModuleName,
+		govtypes.ModuleName,
+		stakingtypes.ModuleName,
+		curiummoduletypes.ModuleName,
+		nfttypes.ModuleName,
+		upgradetypes.ModuleName,
+		ibchost.ModuleName,
+		minttypes.ModuleName,
+		minttypes.ModuleName,
+		distrtypes.ModuleName,
+		slashingtypes.ModuleName,
+		storagemoduletypes.ModuleName,
+		taxmoduletypes.ModuleName,
+		genutiltypes.ModuleName,
+		authtypes.ModuleName,
+		ibctransfertypes.ModuleName,
+		faucetmoduletypes.ModuleName,
+		banktypes.ModuleName,
+		capabilitytypes.ModuleName,
+		evidencetypes.ModuleName,
+		vestingtypes.ModuleName,
+		feegrant.ModuleName,
+		paramstypes.ModuleName,
+		authz.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -531,6 +577,7 @@ func NewCuriumApp(
 		feegrant.ModuleName,
 		vestingtypes.ModuleName,
 		upgradetypes.ModuleName,
+		authz.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
