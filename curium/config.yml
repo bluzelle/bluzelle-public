@@ -1,4 +1,5 @@
 version: 1
+chain_id: "curium"
 build:
   proto:
     path: proto
@@ -11,9 +12,11 @@ accounts:
   - 20000000000ubnt
   - 500000000000000uelt
   - 500000000000000ug4
+  hd-path: "m/44'/118'/0'/0/0"
 - name: minter
   coins:
   - 10000ubnt
+  hd-path: "m/44'/118'/0'/0/0"
 faucet:
   name: null
   coins: []

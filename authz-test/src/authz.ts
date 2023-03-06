@@ -1,10 +1,16 @@
-import {bluzelle, API} from 'bluzelle';
+import { BluzelleClient, newBluzelleClient } from './index';
+import { newLocalWallet } from './index';
 
-const api: API = bluzelle({
-    mnemonic: 'rather expand outer owner happy merit fox endless illegal square faint logic error blur ginger smile myself brush orange alert smile push school divert',
-    endpoint: 'http://localhost:1317',
-    uuid: Date.now().toString(),
-    chain_id: 'curium'
-})
+const wallet = newLocalWallet(
+    "double clock match tag extra picture hen become pause moon dove remain crater damp clutch pretty cabbage wheel fantasy perfect already retreat live cherry",
+    { coinType: 483 }
+);
 
-export {api};
+const blzClient = newBluzelleClient({
+    wallet,
+    url: "http://localhost:26657"
+});
+
+export {
+    blzClient
+}
