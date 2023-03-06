@@ -169,13 +169,19 @@ const signMetadata = (client, metadataId, broadcastOptions) => Promise.resolve(s
 }, broadcastOptions));
 exports.signMetadata = signMetadata;
 // Authz msg send functions begin.
-const grant = (client, granter, grantee, grant, broadcastOptions) => Promise.resolve(sendTx(client, '/cosmos.authz.v1beta1.MsgGrant', {
+const grant = (client, granter, grantee, grant, broadcastOptions) => Promise.resolve(sendTx1(client, '/cosmos.authz.v1beta1.MsgGrant', {
     granter,
     grantee,
     grant
 }, broadcastOptions));
 exports.grant = grant;
 // Authz msg send functions end
+const sendTx1 = (client, type, msg, options, mode = getDefaultBroadcastMode()) => (0, monet_1.Right)(msg)
+    .map(msg => msg)
+    .bind(msg => msgQueue ? (0, monet_1.Left)(msg) : (0, monet_1.Right)(msg))
+    .map(msg => options.mode ? mode[options.mode](client, [msg], options) : mode['sync'](client, [msg], options))
+    .leftMap(msg => queueMessage(msg, options))
+    .cata(lodash_1.identity, lodash_1.identity);
 const sendTx = (client, type, msg, options, mode = getDefaultBroadcastMode()) => (0, monet_1.Right)(msg)
     .map(msg => ({
     typeUrl: type,
