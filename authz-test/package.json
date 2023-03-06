@@ -20,6 +20,6 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "bluzelle": "^3.0.9"
+    "@bluzelle/sdk": "^1.0.19"
   }
 }
