@@ -303,7 +303,7 @@ export const signMetadata = (client: BluzelleClient, metadataId: number, broadca
 
 
 // Authz msg send functions begin.
-export const grant = (client: BluzelleClient, granter: string, grantee: string, grant:Grant, broadcastOptions: BroadcastOptions) => 
+export const grant = (client: BluzelleClient, granter: string, grantee: string, grant:any, broadcastOptions: BroadcastOptions) => 
     Promise.resolve(sendTx(client, '/cosmos.authz.v1beta1.MsgGrant', {
         granter,
         grantee,

@@ -2,7 +2,7 @@ import { BluzelleClient, newBluzelleClient } from './index';
 import { newLocalWallet } from './index';
 
 const wallet = newLocalWallet(
-    "double clock match tag extra picture hen become pause moon dove remain crater damp clutch pretty cabbage wheel fantasy perfect already retreat live cherry",
+    "pigeon candy flock traffic load viable chaos buyer crystal car guide black candy morning sell letter when airport notice favorite theory dial olive general",
     { coinType: 483 }
 );
 
