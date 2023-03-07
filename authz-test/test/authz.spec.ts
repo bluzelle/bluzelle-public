@@ -3,7 +3,14 @@ import { SendAuthorization } from "../src/curium/lib/generated/cosmos/bank/v1bet
 import { getAccountBalance, grant, send } from "../src/index";
 describe("Bluzelle Tests", async () => {
         const client = (await blzClient);
-        grant(client, "bluzelle13hvkqhy7u2x0kxjatlusruw9wd4k9esx5zymcv", "bluzelle1x6w5eaajummca4a78hawe3cx4xa8nauwxt8hld", {}, {
+        grant(client, "bluzelle13hvkqhy7u2x0kxjatlusruw9wd4k9esx5zymcv", "bluzelle1x6w5eaajummca4a78hawe3cx4xa8nauwxt8hld", {
+                "authorization": {
+                        "type": "/cosmos.authz.v1beta1.GenericAuthorization",
+                        "value": {
+                                "msg": "/cosmos.bank.v1beta1.MsgSend"
+                            }
+                    }
+        }, {
                 gasPrice: 0.002,
                 maxGas: 500000,
                 mode: 'sync'
