@@ -192,6 +192,7 @@ const swarmConfig = (): SwarmConfig => ({
     swarmType: SwarmTypes.Docker,
     bluzelleFaucet: true,
     storageBaseDir: '',
+    storageMount: '/home/ubuntu/storage',
     daemons: [{
         host: `local:a.validator`,
         restPort: 1317,
