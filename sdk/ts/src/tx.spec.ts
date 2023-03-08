@@ -20,7 +20,7 @@ describe('sending transactions', function () {
 
     beforeEach(() =>
         Swarm.stopDaemons({...defaultSwarmConfig})
-    )
+    );
 
     it('should be able to mint tokens to a new account', () =>
         startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true}, {url: 'http://localhost:26667'})
@@ -43,7 +43,7 @@ describe('sending transactions', function () {
         startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: false})
             .then(info => mint(info.bzSdk))
             .catch(err => expect(err.message.includes('invalid request')).to.be.true)
-    )
+    );
 
 
     it('should have a withTransaction that can bundle messages', () => {
@@ -145,10 +145,6 @@ describe('sending transactions', function () {
                 expect(err.message).to.include('insufficient fees')
             )
     );
-    it('should throw an error when creating nft after forking from old network', () =>
-        startSwarmWithClient({...defaultSwarmConfig, targetBranch: '7bc61cc', genesis: getOldGenesis()})
-    )
-
 
     // skipping because we don't want to add admin info to repo right now
     describe.skip('as admin', () => {
@@ -224,9 +220,7 @@ describe('sending transactions', function () {
     });
 
 
-})
-
-const getOldGenesis = () =>
+});
 
 
 

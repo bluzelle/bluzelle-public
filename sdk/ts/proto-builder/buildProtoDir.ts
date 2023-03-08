@@ -23,7 +23,7 @@ export const createDir = (dir: string, parent: string = 'proto') =>
     mkdir(parent + '/' + dir, {recursive: true});
 
 export const getPathFromLink = (link: string): string =>
-    link.replace(/.*?\/v0.44.3\/(.*)/, "$1");
+    link.replace(/.*?\/v0.45.11\/(.*)/, "$1");
 
 export const getGooglePathFromLink = (link: string): string =>
     'third_party/proto/' + link.replace(/.*?\/src\/(.*)/, "$1");

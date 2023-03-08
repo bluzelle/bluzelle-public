@@ -3,9 +3,7 @@ import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {expect} from "chai";
 import {createAddress, mint} from "./faucet";
 import {Swarm} from "daemon-manager";
-import {BluzelleClient, newBluzelleClient} from "./sdk";
-import {getBalance} from "infra-control-test/utils/swarmUtils";
-import {balance} from "staking-wallet/src/helpers/accountHelper";
+import {BluzelleClient} from "./sdk";
 import {getAccountBalance} from "./query";
 
 describe('faucet', function () {

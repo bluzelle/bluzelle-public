@@ -9,7 +9,7 @@ describe('tendermint queries', () => {
 
     beforeEach(() =>
         Swarm.stopDaemons({...defaultSwarmConfig})
-    )
+    );
 
     it('should get the status of a node', () =>
         startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})
@@ -21,7 +21,7 @@ describe('tendermint queries', () => {
                 expect(response.blockHeight).to.be.greaterThan(0)
                 expect(response.moniker).to.equal('a.client.sentry')
             })
-    )
+    );
 
     it('should return the validators on a network', () =>
         startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})
@@ -30,5 +30,5 @@ describe('tendermint queries', () => {
                 expect(response[0].address.length).to.equal(40)
                 expect(response[0].votingPower).to.equal(defaultSwarmConfig.genesisTokenBalance? defaultSwarmConfig.genesisTokenBalance / 10: 0)
             })
-    )
-})
+    );
+});
