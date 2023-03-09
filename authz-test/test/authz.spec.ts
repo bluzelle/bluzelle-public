@@ -212,7 +212,7 @@ describe("Authorization Module Test", function () {
         const gParams: GenericAuthorizationParams = {
             granter: testGranter,
             grantee: testGrantee,
-            msg: "osmos.gov.v1beta1.MsgSubmitProposal",
+            msg: "/cosmos.gov.v1beta1.MsgSubmitProposal",
             expiration
         }
         const client = await newBluzelleClient({
@@ -228,7 +228,18 @@ describe("Authorization Module Test", function () {
         expect(res.grants[0].authorization?.typeUrl).to.equal("/cosmos.authz.v1beta1.GenericAuthorization")
         expect(GenericAuthorization.decode(res.grants[0].authorization?.value as any).msg).to.equal("/cosmos.gov.v1beta1.MsgSubmitProposal")
         await revokeAuthorizationTx(client, params);
-
+        const res1 = async () => {
+            try {
+                await client.queryClient.authz.Grants({
+                    granter: testGranter,
+                    grantee: testGrantee,
+                    msgTypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal"
+                })
+            } catch (e) {
+                expect(e).to.match(/?NotFound?/)
+            }
+        }
+        await res1();
     });
 
 }
