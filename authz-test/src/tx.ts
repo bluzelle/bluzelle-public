@@ -1,11 +1,11 @@
-import {BluzelleClient} from "./sdk";
-import {MsgPin} from "./curium/lib/generated/storage/tx";
-import {EncodeObject, Registry} from "@cosmjs/proto-signing";
-import {Deferred, newDeferred} from './utils/Deferred'
-import {Left, Right, Some} from "monet";
-import {passThrough} from "promise-passthrough";
-import {identity} from "lodash";
-import {MsgSend} from "./curium/lib/generated/cosmos/bank/v1beta1/tx";
+import { BluzelleClient } from "./sdk";
+import { MsgPin } from "./curium/lib/generated/storage/tx";
+import { EncodeObject, Registry } from "@cosmjs/proto-signing";
+import { Deferred, newDeferred } from './utils/Deferred'
+import { Left, Right, Some } from "monet";
+import { passThrough } from "promise-passthrough";
+import { identity } from "lodash";
+import { MsgSend } from "./curium/lib/generated/cosmos/bank/v1beta1/tx";
 import { SendAuthorization } from "./curium/lib/generated/cosmos/bank/v1beta1/authz";
 import {
     MsgCreateNFT,
@@ -22,16 +22,16 @@ import {
     MsgSetTaxCollector,
     MsgSetTransferTaxBp
 } from "./curium/lib/generated/tax/tx";
-import {MsgDelegate, MsgUndelegate, MsgBeginRedelegate} from "./curium/lib/generated/cosmos/staking/v1beta1/tx";
-import {MsgWithdrawDelegatorReward} from "./curium/lib/generated/cosmos/distribution/v1beta1/tx";
+import { MsgDelegate, MsgUndelegate, MsgBeginRedelegate } from "./curium/lib/generated/cosmos/staking/v1beta1/tx";
+import { MsgWithdrawDelegatorReward } from "./curium/lib/generated/cosmos/distribution/v1beta1/tx";
 // Authz Msg import
 import { MsgGrant, MsgExec, MsgRevoke } from "./curium/lib/generated/cosmos/authz/v1beta1/tx";
 
-import {DeliverTxResponse} from "@cosmjs/stargate";
-import {toHex} from '@cosmjs/encoding'
-import {TxRaw} from "./curium/lib/generated/cosmos/tx/v1beta1/tx"
-import {Creator, Metadata} from "./curium/lib/generated/nft/nft";
-import {adaptCid} from "./utils/cidAdapter";
+import { DeliverTxResponse } from "@cosmjs/stargate";
+import { toHex } from '@cosmjs/encoding'
+import { TxRaw } from "./curium/lib/generated/cosmos/tx/v1beta1/tx"
+import { Creator, Metadata } from "./curium/lib/generated/nft/nft";
+import { adaptCid } from "./utils/cidAdapter";
 import { Grant } from "./curium/lib/generated/cosmos/authz/v1beta1/authz";
 const Long = require('long');
 
@@ -67,7 +67,7 @@ type MetadataHumanReadable = {
     creators: Creator[];
     metadataAuthority: string;
     mintAuthority: string;
-    masterEdition?: {supply: number, maxSupply: number};
+    masterEdition?: { supply: number, maxSupply: number };
 }
 
 export const withTransaction = (client: BluzelleClient, fn: () => unknown) => {
@@ -77,7 +77,7 @@ export const withTransaction = (client: BluzelleClient, fn: () => unknown) => {
     msgQueue = undefined;
     return endTransaction(queue, client)
         .then(passThrough(response => queue.map((it, idx) =>
-            it.deferred.resolve({...response, rawLog: response.rawLog?.[idx]})
+            it.deferred.resolve({ ...response, rawLog: response.rawLog?.[idx] })
         )))
 
 };
@@ -92,7 +92,7 @@ const endTransaction = (queue: MsgQueue, client: BluzelleClient) => {
             ...options,
             maxGas: options.maxGas + item.options.maxGas,
             gasPrice: item.options.gasPrice
-        }), {maxGas: 0} as BroadcastOptions)
+        }), { maxGas: 0 } as BroadcastOptions)
     }
 };
 
@@ -138,23 +138,23 @@ const queueMessage = (msg: EncodeObject, options: BroadcastOptions) =>
 
 
 export const pinCid = (client: BluzelleClient, cid: string, options: BroadcastOptions) =>
-    sendTx(client, '/bluzelle.curium.storage.MsgPin', {cid, creator: client.address}, options);
+    sendTx(client, '/bluzelle.curium.storage.MsgPin', { cid, creator: client.address }, options);
 
 export const send = (client: BluzelleClient, toAddress: string, amount: number, options: BroadcastOptions, denom: string = "ubnt") =>
     Promise.resolve(sendTx(client, '/cosmos.bank.v1beta1.MsgSend', {
         toAddress: toAddress,
-        amount: [{denom, amount: amount.toString()}],
+        amount: [{ denom, amount: amount.toString() }],
         fromAddress: client.address
     }, options));
 
 export const setGasTaxBp = (client: BluzelleClient, bp: number, options: BroadcastOptions) =>
-    sendTx(client, '/bluzelle.curium.tax.MsgSetGasTaxBp', {bp, creator: client.address}, options);
+    sendTx(client, '/bluzelle.curium.tax.MsgSetGasTaxBp', { bp, creator: client.address }, options);
 
 export const setTransferTaxBp = (client: BluzelleClient, bp: number, options: BroadcastOptions) =>
-    sendTx(client, '/bluzelle.curium.tax.MsgSetTransferTaxBp', {bp, creator: client.address}, options);
+    sendTx(client, '/bluzelle.curium.tax.MsgSetTransferTaxBp', { bp, creator: client.address }, options);
 
 export const setTaxCollector = (client: BluzelleClient, taxCollector: string, options: BroadcastOptions) =>
-    sendTx(client, '/bluzelle.curium.tax.MsgSetTaxCollector', {taxCollector, creator: client.address}, options);
+    sendTx(client, '/bluzelle.curium.tax.MsgSetTaxCollector', { taxCollector, creator: client.address }, options);
 
 export const delegate = (
     client: BluzelleClient,
@@ -165,7 +165,7 @@ export const delegate = (
     Promise.resolve(sendTx(client, '/cosmos.staking.v1beta1.MsgDelegate', {
         delegatorAddress,
         validatorAddress,
-        amount: {denom: 'ubnt', amount: amount.toString()},
+        amount: { denom: 'ubnt', amount: amount.toString() },
     } as MsgDelegate, options))
         .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
@@ -179,7 +179,7 @@ export const undelegate = (
     Promise.resolve(sendTx(client, '/cosmos.staking.v1beta1.MsgUndelegate', {
         delegatorAddress,
         validatorAddress,
-        amount: {denom: 'ubnt', amount: amount.toString()},
+        amount: { denom: 'ubnt', amount: amount.toString() },
     } as MsgUndelegate, options))
         .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
@@ -195,7 +195,7 @@ export const redelegate = (
         delegatorAddress,
         validatorSrcAddress,
         validatorDstAddress,
-        amount: {denom: 'ubnt', amount: amount.toString()},
+        amount: { denom: 'ubnt', amount: amount.toString() },
     } as MsgBeginRedelegate, options))
         .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
@@ -211,14 +211,14 @@ export const withdrawDelegatorReward = (
     } as MsgWithdrawDelegatorReward, options))
         .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
-export function createNft (client: BluzelleClient, props: {collId: number, metadata?: MetadataHumanReadable}, options: BroadcastOptions) {
+export function createNft(client: BluzelleClient, props: { collId: number, metadata?: MetadataHumanReadable }, options: BroadcastOptions) {
     return Promise.resolve(sendTx<MsgCreateNFT>(client, '/bluzelle.curium.nft.MsgCreateNFT', {
         sender: client.address,
         collId: new Long(props.collId),
         metadata: props.metadata && adaptMetadataProps(props.metadata),
     }, options));
 
-    function adaptMetadataProps (props: MetadataHumanReadable): Metadata {
+    function adaptMetadataProps(props: MetadataHumanReadable): Metadata {
         return ({
             ...props,
             id: new Long(props.id),
@@ -264,16 +264,17 @@ export const printNftEdition = (client: BluzelleClient, metadataId: number, coll
         owner,
     }, broadcastOptions));
 
-export function updateMetadata (client: BluzelleClient, props: {
+export function updateMetadata(client: BluzelleClient, props: {
     sender: string;
     metadataId: number;
     name: string;
     uri: string;
     sellerFeeBasisPoints: number;
-    creators: Creator[]}, broadcastOptions: BroadcastOptions) {
+    creators: Creator[]
+}, broadcastOptions: BroadcastOptions) {
     return Promise.resolve(sendTx<MsgUpdateMetadata>(client, '/bluzelle.curium.nft.MsgUpdateMetadata', adaptUpdateMetadataProps(props.metadataId, props), broadcastOptions))
 
-    function adaptUpdateMetadataProps (id: number, props: Omit<MsgUpdateMetadata, 'metadataId'>): MsgUpdateMetadata {
+    function adaptUpdateMetadataProps(id: number, props: Omit<MsgUpdateMetadata, 'metadataId'>): MsgUpdateMetadata {
         return ({
             ...props,
             metadataId: new Long(id)
@@ -303,12 +304,19 @@ export const signMetadata = (client: BluzelleClient, metadataId: number, broadca
 
 
 // Authz msg send functions begin.
-export const grant = (client: BluzelleClient, granter: string, grantee: string, grant:Grant, broadcastOptions: BroadcastOptions): any => 
+export const grant = (client: BluzelleClient, granter: string, grantee: string, grant: Grant, broadcastOptions: BroadcastOptions): any =>
     Promise.resolve(sendTx<MsgGrant>(client, '/cosmos.authz.v1beta1.MsgGrant', {
         granter,
         grantee,
         grant
     }, broadcastOptions));
+export const revoke = (client: BluzelleClient, granter: string, grantee: string, msgTypeUrl: string, broadcastOptions: BroadcastOptions): any =>
+    Promise.resolve(sendTx<MsgRevoke>(client, '/cosmos.authz.v1beta1.MsgRevoke', {
+        granter,
+        grantee,
+        msgTypeUrl
+    }, broadcastOptions));
+
 
 // Authz msg send functions end
 
@@ -356,7 +364,7 @@ const broadcastTxAsync = <T>(client: BluzelleClient, msgs: EncodeObject[], optio
             client.tmClient.broadcastTxAsync({
                 tx: txBytes
             }))
-        .then(({hash}) => toHex(hash).toUpperCase());
+        .then(({ hash }) => toHex(hash).toUpperCase());
 
 const tryJson = (s: string = '') => {
     try {

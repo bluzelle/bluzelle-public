@@ -14,7 +14,6 @@ import {
 import { expect } from "chai";
 import { BluzelleClient } from "@bluzelle/sdk";
 import { AuthorizationType } from "../src/curium/lib/generated/cosmos/staking/v1beta1/authz";
-import { Any } from "../src/curium/lib/generated/google/protobuf/any";
 import { GenericAuthorization } from "../src/curium/lib/generated/cosmos/authz/v1beta1/authz";
 import { StakeAuthorization } from "../src/curium/lib/generated/cosmos/staking/v1beta1/authz";
 const wallet = newLocalWallet(
@@ -204,8 +203,6 @@ describe("Authorization Module Test", function () {
                 })
         );
     });
-
-
 }
 )
 

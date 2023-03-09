@@ -1,5 +1,5 @@
 import { BluzelleClient } from "./sdk"
-import { BluzelleTxResponse, grant } from "./tx"
+import { BluzelleTxResponse, grant, revoke } from "./tx"
 import { GenericAuthorization } from "./curium/lib/generated/cosmos/authz/v1beta1/authz"
 import { SendAuthorization } from "./curium/lib/generated/cosmos/bank/v1beta1/authz"
 import { Coin } from "./curium/lib/generated/cosmos/base/v1beta1/coin"
@@ -29,6 +29,11 @@ export interface StakeAuthorizationParams {
     expiration: Date
 }
 
+export interface RevokeAuthorizationParams {
+    granter: string,
+    grantee: string,
+    msgTypeUrl: string
+}
 const genericAuthorizationTx = async (client: BluzelleClient, params: GenericAuthorizationParams): Promise<BluzelleTxResponse | undefined> => {
     let txResult: BluzelleTxResponse;
     try {
@@ -104,8 +109,24 @@ const stakeAuthorizationTx = async (client: BluzelleClient, params: StakeAuthori
     }
 }
 
+const revokeAuthorizationTx = async (client: BluzelleClient, params: RevokeAuthorizationParams): Promise<BluzelleTxResponse | undefined> => {
+    let txResult: BluzelleTxResponse;
+    try {
+        txResult = await revoke(client, params.granter, params.grantee,
+            params.msgTypeUrl, {
+            gasPrice: 0.002,
+            maxGas: 200000,
+            mode: 'sync'
+        });
+        return txResult;
+    } catch (e: any) {
+        console.log(e.message);
+    }
+}
+
 export {
     genericAuthorizationTx,
     sendAuthorizationTx,
-    stakeAuthorizationTx
+    stakeAuthorizationTx,
+    revokeAuthorizationTx
 }
