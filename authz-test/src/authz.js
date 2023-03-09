@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stakeAuthorizationTx = exports.sendAuthorizationTx = exports.genericAuthorizationTx = void 0;
+exports.revokeAuthorizationTx = exports.stakeAuthorizationTx = exports.sendAuthorizationTx = exports.genericAuthorizationTx = void 0;
 const tx_1 = require("./tx");
 const authz_1 = require("./curium/lib/generated/cosmos/authz/v1beta1/authz");
 const authz_2 = require("./curium/lib/generated/cosmos/bank/v1beta1/authz");
@@ -86,3 +86,32 @@ const stakeAuthorizationTx = (client, params) => __awaiter(void 0, void 0, void 
     }
 });
 exports.stakeAuthorizationTx = stakeAuthorizationTx;
+const revokeAuthorizationTx = (client, params) => __awaiter(void 0, void 0, void 0, function* () {
+    let txResult;
+    try {
+        txResult = yield (0, tx_1.revoke)(client, params.granter, params.grantee, params.msgTypeUrl, {
+            gasPrice: 0.002,
+            maxGas: 200000,
+            mode: 'sync'
+        });
+        return txResult;
+    }
+    catch (e) {
+        console.log(e.message);
+    }
+});
+exports.revokeAuthorizationTx = revokeAuthorizationTx;
+const executeAuthorizationTx = (client, params) => __awaiter(void 0, void 0, void 0, function* () {
+    let txResult;
+    try {
+        txResult = yield (0, tx_1.executeGrant)(client, params.grantee, params.msgs, {
+            gasPrice: 0.002,
+            maxGas: 200000,
+            mode: 'sync'
+        });
+        return txResult;
+    }
+    catch (e) {
+        console.log(e.message);
+    }
+});

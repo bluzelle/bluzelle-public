@@ -33,6 +33,7 @@ import { TxRaw } from "./curium/lib/generated/cosmos/tx/v1beta1/tx"
 import { Creator, Metadata } from "./curium/lib/generated/nft/nft";
 import { adaptCid } from "./utils/cidAdapter";
 import { Grant } from "./curium/lib/generated/cosmos/authz/v1beta1/authz";
+import { Any } from "./curium/lib/generated/google/protobuf/any";
 const Long = require('long');
 
 interface MsgQueueItem<T> {
@@ -310,6 +311,7 @@ export const grant = (client: BluzelleClient, granter: string, grantee: string, 
         grantee,
         grant
     }, broadcastOptions));
+
 export const revoke = (client: BluzelleClient, granter: string, grantee: string, msgTypeUrl: string, broadcastOptions: BroadcastOptions): any =>
     Promise.resolve(sendTx<MsgRevoke>(client, '/cosmos.authz.v1beta1.MsgRevoke', {
         granter,
@@ -317,6 +319,11 @@ export const revoke = (client: BluzelleClient, granter: string, grantee: string,
         msgTypeUrl
     }, broadcastOptions));
 
+export const executeGrant = (client: BluzelleClient, grantee: string, msgs: Any[], broadcastOptions: BroadcastOptions): any =>
+    Promise.resolve(sendTx<MsgExec>(client, '/cosmos.authz.v1beta1.MsgExec', {
+        grantee,
+        msgs
+    }, broadcastOptions));
 
 // Authz msg send functions end
 
