@@ -236,7 +236,7 @@ describe("Authorization Module Test", function () {
                     msgTypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal"
                 })
             } catch (e) {
-                expect(e).to.match(/?NotFound?/)
+                expect(e).to.match(/NotFound/)
             }
         }
         await res1();
