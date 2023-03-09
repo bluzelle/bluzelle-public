@@ -21,6 +21,7 @@ const query_6 = require("./curium/lib/generated/cosmos/distribution/v1beta1/quer
 const query_7 = require("./curium/lib/generated/nft/query");
 const service_1 = require("./curium/lib/generated/cosmos/tx/v1beta1/service");
 const tendermint_rpc_1 = require("@cosmjs/tendermint-rpc");
+const query_8 = require("./curium/lib/generated/cosmos/authz/v1beta1/query");
 const newBluzelleClient = (config) => config.wallet()
     .then(wallet => SigningBluzelleClient.connectWithSigner(config.url, wallet, { prefix: 'bluzelle', registry: (0, registry_1.getRegistry)() })
     .then(sgClient => Promise.all([
@@ -48,7 +49,8 @@ const getRpcClient = (url) => tendermint_rpc_1.Tendermint34Client.connect(url)
     staking: new query_5.QueryClientImpl(rpcClient),
     distribution: new query_6.QueryClientImpl(rpcClient),
     tx: new service_1.ServiceClientImpl(rpcClient),
-    nft: new query_7.QueryClientImpl(rpcClient)
+    nft: new query_7.QueryClientImpl(rpcClient),
+    authz: new query_8.QueryClientImpl(rpcClient)
 }));
 class SigningBluzelleClient extends stargate_1.SigningStargateClient {
     constructor(tmClient, signer, options) {

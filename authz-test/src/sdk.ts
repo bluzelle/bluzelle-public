@@ -1,6 +1,6 @@
-import {createProtobufRpcClient, QueryClient, SequenceResponse, SigningStargateClient} from "@cosmjs/stargate";
-import {getRegistry} from "./registry";
-import {SigningStargateClientOptions} from "@cosmjs/stargate/build/signingstargateclient";
+import { createProtobufRpcClient, QueryClient, SequenceResponse, SigningStargateClient } from "@cosmjs/stargate";
+import { getRegistry } from "./registry";
+import { SigningStargateClientOptions } from "@cosmjs/stargate/build/signingstargateclient";
 import {
     QueryClientImpl as StorageQueryClientImpl
 } from "./curium/lib/generated/storage/query";
@@ -10,7 +10,7 @@ import {
 import {
     QueryClientImpl as FaucetQueryClientImpl
 } from './curium/lib/generated/faucet/query'
-import {BluzelleWallet} from "./wallets/BluzelleWallet";
+import { BluzelleWallet } from "./wallets/BluzelleWallet";
 import {
     QueryClientImpl as TaxQueryClientImpl
 } from './curium/lib/generated/tax/query';
@@ -26,8 +26,10 @@ import {
 import {
     ServiceClientImpl
 } from "./curium/lib/generated/cosmos/tx/v1beta1/service";
-import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
-
+import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
+import {
+    QueryClientImpl as AuthzQueryClientImpl
+} from "./curium/lib/generated/cosmos/authz/v1beta1/query"
 
 type QueryClientImpl = {
     storage: StorageQueryClientImpl;
@@ -38,6 +40,7 @@ type QueryClientImpl = {
     distribution: DistributionQueryClientImpl;
     tx: ServiceClientImpl;
     nft: NftQueryClientImpl;
+    authz: AuthzQueryClientImpl
 }
 
 
@@ -53,7 +56,7 @@ export interface BluzelleClient {
 export const newBluzelleClient = (config: { wallet: () => Promise<BluzelleWallet>; url: string }): Promise<BluzelleClient> =>
     config.wallet()
         .then(wallet =>
-            SigningBluzelleClient.connectWithSigner(config.url, wallet, {prefix: 'bluzelle', registry: getRegistry()})
+            SigningBluzelleClient.connectWithSigner(config.url, wallet, { prefix: 'bluzelle', registry: getRegistry() })
                 .then(sgClient => Promise.all([
                     getRpcClient(config.url),
                     sgClient,
@@ -80,7 +83,8 @@ const getRpcClient = (url: string): Promise<QueryClientImpl> =>
             staking: new StakingQueryClientImpl(rpcClient),
             distribution: new DistributionQueryClientImpl(rpcClient),
             tx: new ServiceClientImpl(rpcClient),
-            nft: new NftQueryClientImpl(rpcClient)
+            nft: new NftQueryClientImpl(rpcClient),
+            authz: new AuthzQueryClientImpl(rpcClient)
         }));
 
 export class SigningBluzelleClient extends SigningStargateClient {
