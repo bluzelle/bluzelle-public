@@ -75,10 +75,11 @@ var globalThis = (() => {
         return global;
     throw "Unable to locate global object";
 })();
-const atob = globalThis.atob ||
-    ((b64) => globalThis.Buffer.from(b64, "base64").toString("binary"));
+const atob = ((b64) => globalThis.Buffer.from(b64, "base64").toString("binary"));
 function bytesFromBase64(b64) {
+    //console.log(globalThis.Buffer.from(b64, "base64").toString("binary"))
     const bin = atob(b64);
+    console.log(bin)
     const arr = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; ++i) {
         arr[i] = bin.charCodeAt(i);
