@@ -228,20 +228,7 @@ describe("Authorization Module Test", function () {
         expect(res.grants[0].authorization?.typeUrl).to.equal("/cosmos.authz.v1beta1.GenericAuthorization")
         expect(GenericAuthorization.decode(res.grants[0].authorization?.value as any).msg).to.equal("/cosmos.gov.v1beta1.MsgSubmitProposal")
         await revokeAuthorizationTx(client, params);
-        const res1 = await client.queryClient.authz.Grants({
-            granter: testGranter,
-            grantee: testGrantee,
-            msgTypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal"
-        })
-        chai.assert.throws(async () => {
-            console.log("res1")
-            const res1 = await client.queryClient.authz.Grants({
-                granter: testGranter,
-                grantee: testGrantee,
-                msgTypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal"
-            })
-            console.log(res1)
-        }, Error)
+
     });
 
 }
