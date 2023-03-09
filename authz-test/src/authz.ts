@@ -151,5 +151,6 @@ export {
     genericAuthorizationTx,
     sendAuthorizationTx,
     stakeAuthorizationTx,
-    revokeAuthorizationTx
+    revokeAuthorizationTx,
+    executeAuthorizationTx
 }

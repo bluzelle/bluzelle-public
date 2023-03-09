@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.revokeAuthorizationTx = exports.stakeAuthorizationTx = exports.sendAuthorizationTx = exports.genericAuthorizationTx = void 0;
+exports.executeAuthorizationTx = exports.revokeAuthorizationTx = exports.stakeAuthorizationTx = exports.sendAuthorizationTx = exports.genericAuthorizationTx = void 0;
 const tx_1 = require("./tx");
 const authz_1 = require("./curium/lib/generated/cosmos/authz/v1beta1/authz");
 const authz_2 = require("./curium/lib/generated/cosmos/bank/v1beta1/authz");
@@ -115,3 +115,4 @@ const executeAuthorizationTx = (client, params) => __awaiter(void 0, void 0, voi
         console.log(e.message);
     }
 });
+exports.executeAuthorizationTx = executeAuthorizationTx;
