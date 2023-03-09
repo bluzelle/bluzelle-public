@@ -1,6 +1,5 @@
 import { SendAuthorization } from "../src/curium/lib/generated/cosmos/bank/v1beta1/authz";
-import { grant } from "../src/index";
-import { Coin } from "../src/curium/lib/generated/cosmos/base/v1beta1/coin";
+import chai from "chai";
 import { newBluzelleClient } from '../src/index';
 import { newLocalWallet } from '../src/index';
 import {
@@ -9,10 +8,12 @@ import {
     SendAuthorizationParams,
     sendAuthorizationTx,
     StakeAuthorizationParams,
-    stakeAuthorizationTx
+    stakeAuthorizationTx,
+    revokeAuthorizationTx,
+    RevokeAuthorizationParams
 } from "../src/authz";
 import { expect } from "chai";
-import { BluzelleClient } from "@bluzelle/sdk";
+import { BluzelleClient } from "../src/sdk";
 import { AuthorizationType } from "../src/curium/lib/generated/cosmos/staking/v1beta1/authz";
 import { GenericAuthorization } from "../src/curium/lib/generated/cosmos/authz/v1beta1/authz";
 import { StakeAuthorization } from "../src/curium/lib/generated/cosmos/staking/v1beta1/authz";
@@ -23,7 +24,6 @@ const wallet = newLocalWallet(
 const testGranter = "bluzelle13eyh7hyjmlk4ya0nftl4yuuqcmu86agw34h27g";
 const testGrantee = "bluzelle1mzrns4r83g6c7pk2400gnycvr0ct9zyugtzu5a"
 const expiration = new Date("1/1/2024");
-console.log(expiration)
 describe("Authorization Module Test", function () {
     this.timeout(1_800_000)
     let client: BluzelleClient;
@@ -47,7 +47,6 @@ describe("Authorization Module Test", function () {
                 })
                 )
                 .then((res) => {
-                    console.log(GenericAuthorization.decode(res.grants[0].authorization?.value as any))
                     expect(res.grants[0].authorization?.typeUrl).to.equal("/cosmos.authz.v1beta1.GenericAuthorization")
                     expect(GenericAuthorization.decode(res.grants[0].authorization?.value as any).msg).to.equal("/cosmos.gov.v1beta1.MsgSubmitProposal")
                 })
@@ -203,6 +202,48 @@ describe("Authorization Module Test", function () {
                 })
         );
     });
+
+    it('grant should be successfully revoked', async () => {
+        const params: RevokeAuthorizationParams = {
+            granter: testGranter,
+            grantee: testGrantee,
+            msgTypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal",
+        }
+        const gParams: GenericAuthorizationParams = {
+            granter: testGranter,
+            grantee: testGrantee,
+            msg: "osmos.gov.v1beta1.MsgSubmitProposal",
+            expiration
+        }
+        const client = await newBluzelleClient({
+            wallet,
+            url: "http://localhost:26657"
+        })
+        await genericAuthorizationTx(client, gParams);
+        const res: any = await client.queryClient.authz.Grants({
+            granter: testGranter,
+            grantee: testGrantee,
+            msgTypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal"
+        })
+        expect(res.grants[0].authorization?.typeUrl).to.equal("/cosmos.authz.v1beta1.GenericAuthorization")
+        expect(GenericAuthorization.decode(res.grants[0].authorization?.value as any).msg).to.equal("/cosmos.gov.v1beta1.MsgSubmitProposal")
+        await revokeAuthorizationTx(client, params);
+        const res1 = await client.queryClient.authz.Grants({
+            granter: testGranter,
+            grantee: testGrantee,
+            msgTypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal"
+        })
+        chai.assert.throws(async () => {
+            console.log("res1")
+            const res1 = await client.queryClient.authz.Grants({
+                granter: testGranter,
+                grantee: testGrantee,
+                msgTypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal"
+            })
+            console.log(res1)
+        }, Error)
+    });
+
 }
 )
 

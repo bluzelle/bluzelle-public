@@ -1,10 +1,23 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const authz_1 = require("../src/curium/lib/generated/cosmos/bank/v1beta1/authz");
+const chai_1 = __importDefault(require("chai"));
 const index_1 = require("../src/index");
 const index_2 = require("../src/index");
 const authz_2 = require("../src/authz");
-const chai_1 = require("chai");
+const chai_2 = require("chai");
 const authz_3 = require("../src/curium/lib/generated/cosmos/staking/v1beta1/authz");
 const authz_4 = require("../src/curium/lib/generated/cosmos/authz/v1beta1/authz");
 const authz_5 = require("../src/curium/lib/generated/cosmos/staking/v1beta1/authz");
@@ -12,7 +25,6 @@ const wallet = (0, index_2.newLocalWallet)("tired inquiry tape jar pizza mango s
 const testGranter = "bluzelle13eyh7hyjmlk4ya0nftl4yuuqcmu86agw34h27g";
 const testGrantee = "bluzelle1mzrns4r83g6c7pk2400gnycvr0ct9zyugtzu5a";
 const expiration = new Date("1/1/2024");
-console.log(expiration);
 describe("Authorization Module Test", function () {
     this.timeout(1800000);
     let client;
@@ -33,10 +45,9 @@ describe("Authorization Module Test", function () {
             msgTypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal"
         }))
             .then((res) => {
-            var _a, _b, _c;
-            console.log(authz_4.GenericAuthorization.decode((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.value));
-            (0, chai_1.expect)((_b = res.grants[0].authorization) === null || _b === void 0 ? void 0 : _b.typeUrl).to.equal("/cosmos.authz.v1beta1.GenericAuthorization");
-            (0, chai_1.expect)(authz_4.GenericAuthorization.decode((_c = res.grants[0].authorization) === null || _c === void 0 ? void 0 : _c.value).msg).to.equal("/cosmos.gov.v1beta1.MsgSubmitProposal");
+            var _a, _b;
+            (0, chai_2.expect)((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.typeUrl).to.equal("/cosmos.authz.v1beta1.GenericAuthorization");
+            (0, chai_2.expect)(authz_4.GenericAuthorization.decode((_b = res.grants[0].authorization) === null || _b === void 0 ? void 0 : _b.value).msg).to.equal("/cosmos.gov.v1beta1.MsgSubmitProposal");
         }));
     });
     it('send authorization should be successfully created', () => {
@@ -60,8 +71,8 @@ describe("Authorization Module Test", function () {
         }))
             .then((res) => {
             var _a, _b;
-            (0, chai_1.expect)((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.typeUrl).to.equal("/cosmos.bank.v1beta1.SendAuthorization");
-            (0, chai_1.expect)(authz_1.SendAuthorization.decode((_b = res.grants[0].authorization) === null || _b === void 0 ? void 0 : _b.value).spendLimit[0].amount).to.equal('1000000');
+            (0, chai_2.expect)((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.typeUrl).to.equal("/cosmos.bank.v1beta1.SendAuthorization");
+            (0, chai_2.expect)(authz_1.SendAuthorization.decode((_b = res.grants[0].authorization) === null || _b === void 0 ? void 0 : _b.value).spendLimit[0].amount).to.equal('1000000');
         }));
     });
     it(' stake authorization should be successfully created', () => {
@@ -82,8 +93,8 @@ describe("Authorization Module Test", function () {
         }))
             .then((res) => {
             var _a, _b;
-            (0, chai_1.expect)((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.typeUrl).to.equal("/cosmos.staking.v1beta1.StakeAuthorization");
-            (0, chai_1.expect)(authz_5.StakeAuthorization.decode((_b = res.grants[0].authorization) === null || _b === void 0 ? void 0 : _b.value).authorizationType).to.equal(authz_3.AuthorizationType.AUTHORIZATION_TYPE_DELEGATE);
+            (0, chai_2.expect)((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.typeUrl).to.equal("/cosmos.staking.v1beta1.StakeAuthorization");
+            (0, chai_2.expect)(authz_5.StakeAuthorization.decode((_b = res.grants[0].authorization) === null || _b === void 0 ? void 0 : _b.value).authorizationType).to.equal(authz_3.AuthorizationType.AUTHORIZATION_TYPE_DELEGATE);
         }));
     });
     it(' creat nft authorization should be successfully created', () => {
@@ -104,7 +115,7 @@ describe("Authorization Module Test", function () {
         }))
             .then((res) => {
             var _a;
-            (0, chai_1.expect)(authz_4.GenericAuthorization.decode((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.value).msg).to.equal("/bluzelle.curium.nft.MsgCreateNFT");
+            (0, chai_2.expect)(authz_4.GenericAuthorization.decode((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.value).msg).to.equal("/bluzelle.curium.nft.MsgCreateNFT");
         }));
     });
     it(' print edition authorization should be successfully created', () => {
@@ -125,7 +136,7 @@ describe("Authorization Module Test", function () {
         }))
             .then((res) => {
             var _a;
-            (0, chai_1.expect)(authz_4.GenericAuthorization.decode((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.value).msg).to.equal("/bluzelle.curium.nft.MsgPrintEdition");
+            (0, chai_2.expect)(authz_4.GenericAuthorization.decode((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.value).msg).to.equal("/bluzelle.curium.nft.MsgPrintEdition");
         }));
     });
     it(' transfer nft authorization should be successfully created', () => {
@@ -146,7 +157,7 @@ describe("Authorization Module Test", function () {
         }))
             .then((res) => {
             var _a;
-            (0, chai_1.expect)(authz_4.GenericAuthorization.decode((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.value).msg).to.equal("/bluzelle.curium.nft.MsgTransferNFT");
+            (0, chai_2.expect)(authz_4.GenericAuthorization.decode((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.value).msg).to.equal("/bluzelle.curium.nft.MsgTransferNFT");
         }));
     });
     it(' create collection authorization should be successfully created', () => {
@@ -167,7 +178,48 @@ describe("Authorization Module Test", function () {
         }))
             .then((res) => {
             var _a;
-            (0, chai_1.expect)(authz_4.GenericAuthorization.decode((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.value).msg).to.equal("/bluzelle.curium.nft.MsgCreateCollection");
+            (0, chai_2.expect)(authz_4.GenericAuthorization.decode((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.value).msg).to.equal("/bluzelle.curium.nft.MsgCreateCollection");
         }));
     });
+    it('grant should be successfully revoked', () => __awaiter(this, void 0, void 0, function* () {
+        var _a, _b;
+        const params = {
+            granter: testGranter,
+            grantee: testGrantee,
+            msgTypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal",
+        };
+        const gParams = {
+            granter: testGranter,
+            grantee: testGrantee,
+            msg: "osmos.gov.v1beta1.MsgSubmitProposal",
+            expiration
+        };
+        const client = yield (0, index_1.newBluzelleClient)({
+            wallet,
+            url: "http://localhost:26657"
+        });
+        yield (0, authz_2.genericAuthorizationTx)(client, gParams);
+        const res = yield client.queryClient.authz.Grants({
+            granter: testGranter,
+            grantee: testGrantee,
+            msgTypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal"
+        });
+        (0, chai_2.expect)((_a = res.grants[0].authorization) === null || _a === void 0 ? void 0 : _a.typeUrl).to.equal("/cosmos.authz.v1beta1.GenericAuthorization");
+        (0, chai_2.expect)(authz_4.GenericAuthorization.decode((_b = res.grants[0].authorization) === null || _b === void 0 ? void 0 : _b.value).msg).to.equal("/cosmos.gov.v1beta1.MsgSubmitProposal");
+        yield (0, authz_2.revokeAuthorizationTx)(client, params);
+        const res1 = yield client.queryClient.authz.Grants({
+            granter: testGranter,
+            grantee: testGrantee,
+            msgTypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal"
+        });
+        chai_1.default.assert.throws(() => __awaiter(this, void 0, void 0, function* () {
+            console.log("res1");
+            const res1 = yield client.queryClient.authz.Grants({
+                granter: testGranter,
+                grantee: testGrantee,
+                msgTypeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal"
+            });
+            console.log(res1);
+        }), Error);
+    }));
 });
