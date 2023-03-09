@@ -20,10 +20,17 @@ import { AuthorizationType } from "../src/curium/lib/generated/cosmos/staking/v1
 import { GenericAuthorization } from "../src/curium/lib/generated/cosmos/authz/v1beta1/authz";
 import { StakeAuthorization } from "../src/curium/lib/generated/cosmos/staking/v1beta1/authz";
 import { MsgSend } from "../src/curium/lib/generated/cosmos/bank/v1beta1/tx";
+
 const wallet = newLocalWallet(
     "tired inquiry tape jar pizza mango system slogan door always sleep office space want stove scatter ski uphold toward pet material dinosaur prosper round",
     { coinType: 483 }
 );
+
+const granteeWallet = newLocalWallet(
+    "legal obvious account topic village rigid motor spray wink shy arch midnight idle elite bag improve orphan sample brass scan amazing ostrich science poverty",
+    { coinType: 483 }
+)
+
 const testGranter = "bluzelle13eyh7hyjmlk4ya0nftl4yuuqcmu86agw34h27g";
 const testGrantee = "bluzelle1mzrns4r83g6c7pk2400gnycvr0ct9zyugtzu5a"
 const expiration = new Date("1/1/2024");
@@ -274,12 +281,8 @@ describe("Authorization Module Test", function () {
             url: "http://localhost:26657"
         })
         await sendAuthorizationTx(client, sParams);
-        const eWallet = newLocalWallet(
-            "legal obvious account topic village rigid motor spray wink shy arch midnight idle elite bag improve orphan sample brass scan amazing ostrich science poverty",
-            { coinType: 483 }
-        );
         const eClient = await newBluzelleClient({
-            wallet: eWallet,
+            wallet: granteeWallet,
             url: "http://localhost:26657"
         })
         const originalBalance = await getAccountBalance(client, testGrantee);
