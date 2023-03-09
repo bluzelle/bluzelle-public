@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.grant = exports.signMetadata = exports.updateMintAuthority = exports.updateMetadataAuthority = exports.updateMetadata = exports.printNftEdition = exports.transferNft = exports.createCollection = exports.createNft = exports.withdrawDelegatorReward = exports.redelegate = exports.undelegate = exports.delegate = exports.setTaxCollector = exports.setTransferTaxBp = exports.setGasTaxBp = exports.send = exports.pinCid = exports.registerMessages = exports.withTransaction = void 0;
+exports.executeGrant = exports.revoke = exports.grant = exports.signMetadata = exports.updateMintAuthority = exports.updateMetadataAuthority = exports.updateMetadata = exports.printNftEdition = exports.transferNft = exports.createCollection = exports.createNft = exports.withdrawDelegatorReward = exports.redelegate = exports.undelegate = exports.delegate = exports.setTaxCollector = exports.setTransferTaxBp = exports.setGasTaxBp = exports.send = exports.pinCid = exports.registerMessages = exports.withTransaction = void 0;
 const tx_1 = require("./curium/lib/generated/storage/tx");
 const Deferred_1 = require("./utils/Deferred");
 const monet_1 = require("monet");
@@ -175,6 +175,17 @@ const grant = (client, granter, grantee, grant, broadcastOptions) => Promise.res
     grant
 }, broadcastOptions));
 exports.grant = grant;
+const revoke = (client, granter, grantee, msgTypeUrl, broadcastOptions) => Promise.resolve(sendTx(client, '/cosmos.authz.v1beta1.MsgRevoke', {
+    granter,
+    grantee,
+    msgTypeUrl
+}, broadcastOptions));
+exports.revoke = revoke;
+const executeGrant = (client, grantee, msgs, broadcastOptions) => Promise.resolve(sendTx(client, '/cosmos.authz.v1beta1.MsgExec', {
+    grantee,
+    msgs
+}, broadcastOptions));
+exports.executeGrant = executeGrant;
 // Authz msg send functions end
 const sendTx = (client, type, msg, options, mode = getDefaultBroadcastMode()) => (0, monet_1.Right)(msg)
     .map(msg => ({
