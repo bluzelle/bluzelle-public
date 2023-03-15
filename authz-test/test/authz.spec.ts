@@ -220,18 +220,12 @@ describe("Authorization Module Test", function () {
             expect(GenericAuthorization.decode(res.grants[0].authorization?.value as any).msg).to.equal(MsgMapping[MsgType.SUBMIT_PROPOSAL])
         }
         await revokeAuthorizationTx(client, params);
-        const res1 = async () => {
-            try {
-                await queryGrant(client, {
-                    granter: testGranter,
-                    grantee: testGrantee,
-                    msg: MsgType.SUBMIT_PROPOSAL
-                })
-            } catch (e) {
-                expect(e).to.match(/NotFound/)
-            }
-        }
-        await res1();
+        const res1 = await queryGrant(client, {
+            granter: testGranter,
+            grantee: testGrantee,
+            msg: MsgType.SUBMIT_PROPOSAL
+        })
+        expect(res1).to.match(/NotFound/)
     });
 
     it('grant should be successfully executed', async () => {

@@ -210,19 +210,12 @@ describe("Authorization Module Test", function () {
             (0, chai_1.expect)(authz_4.GenericAuthorization.decode((_m = res.grants[0].authorization) === null || _m === void 0 ? void 0 : _m.value).msg).to.equal(msg_1.MsgMapping[8 /* MsgType.SUBMIT_PROPOSAL */]);
         }
         yield (0, authz_2.revokeAuthorizationTx)(client, params);
-        const res1 = () => __awaiter(this, void 0, void 0, function* () {
-            try {
-                yield (0, authz_2.queryGrant)(client, {
-                    granter: testGranter,
-                    grantee: testGrantee,
-                    msg: 8 /* MsgType.SUBMIT_PROPOSAL */
-                });
-            }
-            catch (e) {
-                (0, chai_1.expect)(e).to.match(/NotFound/);
-            }
+        const res1 = yield (0, authz_2.queryGrant)(client, {
+            granter: testGranter,
+            grantee: testGrantee,
+            msg: 8 /* MsgType.SUBMIT_PROPOSAL */
         });
-        yield res1();
+        (0, chai_1.expect)(res1).to.match(/NotFound/);
     }));
     it('grant should be successfully executed', () => __awaiter(this, void 0, void 0, function* () {
         const params = {
@@ -258,6 +251,7 @@ describe("Authorization Module Test", function () {
             url: "http://localhost:26657"
         });
         const originalBalance = yield (0, index_1.getAccountBalance)(client, testGrantee);
+        yield (0, authz_2.executeAuthorizationTx)(eClient, params);
         const afterBalance = yield (0, index_1.getAccountBalance)(client, testGrantee);
         (0, chai_1.expect)(originalBalance - afterBalance).to.equal(100);
     }));

@@ -163,6 +163,6 @@ export const queryGrant = async (client: BluzelleClient, params: GrantQueryParam
         })
         return queryResult;
     } catch (e: any) {
-        console.log(e.message);
+        return e.message;
     }
 }

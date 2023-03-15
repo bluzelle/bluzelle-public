@@ -128,7 +128,7 @@ const queryGrant = (client, params) => __awaiter(void 0, void 0, void 0, functio
         return queryResult;
     }
     catch (e) {
-        console.log(e.message);
+        return e.message;
     }
 });
 exports.queryGrant = queryGrant;
