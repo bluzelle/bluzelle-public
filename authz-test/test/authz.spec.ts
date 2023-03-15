@@ -268,6 +268,7 @@ describe("Authorization Module Test", function () {
             url: "http://localhost:26657"
         })
         const originalBalance = await getAccountBalance(client, testGrantee);
+        await executeAuthorizationTx(eClient, params);
         const afterBalance = await getAccountBalance(client, testGrantee);
         expect(originalBalance - afterBalance).to.equal(100)
     });
