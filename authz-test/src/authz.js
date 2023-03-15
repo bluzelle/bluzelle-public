@@ -9,11 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.executeAuthorizationTx = exports.revokeAuthorizationTx = exports.stakeAuthorizationTx = exports.sendAuthorizationTx = exports.genericAuthorizationTx = void 0;
+exports.queryGrant = exports.executeAuthorizationTx = exports.revokeAuthorizationTx = exports.stakeAuthorizationTx = exports.sendAuthorizationTx = exports.genericAuthorizationTx = void 0;
 const tx_1 = require("./tx");
 const authz_1 = require("./curium/lib/generated/cosmos/authz/v1beta1/authz");
 const authz_2 = require("./curium/lib/generated/cosmos/bank/v1beta1/authz");
 const authz_3 = require("./curium/lib/generated/cosmos/staking/v1beta1/authz");
+const msg_1 = require("./msg");
 const genericAuthorizationTx = (client, params) => __awaiter(void 0, void 0, void 0, function* () {
     let txResult;
     try {
@@ -21,7 +22,7 @@ const genericAuthorizationTx = (client, params) => __awaiter(void 0, void 0, voi
             "authorization": {
                 "typeUrl": "/cosmos.authz.v1beta1.GenericAuthorization",
                 "value": authz_1.GenericAuthorization.encode({
-                    msg: params.msg
+                    msg: msg_1.MsgMapping[params.msg]
                 }).finish()
             },
             expiration: params.expiration
@@ -89,7 +90,7 @@ exports.stakeAuthorizationTx = stakeAuthorizationTx;
 const revokeAuthorizationTx = (client, params) => __awaiter(void 0, void 0, void 0, function* () {
     let txResult;
     try {
-        txResult = yield (0, tx_1.revoke)(client, params.granter, params.grantee, params.msgTypeUrl, {
+        txResult = yield (0, tx_1.revoke)(client, params.granter, params.grantee, msg_1.MsgMapping[params.msg], {
             gasPrice: 0.002,
             maxGas: 200000,
             mode: 'sync'
@@ -116,3 +117,18 @@ const executeAuthorizationTx = (client, params) => __awaiter(void 0, void 0, voi
     }
 });
 exports.executeAuthorizationTx = executeAuthorizationTx;
+const queryGrant = (client, params) => __awaiter(void 0, void 0, void 0, function* () {
+    let queryResult;
+    try {
+        queryResult = yield client.queryClient.authz.Grants({
+            granter: params.granter,
+            grantee: params.grantee,
+            msgTypeUrl: msg_1.MsgMapping[params.msg]
+        });
+        return queryResult;
+    }
+    catch (e) {
+        console.log(e.message);
+    }
+});
+exports.queryGrant = queryGrant;

@@ -5,11 +5,12 @@ import { SendAuthorization } from "./curium/lib/generated/cosmos/bank/v1beta1/au
 import { Coin } from "./curium/lib/generated/cosmos/base/v1beta1/coin"
 import { StakeAuthorization, StakeAuthorization_Validators, AuthorizationType } from "./curium/lib/generated/cosmos/staking/v1beta1/authz"
 import { Any } from "./curium/lib/generated/google/protobuf/any"
-
+import { MsgMapping, MsgType } from "./msg"
+import { QueryGrantsResponse } from "./curium/lib/generated/cosmos/authz/v1beta1/query"
 export interface GenericAuthorizationParams {
     granter: string,
     grantee: string,
-    msg: string
+    msg: MsgType,
     expiration: Date
 }
 
@@ -33,14 +34,20 @@ export interface StakeAuthorizationParams {
 export interface RevokeAuthorizationParams {
     granter: string,
     grantee: string,
-    msgTypeUrl: string
+    msg: MsgType
 }
 
 export interface ExecuteAuthorizationParams {
     grantee: string,
     msgs: Any[]
 }
-const genericAuthorizationTx = async (client: BluzelleClient, params: GenericAuthorizationParams): Promise<BluzelleTxResponse | undefined> => {
+
+export interface GrantQueryParams {
+    granter: string,
+    grantee: string,
+    msg: MsgType
+}
+export const genericAuthorizationTx = async (client: BluzelleClient, params: GenericAuthorizationParams): Promise<BluzelleTxResponse | undefined> => {
     let txResult: BluzelleTxResponse;
     try {
         txResult = await grant(client, params.granter, params.grantee, {
@@ -48,7 +55,7 @@ const genericAuthorizationTx = async (client: BluzelleClient, params: GenericAut
                 "typeUrl": "/cosmos.authz.v1beta1.GenericAuthorization",
                 "value": GenericAuthorization.encode(
                     {
-                        msg: params.msg
+                        msg: MsgMapping[params.msg]
                     }
                 ).finish()
             },
@@ -64,7 +71,7 @@ const genericAuthorizationTx = async (client: BluzelleClient, params: GenericAut
     }
 }
 
-const sendAuthorizationTx = async (client: BluzelleClient, params: SendAuthorizationParams): Promise<BluzelleTxResponse | undefined> => {
+export const sendAuthorizationTx = async (client: BluzelleClient, params: SendAuthorizationParams): Promise<BluzelleTxResponse | undefined> => {
     let txResult: BluzelleTxResponse;
     try {
         txResult = await grant(client, params.granter, params.grantee, {
@@ -88,7 +95,7 @@ const sendAuthorizationTx = async (client: BluzelleClient, params: SendAuthoriza
     }
 }
 
-const stakeAuthorizationTx = async (client: BluzelleClient, params: StakeAuthorizationParams): Promise<BluzelleTxResponse | undefined> => {
+export const stakeAuthorizationTx = async (client: BluzelleClient, params: StakeAuthorizationParams): Promise<BluzelleTxResponse | undefined> => {
     let txResult: BluzelleTxResponse;
     try {
         txResult = await grant(client, params.granter, params.grantee, {
@@ -115,11 +122,11 @@ const stakeAuthorizationTx = async (client: BluzelleClient, params: StakeAuthori
     }
 }
 
-const revokeAuthorizationTx = async (client: BluzelleClient, params: RevokeAuthorizationParams): Promise<BluzelleTxResponse | undefined> => {
+export const revokeAuthorizationTx = async (client: BluzelleClient, params: RevokeAuthorizationParams): Promise<BluzelleTxResponse | undefined> => {
     let txResult: BluzelleTxResponse;
     try {
         txResult = await revoke(client, params.granter, params.grantee,
-            params.msgTypeUrl, {
+            MsgMapping[params.msg], {
             gasPrice: 0.002,
             maxGas: 200000,
             mode: 'sync'
@@ -130,8 +137,7 @@ const revokeAuthorizationTx = async (client: BluzelleClient, params: RevokeAutho
     }
 }
 
-
-const executeAuthorizationTx = async (client: BluzelleClient, params: ExecuteAuthorizationParams): Promise<BluzelleTxResponse | undefined> => {
+export const executeAuthorizationTx = async (client: BluzelleClient, params: ExecuteAuthorizationParams): Promise<BluzelleTxResponse | undefined> => {
     let txResult: BluzelleTxResponse;
     try {
         txResult = await executeGrant(client, params.grantee,
@@ -147,10 +153,16 @@ const executeAuthorizationTx = async (client: BluzelleClient, params: ExecuteAut
     }
 }
 
-export {
-    genericAuthorizationTx,
-    sendAuthorizationTx,
-    stakeAuthorizationTx,
-    revokeAuthorizationTx,
-    executeAuthorizationTx
+export const queryGrant = async (client: BluzelleClient, params: GrantQueryParams): Promise<QueryGrantsResponse | undefined> => {
+    let queryResult: QueryGrantsResponse;
+    try {
+        queryResult = await client.queryClient.authz.Grants({
+            granter: params.granter,
+            grantee: params.grantee,
+            msgTypeUrl: MsgMapping[params.msg]
+        })
+        return queryResult;
+    } catch (e: any) {
+        console.log(e.message);
+    }
 }
