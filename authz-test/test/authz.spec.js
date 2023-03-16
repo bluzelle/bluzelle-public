@@ -200,7 +200,11 @@ describe("Authorization Module Test", function () {
                         }).finish()
                     }],
             };
-            const initAmount = 0;
+            let initAmount = 0;
+            try {
+                initAmount = (yield (0, sdk_1.getDelegation)(eClient, testGrantee, testValAddress)).delegation.shares;
+            }
+            catch (_h) { }
             const res1 = yield (0, authz_1.executeAuthorizationTx)(eClient, eParams);
             (0, chai_1.expect)(res1.code).to.equal(0);
             const afterAmount = (yield (0, sdk_1.getDelegation)(eClient, testGrantee, testValAddress)).delegation.shares;
@@ -208,7 +212,7 @@ describe("Authorization Module Test", function () {
         }
     }));
     it('redelegate msg authorization should be successfully created and executed', () => __awaiter(this, void 0, void 0, function* () {
-        var _h, _j;
+        var _j, _k;
         const params = {
             granter: testGranter,
             grantee: testGrantee,
@@ -226,8 +230,8 @@ describe("Authorization Module Test", function () {
             msg: 27 /* MsgType.REDELEGATE */
         });
         if (res) {
-            (0, chai_1.expect)((_h = res.grants[0].authorization) === null || _h === void 0 ? void 0 : _h.typeUrl).to.equal("/cosmos.staking.v1beta1.StakeAuthorization");
-            (0, chai_1.expect)(authz_4.StakeAuthorization.decode((_j = res.grants[0].authorization) === null || _j === void 0 ? void 0 : _j.value).authorizationType).to.equal(authz_2.AuthorizationType.AUTHORIZATION_TYPE_REDELEGATE);
+            (0, chai_1.expect)((_j = res.grants[0].authorization) === null || _j === void 0 ? void 0 : _j.typeUrl).to.equal("/cosmos.staking.v1beta1.StakeAuthorization");
+            (0, chai_1.expect)(authz_4.StakeAuthorization.decode((_k = res.grants[0].authorization) === null || _k === void 0 ? void 0 : _k.value).authorizationType).to.equal(authz_2.AuthorizationType.AUTHORIZATION_TYPE_REDELEGATE);
             const eClient = yield (0, index_1.newBluzelleClient)({
                 wallet: granteeWallet,
                 url: "http://localhost:26657"
@@ -255,7 +259,7 @@ describe("Authorization Module Test", function () {
                 try {
                     initAmount = (yield (0, sdk_1.getDelegation)(eClient, testGrantee, testValAddress1)).delegation.shares;
                 }
-                catch (_k) { }
+                catch (_l) { }
                 const res1 = yield (0, authz_1.executeAuthorizationTx)(eClient, eParams);
                 (0, chai_1.expect)(res1.code).to.equal(0);
                 const afterAmount = (yield (0, sdk_1.getDelegation)(eClient, testGrantee, testValAddress1)).delegation.shares;
@@ -264,7 +268,7 @@ describe("Authorization Module Test", function () {
         }
     }));
     it(' create nft collection authorization should be successfully created and executed.', () => __awaiter(this, void 0, void 0, function* () {
-        var _l;
+        var _m;
         const client = yield (0, index_1.newBluzelleClient)({
             wallet,
             url: "http://localhost:26657"
@@ -297,10 +301,10 @@ describe("Authorization Module Test", function () {
         const res1 = yield (0, authz_1.executeAuthorizationTx)(eClient, eParams);
         (0, chai_1.expect)(res1.code).to.equal(0);
         const collectionRes = yield (0, sdk_1.getCollectionInfo)(eClient, 1);
-        (0, chai_1.expect)((_l = collectionRes.collection) === null || _l === void 0 ? void 0 : _l.symbol).to.equal("TMP");
+        (0, chai_1.expect)((_m = collectionRes.collection) === null || _m === void 0 ? void 0 : _m.symbol).to.equal("TMP");
     }));
     it(' create nft authorization should be successfully created and executed.', () => __awaiter(this, void 0, void 0, function* () {
-        var _m;
+        var _o;
         const client = yield (0, index_1.newBluzelleClient)({
             wallet,
             url: "http://localhost:26657"
@@ -348,7 +352,7 @@ describe("Authorization Module Test", function () {
         const nft = (yield (0, sdk_1.getNftByOwner)(eClient, testGrantee)).nfts.pop();
         const id = nft.collId.toString() + ":" + nft.metadataId.toString() + ":" + nft.seq.toString();
         const nftInfo = yield (0, sdk_1.getNftInfo)(eClient, id);
-        (0, chai_1.expect)((_m = nftInfo.metadata) === null || _m === void 0 ? void 0 : _m.name).to.equal("TMPMeta");
+        (0, chai_1.expect)((_o = nftInfo.metadata) === null || _o === void 0 ? void 0 : _o.name).to.equal("TMPMeta");
     }));
     it(' transfer nft authorization should be successfully created and executed.', () => __awaiter(this, void 0, void 0, function* () {
         const client = yield (0, index_1.newBluzelleClient)({
@@ -404,7 +408,7 @@ describe("Authorization Module Test", function () {
         }
     }));
     it(' updateMetadataAuthority authorization should be successfully created and executed.', () => __awaiter(this, void 0, void 0, function* () {
-        var _o;
+        var _p;
         const client = yield (0, index_1.newBluzelleClient)({
             wallet,
             url: "http://localhost:26657"
@@ -458,11 +462,11 @@ describe("Authorization Module Test", function () {
         (0, chai_1.expect)(res1.code).to.equal(0);
         const updatedNftInfo = yield (0, sdk_1.getNftInfo)(eClient, id);
         if (updatedNftInfo.nft) {
-            (0, chai_1.expect)((_o = updatedNftInfo.metadata) === null || _o === void 0 ? void 0 : _o.metadataAuthority).to.equal(testGranter);
+            (0, chai_1.expect)((_p = updatedNftInfo.metadata) === null || _p === void 0 ? void 0 : _p.metadataAuthority).to.equal(testGranter);
         }
     }));
     it(' updateMetadata authorization should be successfully created and executed.', () => __awaiter(this, void 0, void 0, function* () {
-        var _p;
+        var _q;
         const client = yield (0, index_1.newBluzelleClient)({
             wallet,
             url: "http://localhost:26657"
@@ -523,11 +527,11 @@ describe("Authorization Module Test", function () {
         (0, chai_1.expect)(res1.code).to.equal(0);
         const nftInfo = yield (0, sdk_1.getNftInfo)(eClient, id);
         if (nftInfo.nft) {
-            (0, chai_1.expect)((_p = nftInfo.metadata) === null || _p === void 0 ? void 0 : _p.name).to.equal("UpdatedTmpMeta");
+            (0, chai_1.expect)((_q = nftInfo.metadata) === null || _q === void 0 ? void 0 : _q.name).to.equal("UpdatedTmpMeta");
         }
     }));
     it(' updateMintAuthority authorization should be successfully created and executed.', () => __awaiter(this, void 0, void 0, function* () {
-        var _q;
+        var _r;
         const client = yield (0, index_1.newBluzelleClient)({
             wallet,
             url: "http://localhost:26657"
@@ -581,7 +585,7 @@ describe("Authorization Module Test", function () {
         (0, chai_1.expect)(res1.code).to.equal(0);
         const nftInfo = yield (0, sdk_1.getNftInfo)(eClient, id);
         if (nftInfo.nft) {
-            (0, chai_1.expect)((_q = nftInfo.metadata) === null || _q === void 0 ? void 0 : _q.mintAuthority).to.equal(testGranter);
+            (0, chai_1.expect)((_r = nftInfo.metadata) === null || _r === void 0 ? void 0 : _r.mintAuthority).to.equal(testGranter);
         }
     }));
     it(' printEdition authorization should be successfully created and executed.', () => __awaiter(this, void 0, void 0, function* () {
@@ -696,7 +700,7 @@ describe("Authorization Module Test", function () {
         (0, chai_1.expect)(res1.code).to.equal(0);
     }));
     it('grant should be successfully revoked', () => __awaiter(this, void 0, void 0, function* () {
-        var _r, _s;
+        var _s, _t;
         const params = {
             granter: testGranter,
             grantee: testGrantee,
@@ -719,8 +723,8 @@ describe("Authorization Module Test", function () {
             msg: 8 /* MsgType.SUBMIT_PROPOSAL */
         });
         if (res) {
-            (0, chai_1.expect)((_r = res.grants[0].authorization) === null || _r === void 0 ? void 0 : _r.typeUrl).to.equal("/cosmos.authz.v1beta1.GenericAuthorization");
-            (0, chai_1.expect)(authz_3.GenericAuthorization.decode((_s = res.grants[0].authorization) === null || _s === void 0 ? void 0 : _s.value).msg).to.equal(msg_1.MsgMapping[8 /* MsgType.SUBMIT_PROPOSAL */]);
+            (0, chai_1.expect)((_s = res.grants[0].authorization) === null || _s === void 0 ? void 0 : _s.typeUrl).to.equal("/cosmos.authz.v1beta1.GenericAuthorization");
+            (0, chai_1.expect)(authz_3.GenericAuthorization.decode((_t = res.grants[0].authorization) === null || _t === void 0 ? void 0 : _t.value).msg).to.equal(msg_1.MsgMapping[8 /* MsgType.SUBMIT_PROPOSAL */]);
         }
         yield (0, authz_1.revokeAuthorizationTx)(client, params);
         const res1 = yield (0, authz_1.queryGrant)(client, {
