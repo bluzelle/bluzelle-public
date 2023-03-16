@@ -1,49 +1,43 @@
 export const enum MsgType {
   // crisis module msgs
-  VERIFY_INVARIENT = 0,
+  VERIFY_INVARIANT,
   // distribution module msgs
-  SET_WITHDRAW_ADDRESS = 1,
-  WITHDRAW_DELEGATOR_REWARD = 2,
-  WITHDRAW_VALIDATOR_COMMISSION = 3,
-  FUND_COMMUNITIY_POOL = 4,
+  SET_WITHDRAW_ADDRESS,
+  WITHDRAW_DELEGATOR_REWARD,
+  WITHDRAW_VALIDATOR_COMMISSION,
+  FUND_COMMUNITIY_POOL,
   // evidence moduel msgs
-  SUBMIT_EVIDENCE = 5,
+  SUBMIT_EVIDENCE,
   // feegrant module msgs
-  GRANT_ALLOWANCE = 6,
-  REVOKE_ALLOWANCE = 7,
+  GRANT_ALLOWANCE,
+  REVOKE_ALLOWANCE,
   // gov module msgs
-  SUBMIT_PROPOSAL = 8,
-  DEPOSIT = 9,
-  VOTE = 10,
-  VOTE_WEIGHTED = 11,
+  SUBMIT_PROPOSAL,
+  DEPOSIT,
+  VOTE,
+  VOTE_WEIGHTED,
   // slashing msgs
-  UNJAIL = 12,
-  // faucet msgs
-  FAUCET_MINT = 13,
+  UNJAIL,
   // nft module msgs
-  CREATE_NFT = 14,
-  PRINT_EDITION = 15,
-  TRANSFER_NFT = 16,
-  SIGN_METADATA = 17,
-  UPDATE_METADATA = 18,
-  UPDATE_METADATA_AUTHORITY = 19,
-  UPDATE_MINT_AUTHORITIY = 20,
-  CREATE_COLLECTION = 21,
-  UPDATE_COLLECTION_AUTHORITY = 22,
+  CREATE_NFT,
+  PRINT_EDITION,
+  TRANSFER_NFT,
+  SIGN_METADATA,
+  UPDATE_METADATA,
+  UPDATE_METADATA_AUTHORITY,
+  UPDATE_MINT_AUTHORITIY,
+  CREATE_COLLECTION,
+  UPDATE_COLLECTION_AUTHORITY,
   // storage msgs
-  PIN = 23,
-  // tax module msgs
-  SET_GAS_TAX_BP = 24,
-  SET_TRANSFER_TAX_BP = 25,
-  SET_TAX_COLLECTOR = 26,
+  PIN,
   //bank module msgs
-  SEND = 27,
+  SEND,
   // staking module msgs
-  CREATE_VALIDATOR = 28,
-  EDIT_VALIDATOR = 29,
-  DELEGATE = 30,
-  REDELEGATE = 31,
-  UNDELEGATE = 32,
+  CREATE_VALIDATOR,
+  EDIT_VALIDATOR,
+  DELEGATE,
+  REDELEGATE,
+  UNDELEGATE,
 }
 
 export const MsgMapping = {
@@ -54,7 +48,7 @@ export const MsgMapping = {
   [MsgType.REDELEGATE]: "/cosmos.staking.v1beta1.MsgBeginRedelegate",
   [MsgType.UNDELEGATE]: "/cosmos.staking.v1beta1.MsgUndelegate",
 
-  [MsgType.VERIFY_INVARIENT]: "/cosmos.crisis.v1beta1.MsgVerifyInvarient",
+  [MsgType.VERIFY_INVARIANT]: "/cosmos.crisis.v1beta1.MsgVerifyInvariant",
   [MsgType.SET_WITHDRAW_ADDRESS]: "/cosmos.distribution.v1beta1.MsgSetWithdrawAddress",
   [MsgType.WITHDRAW_DELEGATOR_REWARD]: "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
   [MsgType.WITHDRAW_VALIDATOR_COMMISSION]: "/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission",
@@ -68,19 +62,15 @@ export const MsgMapping = {
   [MsgType.VOTE_WEIGHTED]: "/cosmos.gov.v1beta1.MsgVoteWeighted",
   [MsgType.UNJAIL]: "/cosmos.slashing.v1beta1.MsgUnjail",
   // custom module msgs
-  [MsgType.FAUCET_MINT]: "/bluzelle.curium.faucet.MsgMint",
   [MsgType.CREATE_NFT]: "/bluzelle.curium.nft.MsgCreateNFT",
   [MsgType.PRINT_EDITION]: "/bluzelle.curium.nft.MsgPrintEdition",
   [MsgType.TRANSFER_NFT]: "/bluzelle.curium.nft.MsgTransferNFT",
   [MsgType.SIGN_METADATA]: "/bluzelle.curium.nft.MsgSignMetadata",
-  [MsgType.UPDATE_METADATA]: "/bluzelle.curium.nft.MsgUpdateMetaData",
+  [MsgType.UPDATE_METADATA]: "/bluzelle.curium.nft.MsgUpdateMetadata",
   [MsgType.UPDATE_METADATA_AUTHORITY]: "/bluzelle.curium.nft.MsgUpdateMetadataAuthority",
   [MsgType.UPDATE_MINT_AUTHORITIY]: "/bluzelle.curium.nft.MsgUpdateMintAuthority",
   [MsgType.CREATE_COLLECTION]: "/bluzelle.curium.nft.MsgCreateCollection",
-  [MsgType.UPDATE_COLLECTION_AUTHORITY]: "/bluzelle.curium.nft.MsgUpdateCollectionAuthoritiy",
+  [MsgType.UPDATE_COLLECTION_AUTHORITY]: "/bluzelle.curium.nft.MsgUpdateCollectionAuthority",
   [MsgType.PIN]: "/bluzelle.curium.storage.MsgPin",
-  [MsgType.SET_GAS_TAX_BP]: "/bluzelle.curium.tax.MsgSetGasTaxBp",
-  [MsgType.SET_TRANSFER_TAX_BP]: "/bluzelle.curium.tax.MsgSetTransferTaxBp",
-  [MsgType.SET_TAX_COLLECTOR]: "/bluzelle.curium.tax.MsgSetTaxCollector",
 }
 
