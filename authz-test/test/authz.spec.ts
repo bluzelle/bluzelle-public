@@ -22,7 +22,7 @@ import { GenericAuthorization } from "../src/curium/lib/generated/cosmos/authz/v
 import { StakeAuthorization } from "../src/curium/lib/generated/cosmos/staking/v1beta1/authz";
 import { MsgSend } from "../src/curium/lib/generated/cosmos/bank/v1beta1/tx";
 import { MsgMapping, MsgType } from "../src/msg";
-import { createCollection, executeGrant } from "../src/tx";
+import {createCollection, executeGrant, newExecuteGrant, TempMsgType} from "../src/tx";
 import { MsgVerifyInvariant } from "../src/curium/lib/generated/cosmos/crisis/v1beta1/tx";
 import { MsgSetWithdrawAddress } from "../src/curium/lib/generated/cosmos/distribution/v1beta1/tx";
 import { MsgPin } from "../src/curium/lib/generated/storage/tx";
@@ -51,6 +51,24 @@ const testGrantee = "bluzelle1nuj2f4umg3qre662kn84py7w2vyjtu6kcz0kuw";
 const expiration = new Date("1/1/2024");
 describe("Authorization Module Test", function () {
     this.timeout(1_800_000)
+
+    it('example of using the updated version of executeGrant', () =>
+        newBluzelleClient({
+            wallet,
+            url: "http://localhost:26657"
+        })
+            .then(client => newExecuteGrant(client, TempMsgType.SEND, testGrantee, [{
+                fromAddress: testGrantee,
+                toAddress: testGranter,
+                amount: [{
+                    denom: "ubnt",
+                    amount: "100"
+                }, {
+                    denom: "ubnt",
+                    amount: "200"
+                }]
+            }], {maxGas: 1000000, gasPrice: 0.002}))
+    );
 
     it('verifyInvarient msg authorization should be successfully created', async () => {
         const params: GenericAuthorizationParams = {

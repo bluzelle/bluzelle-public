@@ -319,6 +319,55 @@ export const revoke = (client: BluzelleClient, granter: string, grantee: string,
         msgTypeUrl
     }, broadcastOptions));
 
+
+export enum TempMsgType {
+    SEND,
+    PIN,
+    DELEGATE,
+}
+
+type MsgTypeToTypeUrlMap = {
+    [K in TempMsgType]: string;
+};
+
+const tempMsgMapping: MsgTypeToTypeUrlMap = {
+    [TempMsgType.SEND]: '/cosmos.bank.v1beta1.MsgSend',
+    [TempMsgType.PIN]: '/bluzelle.curium.storage.MsgPin',
+    [TempMsgType.DELEGATE]: '/cosmos.staking.v1beta1.MsgDelegate',
+};
+
+type MsgTypeToMsgMap = {
+    [TempMsgType.SEND]: MsgSend;
+    [TempMsgType.PIN]: MsgPin;
+    [TempMsgType.DELEGATE]: MsgDelegate;
+};
+
+type MsgTypeToEncodeFunctionMap = {
+    [K in TempMsgType]: (msg: MsgTypeToMsgMap[K]) => Uint8Array;
+};
+
+const msgTypeToEncodeFunctionMap: MsgTypeToEncodeFunctionMap = {
+    [TempMsgType.SEND]: (msg: MsgSend) => MsgSend.encode(msg).finish(),
+    [TempMsgType.PIN]: (msg: MsgPin) => MsgPin.encode(msg).finish(),
+    [TempMsgType.DELEGATE]: (msg: MsgDelegate) => MsgDelegate.encode(msg).finish(),
+};
+
+export const newExecuteGrant = <T extends TempMsgType>(
+    client: BluzelleClient,
+    msgType: T,
+    grantee: string,
+    paramsArray: Array<MsgTypeToMsgMap[T]>,
+    broadcastOptions: BroadcastOptions
+) => Promise.resolve(paramsArray.map((params) => ({
+    typeUrl: tempMsgMapping[msgType],
+    value: msgTypeToEncodeFunctionMap[msgType](params)
+})))
+    .then(msgs => sendTx<MsgExec>(client, '/cosmos.authz.v1beta1.MsgExec', {
+        grantee,
+        msgs
+    }, broadcastOptions));
+
+
 export const executeGrant = (client: BluzelleClient, grantee: string, msgs: Any[], broadcastOptions: BroadcastOptions): any =>
     Promise.resolve(sendTx<MsgExec>(client, '/cosmos.authz.v1beta1.MsgExec', {
         grantee,
