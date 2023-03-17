@@ -352,20 +352,30 @@ const msgTypeToEncodeFunctionMap: MsgTypeToEncodeFunctionMap = {
     [TempMsgType.DELEGATE]: (msg: MsgDelegate) => MsgDelegate.encode(msg).finish(),
 };
 
-export const newExecuteGrant = <T extends TempMsgType>(
+type ExecuteAuthzMsg = {
+    [T in TempMsgType]: {
+        msgType: T;
+        params: MsgTypeToMsgMap[T];
+    };
+}[TempMsgType];
+
+export const newExecuteGrant = (
     client: BluzelleClient,
-    msgType: T,
     grantee: string,
-    paramsArray: Array<MsgTypeToMsgMap[T]>,
+    msgs: ExecuteAuthzMsg[],
     broadcastOptions: BroadcastOptions
-) => Promise.resolve(paramsArray.map((params) => ({
-    typeUrl: tempMsgMapping[msgType],
-    value: msgTypeToEncodeFunctionMap[msgType](params)
-})))
-    .then(msgs => sendTx<MsgExec>(client, '/cosmos.authz.v1beta1.MsgExec', {
-        grantee,
-        msgs
-    }, broadcastOptions));
+) =>
+    Promise.resolve(
+        msgs.map(({ msgType, params }) => {
+            const encodingFunction = msgTypeToEncodeFunctionMap[msgType] as (msg: MsgTypeToMsgMap[typeof msgType]) => Uint8Array;
+            return {
+                typeUrl: tempMsgMapping[msgType],
+                value: encodingFunction(params),
+            };
+        })
+    ).then((msgs) =>
+        sendTx<MsgExec>(client, "/cosmos.authz.v1beta1.MsgExec", { grantee, msgs }, broadcastOptions)
+    );
 
 
 export const executeGrant = (client: BluzelleClient, grantee: string, msgs: Any[], broadcastOptions: BroadcastOptions): any =>

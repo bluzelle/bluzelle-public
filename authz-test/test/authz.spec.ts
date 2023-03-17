@@ -57,16 +57,26 @@ describe("Authorization Module Test", function () {
             wallet,
             url: "http://localhost:26657"
         })
-            .then(client => newExecuteGrant(client, TempMsgType.SEND, testGrantee, [{
-                fromAddress: testGrantee,
-                toAddress: testGranter,
-                amount: [{
-                    denom: "ubnt",
-                    amount: "100"
-                }, {
-                    denom: "ubnt",
-                    amount: "200"
-                }]
+            .then(client => newExecuteGrant(client, testGrantee, [{
+                msgType: TempMsgType.SEND,
+                params: {
+                    fromAddress: testGrantee,
+                    toAddress: testGranter,
+                    amount: [{
+                        denom: "ubnt",
+                        amount: "100"
+                    }]
+                }
+            }, {
+                msgType: TempMsgType.DELEGATE,
+                params: {
+                    delegatorAddress: testGrantee,
+                    validatorAddress: testGranter,
+                    amount: {
+                        denom: "ubnt",
+                        amount: "100"
+                    }
+                }
             }], {maxGas: 1000000, gasPrice: 0.002}))
     );
 
