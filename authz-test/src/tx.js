@@ -15,6 +15,7 @@ const tx_6 = require("./curium/lib/generated/cosmos/distribution/v1beta1/tx");
 const tx_7 = require("./curium/lib/generated/cosmos/authz/v1beta1/tx");
 const encoding_1 = require("@cosmjs/encoding");
 const tx_8 = require("./curium/lib/generated/cosmos/tx/v1beta1/tx");
+const authzMappings_1 = require("./authzMappings");
 const Long = require('long');
 let msgQueue;
 const getDefaultBroadcastMode = () => ({
@@ -169,11 +170,21 @@ const signMetadata = (client, metadataId, broadcastOptions) => Promise.resolve(s
 }, broadcastOptions));
 exports.signMetadata = signMetadata;
 // Authz msg send functions begin.
-const grant = (client, granter, grantee, grant, broadcastOptions) => Promise.resolve(sendTx(client, '/cosmos.authz.v1beta1.MsgGrant', {
-    granter,
-    grantee,
-    grant
-}, broadcastOptions));
+const grant = (client, granter, grantee, grantParam, broadcastOptions) => {
+    const encodingFunction = authzMappings_1.grantTypeToEncodeFunctionMap[grantParam.grantType];
+    return Promise.resolve({
+        "authorization": {
+            "typeUrl": authzMappings_1.grantMapping[grantParam.grantType],
+            "value": encodingFunction(grantParam.params)
+        },
+        "expiration": grantParam.expiration
+    })
+        .then((grant) => sendTx(client, '/cosmos.authz.v1beta1.MsgGrant', {
+        granter,
+        grantee,
+        grant,
+    }, broadcastOptions));
+};
 exports.grant = grant;
 const revoke = (client, granter, grantee, msgTypeUrl, broadcastOptions) => Promise.resolve(sendTx(client, '/cosmos.authz.v1beta1.MsgRevoke', {
     granter,
@@ -181,10 +192,13 @@ const revoke = (client, granter, grantee, msgTypeUrl, broadcastOptions) => Promi
     msgTypeUrl
 }, broadcastOptions));
 exports.revoke = revoke;
-const executeGrant = (client, grantee, msgs, broadcastOptions) => Promise.resolve(sendTx(client, '/cosmos.authz.v1beta1.MsgExec', {
-    grantee,
-    msgs
-}, broadcastOptions));
+const executeGrant = (client, grantee, msgs, broadcastOptions) => Promise.resolve(msgs.map(({ msgType, params }) => {
+    const encodingFunction = authzMappings_1.msgTypeToEncodeFunctionMap[msgType];
+    return {
+        typeUrl: authzMappings_1.msgMapping[msgType],
+        value: encodingFunction(params),
+    };
+})).then((msgs) => sendTx(client, "/cosmos.authz.v1beta1.MsgExec", { grantee, msgs }, broadcastOptions));
 exports.executeGrant = executeGrant;
 // Authz msg send functions end
 const sendTx = (client, type, msg, options, mode = getDefaultBroadcastMode()) => (0, monet_1.Right)(msg)

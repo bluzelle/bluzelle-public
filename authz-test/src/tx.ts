@@ -34,6 +34,7 @@ import { Creator, Metadata } from "./curium/lib/generated/nft/nft";
 import { adaptCid } from "./utils/cidAdapter";
 import { Grant } from "./curium/lib/generated/cosmos/authz/v1beta1/authz";
 import { Any } from "./curium/lib/generated/google/protobuf/any";
+import { ExecuteAuthzMsg, grantMapping, GrantParam, GrantType, grantTypeToEncodeFunctionMap, GrantTypeToGrantMap, msgMapping, msgTypeToEncodeFunctionMap, MsgTypeToMsgMap, MsgTypeToTypeUrlMap } from "./authzMappings";
 const Long = require('long');
 
 interface MsgQueueItem<T> {
@@ -305,12 +306,24 @@ export const signMetadata = (client: BluzelleClient, metadataId: number, broadca
 
 
 // Authz msg send functions begin.
-export const grant = (client: BluzelleClient, granter: string, grantee: string, grant: Grant, broadcastOptions: BroadcastOptions): any =>
-    Promise.resolve(sendTx<MsgGrant>(client, '/cosmos.authz.v1beta1.MsgGrant', {
-        granter,
-        grantee,
-        grant
-    }, broadcastOptions));
+
+
+export const grant = (client: BluzelleClient, granter: string, grantee: string, grantParam: GrantParam, broadcastOptions: BroadcastOptions): any => {
+    const encodingFunction = grantTypeToEncodeFunctionMap[grantParam.grantType] as (grant: GrantTypeToGrantMap[typeof grantParam.grantType]) => Uint8Array;
+    return Promise.resolve({
+        "authorization": {
+            "typeUrl": grantMapping[grantParam.grantType],
+            "value": encodingFunction(grantParam.params)
+        },
+        "expiration": grantParam.expiration
+    } as Grant)
+        .then((grant) => sendTx<MsgGrant>(client, '/cosmos.authz.v1beta1.MsgGrant', {
+            granter,
+            grantee,
+            grant,
+        }, broadcastOptions))
+        ;
+}
 
 export const revoke = (client: BluzelleClient, granter: string, grantee: string, msgTypeUrl: string, broadcastOptions: BroadcastOptions): any =>
     Promise.resolve(sendTx<MsgRevoke>(client, '/cosmos.authz.v1beta1.MsgRevoke', {
@@ -320,46 +333,7 @@ export const revoke = (client: BluzelleClient, granter: string, grantee: string,
     }, broadcastOptions));
 
 
-export enum TempMsgType {
-    SEND,
-    PIN,
-    DELEGATE,
-}
-
-type MsgTypeToTypeUrlMap = {
-    [K in TempMsgType]: string;
-};
-
-const tempMsgMapping: MsgTypeToTypeUrlMap = {
-    [TempMsgType.SEND]: '/cosmos.bank.v1beta1.MsgSend',
-    [TempMsgType.PIN]: '/bluzelle.curium.storage.MsgPin',
-    [TempMsgType.DELEGATE]: '/cosmos.staking.v1beta1.MsgDelegate',
-};
-
-type MsgTypeToMsgMap = {
-    [TempMsgType.SEND]: MsgSend;
-    [TempMsgType.PIN]: MsgPin;
-    [TempMsgType.DELEGATE]: MsgDelegate;
-};
-
-type MsgTypeToEncodeFunctionMap = {
-    [K in TempMsgType]: (msg: MsgTypeToMsgMap[K]) => Uint8Array;
-};
-
-const msgTypeToEncodeFunctionMap: MsgTypeToEncodeFunctionMap = {
-    [TempMsgType.SEND]: (msg: MsgSend) => MsgSend.encode(msg).finish(),
-    [TempMsgType.PIN]: (msg: MsgPin) => MsgPin.encode(msg).finish(),
-    [TempMsgType.DELEGATE]: (msg: MsgDelegate) => MsgDelegate.encode(msg).finish(),
-};
-
-type ExecuteAuthzMsg = {
-    [T in TempMsgType]: {
-        msgType: T;
-        params: MsgTypeToMsgMap[T];
-    };
-}[TempMsgType];
-
-export const newExecuteGrant = (
+export const executeGrant = (
     client: BluzelleClient,
     grantee: string,
     msgs: ExecuteAuthzMsg[],
@@ -369,20 +343,13 @@ export const newExecuteGrant = (
         msgs.map(({ msgType, params }) => {
             const encodingFunction = msgTypeToEncodeFunctionMap[msgType] as (msg: MsgTypeToMsgMap[typeof msgType]) => Uint8Array;
             return {
-                typeUrl: tempMsgMapping[msgType],
+                typeUrl: msgMapping[msgType],
                 value: encodingFunction(params),
             };
         })
     ).then((msgs) =>
         sendTx<MsgExec>(client, "/cosmos.authz.v1beta1.MsgExec", { grantee, msgs }, broadcastOptions)
     );
-
-
-export const executeGrant = (client: BluzelleClient, grantee: string, msgs: Any[], broadcastOptions: BroadcastOptions): any =>
-    Promise.resolve(sendTx<MsgExec>(client, '/cosmos.authz.v1beta1.MsgExec', {
-        grantee,
-        msgs
-    }, broadcastOptions));
 
 // Authz msg send functions end
 
