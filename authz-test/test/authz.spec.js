@@ -345,7 +345,6 @@ describe("Authorization Module Test", function () {
             .then((ctx) => (0, sdk_1.getNftInfo)(eClient, ctx.nftId))
             .then((nftInfo) => {
             var _a;
-            console.log(nftInfo);
             (0, chai_1.expect)((_a = nftInfo.nft) === null || _a === void 0 ? void 0 : _a.owner).to.equal(testGranter);
         });
     });

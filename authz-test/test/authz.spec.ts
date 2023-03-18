@@ -356,7 +356,6 @@ describe("Authorization Module Test", function () {
             }], { maxGas: 100000000, gasPrice: 0.002 })))
             .then((ctx) => getNftInfo(eClient, ctx.nftId))
             .then((nftInfo: any) => {
-                console.log(nftInfo)
                 expect(nftInfo.nft?.owner).to.equal(testGranter);
             })
     });
