@@ -1,16 +1,38 @@
-import { MsgSend } from "./curium/lib/generated/cosmos/bank/v1beta1/tx";
-import { MsgPin } from "./curium/lib/generated/storage/tx";
-import { MsgBeginRedelegate, MsgCreateValidator, MsgDelegate, MsgEditValidator, MsgUndelegate } from "./curium/lib/generated/cosmos/staking/v1beta1/tx";
-import { MsgVerifyInvariant } from "./curium/lib/generated/cosmos/crisis/v1beta1/tx";
-import { MsgFundCommunityPool, MsgSetWithdrawAddress, MsgWithdrawDelegatorReward, MsgWithdrawValidatorCommission } from "./curium/lib/generated/cosmos/distribution/v1beta1/tx";
-import { MsgSubmitEvidence } from "./curium/lib/generated/cosmos/evidence/v1beta1/tx";
-import { MsgGrantAllowance, MsgRevokeAllowance } from "./curium/lib/generated/cosmos/feegrant/v1beta1/tx";
-import { MsgDeposit, MsgSubmitProposal, MsgVote, MsgVoteWeighted } from "./curium/lib/generated/cosmos/gov/v1beta1/tx";
-import { MsgUnjail } from "./curium/lib/generated/cosmos/slashing/v1beta1/tx";
-import { MsgCreateCollection, MsgCreateNFT, MsgPrintEdition, MsgSignMetadata, MsgTransferNFT, MsgUpdateCollectionAuthority, MsgUpdateMetadata, MsgUpdateMetadataAuthority, MsgUpdateMintAuthority } from "./curium/lib/generated/nft/tx";
-import { GenericAuthorization, Grant } from "./curium/lib/generated/cosmos/authz/v1beta1/authz";
-import { SendAuthorization } from "./curium/lib/generated/cosmos/bank/v1beta1/authz";
-import { StakeAuthorization } from "./curium/lib/generated/cosmos/staking/v1beta1/authz";
+import {MsgSend} from "./curium/lib/generated/cosmos/bank/v1beta1/tx";
+import {MsgPin} from "./curium/lib/generated/storage/tx";
+import {
+  MsgBeginRedelegate,
+  MsgCreateValidator,
+  MsgDelegate,
+  MsgEditValidator,
+  MsgUndelegate
+} from "./curium/lib/generated/cosmos/staking/v1beta1/tx";
+import {MsgVerifyInvariant} from "./curium/lib/generated/cosmos/crisis/v1beta1/tx";
+import {
+  MsgFundCommunityPool,
+  MsgSetWithdrawAddress,
+  MsgWithdrawDelegatorReward,
+  MsgWithdrawValidatorCommission
+} from "./curium/lib/generated/cosmos/distribution/v1beta1/tx";
+import {MsgSubmitEvidence} from "./curium/lib/generated/cosmos/evidence/v1beta1/tx";
+import {MsgGrantAllowance, MsgRevokeAllowance} from "./curium/lib/generated/cosmos/feegrant/v1beta1/tx";
+import {MsgDeposit, MsgSubmitProposal, MsgVote, MsgVoteWeighted} from "./curium/lib/generated/cosmos/gov/v1beta1/tx";
+import {MsgUnjail} from "./curium/lib/generated/cosmos/slashing/v1beta1/tx";
+import {
+  MsgCreateCollection,
+  MsgCreateNFT,
+  MsgPrintEdition,
+  MsgSignMetadata,
+  MsgTransferNFT,
+  MsgUpdateCollectionAuthority,
+  MsgUpdateMetadata,
+  MsgUpdateMetadataAuthority,
+  MsgUpdateMintAuthority
+} from "./curium/lib/generated/nft/tx";
+import {GenericAuthorization} from "./curium/lib/generated/cosmos/authz/v1beta1/authz";
+import {SendAuthorization} from "./curium/lib/generated/cosmos/bank/v1beta1/authz";
+import {StakeAuthorization} from "./curium/lib/generated/cosmos/staking/v1beta1/authz";
+import {Coin} from "./curium/lib/generated/cosmos/base/v1beta1/coin";
 
 export const enum MsgType {
   // crisis module msgs
@@ -57,8 +79,6 @@ export const enum MsgType {
 export type MsgTypeToTypeUrlMap = {
   [K in MsgType]: string;
 };
-
-
 
 export const msgMapping: MsgTypeToTypeUrlMap = {
   [MsgType.SEND]: "/cosmos.bank.v1beta1.MsgSend",
@@ -129,11 +149,11 @@ export type MsgTypeToMsgMap = {
   [MsgType.PIN]: MsgPin
 };
 
-export type MsgTypeToEncodeFunctionMap = {
+type MsgTypeToEncodeFnMap = {
   [K in MsgType]: (msg: MsgTypeToMsgMap[K]) => Uint8Array;
 };
 
-export const msgTypeToEncodeFunctionMap: MsgTypeToEncodeFunctionMap = {
+export const msgTypeToEncodeFnMap: MsgTypeToEncodeFnMap = {
   [MsgType.SEND]: (msg: MsgSend) => MsgSend.encode(msg).finish(),
   [MsgType.CREATE_VALIDATOR]: (msg: MsgCreateValidator) => MsgCreateValidator.encode(msg).finish(),
   [MsgType.EDIT_VALIDATOR]: (msg: MsgEditValidator) => MsgEditValidator.encode(msg).finish(),
@@ -190,26 +210,31 @@ export const grantMapping: GrantTypeToGrantUrlMap = {
   [GrantType.STAKE]: "/cosmos.staking.v1beta1.StakeAuthorization"
 }
 
-export type GrantTypeToGrantMap = {
-  [GrantType.GENERIC]: GenericAuthorization,
-  [GrantType.SEND]: SendAuthorization,
-  [GrantType.STAKE]: StakeAuthorization
-}
-
-export type GrantTypeToEcodeFunctionMap = {
-  [T in GrantType]: (grant: GrantTypeToGrantMap[T]) => Uint8Array;
-}
-
-export const grantTypeToEncodeFunctionMap = {
-  [GrantType.GENERIC]: (grant: GenericAuthorization) => GenericAuthorization.encode(grant).finish(),
-  [GrantType.SEND]: (grant: SendAuthorization) => SendAuthorization.encode(grant).finish(),
-  [GrantType.STAKE]: (grant: StakeAuthorization) => StakeAuthorization.encode(grant).finish(),
-}
-
-export type GrantParam = {
+type BaseGrantParam = {
   [T in GrantType]: {
     grantType: T,
-    params: GrantTypeToGrantMap[T],
     expiration: Date,
   }
-}[GrantType]
+}
+
+type GenericGrantParam = BaseGrantParam[GrantType.GENERIC] & { msgType: MsgType }
+type SendGrantParam = BaseGrantParam[GrantType.SEND] & { spendLimit: Coin[] }
+type StakeGrantParam = BaseGrantParam[GrantType.STAKE] & { stakeAuthorization: StakeAuthorization }
+
+export type GrantParam = GenericGrantParam | SendGrantParam | StakeGrantParam
+
+type GrantTypeToGrantParamMap = {
+  [GrantType.GENERIC]: GenericGrantParam,
+  [GrantType.SEND]: SendGrantParam,
+  [GrantType.STAKE]: StakeGrantParam
+}
+
+export type GrantTypeToEncodeFnMap = {
+  [T in GrantType]: (grant: GrantTypeToGrantParamMap[T]) => Uint8Array;
+}
+
+export const grantTypeToEncodeFnMap: GrantTypeToEncodeFnMap = {
+  [GrantType.GENERIC]: (params: GenericGrantParam) => GenericAuthorization.encode({msg: msgMapping[params.msgType]}).finish(),
+  [GrantType.SEND]: (params: SendGrantParam) => SendAuthorization.encode({spendLimit: params.spendLimit}).finish(),
+  [GrantType.STAKE]: (params: StakeGrantParam) => StakeAuthorization.encode(params.stakeAuthorization).finish(),
+}

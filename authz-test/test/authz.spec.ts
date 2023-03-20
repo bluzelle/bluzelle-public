@@ -61,9 +61,7 @@ describe("Authorization Module Test", function () {
     it('verifyInvarient msg authorization should be successfully created', () => {
         return grant(client, testGranter, testGrantee, {
             grantType: GrantType.GENERIC,
-            params: {
-                msg: msgMapping[MsgType.VERIFY_INVARIANT],
-            },
+            msgType: MsgType.VERIFY_INVARIANT,
             expiration
         }, {
             maxGas: 1000000, gasPrice: 0.002
@@ -79,15 +77,13 @@ describe("Authorization Module Test", function () {
             })
     });
 
-    it('send grant should be successfully executed', async () =>
+    it('send grant should be successfully executed', () =>
         grant(client, testGranter, testGrantee, {
             grantType: GrantType.SEND,
-            params: {
-                spendLimit: [{
-                    denom: "ubnt",
-                    amount: "100"
-                }]
-            },
+            spendLimit: [{
+                denom: "ubnt",
+                amount: "100"
+            }],
             expiration
         }, {
             maxGas: 1000000, gasPrice: 0.002
@@ -110,12 +106,13 @@ describe("Authorization Module Test", function () {
             .then(withCtxAwait("afterBalance", () => getAccountBalance(client, testGrantee)))
             .then((ctx: any) => {
                 expect(ctx.beforeBalance - ctx.afterBalance).to.equal(100)
-            }))
+            })
+    );
 
     it('delegate msg authorization should be successfully created and executed ', () => {
         return grant(client, testGranter, testGrantee, {
             grantType: GrantType.STAKE,
-            params: {
+            stakeAuthorization: {
                 authorizationType: AuthorizationType.AUTHORIZATION_TYPE_DELEGATE,
             },
             expiration
@@ -159,7 +156,7 @@ describe("Authorization Module Test", function () {
     it('undelegate msg authorization should be successfully created and executed', async () => {
         return grant(client, testGranter, testGrantee, {
             grantType: GrantType.STAKE,
-            params: {
+            stakeAuthorization: {
                 authorizationType: AuthorizationType.AUTHORIZATION_TYPE_UNDELEGATE
             },
             expiration
@@ -199,7 +196,7 @@ describe("Authorization Module Test", function () {
     it('redelegate msg authorization should be successfully created and executed', () => {
         return grant(client, testGranter, testGrantee, {
             grantType: GrantType.STAKE,
-            params: {
+            stakeAuthorization: {
                 authorizationType: AuthorizationType.AUTHORIZATION_TYPE_REDELEGATE
             },
             expiration
@@ -244,9 +241,7 @@ describe("Authorization Module Test", function () {
     it(' create nft collection authorization should be successfully created and executed.', () => {
         return grant(client, testGranter, testGrantee, {
             grantType: GrantType.GENERIC,
-            params: {
-                msg: msgMapping[MsgType.CREATE_COLLECTION]
-            },
+            msgType: MsgType.CREATE_COLLECTION,
             expiration
         }, { maxGas: 1000000, gasPrice: 0.002 })
             .then(executeGrant(eClient, testGrantee, [{
@@ -290,9 +285,7 @@ describe("Authorization Module Test", function () {
             { maxGas: 100000000, gasPrice: 0.002 })
             .then(() => grant(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
-                params: {
-                    msg: msgMapping[MsgType.CREATE_NFT]
-                },
+                msgType: MsgType.CREATE_NFT,
                 expiration
             }, { maxGas: 1000000, gasPrice: 0.002 }))
             .then(() => executeGrant(eClient, testGrantee, [
@@ -338,9 +331,7 @@ describe("Authorization Module Test", function () {
             .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grant(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
-                params: {
-                    msg: msgMapping[MsgType.TRANSFER_NFT]
-                },
+                msgType: MsgType.TRANSFER_NFT,
                 expiration
             }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => getNftByOwner(eClient, testGrantee))
@@ -385,9 +376,7 @@ describe("Authorization Module Test", function () {
             .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grant(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
-                params: {
-                    msg: msgMapping[MsgType.UPDATE_METADATA_AUTHORITY]
-                },
+                msgType: MsgType.UPDATE_METADATA_AUTHORITY,
                 expiration
             }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => getNftByOwner(eClient, testGrantee))
@@ -437,9 +426,7 @@ describe("Authorization Module Test", function () {
             .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grant(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
-                params: {
-                    msg: msgMapping[MsgType.UPDATE_METADATA]
-                },
+                msgType: MsgType.UPDATE_METADATA,
                 expiration
             }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => getNftByOwner(eClient, testGrantee))
@@ -495,9 +482,7 @@ describe("Authorization Module Test", function () {
             .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grant(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
-                params: {
-                    msg: msgMapping[MsgType.UPDATE_MINT_AUTHORITIY]
-                },
+                msgType: MsgType.UPDATE_MINT_AUTHORITIY,
                 expiration
             }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => getNftByOwner(eClient, testGrantee))
@@ -546,9 +531,7 @@ describe("Authorization Module Test", function () {
             .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grant(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
-                params: {
-                    msg: msgMapping[MsgType.PRINT_EDITION]
-                },
+                msgType: MsgType.PRINT_EDITION,
                 expiration
             }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => getNftByOwner(eClient, testGrantee))
@@ -601,9 +584,7 @@ describe("Authorization Module Test", function () {
             .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grant(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
-                params: {
-                    msg: msgMapping[MsgType.SIGN_METADATA]
-                },
+                msgType: MsgType.SIGN_METADATA,
                 expiration
             }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => getNftByOwner(eClient, testGrantee))
@@ -627,13 +608,12 @@ describe("Authorization Module Test", function () {
             )
             )
     });
+
     it('grant should be successfully revoked', () => {
 
         return grant(client, testGranter, testGrantee, {
             grantType: GrantType.GENERIC,
-            params: {
-                msg: msgMapping[MsgType.SUBMIT_PROPOSAL]
-            },
+            msgType: MsgType.SUBMIT_PROPOSAL,
             expiration
         }, { maxGas: 100000000, gasPrice: 0.002 })
             .then(() => queryGrant(client, {
@@ -653,7 +633,6 @@ describe("Authorization Module Test", function () {
             }))
             .then((res: any) => expect(res).to.match(/NotFound/)
             );
-    })
-}
-)
+    });
+});
 
