@@ -28,10 +28,10 @@ import {TxRaw} from "./curium/lib/generated/cosmos/tx/v1beta1/tx"
 import {Creator, Metadata} from "./curium/lib/generated/nft/nft";
 import {Grant} from "./curium/lib/generated/cosmos/authz/v1beta1/authz";
 import {
+    EncodeFn,
     ExecuteAuthzMsg,
     grantMapping,
     GrantParam,
-    GrantTypeToEncodeFnMap,
     grantTypeToEncodeFnMap,
     msgMapping,
     msgTypeToEncodeFnMap,
@@ -312,11 +312,11 @@ export const signMetadata = (client: BluzelleClient, metadataId: number, broadca
 
 
 export const grant = (client: BluzelleClient, granter: string, grantee: string, grantParam: GrantParam, broadcastOptions: BroadcastOptions): any => {
-    const encodingFn = grantTypeToEncodeFnMap[grantParam.grantType] as GrantTypeToEncodeFnMap[typeof grantParam.grantType];
+    const encodingFn = grantTypeToEncodeFnMap[grantParam.grantType] as EncodeFn<typeof grantParam>;
     return Promise.resolve({
         "authorization": {
             "typeUrl": grantMapping[grantParam.grantType],
-            "value": encodingFn(grantParam as any)
+            "value": encodingFn(grantParam)
         },
         "expiration": grantParam.expiration
     } as Grant)

@@ -238,3 +238,5 @@ export const grantTypeToEncodeFnMap: GrantTypeToEncodeFnMap = {
   [GrantType.SEND]: (params: SendGrantParam) => SendAuthorization.encode({spendLimit: params.spendLimit}).finish(),
   [GrantType.STAKE]: (params: StakeGrantParam) => StakeAuthorization.encode(params.stakeAuthorization).finish(),
 }
+
+export type EncodeFn<T extends GrantParam> = (grantParam: T) => Uint8Array;
