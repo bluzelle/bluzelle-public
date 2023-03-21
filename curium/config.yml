@@ -1,19 +1,22 @@
 version: 1
+chain_id: "curium"
 build:
   proto:
     path: proto
     third_party_paths:
-    - third_party/proto
-    - proto_vendor
+      - third_party/proto
+      - proto_vendor
 accounts:
-- name: vuser
-  coins:
-  - 20000000000ubnt
-  - 500000000000000uelt
-  - 500000000000000ug4
-- name: minter
-  coins:
-  - 10000ubnt
+  - name: vuser
+    coins:
+      - 20000000000ubnt
+      - 500000000000000uelt
+      - 500000000000000ug4
+    hd-path: "m/44'/118'/0'/0/0"
+  - name: minter
+    coins:
+      - 10000ubnt
+    hd-path: "m/44'/118'/0'/0/0"
 faucet:
   name: null
   coins: []
@@ -29,8 +32,8 @@ genesis:
     gov:
       deposit_params:
         min_deposit:
-        - amount: "1000000"
-          denom: ubnt
+          - amount: "1000000"
+            denom: ubnt
     mint:
       minter:
         inflation: "0.0"
@@ -47,18 +50,18 @@ genesis:
       taxCollector: bluzelle1dvc2u4l84hyfeem5fmfm9eyjlndpsycwwfhtln
       transferTaxBp: 1
 validators:
-- name: vuser
-  bonded: 100000000ubnt
-  app:
-    api:
-      enable: true
-    minimum-gas-prices: 0ubnt
-    storage-dir: ~/.curium/storage
-  config:
-    consensus:
-      timeout_commit: 5s
-    p2p:
-      addr_book_strict: false
-  client:
-    keyring-backend: test
-    output: json
+  - name: vuser
+    bonded: 100000000ubnt
+    app:
+      api:
+        enable: true
+      minimum-gas-prices: 0ubnt
+      storage-dir: ~/.curium/storage
+    config:
+      consensus:
+        timeout_commit: 5s
+      p2p:
+        addr_book_strict: false
+    client:
+      keyring-backend: test
+      output: json

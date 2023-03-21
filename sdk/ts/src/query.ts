@@ -3,29 +3,27 @@ import {BluzelleClient} from "./sdk";
 import {QueryGetTaxInfoResponse} from "./curium/lib/generated/tax/query";
 import {
     QueryDelegatorDelegationsResponse,
-    QueryValidatorsResponse,
-    QueryDelegatorUnbondingDelegationsResponse
+    QueryDelegatorUnbondingDelegationsResponse,
+    QueryValidatorsResponse
 } from "./curium/lib/generated/cosmos/staking/v1beta1/query";
+import {QueryDelegationTotalRewardsResponse,} from "./curium/lib/generated/cosmos/distribution/v1beta1/query";
 import {
-    QueryDelegationTotalRewardsResponse,
-} from "./curium/lib/generated/cosmos/distribution/v1beta1/query";
-import {
+    Delegation,
     DelegationResponse,
-    Validator,
+    UnbondingDelegation,
     UnbondingDelegationEntry,
-    UnbondingDelegation
+    Validator
 } from "./curium/lib/generated/cosmos/staking/v1beta1/staking";
-import {
-    DelegationDelegatorReward
-} from "./curium/lib/generated/cosmos/distribution/v1beta1/distribution";
+import {DelegationDelegatorReward} from "./curium/lib/generated/cosmos/distribution/v1beta1/distribution";
 import {Coin} from "@cosmjs/proto-signing";
-import {Delegation} from "./curium/lib/generated/cosmos/staking/v1beta1/staking";
 import {PageRequest, PageResponse} from "./curium/lib/generated/cosmos/base/query/v1beta1/pagination";
-const Long = require("long");
 import {padStart} from "lodash";
 import {Some} from "monet";
 import {Collection, MasterEdition, Metadata, NFT} from "./curium/lib/generated/nft/nft";
-import {adaptCid} from "./utils/cidAdapter";
+import {msgMapping, MsgType} from "./authzTypes";
+import {QueryGrantsResponse} from "./curium/lib/generated/cosmos/authz/v1beta1/query";
+
+const Long = require("long");
 
 export type BluzelleDelegatorDelegationsResponse = {
     pagination: PageResponse,
@@ -136,8 +134,6 @@ export const hasContent = (client: BluzelleClient, cid: string) =>
         .then(x => x.hasContent);
 
 
-
-
 export const getAccountBalance = (client: BluzelleClient, address: string, denom: string = "ubnt"): Promise<number> =>
     client.queryClient.bank.Balance({address: address, denom})
         .then(res => Number(res.balance?.amount));
@@ -181,7 +177,18 @@ export const getDelegation = (
                 denom: 'ubnt',
                 amount: 0
             }
-        });
+        } as BluzelleDelegationResponse)
+        .catch(() => ({
+            delegation: {
+                validatorAddress,
+                delegatorAddress,
+                shares: 0
+            },
+            balance: {
+                denom: 'ubnt',
+                amount: 0
+            }
+        }) as BluzelleDelegationResponse);
 
 export const getDelegatorUnbondingDelegations = (
     client: BluzelleClient,
@@ -237,6 +244,32 @@ export const getDelegationTotalRewards = (
         delegatorAddress
     })
         .then(parseQueryDelegationTotalRewardsResponse);
+
+type QueryAuthorizationsParams = {
+    granter: string,
+    grantee: string,
+    msg: MsgType
+}
+
+export const queryAuthorizations = (
+    client: BluzelleClient,
+    params: QueryAuthorizationsParams,
+    options: BluzellePageRequest = defaultPaginationOptions()
+): Promise<QueryGrantsResponse> =>
+    client.queryClient.authz.Grants({
+        granter: params.granter,
+        grantee: params.grantee,
+        msgTypeUrl: msgMapping[params.msg],
+        pagination: {
+            key: options.key,
+            offset: new Long(options.offset),
+            limit: new Long(options.limit),
+            countTotal: options.countTotal,
+            reverse: options.reverse
+        } as PageRequest
+    })
+        .catch(() => ({grants: []}) as QueryGrantsResponse);
+
 
 const parseQueryDelegationTotalRewardsResponse = (res: QueryDelegationTotalRewardsResponse): Promise<BluzelleDelegationTotalRewardsResponse> =>
     Promise.all(res.rewards.map(parseDelegationDelegatorReward))

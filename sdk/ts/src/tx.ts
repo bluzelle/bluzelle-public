@@ -7,27 +7,35 @@ import {passThrough} from "promise-passthrough";
 import {identity} from "lodash";
 import {MsgSend} from "./curium/lib/generated/cosmos/bank/v1beta1/tx";
 import {
+    MsgCreateCollection,
     MsgCreateNFT,
     MsgPrintEdition,
-    MsgCreateCollection,
     MsgSignMetadata,
     MsgTransferNFT,
     MsgUpdateMetadata,
     MsgUpdateMetadataAuthority,
     MsgUpdateMintAuthority
 } from "./curium/lib/generated/nft/tx";
-import {
-    MsgSetGasTaxBp,
-    MsgSetTaxCollector,
-    MsgSetTransferTaxBp
-} from "./curium/lib/generated/tax/tx";
-import {MsgDelegate, MsgUndelegate, MsgBeginRedelegate} from "./curium/lib/generated/cosmos/staking/v1beta1/tx";
+import {MsgSetGasTaxBp, MsgSetTaxCollector, MsgSetTransferTaxBp} from "./curium/lib/generated/tax/tx";
+import {MsgBeginRedelegate, MsgDelegate, MsgUndelegate} from "./curium/lib/generated/cosmos/staking/v1beta1/tx";
 import {MsgWithdrawDelegatorReward} from "./curium/lib/generated/cosmos/distribution/v1beta1/tx";
+import {MsgExec, MsgGrant, MsgRevoke} from "./curium/lib/generated/cosmos/authz/v1beta1/tx";
 import {DeliverTxResponse} from "@cosmjs/stargate";
 import {toHex} from '@cosmjs/encoding'
 import {TxRaw} from "./curium/lib/generated/cosmos/tx/v1beta1/tx"
 import {Creator, Metadata} from "./curium/lib/generated/nft/nft";
-import {adaptCid} from "./utils/cidAdapter";
+import {Grant} from "./curium/lib/generated/cosmos/authz/v1beta1/authz";
+import {
+    EncodeFn,
+    ExecuteAuthzMsg,
+    grantMapping,
+    GrantParam,
+    grantTypeToEncodeFnMap,
+    msgMapping, MsgType,
+    msgTypeToEncodeFnMap,
+    MsgTypeToMsgMap
+} from "./authzTypes";
+
 const Long = require('long');
 
 interface MsgQueueItem<T> {
@@ -110,6 +118,10 @@ export const registerMessages = (registry: Registry) => {
     registry.register('/bluzelle.curium.nft.MsgUpdateMetadataAuthority', MsgUpdateMetadataAuthority)
     registry.register('/bluzelle.curium.nft.MsgPrintEdition', MsgPrintEdition)
     registry.register('/bluzelle.curium.nft.MsgSignMetadata', MsgSignMetadata)
+    registry.register('/cosmos.authz.v1beta1.MsgGrant', MsgGrant)
+    registry.register('/cosmos.authz.v1beta1.MsgExec', MsgExec)
+    registry.register('/cosmos.authz.v1beta1.MsgRevoke', MsgRevoke)
+
     return registry
 };
 
@@ -291,6 +303,54 @@ export const signMetadata = (client: BluzelleClient, metadataId: number, broadca
         metadataId: new Long(metadataId)
     }, broadcastOptions));
 
+
+export const grantAuthorization = (client: BluzelleClient, granter: string, grantee: string, grantParam: GrantParam, broadcastOptions: BroadcastOptions): any => {
+    const encodingFn = grantTypeToEncodeFnMap[grantParam.grantType] as EncodeFn<typeof grantParam>;
+    return Promise.resolve({
+        "authorization": {
+            "typeUrl": grantMapping[grantParam.grantType],
+            "value": encodingFn(grantParam)
+        },
+        "expiration": grantParam.expiration
+    } as Grant)
+        .then((grant) => sendTx<MsgGrant>(client, '/cosmos.authz.v1beta1.MsgGrant', {
+            granter,
+            grantee,
+            grant,
+        }, broadcastOptions))
+};
+
+export const revokeAuthorization = (
+    client: BluzelleClient,
+    granter: string,
+    grantee: string,
+    msgType: MsgType,
+    broadcastOptions: BroadcastOptions
+) =>
+    Promise.resolve(sendTx<MsgRevoke>(client, '/cosmos.authz.v1beta1.MsgRevoke', {
+        granter,
+        grantee,
+        msgTypeUrl: msgMapping[msgType],
+    }, broadcastOptions));
+
+
+export const executeAuthorization = (
+    client: BluzelleClient,
+    grantee: string,
+    msgs: ExecuteAuthzMsg[],
+    broadcastOptions: BroadcastOptions
+) =>
+    Promise.resolve(
+        msgs.map(({msgType, params}) => {
+            const encodingFn = msgTypeToEncodeFnMap[msgType] as (msg: MsgTypeToMsgMap[typeof msgType]) => Uint8Array;
+            return {
+                typeUrl: msgMapping[msgType],
+                value: encodingFn(params),
+            };
+        })
+    ).then((msgs) =>
+        sendTx<MsgExec>(client, "/cosmos.authz.v1beta1.MsgExec", {grantee, msgs}, broadcastOptions)
+    );
 
 const sendTx = <T>(client: BluzelleClient, type: string, msg: T, options: BroadcastOptions, mode: BroadcastMode = getDefaultBroadcastMode()) =>
     Right(msg)

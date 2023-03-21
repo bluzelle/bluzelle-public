@@ -31,6 +31,35 @@ export const getCosmosProtoDependencies = () => [
 
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/crypto/multisig/v1beta1/multisig.proto',
 
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/authz/v1beta1/authz.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/authz/v1beta1/event.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/authz/v1beta1/genesis.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/authz/v1beta1/query.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/authz/v1beta1/tx.proto',
+
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/feegrant/v1beta1/feegrant.proto',
+    'https://github.com/cosmos/cosmos-sdk/blob/v0.45.11/proto/cosmos/feegrant/v1beta1/genesis.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/feegrant/v1beta1/query.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/feegrant/v1beta1/tx.proto',
+
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/slashing/v1beta1/genesis.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/slashing/v1beta1/query.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/slashing/v1beta1/slashing.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/slashing/v1beta1/tx.proto',
+
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/crisis/v1beta1/genesis.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/crisis/v1beta1/tx.proto',
+
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/evidence/v1beta1/evidence.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/evidence/v1beta1/genesis.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/evidence/v1beta1/query.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/evidence/v1beta1/tx.proto',
+
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/gov/v1beta1/genesis.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/gov/v1beta1/gov.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/gov/v1beta1/query.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/gov/v1beta1/tx.proto',
+
 ];
 
 
