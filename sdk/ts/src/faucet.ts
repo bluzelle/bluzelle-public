@@ -9,11 +9,11 @@ import {bech32} from "bech32"
 import delay from "delay";
 import {getAccountBalance} from "./query";
 
-const hdPath = "m/44'/483'/0'/0/0";
+const defaultHdPath = "m/44'/483'/0'/0/0";
 const bech32Prefix = "bluzelle"
 
 
-export function createAddress(mnemonic: string = bip39.generateMnemonic(256)): ({address: string, mnemonic: string}) {
+export function createAddress(mnemonic: string = bip39.generateMnemonic(256), hdPath: string = defaultHdPath): ({address: string, mnemonic: string}) {
     return Some({mnemonic})
         .map(ctx => [ctx, bip39.mnemonicToSeedSync(ctx.mnemonic)])
         .map(([ctx, seed]) => [ctx, BIP32Factory(ecc).fromSeed(seed as Buffer)])
