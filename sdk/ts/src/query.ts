@@ -245,7 +245,7 @@ export const getDelegationTotalRewards = (
     })
         .then(parseQueryDelegationTotalRewardsResponse);
 
-type QueryAuthorizationsParams = {
+export type QueryAuthorizationsParams = {
     granter: string,
     grantee: string,
     msg: MsgType

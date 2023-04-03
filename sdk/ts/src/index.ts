@@ -29,7 +29,9 @@ export {
     getNftInfo,
     getCollectionInfo,
     getNftByOwner,
-    getNftMetadata
+    getNftMetadata,
+    queryAuthorizations,
+    QueryAuthorizationsParams,
 } from "./query";
 export {getStatus, getValidators} from "./queryTendermint";
 export {
@@ -49,7 +51,9 @@ export {
     updateMintAuthority,
     printNftEdition,
     signMetadata,
-
+    grantAuthorization,
+    revokeAuthorization,
+    executeAuthorization,
 } from "./tx";
 export {generateMnemonic} from "./generateMnemonic";
 
