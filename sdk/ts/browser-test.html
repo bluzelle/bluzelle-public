@@ -10,6 +10,8 @@
     <button id="balance">Check balance</button>
     <button id="pin">Pin Cid</button>
     <button id="send">Send Tx</button>
+    <button id="mint">Mint</button>
+    <button id="transferNFT">transferNFT</button>
     <div id="message" style="border: 1px solid black; height: 200px"></div>
 
     <script>
@@ -44,6 +46,22 @@
         writeMessage('sending...')
         bluzelle.send(client, 'bluzelle1xxkl5wddr5l6aact0mrlqx4vghdz752ccws5ke', 100, {
             maxGas: 100000000,
+            gasPrice: 0.002
+        })
+            .then(JSON.stringify)
+            .then(writeMessage)
+    })
+    document.querySelector('#mint').addEventListener('click', () => {
+        writeMessage('minting...')
+        bluzelle.mint(client, client.address)
+            .then(JSON.stringify)
+            .then(writeMessage)
+    })
+
+    document.querySelector('#transferNFT').addEventListener('click', () => {
+        writeMessage('transferring NFT')
+        bluzelle.transferNft(client, '1:1:0', 'bluzelle1xxkl5wddr5l6aact0mrlqx4vghdz752ccws5ke', {
+            maxGas: 1000000,
             gasPrice: 0.002
         })
             .then(JSON.stringify)
