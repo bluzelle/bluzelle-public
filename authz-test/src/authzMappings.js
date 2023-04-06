@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.grantTypeToEncodeFunctionMap = exports.grantMapping = exports.msgTypeToEncodeFunctionMap = exports.msgMapping = void 0;
+exports.grantTypeToEncodeFnMap = exports.grantMapping = exports.msgTypeToEncodeFnMap = exports.msgMapping = void 0;
 const tx_1 = require("./curium/lib/generated/cosmos/bank/v1beta1/tx");
 const tx_2 = require("./curium/lib/generated/storage/tx");
 const tx_3 = require("./curium/lib/generated/cosmos/staking/v1beta1/tx");
@@ -46,7 +46,7 @@ exports.msgMapping = {
     [21 /* MsgType.UPDATE_COLLECTION_AUTHORITY */]: "/bluzelle.curium.nft.MsgUpdateCollectionAuthority",
     [22 /* MsgType.PIN */]: "/bluzelle.curium.storage.MsgPin",
 };
-exports.msgTypeToEncodeFunctionMap = {
+exports.msgTypeToEncodeFnMap = {
     [23 /* MsgType.SEND */]: (msg) => tx_1.MsgSend.encode(msg).finish(),
     [24 /* MsgType.CREATE_VALIDATOR */]: (msg) => tx_3.MsgCreateValidator.encode(msg).finish(),
     [25 /* MsgType.EDIT_VALIDATOR */]: (msg) => tx_3.MsgEditValidator.encode(msg).finish(),
@@ -83,8 +83,8 @@ exports.grantMapping = {
     [1 /* GrantType.SEND */]: "/cosmos.bank.v1beta1.SendAuthorization",
     [2 /* GrantType.STAKE */]: "/cosmos.staking.v1beta1.StakeAuthorization"
 };
-exports.grantTypeToEncodeFunctionMap = {
-    [0 /* GrantType.GENERIC */]: (grant) => authz_1.GenericAuthorization.encode(grant).finish(),
-    [1 /* GrantType.SEND */]: (grant) => authz_2.SendAuthorization.encode(grant).finish(),
-    [2 /* GrantType.STAKE */]: (grant) => authz_3.StakeAuthorization.encode(grant).finish(),
+exports.grantTypeToEncodeFnMap = {
+    [0 /* GrantType.GENERIC */]: (params) => authz_1.GenericAuthorization.encode({ msg: exports.msgMapping[params.msgType] }).finish(),
+    [1 /* GrantType.SEND */]: (params) => authz_2.SendAuthorization.encode({ spendLimit: params.spendLimit }).finish(),
+    [2 /* GrantType.STAKE */]: (params) => authz_3.StakeAuthorization.encode(params.stakeAuthorization).finish(),
 };

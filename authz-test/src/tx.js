@@ -171,11 +171,11 @@ const signMetadata = (client, metadataId, broadcastOptions) => Promise.resolve(s
 exports.signMetadata = signMetadata;
 // Authz msg send functions begin.
 const grant = (client, granter, grantee, grantParam, broadcastOptions) => {
-    const encodingFunction = authzMappings_1.grantTypeToEncodeFunctionMap[grantParam.grantType];
+    const encodingFn = authzMappings_1.grantTypeToEncodeFnMap[grantParam.grantType];
     return Promise.resolve({
         "authorization": {
             "typeUrl": authzMappings_1.grantMapping[grantParam.grantType],
-            "value": encodingFunction(grantParam.params)
+            "value": encodingFn(grantParam)
         },
         "expiration": grantParam.expiration
     })
@@ -193,10 +193,10 @@ const revoke = (client, granter, grantee, msgTypeUrl, broadcastOptions) => Promi
 }, broadcastOptions));
 exports.revoke = revoke;
 const executeGrant = (client, grantee, msgs, broadcastOptions) => Promise.resolve(msgs.map(({ msgType, params }) => {
-    const encodingFunction = authzMappings_1.msgTypeToEncodeFunctionMap[msgType];
+    const encodingFn = authzMappings_1.msgTypeToEncodeFnMap[msgType];
     return {
         typeUrl: authzMappings_1.msgMapping[msgType],
-        value: encodingFunction(params),
+        value: encodingFn(params),
     };
 })).then((msgs) => sendTx(client, "/cosmos.authz.v1beta1.MsgExec", { grantee, msgs }, broadcastOptions));
 exports.executeGrant = executeGrant;

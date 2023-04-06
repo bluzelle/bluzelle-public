@@ -161,6 +161,7 @@ describe("Authorization Module Test", function () {
             },
             expiration
         }, { maxGas: 1000000, gasPrice: 0.002 })
+            .then(() => delegate(eClient, testGrantee, testValAddress, 100, { maxGas: 1000000, gasPrice: 0.002 }))
             .then(() => queryGrant(client, {
                 granter: testGranter,
                 grantee: testGrantee,

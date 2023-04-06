@@ -53,9 +53,7 @@ describe("Authorization Module Test", function () {
     it('verifyInvarient msg authorization should be successfully created', () => {
         return (0, tx_1.grant)(client, testGranter, testGrantee, {
             grantType: 0 /* GrantType.GENERIC */,
-            params: {
-                msg: authzMappings_1.msgMapping[0 /* MsgType.VERIFY_INVARIANT */],
-            },
+            msgType: 0 /* MsgType.VERIFY_INVARIANT */,
             expiration
         }, {
             maxGas: 1000000, gasPrice: 0.002
@@ -71,43 +69,39 @@ describe("Authorization Module Test", function () {
             (0, chai_1.expect)(authz_3.GenericAuthorization.decode((_b = res.grants[0].authorization) === null || _b === void 0 ? void 0 : _b.value).msg).to.equal(authzMappings_1.msgMapping[0 /* MsgType.VERIFY_INVARIANT */]);
         });
     });
-    it('send grant should be successfully executed', () => __awaiter(this, void 0, void 0, function* () {
-        return (0, tx_1.grant)(client, testGranter, testGrantee, {
-            grantType: 1 /* GrantType.SEND */,
+    it('send grant should be successfully executed', () => (0, tx_1.grant)(client, testGranter, testGrantee, {
+        grantType: 1 /* GrantType.SEND */,
+        spendLimit: [{
+                denom: "ubnt",
+                amount: "100"
+            }],
+        expiration
+    }, {
+        maxGas: 1000000, gasPrice: 0.002
+    })
+        .then(() => (0, index_1.getAccountBalance)(client, testGrantee))
+        .then((balance) => (0, with_context_1.createCtx)("beforeBalance", () => balance))
+        .then((0, with_context_1.withCtxAwait)("result", () => (0, tx_1.executeGrant)(eClient, testGrantee, [{
+            msgType: 23 /* MsgType.SEND */,
             params: {
-                spendLimit: [{
+                fromAddress: testGrantee,
+                toAddress: testGranter,
+                amount: [{
                         denom: "ubnt",
                         amount: "100"
                     }]
-            },
-            expiration
-        }, {
-            maxGas: 1000000, gasPrice: 0.002
-        })
-            .then(() => (0, index_1.getAccountBalance)(client, testGrantee))
-            .then((balance) => (0, with_context_1.createCtx)("beforeBalance", () => balance))
-            .then((0, with_context_1.withCtxAwait)("result", () => (0, tx_1.executeGrant)(eClient, testGrantee, [{
-                msgType: 23 /* MsgType.SEND */,
-                params: {
-                    fromAddress: testGrantee,
-                    toAddress: testGranter,
-                    amount: [{
-                            denom: "ubnt",
-                            amount: "100"
-                        }]
-                }
-            }], {
-            maxGas: 1000000, gasPrice: 0.002
-        })))
-            .then((0, with_context_1.withCtxAwait)("afterBalance", () => (0, index_1.getAccountBalance)(client, testGrantee)))
-            .then((ctx) => {
-            (0, chai_1.expect)(ctx.beforeBalance - ctx.afterBalance).to.equal(100);
-        });
+            }
+        }], {
+        maxGas: 1000000, gasPrice: 0.002
+    })))
+        .then((0, with_context_1.withCtxAwait)("afterBalance", () => (0, index_1.getAccountBalance)(client, testGrantee)))
+        .then((ctx) => {
+        (0, chai_1.expect)(ctx.beforeBalance - ctx.afterBalance).to.equal(100);
     }));
     it('delegate msg authorization should be successfully created and executed ', () => {
         return (0, tx_1.grant)(client, testGranter, testGrantee, {
             grantType: 2 /* GrantType.STAKE */,
-            params: {
+            stakeAuthorization: {
                 authorizationType: authz_2.AuthorizationType.AUTHORIZATION_TYPE_DELEGATE,
             },
             expiration
@@ -150,11 +144,12 @@ describe("Authorization Module Test", function () {
     it('undelegate msg authorization should be successfully created and executed', () => __awaiter(this, void 0, void 0, function* () {
         return (0, tx_1.grant)(client, testGranter, testGrantee, {
             grantType: 2 /* GrantType.STAKE */,
-            params: {
+            stakeAuthorization: {
                 authorizationType: authz_2.AuthorizationType.AUTHORIZATION_TYPE_UNDELEGATE
             },
             expiration
         }, { maxGas: 1000000, gasPrice: 0.002 })
+            .then(() => (0, tx_1.delegate)(eClient, testGrantee, testValAddress, 100, { maxGas: 1000000, gasPrice: 0.002 }))
             .then(() => (0, authz_1.queryGrant)(client, {
             granter: testGranter,
             grantee: testGrantee,
@@ -189,7 +184,7 @@ describe("Authorization Module Test", function () {
     it('redelegate msg authorization should be successfully created and executed', () => {
         return (0, tx_1.grant)(client, testGranter, testGrantee, {
             grantType: 2 /* GrantType.STAKE */,
-            params: {
+            stakeAuthorization: {
                 authorizationType: authz_2.AuthorizationType.AUTHORIZATION_TYPE_REDELEGATE
             },
             expiration
@@ -233,9 +228,7 @@ describe("Authorization Module Test", function () {
     it(' create nft collection authorization should be successfully created and executed.', () => {
         return (0, tx_1.grant)(client, testGranter, testGrantee, {
             grantType: 0 /* GrantType.GENERIC */,
-            params: {
-                msg: authzMappings_1.msgMapping[20 /* MsgType.CREATE_COLLECTION */]
-            },
+            msgType: 20 /* MsgType.CREATE_COLLECTION */,
             expiration
         }, { maxGas: 1000000, gasPrice: 0.002 })
             .then((0, tx_1.executeGrant)(eClient, testGrantee, [{
@@ -278,9 +271,7 @@ describe("Authorization Module Test", function () {
         return (0, tx_1.createCollection)(eClient, eClient.address, 'TMP', 'Temp', 'http://temp.com', true, eClient.address, { maxGas: 100000000, gasPrice: 0.002 })
             .then(() => (0, tx_1.grant)(client, testGranter, testGrantee, {
             grantType: 0 /* GrantType.GENERIC */,
-            params: {
-                msg: authzMappings_1.msgMapping[13 /* MsgType.CREATE_NFT */]
-            },
+            msgType: 13 /* MsgType.CREATE_NFT */,
             expiration
         }, { maxGas: 1000000, gasPrice: 0.002 }))
             .then(() => (0, tx_1.executeGrant)(eClient, testGrantee, [
@@ -326,9 +317,7 @@ describe("Authorization Module Test", function () {
             .then(() => (0, sdk_1.createNft)(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => (0, tx_1.grant)(client, testGranter, testGrantee, {
             grantType: 0 /* GrantType.GENERIC */,
-            params: {
-                msg: authzMappings_1.msgMapping[15 /* MsgType.TRANSFER_NFT */]
-            },
+            msgType: 15 /* MsgType.TRANSFER_NFT */,
             expiration
         }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => (0, sdk_1.getNftByOwner)(eClient, testGrantee))
@@ -372,9 +361,7 @@ describe("Authorization Module Test", function () {
             .then(() => (0, sdk_1.createNft)(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => (0, tx_1.grant)(client, testGranter, testGrantee, {
             grantType: 0 /* GrantType.GENERIC */,
-            params: {
-                msg: authzMappings_1.msgMapping[18 /* MsgType.UPDATE_METADATA_AUTHORITY */]
-            },
+            msgType: 18 /* MsgType.UPDATE_METADATA_AUTHORITY */,
             expiration
         }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => (0, sdk_1.getNftByOwner)(eClient, testGrantee))
@@ -423,9 +410,7 @@ describe("Authorization Module Test", function () {
             .then(() => (0, sdk_1.createNft)(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => (0, tx_1.grant)(client, testGranter, testGrantee, {
             grantType: 0 /* GrantType.GENERIC */,
-            params: {
-                msg: authzMappings_1.msgMapping[17 /* MsgType.UPDATE_METADATA */]
-            },
+            msgType: 17 /* MsgType.UPDATE_METADATA */,
             expiration
         }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => (0, sdk_1.getNftByOwner)(eClient, testGrantee))
@@ -481,9 +466,7 @@ describe("Authorization Module Test", function () {
             .then(() => (0, sdk_1.createNft)(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => (0, tx_1.grant)(client, testGranter, testGrantee, {
             grantType: 0 /* GrantType.GENERIC */,
-            params: {
-                msg: authzMappings_1.msgMapping[19 /* MsgType.UPDATE_MINT_AUTHORITIY */]
-            },
+            msgType: 19 /* MsgType.UPDATE_MINT_AUTHORITIY */,
             expiration
         }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => (0, sdk_1.getNftByOwner)(eClient, testGrantee))
@@ -532,9 +515,7 @@ describe("Authorization Module Test", function () {
             .then(() => (0, sdk_1.createNft)(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => (0, tx_1.grant)(client, testGranter, testGrantee, {
             grantType: 0 /* GrantType.GENERIC */,
-            params: {
-                msg: authzMappings_1.msgMapping[14 /* MsgType.PRINT_EDITION */]
-            },
+            msgType: 14 /* MsgType.PRINT_EDITION */,
             expiration
         }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => (0, sdk_1.getNftByOwner)(eClient, testGrantee))
@@ -584,9 +565,7 @@ describe("Authorization Module Test", function () {
             .then(() => (0, sdk_1.createNft)(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => (0, tx_1.grant)(client, testGranter, testGrantee, {
             grantType: 0 /* GrantType.GENERIC */,
-            params: {
-                msg: authzMappings_1.msgMapping[16 /* MsgType.SIGN_METADATA */]
-            },
+            msgType: 16 /* MsgType.SIGN_METADATA */,
             expiration
         }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => (0, sdk_1.getNftByOwner)(eClient, testGrantee))
@@ -611,9 +590,7 @@ describe("Authorization Module Test", function () {
     it('grant should be successfully revoked', () => {
         return (0, tx_1.grant)(client, testGranter, testGrantee, {
             grantType: 0 /* GrantType.GENERIC */,
-            params: {
-                msg: authzMappings_1.msgMapping[8 /* MsgType.SUBMIT_PROPOSAL */]
-            },
+            msgType: 8 /* MsgType.SUBMIT_PROPOSAL */,
             expiration
         }, { maxGas: 100000000, gasPrice: 0.002 })
             .then(() => (0, authz_1.queryGrant)(client, {
