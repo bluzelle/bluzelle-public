@@ -139,3 +139,8 @@ message EventUpdateCollectionAuthority {
   uint64 collection_id = 1;
   string new_authority = 2;
 }
+
+message EventUpdateCollectionUri {
+  uint64 collection_id = 1;
+  string uri = 2;
+}

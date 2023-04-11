@@ -11,7 +11,7 @@ import {
     MsgCreateNFT,
     MsgPrintEdition,
     MsgSignMetadata,
-    MsgTransferNFT,
+    MsgTransferNFT, MsgUpdateCollectionUri,
     MsgUpdateMetadata,
     MsgUpdateMetadataAuthority,
     MsgUpdateMintAuthority
@@ -122,6 +122,7 @@ export const registerMessages = (registry: Registry) => {
     registry.register('/cosmos.authz.v1beta1.MsgGrant', MsgGrant)
     registry.register('/cosmos.authz.v1beta1.MsgExec', MsgExec)
     registry.register('/cosmos.authz.v1beta1.MsgRevoke', MsgRevoke)
+    registry.register('/bluzelle.curium.nft.MsgUpdateCollectionUri', MsgUpdateCollectionUri)
 
     return registry
 };
@@ -300,6 +301,14 @@ export const updateMintAuthority = (client: BluzelleClient, metadataId: number, 
         metadataId: new Long(metadataId),
         newAuthority
     }, broadcastOptions));
+
+export const updateCollectionUri = (client: BluzelleClient, collectionId: number, uri: string, broadcastOptions: BroadcastOptions) =>
+    Promise.resolve(sendTx<MsgUpdateCollectionUri>(client, '/bluzelle.curium.nft.MsgUpdateCollectionUri', {
+        sender: client.address,
+        collectionId: new Long(collectionId),
+        uri
+    }, broadcastOptions))
+
 
 export const signMetadata = (client: BluzelleClient, metadataId: number, broadcastOptions: BroadcastOptions) =>
     Promise.resolve(sendTx<MsgSignMetadata>(client, '/bluzelle.curium.nft.MsgSignMetadata', {

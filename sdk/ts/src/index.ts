@@ -48,6 +48,7 @@ export {
     createCollection,
     updateMetadataAuthority,
     updateMetadata,
+    updateCollectionUri,
     updateMintAuthority,
     printNftEdition,
     signMetadata,

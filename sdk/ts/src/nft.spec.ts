@@ -7,7 +7,7 @@ import {
     createCollection,
     createNft,
     printNftEdition,
-    transferNft,
+    transferNft, updateCollectionUri,
     updateMetadata,
     updateMetadataAuthority,
     updateMintAuthority
@@ -250,6 +250,22 @@ describe('nft module', function () {
             .then(() => getNftInfo(client, '1:1:0'))
             .then(nftInfo => {
                 expect(nftInfo.metadata?.mutableUri).to.deep.equal('http://updatedStarloopDatabase.com');
+            })
+    )
+
+
+    it('should update the collection uri', () =>
+        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {
+            maxGas: 100000000,
+            gasPrice: 0.002
+        })
+            .then(() => updateCollectionUri(client, 1, 'http://updatedTemp.com', {
+                maxGas: 100000000,
+                gasPrice: 0.002
+            }))
+            .then(() => getCollectionInfo(client, 1))
+            .then(resp => {
+                expect(resp.collection.uri).to.deep.equal('http://updatedTemp.com')
             })
     )
 
