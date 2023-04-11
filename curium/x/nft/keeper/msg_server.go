@@ -116,6 +116,7 @@ func (m msgServer) UpdateMetadata(goCtx context.Context, msg *types.MsgUpdateMet
 
 	metadata.Name = msg.Name
 	metadata.Uri = msg.Uri
+	metadata.MutableUri = msg.MutableUri
 	metadata.SellerFeeBasisPoints = msg.SellerFeeBasisPoints
 	metadata.Creators = msg.Creators
 

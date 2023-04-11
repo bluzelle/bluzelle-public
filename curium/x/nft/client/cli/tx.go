@@ -87,7 +87,7 @@ func GetCmdCreateNFT() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateNFT(clientCtx.GetFromAddress(), collId, updateAuthority, data.Name, data.Uri, data.SellerFeeBasisPoints, false, isMutable, data.Creators, masterEditionMaxSupply)
+			msg := types.NewMsgCreateNFT(clientCtx.GetFromAddress(), collId, updateAuthority, data.Name, data.Uri, data.MutableUri, data.SellerFeeBasisPoints, false, isMutable, data.Creators, masterEditionMaxSupply)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -256,7 +256,7 @@ func GetCmdUpdateMetadata() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpdateMetadata(clientCtx.GetFromAddress(), metadataId, data.Name, data.Uri, data.SellerFeeBasisPoints, data.Creators)
+			msg := types.NewMsgUpdateMetadata(clientCtx.GetFromAddress(), metadataId, data.Name, data.Uri, data.MutableUri, data.SellerFeeBasisPoints, data.Creators)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err

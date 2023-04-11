@@ -11,7 +11,7 @@ import (
 func (suite *KeeperTestSuite) CreateNFT(creator sdk.AccAddress, collectionId uint64) *types.MsgCreateNFTResponse {
 	msgServer := keeper.NewMsgServerImpl(*suite.NFTKeeper)
 	resp, err := msgServer.CreateNFT(sdk.WrapSDKContext(suite.ctx), types.NewMsgCreateNFT(
-		creator, collectionId, creator.String(), "Punk", "punk.com", 0, false, false, []types.Creator{}, 1,
+		creator, collectionId, creator.String(), "Punk", "punk.com", "http://starloopDatabase.com", 0, false, false, []types.Creator{}, 1,
 	))
 	suite.Require().NoError(err)
 	return resp
@@ -20,7 +20,7 @@ func (suite *KeeperTestSuite) CreateNFT(creator sdk.AccAddress, collectionId uin
 func (suite *KeeperTestSuite) CreateMutableNFT(creator sdk.AccAddress, collectionId uint64) *types.MsgCreateNFTResponse {
 	msgServer := keeper.NewMsgServerImpl(*suite.NFTKeeper)
 	resp, err := msgServer.CreateNFT(sdk.WrapSDKContext(suite.ctx), types.NewMsgCreateNFT(
-		creator, collectionId, creator.String(), "Punk", "punk.com", 0, false, true, []types.Creator{}, 1,
+		creator, collectionId, creator.String(), "Punk", "punk.com", "http://starloopDatabase.com", 0, false, true, []types.Creator{}, 1,
 	))
 	suite.Require().NoError(err)
 	return resp
@@ -37,7 +37,7 @@ func (suite *KeeperTestSuite) CreateNFTWithCreators(creator sdk.AccAddress, coll
 	}
 	msgServer := keeper.NewMsgServerImpl(*suite.NFTKeeper)
 	resp, err := msgServer.CreateNFT(sdk.WrapSDKContext(suite.ctx), types.NewMsgCreateNFT(
-		creator, collectionId, creator.String(), "Punk", "punk.com", 0, false, false, creators, 1,
+		creator, collectionId, creator.String(), "Punk", "punk.com", "http://starloopDatabase.com", 0, false, false, creators, 1,
 	))
 	suite.Require().NoError(err)
 	return resp
@@ -86,7 +86,7 @@ func (suite *KeeperTestSuite) TestMsgServerCreateNFT() {
 
 		msgServer := keeper.NewMsgServerImpl(*suite.NFTKeeper)
 		resp, err := msgServer.CreateNFT(sdk.WrapSDKContext(suite.ctx), types.NewMsgCreateNFT(
-			creator, collInfo.Id, creator.String(), "Punk", "punk.com", 0, false, false, []types.Creator{
+			creator, collInfo.Id, creator.String(), "Punk", "punk.com", "http://starloopDatabase.com", 0, false, false, []types.Creator{
 				{
 					Address:  creator.String(),
 					Verified: true,
@@ -506,7 +506,7 @@ func (suite *KeeperTestSuite) TestMsgServerUpdateMetadata() {
 	for _, tc := range tests {
 		msgServer := keeper.NewMsgServerImpl(*suite.NFTKeeper)
 		_, err := msgServer.UpdateMetadata(sdk.WrapSDKContext(suite.ctx), types.NewMsgUpdateMetadata(
-			tc.sender, tc.metadataId, "NewPUNK", "NewURI", 10, []types.Creator{
+			tc.sender, tc.metadataId, "NewPUNK", "NewURI", "http://starloopDatabase.com", 10, []types.Creator{
 				{Address: creator1.String(), Verified: true, Share: 100},
 			},
 		))
