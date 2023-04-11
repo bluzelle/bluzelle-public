@@ -35,6 +35,7 @@ func NewTxCmd() *cobra.Command {
 		GetCmdUpdateMintAuthority(),
 		GetCmdCreateCollection(),
 		GetCmdUpdateCollectionAuthority(),
+		GetCmdUpdateCollectionUri(),
 	)
 
 	return txCmd
@@ -441,6 +442,47 @@ func GetCmdUpdateCollectionAuthority() *cobra.Command {
 			}
 
 			msg := types.NewMsgUpdateCollectionAuthority(clientCtx.GetFromAddress(), collectionId, newAuthority)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FlagUpdateCollectionAuthority())
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func GetCmdUpdateCollectionUri() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "update-collection-uri",
+		Long: "Update collection uri",
+		Example: fmt.Sprintf(
+			`$ %s tx nft update-collection-authority
+				--collection-id=1
+				--uri="https://punk.com"`,
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			collectionId, err := cmd.Flags().GetUint64(FlagCollectionId)
+			if err != nil {
+				return err
+			}
+
+			newUri, err := cmd.Flags().GetString(FlagUri)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgUpdateCollectionUri(clientCtx.GetFromAddress(), collectionId, newUri)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err

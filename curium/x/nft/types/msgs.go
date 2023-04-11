@@ -441,3 +441,44 @@ func (msg MsgUpdateCollectionAuthority) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{sender}
 }
+
+var _ sdk.Msg = &MsgUpdateCollectionUri{}
+
+func NewMsgUpdateCollectionUri(sender sdk.AccAddress, collectionId uint64, uri string) *MsgUpdateCollectionUri {
+	return &MsgUpdateCollectionUri{
+		Sender:       sender.String(),
+		CollectionId: collectionId,
+		Uri:          uri,
+	}
+}
+
+func (msg MsgUpdateCollectionUri) Route() string { return RouterKey }
+
+func (msg MsgUpdateCollectionUri) Type() string { return TypeMsgUpdateMetadataAuthority }
+
+func (msg MsgUpdateCollectionUri) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+	}
+
+	return nil
+}
+
+// GetSignBytes Implements Msg.
+func (msg MsgUpdateCollectionUri) GetSignBytes() []byte {
+	b, err := ModuleCdc.MarshalJSON(&msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// GetSigners Implements Msg.
+func (msg MsgUpdateCollectionUri) GetSigners() []sdk.AccAddress {
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{sender}
+}

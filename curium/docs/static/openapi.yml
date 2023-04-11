@@ -30735,6 +30735,8 @@ definitions:
     type: object
   bluzelle.curium.nft.MsgUpdateCollectionAuthorityResponse:
     type: object
+  bluzelle.curium.nft.MsgUpdateCollectionUriResponse:
+    type: object
   bluzelle.curium.nft.MsgUpdateMetadataAuthorityResponse:
     type: object
   bluzelle.curium.nft.MsgUpdateMetadataResponse:
