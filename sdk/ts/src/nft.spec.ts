@@ -220,6 +220,39 @@ describe('nft module', function () {
             )
     });
 
+    it('should be able to add a mutableUri to an nft', () =>
+        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com',true, client.address, {
+            maxGas: 100000000,
+            gasPrice: 0.002
+        })
+            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps(1, 'NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(x => getNftMetadata(client, 1))
+            .then(info => {
+                expect(info.metadata.mutableUri).to.deep.equal(defaultMetadataProps(1, 'NFT1', true, client.address).mutableUri)
+            })
+    )
+
+    it('should be able to update a mutableUri of an nft', () =>
+        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com',true, client.address, {
+            maxGas: 100000000,
+            gasPrice: 0.002
+        })
+            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps(1, 'NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => updateMetadata(client, {
+                name: 'NFT2',
+                uri: 'http://temp2.com',
+                mutableUri: 'http://updatedStarloopDatabase.com',
+                creators: [defaultCreators(client.address)],
+                sellerFeeBasisPoints: 80,
+                sender: client.address,
+                metadataId: 1
+            }, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => getNftInfo(client, '1:1:0'))
+            .then(nftInfo => {
+                expect(nftInfo.metadata?.mutableUri).to.deep.equal('http://updatedStarloopDatabase.com');
+            })
+    )
+
 
 });
 
@@ -238,6 +271,7 @@ export const defaultMetadataProps = (id: number, name: string, isMutable: boolea
     id,
     name,
     uri: 'https://tmp.com',
+    mutableUri: 'http://starloopDatabase.com',
     sellerFeeBasisPoints: 100,
     primarySaleHappened: false,
     isMutable,

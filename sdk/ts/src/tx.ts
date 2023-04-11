@@ -64,6 +64,7 @@ type MetadataHumanReadable = {
     id: number,
     name: string;
     uri: string;
+    mutableUri?: string;
     sellerFeeBasisPoints: number;
     primarySaleHappened: boolean;
     isMutable: boolean;
@@ -223,6 +224,7 @@ export function createNft (client: BluzelleClient, props: {collId: number, metad
     function adaptMetadataProps (props: MetadataHumanReadable): Metadata {
         return ({
             ...props,
+            mutableUri: props.mutableUri || '',
             id: new Long(props.id),
             masterEdition: props.masterEdition && {
                 supply: new Long(props.masterEdition.supply),
@@ -271,13 +273,15 @@ export function updateMetadata (client: BluzelleClient, props: {
     metadataId: number;
     name: string;
     uri: string;
+    mutableUri?: string;
     sellerFeeBasisPoints: number;
     creators: Creator[]}, broadcastOptions: BroadcastOptions) {
-    return Promise.resolve(sendTx<MsgUpdateMetadata>(client, '/bluzelle.curium.nft.MsgUpdateMetadata', adaptUpdateMetadataProps(props.metadataId, props), broadcastOptions))
+    return Promise.resolve(sendTx<MsgUpdateMetadata>(client, '/bluzelle.curium.nft.MsgUpdateMetadata', adaptUpdateMetadataProps(props.metadataId, props.mutableUri || "", props), broadcastOptions))
 
-    function adaptUpdateMetadataProps (id: number, props: Omit<MsgUpdateMetadata, 'metadataId'>): MsgUpdateMetadata {
+    function adaptUpdateMetadataProps (id: number, mutableUri: string, props: Omit<MsgUpdateMetadata, 'metadataId' | 'mutableUri'>): MsgUpdateMetadata {
         return ({
             ...props,
+            mutableUri,
             metadataId: new Long(id)
         })
     }
