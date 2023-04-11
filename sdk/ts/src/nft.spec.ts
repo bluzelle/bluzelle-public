@@ -24,7 +24,7 @@ describe('nft module', function () {
     let client: BluzelleClient;
     beforeEach(() =>
         stopSwarm()
-            .then(() => startSwarmWithClient()
+            .then(() => startSwarmWithClient())
             .then(({bzSdk}) => client = bzSdk)
     );
 
