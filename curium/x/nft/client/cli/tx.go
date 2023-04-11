@@ -462,7 +462,7 @@ func GetCmdUpdateCollectionUri() *cobra.Command {
 		Use:  "update-collection-uri",
 		Long: "Update collection uri",
 		Example: fmt.Sprintf(
-			`$ %s tx nft update-collection-authority
+			`$ %s tx nft update-collection-uri
 				--collection-id=1
 				--uri="https://punk.com"`,
 		),

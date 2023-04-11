@@ -24,8 +24,12 @@ describe('nft module', function () {
     let client: BluzelleClient;
     beforeEach(() =>
         stopSwarm()
-            .then(() => startSwarmWithClient())
-            .then(({bzSdk}) => client = bzSdk)
+            //.then(() => startSwarmWithClient(defaultSwarmConfig, {url: 'http://localhost:26657'}))
+            .then(() => newBluzelleClient({
+                wallet: newLocalWallet('cactus struggle uncle setup together grocery bring park thank need call ship blind frequent inhale stadium trap deputy light transfer bitter million ring man'),
+                url: 'http://localhost:26657'
+            }))
+            .then(bzSdk => client = bzSdk)
     );
 
     it('should throw an error when querying an invalid nft', () =>
@@ -228,7 +232,7 @@ describe('nft module', function () {
             .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps(1, 'NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
             .then(x => getNftMetadata(client, 1))
             .then(info => {
-                expect(info.metadata.mutableUri).to.deep.equal(defaultMetadataProps(1, 'NFT1', true, client.address).mutableUri)
+                expect(info.metadata?.mutableUri).to.deep.equal(defaultMetadataProps(1, 'NFT1', true, client.address).mutableUri)
             })
     )
 
@@ -265,7 +269,7 @@ describe('nft module', function () {
             }))
             .then(() => getCollectionInfo(client, 1))
             .then(resp => {
-                expect(resp.collection.uri).to.deep.equal('http://updatedTemp.com')
+                expect(resp.collection?.uri).to.deep.equal('http://updatedTemp.com')
             })
     )
 

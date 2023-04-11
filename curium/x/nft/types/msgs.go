@@ -17,6 +17,7 @@ const (
 	TypeMsgVerifyCollection          = "verify_collection"
 	TypeMsgUnverifyCollection        = "unverify_collection"
 	TypeMsgUpdateCollectionAuthority = "update_collection_authority"
+	TypeMsgUpdateCollectionUri       = "update_collection_uri"
 )
 
 var _ sdk.Msg = &MsgCreateNFT{}
@@ -454,7 +455,7 @@ func NewMsgUpdateCollectionUri(sender sdk.AccAddress, collectionId uint64, uri s
 
 func (msg MsgUpdateCollectionUri) Route() string { return RouterKey }
 
-func (msg MsgUpdateCollectionUri) Type() string { return TypeMsgUpdateMetadataAuthority }
+func (msg MsgUpdateCollectionUri) Type() string { return TypeMsgUpdateCollectionUri }
 
 func (msg MsgUpdateCollectionUri) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
