@@ -26,6 +26,11 @@ describe('nft module', function () {
         stopSwarm()
             .then(() => startSwarmWithClient())
             .then(({bzSdk}) => client = bzSdk)
+            // .then(() => newBluzelleClient({
+            //     url: 'http://localhost:26657',
+            //     wallet: newLocalWallet("hurry involve cruel hope crush pear nothing trend strong spin twin garment special fine still scrub satisfy vote also height goose catalog illness media")
+            // }))
+            .then(sdk => client = sdk)
     );
 
     it('should throw an error when querying an invalid nft', () =>

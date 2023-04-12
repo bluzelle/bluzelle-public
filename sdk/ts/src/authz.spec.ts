@@ -287,6 +287,7 @@ describe("authz", function () {
             id: new Long(1),
             name: "TMPMeta",
             uri: 'https://tmp.com',
+            mutableUri: '',
             sellerFeeBasisPoints: 100,
             primarySaleHappened: false,
             isMutable: true,
@@ -465,6 +466,7 @@ describe("authz", function () {
                     metadataId: new Long(ctx.nftInfo.nft.metadataId),
                     name: "UpdatedTmpMeta",
                     uri: "https://tmp.com",
+                    mutableUri: '',
                     sellerFeeBasisPoints: 100,
                     creators: [{
                         address: testGranter,
