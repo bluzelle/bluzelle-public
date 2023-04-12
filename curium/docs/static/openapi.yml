@@ -105,6 +105,8 @@ paths:
                     type: string
                   uri:
                     type: string
+                  mutable_uri:
+                    type: string
                   is_mutable:
                     type: boolean
                     title: Whether or not the data struct is mutable, default is not
@@ -30623,6 +30625,8 @@ definitions:
         type: string
       uri:
         type: string
+      mutable_uri:
+        type: string
       is_mutable:
         type: boolean
         title: Whether or not the data struct is mutable, default is not
@@ -30735,6 +30739,8 @@ definitions:
     type: object
   bluzelle.curium.nft.MsgUpdateCollectionAuthorityResponse:
     type: object
+  bluzelle.curium.nft.MsgUpdateCollectionMutableUriResponse:
+    type: object
   bluzelle.curium.nft.MsgUpdateCollectionUriResponse:
     type: object
   bluzelle.curium.nft.MsgUpdateMetadataAuthorityResponse:
@@ -30773,6 +30779,8 @@ definitions:
           name:
             type: string
           uri:
+            type: string
+          mutable_uri:
             type: string
           is_mutable:
             type: boolean

@@ -6,18 +6,19 @@ import (
 )
 
 const (
-	TypeMsgCreateNFT                 = "create_nft"
-	TypeMsgPrintEdition              = "print_edition"
-	TypeMsgTransferNFT               = "transfer_nft"
-	TypeMsgSignMetadata              = "sign_metadata"
-	TypeMsgUpdateMetadata            = "update_metadata"
-	TypeMsgUpdateMetadataAuthority   = "update_metadata_authority"
-	TypeMsgUpdateMintAuthority       = "update_metadata_authority"
-	TypeMsgCreateCollection          = "create_collection"
-	TypeMsgVerifyCollection          = "verify_collection"
-	TypeMsgUnverifyCollection        = "unverify_collection"
-	TypeMsgUpdateCollectionAuthority = "update_collection_authority"
-	TypeMsgUpdateCollectionUri       = "update_collection_uri"
+	TypeMsgCreateNFT                  = "create_nft"
+	TypeMsgPrintEdition               = "print_edition"
+	TypeMsgTransferNFT                = "transfer_nft"
+	TypeMsgSignMetadata               = "sign_metadata"
+	TypeMsgUpdateMetadata             = "update_metadata"
+	TypeMsgUpdateMetadataAuthority    = "update_metadata_authority"
+	TypeMsgUpdateMintAuthority        = "update_metadata_authority"
+	TypeMsgCreateCollection           = "create_collection"
+	TypeMsgVerifyCollection           = "verify_collection"
+	TypeMsgUnverifyCollection         = "unverify_collection"
+	TypeMsgUpdateCollectionAuthority  = "update_collection_authority"
+	TypeMsgUpdateCollectionUri        = "update_collection_uri"
+	TypeMsgUpdateCollectionMutableUri = "update_collection_mutable_uri"
 )
 
 var _ sdk.Msg = &MsgCreateNFT{}
@@ -477,6 +478,47 @@ func (msg MsgUpdateCollectionUri) GetSignBytes() []byte {
 
 // GetSigners Implements Msg.
 func (msg MsgUpdateCollectionUri) GetSigners() []sdk.AccAddress {
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{sender}
+}
+
+var _ sdk.Msg = &MsgUpdateCollectionMutableUri{}
+
+func NewMsgUpdateCollectionMutableUri(sender sdk.AccAddress, collectionId uint64, uri string) *MsgUpdateCollectionMutableUri {
+	return &MsgUpdateCollectionMutableUri{
+		Sender:       sender.String(),
+		CollectionId: collectionId,
+		Uri:          uri,
+	}
+}
+
+func (msg MsgUpdateCollectionMutableUri) Route() string { return RouterKey }
+
+func (msg MsgUpdateCollectionMutableUri) Type() string { return TypeMsgUpdateCollectionMutableUri }
+
+func (msg MsgUpdateCollectionMutableUri) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+	}
+
+	return nil
+}
+
+// GetSignBytes Implements Msg.
+func (msg MsgUpdateCollectionMutableUri) GetSignBytes() []byte {
+	b, err := ModuleCdc.MarshalJSON(&msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// GetSigners Implements Msg.
+func (msg MsgUpdateCollectionMutableUri) GetSigners() []sdk.AccAddress {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		panic(err)

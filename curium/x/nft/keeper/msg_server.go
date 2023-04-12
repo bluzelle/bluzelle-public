@@ -163,6 +163,7 @@ func (m msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		Symbol:          msg.Symbol,
 		Name:            msg.Name,
 		Uri:             msg.Uri,
+		MutableUri:      msg.MutableUri,
 		IsMutable:       msg.IsMutable,
 		UpdateAuthority: msg.UpdateAuthority,
 	}
@@ -217,4 +218,25 @@ func (m msgServer) UpdateCollectionUri(goCtx context.Context, msg *types.MsgUpda
 	})
 
 	return &types.MsgUpdateCollectionUriResponse{}, nil
+}
+
+func (m msgServer) UpdateCollectionMutableUri(goCtx context.Context, msg *types.MsgUpdateCollectionMutableUri) (*types.MsgUpdateCollectionMutableUriResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	collection, err := m.Keeper.GetCollectionById(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+	if collection.UpdateAuthority != msg.Sender {
+		return nil, types.ErrNotEnoughPermission
+	}
+
+	collection.MutableUri = msg.Uri
+	m.Keeper.SetCollection(ctx, collection)
+	ctx.EventManager().EmitTypedEvent(&types.EventUpdateCollectionMutableUri{
+		CollectionId: msg.CollectionId,
+		Uri:          msg.Uri,
+	})
+
+	return &types.MsgUpdateCollectionMutableUriResponse{}, nil
 }

@@ -43,10 +43,12 @@ message Collection {
   string name = 3;
 
   string uri = 4;
+
+  string mutable_uri = 5;
   // Whether or not the data struct is mutable, default is not
-  bool is_mutable = 5;
+  bool is_mutable = 6;
   // who can update metadata (if is_mutable is true)
-  string update_authority = 6;
+  string update_authority = 7;
 }
 
 message Creator {
@@ -141,6 +143,11 @@ message EventUpdateCollectionAuthority {
 }
 
 message EventUpdateCollectionUri {
+  uint64 collection_id = 1;
+  string uri = 2;
+}
+
+message EventUpdateCollectionMutableUri {
   uint64 collection_id = 1;
   string uri = 2;
 }

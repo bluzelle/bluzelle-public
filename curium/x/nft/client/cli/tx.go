@@ -498,6 +498,47 @@ func GetCmdUpdateCollectionUri() *cobra.Command {
 	return cmd
 }
 
+func GetCmdUpdateCollectionMutableUri() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "update-collection-mutable-uri",
+		Long: "Update collection mutable uri",
+		Example: fmt.Sprintf(
+			`$ %s tx nft update-collection-mutable-uri
+				--collection-id=1
+				--uri="https://punk.com"`,
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			collectionId, err := cmd.Flags().GetUint64(FlagCollectionId)
+			if err != nil {
+				return err
+			}
+
+			newUri, err := cmd.Flags().GetString(FlagUri)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgUpdateCollectionMutableUri(clientCtx.GetFromAddress(), collectionId, newUri)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FlagUpdateCollectionAuthority())
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
 func CollectCreatorsData(cmd *cobra.Command) ([]types.Creator, error) {
 	creators := []types.Creator{}
 	creatorAccsStr, err := cmd.Flags().GetString(FlagCreators)

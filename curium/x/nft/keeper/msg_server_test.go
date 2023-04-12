@@ -749,3 +749,55 @@ func (suite *KeeperTestSuite) TestMsgServerUpdateCollectionUri() {
 		}
 	}
 }
+
+func (suite *KeeperTestSuite) TestMsgServerUpdateCollectionMutableUri() {
+	creator1 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+	creator2 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+	collectionInfo1 := suite.CreateCollection(creator1)
+	collectionInfo2 := suite.CreateCollection(creator2)
+
+	tests := []struct {
+		testCase     string
+		sender       sdk.AccAddress
+		targetOwner  string
+		collectionId uint64
+		newUri       string
+		expectPass   bool
+	}{
+		{
+			"update collection uri with owner",
+			creator1,
+			creator2.String(),
+			collectionInfo1.Id,
+			"http://updatedLink.com",
+			true,
+		},
+		{
+			"try updating collection uri with non-owner",
+			creator1,
+			creator2.String(),
+			collectionInfo2.Id,
+			"http://updatedLink.com",
+			false,
+		},
+	}
+
+	for _, tc := range tests {
+
+		msgServer := keeper.NewMsgServerImpl(*suite.NFTKeeper)
+		_, err := msgServer.UpdateCollectionMutableUri(sdk.WrapSDKContext(suite.ctx), types.NewMsgUpdateCollectionMutableUri(
+			tc.sender, tc.collectionId, tc.newUri,
+		))
+		if tc.expectPass {
+			suite.Require().NoError(err)
+
+			// test uri was updated correctly
+			collection, err := suite.NFTKeeper.GetCollectionById(suite.ctx, tc.collectionId)
+			suite.Require().NoError(err)
+			suite.Require().Equal(collection.Id, tc.collectionId)
+			suite.Require().Equal(collection.MutableUri, tc.newUri)
+		} else {
+			suite.Require().Error(err)
+		}
+	}
+}
