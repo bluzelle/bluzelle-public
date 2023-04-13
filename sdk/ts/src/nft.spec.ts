@@ -7,7 +7,7 @@ import {
     createCollection,
     createNft,
     printNftEdition,
-    transferNft, updateCollectionUri,
+    transferNft, updateCollectionMutableUri, updateCollectionUri,
     updateMetadata,
     updateMetadataAuthority,
     updateMintAuthority
@@ -272,6 +272,35 @@ describe('nft module', function () {
             .then(resp => {
                 expect(resp.collection?.uri).to.deep.equal('http://updatedTemp.com')
             })
+    )
+
+    it('should update the collection mutable uri', () =>
+        createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
+            maxGas: 100000000,
+            gasPrice: 0.002
+        })
+            .then(() => updateCollectionMutableUri(client, 1, 'http://updatedTemp.com', {
+                maxGas: 100000000,
+                gasPrice: 0.002
+            }))
+            .then(() => getCollectionInfo(client, 1))
+            .then(resp => {
+                expect(resp.collection?.mutableUri).to.deep.equal('http://updatedTemp.com')
+            })
+    )
+
+    it('should fail an update if the collection is immutable', () =>
+        createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: false, updateAuthority: client.address},  {
+            maxGas: 100000000,
+            gasPrice: 0.002
+        })
+            .then(() => updateCollectionMutableUri(client, 1, 'http://updatedTemp.com', {
+                maxGas: 100000000,
+                gasPrice: 0.002
+            }))
+            .then(() => expect(true).to.be.false)
+            .catch(err => {})
+
     )
 
 
