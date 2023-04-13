@@ -272,6 +272,7 @@ describe("authz", function () {
                     symbol: "TMP",
                     name: "Temp",
                     uri: "https://temp.com",
+                    mutableUri: '',
                     isMutable: true,
                     updateAuthority: testGrantee
                 }
@@ -303,7 +304,14 @@ describe("authz", function () {
                 maxSupply: new Long(1_000_000)
             }
         }
-        return createCollection(eClient, eClient.address, 'TMP', 'Temp', 'http://temp.com', true, eClient.address,
+        return createCollection(eClient, {
+            sender: eClient.address,
+            name: 'Temp',
+            symbol: 'TMP',
+            uri: 'http://temp.com',
+            isMutable: true,
+            updateAuthority: eClient.address
+            },
             { maxGas: 100000000, gasPrice: 0.002 })
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
@@ -349,7 +357,14 @@ describe("authz", function () {
                 maxSupply: new Long(1_000_000)
             }
         }
-        return createCollection(eClient, eClient.address, 'TMP', 'Temp', 'http://temp.com', true, eClient.address, { maxGas: 100000000, gasPrice: 0.002 })
+        return createCollection(eClient, {
+            sender: eClient.address,
+            name: 'Temp',
+            symbol: 'TMP',
+            uri: 'http://temp.com',
+            isMutable: true,
+            updateAuthority: eClient.address
+        },{ maxGas: 100000000, gasPrice: 0.002 })
             .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
@@ -394,7 +409,14 @@ describe("authz", function () {
                 maxSupply: new Long(1_000_000)
             }
         }
-        return createCollection(eClient, eClient.address, 'TMP', 'Temp', 'http://temp.com', true, eClient.address, { maxGas: 100000000, gasPrice: 0.002 })
+        return createCollection(eClient, {
+            sender: eClient.address,
+            name: 'Temp',
+            symbol: 'TMP',
+            uri: 'http://temp.com',
+            isMutable: true,
+            updateAuthority: eClient.address
+        }, { maxGas: 100000000, gasPrice: 0.002 })
             .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
@@ -444,7 +466,14 @@ describe("authz", function () {
                 maxSupply: new Long(1_000_000)
             }
         }
-        return createCollection(eClient, eClient.address, 'TMP', 'Temp', 'http://temp.com', true, eClient.address, { maxGas: 100000000, gasPrice: 0.002 })
+        return createCollection(eClient, {
+            sender: eClient.address,
+            name: 'Temp',
+            symbol: 'TMP',
+            uri: 'http://temp.com',
+            isMutable: true,
+            updateAuthority: eClient.address
+        }, { maxGas: 100000000, gasPrice: 0.002 })
             .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
@@ -501,7 +530,14 @@ describe("authz", function () {
                 maxSupply: new Long(1_000_000)
             }
         }
-        return createCollection(eClient, eClient.address, 'TMP', 'Temp', 'http://temp.com', true, eClient.address, { maxGas: 100000000, gasPrice: 0.002 })
+        return createCollection(eClient, {
+            sender: eClient.address,
+            name: 'Temp',
+            symbol: 'TMP',
+            uri: 'http://temp.com',
+            isMutable: true,
+            updateAuthority: eClient.address
+        },{ maxGas: 100000000, gasPrice: 0.002 })
             .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
@@ -550,7 +586,14 @@ describe("authz", function () {
                 maxSupply: new Long(1_000_000)
             }
         }
-        return createCollection(eClient, eClient.address, 'TMP', 'Temp', 'http://temp.com', true, eClient.address, { maxGas: 100000000, gasPrice: 0.002 })
+        return createCollection(eClient,{
+            sender: eClient.address,
+            name: 'Temp',
+            symbol: 'TMP',
+            uri: 'http://temp.com',
+            isMutable: true,
+            updateAuthority: eClient.address
+        }, { maxGas: 100000000, gasPrice: 0.002 })
             .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
@@ -603,7 +646,14 @@ describe("authz", function () {
                 maxSupply: new Long(1_000_000)
             }
         }
-        return createCollection(eClient, eClient.address, 'TMP', 'Temp', 'http://temp.com', true, eClient.address, { maxGas: 100000000, gasPrice: 0.002 })
+        return createCollection(eClient, {
+            sender: eClient.address,
+            name: 'Temp',
+            symbol: 'TMP',
+            uri: 'http://temp.com',
+            isMutable: true,
+            updateAuthority: eClient.address
+        }, { maxGas: 100000000, gasPrice: 0.002 })
             .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
