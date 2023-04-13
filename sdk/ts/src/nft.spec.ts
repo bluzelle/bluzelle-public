@@ -40,7 +40,7 @@ describe('nft module', function () {
     );
 
     it('should create an empty collection', () =>
-        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {
+        createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
             maxGas: 100000000,
             gasPrice: 0.002
         })
@@ -49,7 +49,7 @@ describe('nft module', function () {
     );
 
     it('should get the info of a collection', () =>
-        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {
+        createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
             maxGas: 100000000,
             gasPrice: 0.002
         })
@@ -63,7 +63,7 @@ describe('nft module', function () {
     );
 
     it('should get the info of an nft', () =>
-        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {
+        createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
             maxGas: 100000000,
             gasPrice: 0.002
         })
@@ -83,7 +83,7 @@ describe('nft module', function () {
     );
 
     it('should create an nft without metadata', () =>
-        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {
+        createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
             maxGas: 100000000,
             gasPrice: 0.002
         })
@@ -97,7 +97,7 @@ describe('nft module', function () {
     )
 
     it('should update the metadata of an nft', () =>
-        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {
+        createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
             maxGas: 100000000,
             gasPrice: 0.002
         })
@@ -122,7 +122,7 @@ describe('nft module', function () {
 
     it('should update the metadata authority of an nft', () => {
             let newAuthority = createAddress().address;
-            return createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {
+            return createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
                 maxGas: 100000000,
                 gasPrice: 0.002
             })
@@ -140,7 +140,7 @@ describe('nft module', function () {
 
     it('should update the mint authority of an nft', () => {
             let newAuthority = createAddress().address;
-            return createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {
+            return createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
                 maxGas: 100000000,
                 gasPrice: 0.002
             })
@@ -157,7 +157,7 @@ describe('nft module', function () {
     );
 
     it('should print an edition of an nft', () =>
-        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {
+        createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address}, {
             maxGas: 100000000,
             gasPrice: 0.002
         })
@@ -174,7 +174,7 @@ describe('nft module', function () {
     );
 
     it('should transfer an nft from one user to another', () => {
-        return createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {
+        return createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address}, {
             maxGas: 100000000,
             gasPrice: 0.002
         })
@@ -202,7 +202,7 @@ describe('nft module', function () {
     });
 
     it('should query the nfts owned by given address', () => {
-        return createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {
+        return createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
             maxGas: 100000000,
             gasPrice: 0.002
         })
@@ -226,7 +226,7 @@ describe('nft module', function () {
     });
 
     it('should be able to add a mutableUri to an nft', () =>
-        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com',true, client.address, {
+        createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
             maxGas: 100000000,
             gasPrice: 0.002
         })
@@ -238,7 +238,7 @@ describe('nft module', function () {
     )
 
     it('should be able to update a mutableUri of an nft', () =>
-        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com',true, client.address, {
+        createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
             maxGas: 100000000,
             gasPrice: 0.002
         })
@@ -260,7 +260,7 @@ describe('nft module', function () {
 
 
     it('should update the collection uri', () =>
-        createCollection(client, client.address, 'TMP', 'Temp', 'http://temp.com', true, client.address, {
+        createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
             maxGas: 100000000,
             gasPrice: 0.002
         })

@@ -49,6 +49,7 @@ export {
     updateMetadataAuthority,
     updateMetadata,
     updateCollectionUri,
+    updateCollectionMutableUri,
     updateMintAuthority,
     printNftEdition,
     signMetadata,

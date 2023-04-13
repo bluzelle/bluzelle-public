@@ -23,6 +23,7 @@ service Msg {
   rpc UpdateCollectionAuthority(MsgUpdateCollectionAuthority) returns (MsgUpdateCollectionAuthorityResponse);
 
   rpc UpdateCollectionUri(MsgUpdateCollectionUri) returns (MsgUpdateCollectionUriResponse);
+  rpc UpdateCollectionMutableUri(MsgUpdateCollectionMutableUri) returns (MsgUpdateCollectionMutableUriResponse);
 }
 
 message MsgCreateNFT {
@@ -95,8 +96,9 @@ message MsgCreateCollection {
   string symbol = 2;
   string name = 3;
   string uri = 4;
-  bool is_mutable = 5;
-  string update_authority = 6;
+  string mutable_uri = 5;
+  bool is_mutable = 6;
+  string update_authority = 7;
 }
 message MsgCreateCollectionResponse {
     uint64 id = 1;
@@ -116,3 +118,11 @@ message MsgUpdateCollectionUri {
 }
 
 message MsgUpdateCollectionUriResponse {}
+
+message MsgUpdateCollectionMutableUri {
+  string sender = 1;
+  uint64 collection_id = 2;
+  string uri = 3;
+}
+
+message MsgUpdateCollectionMutableUriResponse {}

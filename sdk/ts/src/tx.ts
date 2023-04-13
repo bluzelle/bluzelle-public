@@ -11,7 +11,7 @@ import {
     MsgCreateNFT,
     MsgPrintEdition,
     MsgSignMetadata,
-    MsgTransferNFT, MsgUpdateCollectionUri,
+    MsgTransferNFT, MsgUpdateCollectionMutableUri, MsgUpdateCollectionUri,
     MsgUpdateMetadata,
     MsgUpdateMetadataAuthority,
     MsgUpdateMintAuthority
@@ -35,7 +35,7 @@ import {
     msgTypeToEncodeFnMap,
     MsgTypeToMsgMap
 } from "./authzTypes";
-
+import {partial} from 'lodash'
 const Long = require('long');
 
 interface MsgQueueItem<T> {
@@ -123,6 +123,7 @@ export const registerMessages = (registry: Registry) => {
     registry.register('/cosmos.authz.v1beta1.MsgExec', MsgExec)
     registry.register('/cosmos.authz.v1beta1.MsgRevoke', MsgRevoke)
     registry.register('/bluzelle.curium.nft.MsgUpdateCollectionUri', MsgUpdateCollectionUri)
+    registry.register('/bluzelle.curium.nft.MsgUpdateCollectionMutableUri', MsgUpdateCollectionMutableUri)
 
     return registry
 };
@@ -238,18 +239,20 @@ export function createNft (client: BluzelleClient, props: {collId: number, metad
 
 export const createCollection = (
     client: BluzelleClient,
-    sender: string,
-    symbol: string,
-    name: string,
-    uri: string,
-    isMutable: boolean,
-    updateAuthority: string,
+    {sender, symbol, name, uri, isMutable, updateAuthority, mutableUri}: { sender: string,
+        symbol: string,
+        name: string,
+        uri: string,
+        mutableUri?: string,
+        isMutable: boolean,
+        updateAuthority: string},
     options: BroadcastOptions) =>
     Promise.resolve(sendTx<MsgCreateCollection>(client, '/bluzelle.curium.nft.MsgCreateCollection', {
         sender,
         symbol,
         name,
         uri,
+        mutableUri: mutableUri || '',
         isMutable,
         updateAuthority,
     }, options));
@@ -304,6 +307,13 @@ export const updateMintAuthority = (client: BluzelleClient, metadataId: number, 
 
 export const updateCollectionUri = (client: BluzelleClient, collectionId: number, uri: string, broadcastOptions: BroadcastOptions) =>
     Promise.resolve(sendTx<MsgUpdateCollectionUri>(client, '/bluzelle.curium.nft.MsgUpdateCollectionUri', {
+        sender: client.address,
+        collectionId: new Long(collectionId),
+        uri
+    }, broadcastOptions))
+
+export const updateCollectionMutableUri = (client: BluzelleClient, collectionId: number, uri: string, broadcastOptions: BroadcastOptions) =>
+    Promise.resolve(sendTx<MsgUpdateCollectionMutableUri>(client, '/bluzelle.curium.nft.MsgUpdateCollectionMutableUri', {
         sender: client.address,
         collectionId: new Long(collectionId),
         uri
