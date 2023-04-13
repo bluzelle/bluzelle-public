@@ -43,10 +43,10 @@ func (suite *KeeperTestSuite) CreateNFTWithCreators(creator sdk.AccAddress, coll
 	return resp
 }
 
-func (suite *KeeperTestSuite) CreateCollection(creator sdk.AccAddress) *types.MsgCreateCollectionResponse {
+func (suite *KeeperTestSuite) CreateCollection(creator sdk.AccAddress, isMutable bool) *types.MsgCreateCollectionResponse {
 	msgServer := keeper.NewMsgServerImpl(*suite.NFTKeeper)
 	resp, err := msgServer.CreateCollection(sdk.WrapSDKContext(suite.ctx), types.NewMsgCreateCollection(
-		creator, "PUNK", "Punk Collection", "punk.com", creator.String(), false,
+		creator, "PUNK", "Punk Collection", "punk.com", creator.String(), isMutable,
 	))
 	suite.Require().NoError(err)
 	return resp
@@ -82,7 +82,7 @@ func (suite *KeeperTestSuite) TestMsgServerCreateNFT() {
 		suite.BankKeeper.MintCoins(suite.ctx, minttypes.ModuleName, sdk.Coins{issuePrice})
 		suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, minttypes.ModuleName, creator, sdk.Coins{issuePrice})
 
-		collInfo := suite.CreateCollection(creator)
+		collInfo := suite.CreateCollection(creator, true)
 
 		msgServer := keeper.NewMsgServerImpl(*suite.NFTKeeper)
 		resp, err := msgServer.CreateNFT(sdk.WrapSDKContext(suite.ctx), types.NewMsgCreateNFT(
@@ -300,8 +300,8 @@ func (suite *KeeperTestSuite) TestMsgServerTransferNFT() {
 		IssuePrice: sdk.NewInt64Coin("stake", 1000),
 	})
 
-	collInfo1 := suite.CreateCollection(creator1)
-	collInfo2 := suite.CreateCollection(creator2)
+	collInfo1 := suite.CreateCollection(creator1, true)
+	collInfo2 := suite.CreateCollection(creator2, true)
 	nftInfo1 := suite.CreateNFT(creator1, collInfo1.Id)
 	nftInfo2 := suite.CreateNFT(creator1, collInfo1.Id)
 	nftInfo3 := suite.CreateNFT(creator2, collInfo2.Id)
@@ -391,7 +391,7 @@ func (suite *KeeperTestSuite) TestMsgServerSignMetadata() {
 		IssuePrice: sdk.NewInt64Coin("stake", 1000),
 	})
 
-	collInfo1 := suite.CreateCollection(creator1)
+	collInfo1 := suite.CreateCollection(creator1, true)
 	nftInfo := suite.CreateNFTWithCreators(creator1, collInfo1.Id, []sdk.AccAddress{creator1, creator2})
 
 	tests := []struct {
@@ -466,9 +466,9 @@ func (suite *KeeperTestSuite) TestMsgServerUpdateMetadata() {
 		IssuePrice: sdk.NewInt64Coin("stake", 1000),
 	})
 
-	collInfo1 := suite.CreateCollection(creator1)
+	collInfo1 := suite.CreateCollection(creator1, true)
 	immutableNft := suite.CreateNFT(creator1, collInfo1.Id)
-	collInfo2 := suite.CreateCollection(creator2)
+	collInfo2 := suite.CreateCollection(creator2, true)
 	mutableNft := suite.CreateMutableNFT(creator2, collInfo2.Id)
 
 	tests := []struct {
@@ -548,9 +548,9 @@ func (suite *KeeperTestSuite) TestMsgServerUpdateMetadataAuthority() {
 		IssuePrice: sdk.NewInt64Coin("stake", 1000),
 	})
 
-	collInfo1 := suite.CreateCollection(creator1)
+	collInfo1 := suite.CreateCollection(creator1, true)
 	immutableNft := suite.CreateNFT(creator1, collInfo1.Id)
-	collInfo2 := suite.CreateCollection(creator2)
+	collInfo2 := suite.CreateCollection(creator2, true)
 	mutableNft := suite.CreateMutableNFT(creator2, collInfo2.Id)
 
 	tests := []struct {
@@ -652,8 +652,8 @@ func (suite *KeeperTestSuite) TestMsgServerCreateCollection() {
 func (suite *KeeperTestSuite) TestMsgServerUpdateCollectionAuthority() {
 	creator1 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
 	creator2 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
-	collectionInfo1 := suite.CreateCollection(creator1)
-	collectionInfo2 := suite.CreateCollection(creator2)
+	collectionInfo1 := suite.CreateCollection(creator1, true)
+	collectionInfo2 := suite.CreateCollection(creator2, true)
 
 	tests := []struct {
 		testCase     string
@@ -701,8 +701,8 @@ func (suite *KeeperTestSuite) TestMsgServerUpdateCollectionAuthority() {
 func (suite *KeeperTestSuite) TestMsgServerUpdateCollectionUri() {
 	creator1 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
 	creator2 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
-	collectionInfo1 := suite.CreateCollection(creator1)
-	collectionInfo2 := suite.CreateCollection(creator2)
+	collectionInfo1 := suite.CreateCollection(creator1, true)
+	collectionInfo2 := suite.CreateCollection(creator2, true)
 
 	tests := []struct {
 		testCase     string
@@ -753,8 +753,8 @@ func (suite *KeeperTestSuite) TestMsgServerUpdateCollectionUri() {
 func (suite *KeeperTestSuite) TestMsgServerUpdateCollectionMutableUri() {
 	creator1 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
 	creator2 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
-	collectionInfo1 := suite.CreateCollection(creator1)
-	collectionInfo2 := suite.CreateCollection(creator2)
+	collectionInfo1 := suite.CreateCollection(creator1, true)
+	collectionInfo2 := suite.CreateCollection(creator2, true)
 
 	tests := []struct {
 		testCase     string
@@ -765,7 +765,7 @@ func (suite *KeeperTestSuite) TestMsgServerUpdateCollectionMutableUri() {
 		expectPass   bool
 	}{
 		{
-			"update collection uri with owner",
+			"update collection mutable uri with owner",
 			creator1,
 			creator2.String(),
 			collectionInfo1.Id,
@@ -773,10 +773,53 @@ func (suite *KeeperTestSuite) TestMsgServerUpdateCollectionMutableUri() {
 			true,
 		},
 		{
-			"try updating collection uri with non-owner",
+			"try updating collection mutable uri with non-owner",
 			creator1,
 			creator2.String(),
 			collectionInfo2.Id,
+			"http://updatedLink.com",
+			false,
+		},
+	}
+
+	for _, tc := range tests {
+
+		msgServer := keeper.NewMsgServerImpl(*suite.NFTKeeper)
+		_, err := msgServer.UpdateCollectionMutableUri(sdk.WrapSDKContext(suite.ctx), types.NewMsgUpdateCollectionMutableUri(
+			tc.sender, tc.collectionId, tc.newUri,
+		))
+		if tc.expectPass {
+			suite.Require().NoError(err)
+
+			// test uri was updated correctly
+			collection, err := suite.NFTKeeper.GetCollectionById(suite.ctx, tc.collectionId)
+			suite.Require().NoError(err)
+			suite.Require().Equal(collection.Id, tc.collectionId)
+			suite.Require().Equal(collection.MutableUri, tc.newUri)
+		} else {
+			suite.Require().Error(err)
+		}
+	}
+}
+
+func (suite *KeeperTestSuite) TestMsgServerImmutableCollection() {
+	creator1 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+	creator2 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+	collectionInfo1 := suite.CreateCollection(creator1, false)
+
+	tests := []struct {
+		testCase     string
+		sender       sdk.AccAddress
+		targetOwner  string
+		collectionId uint64
+		newUri       string
+		expectPass   bool
+	}{
+		{
+			"fail to update immutable collection",
+			creator1,
+			creator2.String(),
+			collectionInfo1.Id,
 			"http://updatedLink.com",
 			false,
 		},

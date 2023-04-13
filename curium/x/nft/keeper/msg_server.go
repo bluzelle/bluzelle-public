@@ -185,6 +185,11 @@ func (m msgServer) UpdateCollectionAuthority(goCtx context.Context, msg *types.M
 	if err != nil {
 		return nil, err
 	}
+
+	if !collection.IsMutable {
+		return nil, types.ErrCollectionImmutable
+	}
+
 	if collection.UpdateAuthority != msg.Sender {
 		return nil, types.ErrNotEnoughPermission
 	}
@@ -206,6 +211,11 @@ func (m msgServer) UpdateCollectionUri(goCtx context.Context, msg *types.MsgUpda
 	if err != nil {
 		return nil, err
 	}
+
+	if !collection.IsMutable {
+		return nil, types.ErrCollectionImmutable
+	}
+
 	if collection.UpdateAuthority != msg.Sender {
 		return nil, types.ErrNotEnoughPermission
 	}
@@ -227,6 +237,11 @@ func (m msgServer) UpdateCollectionMutableUri(goCtx context.Context, msg *types.
 	if err != nil {
 		return nil, err
 	}
+
+	if !collection.IsMutable {
+		return nil, types.ErrCollectionImmutable
+	}
+
 	if collection.UpdateAuthority != msg.Sender {
 		return nil, types.ErrNotEnoughPermission
 	}

@@ -23,7 +23,7 @@ func (suite *KeeperTestSuite) TestGRPCNFTInfo() {
 		return
 	}
 
-	collInfo := suite.CreateCollection(creator)
+	collInfo := suite.CreateCollection(creator, true)
 	nftInfo1 := suite.CreateNFT(creator, collInfo.Id)
 	nftInfo2 := suite.CreateNFT(creator, collInfo.Id)
 
@@ -96,10 +96,10 @@ func (suite *KeeperTestSuite) TestGRPCNFTsByOwner() {
 		return
 	}
 
-	collInfo1 := suite.CreateCollection(creator1)
+	collInfo1 := suite.CreateCollection(creator1, true)
 	suite.CreateNFT(creator1, collInfo1.Id)
 	suite.CreateNFT(creator1, collInfo1.Id)
-	collInfo2 := suite.CreateCollection(creator2)
+	collInfo2 := suite.CreateCollection(creator2, true)
 	suite.CreateNFT(creator2, collInfo2.Id)
 
 	tests := []struct {
@@ -178,10 +178,10 @@ func (suite *KeeperTestSuite) TestGRPCMetadata() {
 		return
 	}
 
-	collInfo1 := suite.CreateCollection(creator1)
+	collInfo1 := suite.CreateCollection(creator1, true)
 	nftInfo1 := suite.CreateNFT(creator1, collInfo1.Id)
 
-	collInfo2 := suite.CreateCollection(creator2)
+	collInfo2 := suite.CreateCollection(creator2, true)
 	nftInfo2 := suite.CreateNFT(creator2, collInfo2.Id)
 
 	tests := []struct {
@@ -240,8 +240,8 @@ func (suite *KeeperTestSuite) TestGRPCCollection() {
 		return
 	}
 
-	collectionInfo1 := suite.CreateCollection(creator)
-	collectionInfo2 := suite.CreateCollection(creator)
+	collectionInfo1 := suite.CreateCollection(creator, true)
+	collectionInfo2 := suite.CreateCollection(creator, true)
 	suite.CreateNFT(creator, collectionInfo1.Id)
 	suite.CreateNFT(creator, collectionInfo1.Id)
 

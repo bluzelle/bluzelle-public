@@ -18,4 +18,5 @@ var (
 	ErrAlreadyReachedEditionMaxSupply = sdkerrors.Register(ModuleName, 11, "already reached edition maximum supply")
 	ErrInvalidNftId                   = sdkerrors.Register(ModuleName, 12, "invalid nft id")
 	ErrMasterEditionNftDoesNotExists  = sdkerrors.Register(ModuleName, 13, "master edition nft does not exists")
+	ErrCollectionImmutable            = sdkerrors.Register(ModuleName, 14, "collection does is immutable")
 )
