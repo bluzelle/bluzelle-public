@@ -361,12 +361,13 @@ func (msg MsgUpdateMintAuthority) GetSigners() []sdk.AccAddress {
 
 var _ sdk.Msg = &MsgCreateCollection{}
 
-func NewMsgCreateCollection(sender sdk.AccAddress, symbol, name, uri, updateAuthority string, isMutable bool) *MsgCreateCollection {
+func NewMsgCreateCollection(sender sdk.AccAddress, symbol, name, uri, mutableUri, updateAuthority string, isMutable bool) *MsgCreateCollection {
 	return &MsgCreateCollection{
 		Sender:          sender.String(),
 		Symbol:          symbol,
 		Name:            name,
 		Uri:             uri,
+		MutableUri:      mutableUri,
 		UpdateAuthority: updateAuthority,
 		IsMutable:       isMutable,
 	}

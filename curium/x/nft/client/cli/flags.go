@@ -8,6 +8,7 @@ const (
 	FlagName                   = "name"
 	FlagSymbol                 = "symbol"
 	FlagUri                    = "uri"
+	FlagMutableUri             = "mutable-uri"
 	FlagSellerFeeBasisPoints   = "seller-fee-basis-points"
 	FlagCreators               = "creators"
 	FlagCreatorShares          = "creator-shares"
@@ -95,6 +96,7 @@ func FlagCreateCollection() *flag.FlagSet {
 	fs.String(FlagSymbol, "", "Symbol of the collection")
 	fs.String(FlagName, "", "Name of the collection")
 	fs.String(FlagUri, "", "Uri of the collection")
+	fs.String(FlagMutableUri, "", "Mutable uri of the collection")
 	fs.String(FlagUpdateAuthority, "", "Update authority of the collection")
 	fs.Bool(FlagMutable, false, "mutability of the collection")
 
@@ -115,6 +117,24 @@ func FlagUpdateCollectionAuthority() *flag.FlagSet {
 
 	fs.Uint64(FlagCollectionId, 0, "Id of the collection to verify")
 	fs.String(FlagNewAuthority, "", "New authority of the collection")
+
+	return fs
+}
+
+func FlagUpdateCollectionUri() *flag.FlagSet {
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+
+	fs.Uint64(FlagCollectionId, 0, "Id of the collection to verify")
+	fs.String(FlagMutableUri, "", "New uri for uri of collection")
+
+	return fs
+}
+
+func FlagUpdateCollectionMutableUri() *flag.FlagSet {
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+
+	fs.Uint64(FlagCollectionId, 0, "Id of the collection to update")
+	fs.String(FlagMutableUri, "", "New uri of mutable uri of collection")
 
 	return fs
 }

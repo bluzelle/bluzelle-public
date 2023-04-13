@@ -36,6 +36,7 @@ func NewTxCmd() *cobra.Command {
 		GetCmdCreateCollection(),
 		GetCmdUpdateCollectionAuthority(),
 		GetCmdUpdateCollectionUri(),
+		GetCmdUpdateCollectionMutableUri(),
 	)
 
 	return txCmd
@@ -365,7 +366,9 @@ func GetCmdCreateCollection() *cobra.Command {
 			`$ %s tx nft create-collection
 				--name="punk-collection"
 				--uri="https://punk.com"
-				--update-authority="bluzelle13m350fvnk3s6y5n8ugxhmka277r0t7cw48ru47"`,
+				--update-authority="bluzelle13m350fvnk3s6y5n8ugxhmka277r0t7cw48ru47"
+				--mutable-uri="https://starloop.com"
+`,
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -389,6 +392,11 @@ func GetCmdCreateCollection() *cobra.Command {
 				return err
 			}
 
+			mutableUri, err := cmd.Flags().GetString(FlagMutableUri)
+			if err != nil {
+				return err
+			}
+
 			updateAuthority, err := cmd.Flags().GetString(FlagUpdateAuthority)
 			if err != nil {
 				return err
@@ -399,7 +407,7 @@ func GetCmdCreateCollection() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateCollection(clientCtx.GetFromAddress(), symbol, name, uri, updateAuthority, isMutable)
+			msg := types.NewMsgCreateCollection(clientCtx.GetFromAddress(), symbol, name, uri, mutableUri, updateAuthority, isMutable)
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -492,7 +500,7 @@ func GetCmdUpdateCollectionUri() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FlagUpdateCollectionAuthority())
+	cmd.Flags().AddFlagSet(FlagUpdateCollectionUri())
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
@@ -505,7 +513,7 @@ func GetCmdUpdateCollectionMutableUri() *cobra.Command {
 		Example: fmt.Sprintf(
 			`$ %s tx nft update-collection-mutable-uri
 				--collection-id=1
-				--uri="https://punk.com"`,
+				--mutable-uri="https://punk.com"`,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -518,7 +526,7 @@ func GetCmdUpdateCollectionMutableUri() *cobra.Command {
 				return err
 			}
 
-			newUri, err := cmd.Flags().GetString(FlagUri)
+			newUri, err := cmd.Flags().GetString(FlagMutableUri)
 			if err != nil {
 				return err
 			}
@@ -533,7 +541,7 @@ func GetCmdUpdateCollectionMutableUri() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlagSet(FlagUpdateCollectionAuthority())
+	cmd.Flags().AddFlagSet(FlagUpdateCollectionMutableUri())
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
