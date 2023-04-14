@@ -13,7 +13,7 @@ module.exports = {
     target: 'node',
     externalsPresets: {node: true},
     externals: 'tiny-secp256k1',
-    mode: 'development',
+    mode: 'production',
     module: {
         rules: [
             {
