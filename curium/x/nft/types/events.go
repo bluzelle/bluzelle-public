@@ -1,7 +1,8 @@
 package types
 
 var (
-	EventTypeNftCreation = "nft_creation"
+	EventTypeNftCreation           = "nft_creation"
+	EventTypeNftCollectionCreation = "nft_collection_creation"
 
 	AttributeKeyNftId         = "nft_id"
 	AttributeKeyNftCollId     = "nft_coll_id"

@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -172,6 +173,13 @@ func (m msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		Creator:      msg.Sender,
 		CollectionId: collection.Id,
 	})
+	
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeNftCollectionCreation,
+			sdk.NewAttribute(types.AttributeKeyNftCollId, strconv.FormatUint(collection.Id, 10)),
+		),
+	)
 
 	return &types.MsgCreateCollectionResponse{
 		Id: collectionId,
