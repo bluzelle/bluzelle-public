@@ -51,6 +51,7 @@ func GetCmdCreateNFT() *cobra.Command {
 				--name="Punk10"
 				--symbol="PUNK"
 				--uri="https://punk.com/10"
+				--mutable-uri="https://starloop.com"
 				--seller-fee-basis-points=100
 				--creators="bluzelle13m350fvnk3s6y5n8ugxhmka277r0t7cw48ru47"
 				--creator-shares="10"
@@ -237,6 +238,7 @@ func GetCmdUpdateMetadata() *cobra.Command {
 				--name="Punk10"
 				--symbol="PUNK"
 				--uri="https://punk.com/10"
+                --mutable-uri="https://starloop.com"
 				--seller-fee-basis-points=100
 				--creators="bluzelle13m350fvnk3s6y5n8ugxhmka277r0t7cw48ru47"
 				--creator-shares="10"`,
@@ -588,6 +590,10 @@ func collectNftData(cmd *cobra.Command) (types.Metadata, error) {
 	if err != nil {
 		return types.Metadata{}, err
 	}
+	mutableUri, err := cmd.Flags().GetString(FlagMutableUri)
+	if err != nil {
+		return types.Metadata{}, err
+	}
 	sellerFeeBasisPoints, err := cmd.Flags().GetUint32(FlagSellerFeeBasisPoints)
 	if err != nil {
 		return types.Metadata{}, err
@@ -601,6 +607,7 @@ func collectNftData(cmd *cobra.Command) (types.Metadata, error) {
 	return types.Metadata{
 		Name:                 name,
 		Uri:                  uri,
+		MutableUri:           mutableUri,
 		SellerFeeBasisPoints: sellerFeeBasisPoints,
 		Creators:             creators,
 	}, nil
