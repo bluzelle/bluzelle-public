@@ -1,12 +1,12 @@
-import {startSwarmWithClient} from "@bluzelle/testing/src/swarmUtils";
-import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
+import {defaultSwarmConfig, startSwarmWithClient} from "@bluzelle/testing";
 import {expect} from "chai";
-import {createAddress, mint} from "./faucet";
-import {Swarm} from "daemon-manager";
-import {BluzelleClient} from "./sdk";
-import {getAccountBalance} from "./query";
+import {createAddress, mint} from "./tx";
+import {Swarm} from "daemon-manager/src";
+import {BluzelleClient} from "../../core";
+import {getAccountBalance} from "../bank";
+import {withCtxAwait} from "@scottburch/with-context";
 
-describe('faucet', function () {
+describe('faucet module', function () {
 
     this.timeout(1_800_000);
 
@@ -47,9 +47,33 @@ describe('faucet', function () {
         return startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: false})
             .then(({bzSdk}) => client = bzSdk)
             .then(() => mint(client, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
-            .then(resp => expect(true).to.be.false)
+            .then(() => expect(true).to.be.false)
             .catch(err => expect(err.stack).to.contain('invalid request'))
             .then(() => getAccountBalance(client, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
             .then(bal => expect(bal).to.equal(0))
     });
+
+    it('should be able to mint tokens to a new account', () =>
+        startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true}, {url: 'http://localhost:26667'})
+            .then(info => ({client: info.bzSdk}))
+            .then(withCtxAwait('mintResult', ctx => mint(ctx.client)))
+            .then(ctx => getAccountBalance(ctx.client, ctx.mintResult.address))
+            .then(balance => expect(balance).to.equal(200_000_000))
+    );
+
+
+    it('should be able to mint tokens to a new given', () =>
+        startSwarmWithClient()
+            .then(info => ({client: info.bzSdk}))
+            .then(withCtxAwait('mintResult', ctx => mint(ctx.client, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj')))
+            .then(ctx => getAccountBalance(ctx.client, ctx.mintResult.address))
+            .then(balance => expect(balance).to.equal(200_000_000))
+    );
+
+    it('should not mint if bluzelleFaucet is not turned on', () =>
+        startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: false})
+            .then(info => mint(info.bzSdk))
+            .catch(err => expect(err.message.includes('invalid request')).to.be.true)
+    );
+
 });

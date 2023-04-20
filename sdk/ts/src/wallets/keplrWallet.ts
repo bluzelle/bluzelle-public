@@ -1,10 +1,9 @@
-import {newBluzelleClient, SigningBluzelleClient} from "../sdk";
+import {getStatus, newBluzelleClient, SigningBluzelleClient} from "../core";
 import {SequenceResponse} from "@cosmjs/stargate";
 import {passThrough, passThroughAwait} from "promise-passthrough";
 import {BluzelleWallet} from "./BluzelleWallet";
 import {Window} from '@keplr-wallet/types';
 import {AccountData, DirectSignResponse, OfflineDirectSigner} from "@cosmjs/proto-signing/build/signer";
-import {getStatus} from "../queryTendermint";
 import {newLocalWallet} from "./localWallet";
 import * as bip39 from 'bip39';
 

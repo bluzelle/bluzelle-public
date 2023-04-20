@@ -1,23 +1,25 @@
 import {getBlzClient, restartIpfsServerAndSwarm} from "@bluzelle/testing/src/commonUtils";
 import {generateContent} from "@bluzelle/testing/src/fileUtils";
-import {hasContent, getAccountBalance, parseDecTypeToNumber, getTx} from "./query";
-import {pinCid, withTransaction} from "./tx";
 import {BehaviorSubject} from "rxjs";
 import {times} from "lodash";
 import {passThroughAwait} from "promise-passthrough";
-import {createCtx, createCtxAwait, withCtxAwait} from "@scottburch/with-context";
+import {createCtx, withCtxAwait} from "@scottburch/with-context";
 import {create} from "ipfs-http-client";
 import {expect} from "chai";
 import {CID} from "multiformats/cid";
 import delay from "delay";
 import {defaultSwarmConfig} from "@bluzelle/testing";
+import {hasContent} from "./query";
+import {getAccountBalance} from "../bank";
+import {pinCid} from "./tx";
+import {getTx, withTransaction} from "../../core";
 
 const ipfsClient = create({host: '127.0.0.1', port: 5001, protocol: 'http'})
 
 const curiumUrl = 'http://localhost:26667';
 const mnemonic = new BehaviorSubject<string>("");
 
-describe('query', function () {
+describe('storage module', function () {
     this.timeout(600_000);
 
     beforeEach(() =>
@@ -57,6 +59,7 @@ describe('query', function () {
             )))
     );
 
+
     it('getAccountBalance should return account balance', () =>
         Promise.all(times(5).map(() =>
             Promise.resolve({content: generateContent(0.01)})
@@ -75,21 +78,6 @@ describe('query', function () {
             .then(ctx => getAccountBalance(ctx.client, ctx.client.address))
     );
 
-    it('getAccountBalance should return account balance for the elt and g4 denoms', () =>
-        getBlzClient(curiumUrl, mnemonic.getValue())
-            .then(client => Promise.all([getAccountBalance(client, client.address, "uelt"), getAccountBalance(client, client.address, "ug4")]))
-            .then(([ueltBal, ug4Bal]) => {
-                expect(ueltBal).to.equal(500000000000000);
-                expect(ug4Bal).to.equal(500000000000000);
-            })
-    );
-
-    it("getAccountBalance should not charge gas", () =>
-        Promise.resolve(createCtxAwait('client', () => getBlzClient(curiumUrl, mnemonic.getValue())))
-            .then(withCtxAwait('balanceBefore', (ctx) => getAccountBalance(ctx.client, ctx.client.address)))
-            .then(withCtxAwait('balanceAfter', (ctx) => getAccountBalance(ctx.client, ctx.client.address)))
-            .then((ctx) => expect(ctx.balanceAfter).equal(ctx.balanceBefore))
-    );
 
     it('should query for v1 cids', () =>
         getBlzClient(curiumUrl, mnemonic.getValue())
@@ -105,6 +93,7 @@ describe('query', function () {
             .then(resp => expect(resp).to.be.true)
     );
 
+
     it('should query for the same cid with either v0 or v1', () =>
         getBlzClient(curiumUrl, mnemonic.getValue())
             .then(passThroughAwait(bzSdk =>
@@ -118,6 +107,7 @@ describe('query', function () {
             .then(bzSdk => hasContent(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'))
             .then(resp => expect(resp).to.be.true)
     );
+
 
     it('should query for the same cid with either v0 or v1 other direction', () =>
         getBlzClient(curiumUrl, mnemonic.getValue())
@@ -134,12 +124,6 @@ describe('query', function () {
             .then(resp => expect(resp).to.be.true)
     );
 
-    it("should parse dec type to number", () => {
-        expect(parseDecTypeToNumber("100000000000000000")).to.equal(0.1)
-        expect(parseDecTypeToNumber("10000000000000000")).to.equal(0.01)
-        expect(parseDecTypeToNumber("100500000000000")).to.equal(0.0001005)
-        expect(parseDecTypeToNumber("20500000000000000000")).to.equal(20.5)
-    });
 
     it('should query a transaction by hash', () => {
         return getBlzClient(curiumUrl, mnemonic.getValue())

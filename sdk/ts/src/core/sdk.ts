@@ -3,32 +3,32 @@ import {getRegistry} from "./registry";
 import {SigningStargateClientOptions} from "@cosmjs/stargate/build/signingstargateclient";
 import {
     QueryClientImpl as StorageQueryClientImpl
-} from "./curium/lib/generated/storage/query";
+} from "../curium/lib/generated/storage/query";
 import {
     QueryClientImpl as BankQueryClientImpl
-} from "./curium/lib/generated/cosmos/bank/v1beta1/query";
+} from "../curium/lib/generated/cosmos/bank/v1beta1/query";
 import {
     QueryClientImpl as FaucetQueryClientImpl
-} from './curium/lib/generated/faucet/query'
-import {BluzelleWallet} from "./wallets/BluzelleWallet";
+} from '../curium/lib/generated/faucet/query'
+import {BluzelleWallet} from "../wallets/BluzelleWallet";
 import {
     QueryClientImpl as TaxQueryClientImpl
-} from './curium/lib/generated/tax/query';
+} from '../curium/lib/generated/tax/query';
 import {
     QueryClientImpl as StakingQueryClientImpl
-} from "./curium/lib/generated/cosmos/staking/v1beta1/query";
+} from "../curium/lib/generated/cosmos/staking/v1beta1/query";
 import {
     QueryClientImpl as DistributionQueryClientImpl
-} from "./curium/lib/generated/cosmos/distribution/v1beta1/query";
+} from "../curium/lib/generated/cosmos/distribution/v1beta1/query";
 import {
     QueryClientImpl as NftQueryClientImpl
-} from "./curium/lib/generated/nft/query";
+} from "../curium/lib/generated/nft/query";
 import {
     QueryClientImpl as AuthzQueryClientImpl
-} from "./curium/lib/generated/cosmos/authz/v1beta1/query"
+} from "../curium/lib/generated/cosmos/authz/v1beta1/query"
 import {
     ServiceClientImpl
-} from "./curium/lib/generated/cosmos/tx/v1beta1/service";
+} from "../curium/lib/generated/cosmos/tx/v1beta1/service";
 import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 
 

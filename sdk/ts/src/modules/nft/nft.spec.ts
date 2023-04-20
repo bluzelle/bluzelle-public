@@ -1,22 +1,24 @@
-import {defaultSwarmConfig, startSwarmWithClient} from "@bluzelle/testing";
+import {startSwarmWithClient} from "@bluzelle/testing";
 import {stopSwarm} from "@bluzelle/testing/src/swarmUtils";
-import {BluzelleClient, newBluzelleClient} from "./sdk";
-import {getCollectionInfo, getNftByOwner, getNftInfo, getNftMetadata} from "./query";
+import {BluzelleClient, newBluzelleClient} from "../../core";
 import {expect} from 'chai';
+import {Creator} from "../../curium/lib/generated/nft/nft";
+import {createAddress} from "../faucet";
+import {newLocalWallet} from "../../wallets/localWallet";
+import {generateMnemonic} from "../../utils/generateMnemonic";
+import {passThroughAwait} from "promise-passthrough";
 import {
     createCollection,
     createNft,
     printNftEdition,
-    transferNft, updateCollectionMutableUri, updateCollectionUri,
+    transferNft,
+    updateCollectionMutableUri,
+    updateCollectionUri,
     updateMetadata,
     updateMetadataAuthority,
     updateMintAuthority
 } from "./tx";
-import {Creator} from "./curium/lib/generated/nft/nft";
-import {createAddress} from "./faucet";
-import {newLocalWallet} from "./wallets/localWallet";
-import {generateMnemonic} from "./generateMnemonic";
-import {passThroughAwait} from "promise-passthrough";
+import {getCollectionInfo, getNftByOwner, getNftInfo, getNftMetadata} from "./query";
 
 
 describe('nft module', function () {

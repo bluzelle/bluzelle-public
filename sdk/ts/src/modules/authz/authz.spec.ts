@@ -1,38 +1,40 @@
 import {
     BluzelleDelegationResponse,
     BluzelleValidatorsResponse,
-    getAccountBalance,
-    getValidatorsInfo,
-    mint,
-    newBluzelleClient,
-    newLocalWallet
-} from '../src/index';
-import {QueryGrantsResponse} from "./curium/lib/generated/cosmos/authz/v1beta1/query";
-import {expect} from "chai";
-import {BluzelleClient} from "./sdk";
-import {AuthorizationType, StakeAuthorization} from "./curium/lib/generated/cosmos/staking/v1beta1/authz";
-import {GenericAuthorization} from "./curium/lib/generated/cosmos/authz/v1beta1/authz";
-import {
     createCollection,
     createNft,
     delegate,
     executeAuthorization,
+    getAccountBalance,
+    getCollectionInfo,
+    getDelegation,
+    getNftByOwner,
+    getNftInfo,
+    getValidatorsInfo,
     grantAuthorization,
+    mint,
+    newBluzelleClient,
+    newLocalWallet,
+    queryAuthorizations,
     revokeAuthorization
-} from "./tx";
-import {getCollectionInfo, getDelegation, getNftByOwner, getNftInfo, queryAuthorizations} from "./query";
+} from '../../index';
+import {QueryGrantsResponse} from "../../curium/lib/generated/cosmos/authz/v1beta1/query";
+import {expect} from "chai";
+import {BluzelleClient} from "../../core";
+import {AuthorizationType, StakeAuthorization} from "../../curium/lib/generated/cosmos/staking/v1beta1/authz";
+import {GenericAuthorization} from "../../curium/lib/generated/cosmos/authz/v1beta1/authz";
 import {createCtx, withCtxAwait} from "@scottburch/with-context";
 import {passThroughAwait} from "promise-passthrough";
-import {Metadata} from "./curium/lib/generated/nft/nft";
+import {Metadata} from "../../curium/lib/generated/nft/nft";
 import {GrantType, msgMapping, MsgType} from "./authzTypes";
-import {QueryCollectionResponse} from "./curium/lib/generated/nft/query";
+import {QueryCollectionResponse} from "../../curium/lib/generated/nft/query";
 import {startSwarmWithClient, stopSwarm} from "@bluzelle/testing/src/swarmUtils";
 import {defaultSwarmConfig} from "@bluzelle/testing";
 import * as bip39 from "bip39";
 
 const Long = require('long');
 
-describe("authz", function () {
+describe("authz module", function () {
     this.timeout(1_800_000)
 
     let testGranter: string;

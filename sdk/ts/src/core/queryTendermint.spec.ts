@@ -2,7 +2,7 @@ import {startSwarmWithClient} from "@bluzelle/testing/src/swarmUtils";
 import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {getStatus, getValidators} from "./queryTendermint";
 import {expect} from "chai";
-import {Swarm} from "daemon-manager";
+import {Swarm} from "daemon-manager/src";
 
 
 describe('tendermint queries', () => {

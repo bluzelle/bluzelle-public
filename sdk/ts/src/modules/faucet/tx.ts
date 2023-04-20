@@ -1,13 +1,12 @@
-import {BluzelleClient} from "./sdk";
+import {BluzelleClient} from "../../core";
 import {passThroughAwait} from "promise-passthrough";
 import * as bip39 from 'bip39';
 import {Some} from "monet";
-import BIP32Factory from 'bip32';
+import BIP32Factory, {BIP32Interface} from 'bip32';
 import * as ecc from 'tiny-secp256k1';
-import {BIP32Interface} from 'bip32'
 import {bech32} from "bech32"
 import delay from "delay";
-import {getAccountBalance} from "./query";
+import {getAccountBalance} from "../bank";
 
 const defaultHdPath = "m/44'/483'/0'/0/0";
 const bech32Prefix = "bluzelle"

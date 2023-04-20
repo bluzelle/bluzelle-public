@@ -1,23 +1,23 @@
-import {MsgSend} from "./curium/lib/generated/cosmos/bank/v1beta1/tx";
-import {MsgPin} from "./curium/lib/generated/storage/tx";
+import {MsgSend} from "../../curium/lib/generated/cosmos/bank/v1beta1/tx";
+import {MsgPin} from "../../curium/lib/generated/storage/tx";
 import {
     MsgBeginRedelegate,
     MsgCreateValidator,
     MsgDelegate,
     MsgEditValidator,
     MsgUndelegate
-} from "./curium/lib/generated/cosmos/staking/v1beta1/tx";
-import {MsgVerifyInvariant} from "./curium/lib/generated/cosmos/crisis/v1beta1/tx";
+} from "../../curium/lib/generated/cosmos/staking/v1beta1/tx";
+import {MsgVerifyInvariant} from "../../curium/lib/generated/cosmos/crisis/v1beta1/tx";
 import {
     MsgFundCommunityPool,
     MsgSetWithdrawAddress,
     MsgWithdrawDelegatorReward,
     MsgWithdrawValidatorCommission
-} from "./curium/lib/generated/cosmos/distribution/v1beta1/tx";
-import {MsgSubmitEvidence} from "./curium/lib/generated/cosmos/evidence/v1beta1/tx";
-import {MsgGrantAllowance, MsgRevokeAllowance} from "./curium/lib/generated/cosmos/feegrant/v1beta1/tx";
-import {MsgDeposit, MsgSubmitProposal, MsgVote, MsgVoteWeighted} from "./curium/lib/generated/cosmos/gov/v1beta1/tx";
-import {MsgUnjail} from "./curium/lib/generated/cosmos/slashing/v1beta1/tx";
+} from "../../curium/lib/generated/cosmos/distribution/v1beta1/tx";
+import {MsgSubmitEvidence} from "../../curium/lib/generated/cosmos/evidence/v1beta1/tx";
+import {MsgGrantAllowance, MsgRevokeAllowance} from "../../curium/lib/generated/cosmos/feegrant/v1beta1/tx";
+import {MsgDeposit, MsgSubmitProposal, MsgVote, MsgVoteWeighted} from "../../curium/lib/generated/cosmos/gov/v1beta1/tx";
+import {MsgUnjail} from "../../curium/lib/generated/cosmos/slashing/v1beta1/tx";
 import {
     MsgCreateCollection,
     MsgCreateNFT,
@@ -28,11 +28,11 @@ import {
     MsgUpdateMetadata,
     MsgUpdateMetadataAuthority,
     MsgUpdateMintAuthority
-} from "./curium/lib/generated/nft/tx";
-import {GenericAuthorization} from "./curium/lib/generated/cosmos/authz/v1beta1/authz";
-import {SendAuthorization} from "./curium/lib/generated/cosmos/bank/v1beta1/authz";
-import {StakeAuthorization} from "./curium/lib/generated/cosmos/staking/v1beta1/authz";
-import {Coin} from "./curium/lib/generated/cosmos/base/v1beta1/coin";
+} from "../../curium/lib/generated/nft/tx";
+import {GenericAuthorization} from "../../curium/lib/generated/cosmos/authz/v1beta1/authz";
+import {SendAuthorization} from "../../curium/lib/generated/cosmos/bank/v1beta1/authz";
+import {StakeAuthorization} from "../../curium/lib/generated/cosmos/staking/v1beta1/authz";
+import {Coin} from "../../curium/lib/generated/cosmos/base/v1beta1/coin";
 
 export const enum MsgType {
     // crisis

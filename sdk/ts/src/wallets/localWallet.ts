@@ -1,7 +1,10 @@
-import {SigningBluzelleClient} from "../sdk";
+import {SigningBluzelleClient} from "../core";
 import {SequenceResponse} from "@cosmjs/stargate";
-import {DirectSecp256k1HdWallet, DirectSecp256k1HdWalletOptions} from "@cosmjs/proto-signing/build/directsecp256k1hdwallet";
-import {EnglishMnemonic, Bip39, HdPath, Slip10RawIndex} from "@cosmjs/crypto";
+import {
+    DirectSecp256k1HdWallet,
+    DirectSecp256k1HdWalletOptions
+} from "@cosmjs/proto-signing/build/directsecp256k1hdwallet";
+import {Bip39, EnglishMnemonic, HdPath, Slip10RawIndex} from "@cosmjs/crypto";
 import {passThrough} from "promise-passthrough";
 import {BluzelleWallet} from "./BluzelleWallet";
 

@@ -2,24 +2,13 @@ import {startSwarmWithClient} from "@bluzelle/testing";
 import {withCtxAwait} from "@scottburch/with-context";
 import {DaemonConfig, Environment, SwarmConfig, SwarmTypes} from "daemon-manager/src/SwarmConfig";
 import {passThroughAwait} from "promise-passthrough";
-import {delegate, pinCid, redelegate, send, undelegate, withdrawDelegatorReward} from "./tx";
-import {
-    getDelegation,
-    getDelegationRewards,
-    getDelegatorDelegations,
-    getDelegationTotalRewards,
-    getDelegatorUnbondingDelegations,
-    getValidatorsInfo
-} from "./query";
 import {expect} from "chai";
-import {newBluzelleClient} from "./sdk";
-import {newLocalWallet} from "./wallets/localWallet";
-import * as bip39 from "bip39";
-import {mint} from "./faucet";
 import {stopSwarm} from "@bluzelle/testing/src/swarmUtils";
 import {getOtherTokenDefaults} from "@bluzelle/testing/src/commonUtils";
+import {delegate, redelegate, undelegate} from "./tx";
+import {getDelegation, getDelegatorDelegations, getDelegatorUnbondingDelegations, getValidatorsInfo} from "./query";
 
-describe('staking', function () {
+describe('staking module', function () {
     this.timeout(2_000_000);
 
     beforeEach(stopSwarm);
@@ -55,7 +44,6 @@ describe('staking', function () {
             .then(ctx => undelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 2_000_000, {maxGas: 200_000, gasPrice: 10}))
             .then(res => expect(res.code).to.equal(0))
     );
-
 
     it("should be able to redelegate", () =>
         startSwarmWithClient({...swarmConfig()})
@@ -96,73 +84,6 @@ describe('staking', function () {
             .then(res => expect(res.validators.length).to.equal(3))
     );
 
-    it('should have reward for delegating', () =>
-        startSwarmWithClient({...swarmConfig()})
-            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
-            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
-            .then(passThroughAwait(ctx => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 100_000_000, {maxGas: 200_000, gasPrice: 10})))
-            .then(ctx => getDelegationRewards(ctx.bzSdk, ctx.auth.address, ctx.valoper))
-            .then(rewards => expect(rewards.length).to.equal(1))
-    );
-
-    it('should reward delegator when other addresses send tx', () =>
-        startSwarmWithClient({...swarmConfig()})
-            .then(withCtxAwait('mnemonic', () => Promise.resolve(bip39.generateMnemonic(256))))
-            .then(withCtxAwait('sentry', ctx =>
-                newBluzelleClient({
-                    url: 'localhost:26667',
-                    wallet: newLocalWallet(ctx.mnemonic)
-                })
-            ))
-            .then(passThroughAwait(ctx => mint(ctx.bzSdk, ctx.sentry.address)))
-            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
-            .then(passThroughAwait(ctx => delegate(ctx.sentry, ctx.sentry.address, ctx.valoper, 100_000_000, {maxGas: 200_000, gasPrice: 10})))
-            .then(passThroughAwait(ctx => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 100_000_000, {maxGas: 200_000, gasPrice: 10})))
-            .then(ctx => getDelegationRewards(ctx.sentry, ctx.sentry.address, ctx.valoper))
-            .then(rewards => expect(rewards.length).to.equal(1))
-    );
-
-    it('should withdraw delegation rewards', () =>
-        startSwarmWithClient({...swarmConfig()})
-            .then(withCtxAwait('mnemonic', () => Promise.resolve(bip39.generateMnemonic(256))))
-            .then(withCtxAwait('sentry', ctx =>
-                newBluzelleClient({
-                    url: 'localhost:26667',
-                    wallet: newLocalWallet(ctx.mnemonic)
-                })
-            ))
-            .then(passThroughAwait(ctx => mint(ctx.bzSdk, ctx.sentry.address)))
-            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
-            .then(passThroughAwait(ctx => delegate(ctx.sentry, ctx.sentry.address, ctx.valoper, 100_000_000, {maxGas: 200_000, gasPrice: 10})))
-            .then(passThroughAwait(ctx => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 10_000_000_000, {maxGas: 200_000, gasPrice: 10})))
-            .then(ctx => withdrawDelegatorReward(ctx.sentry, ctx.sentry.address, ctx.valoper, {maxGas: 200_000, gasPrice: 10}))
-            .then(res => expect(res.code).to.equal(0))
-    );
-
-    it('should not throw error when get total delegation rewards', () =>
-        startSwarmWithClient({...swarmConfig()})
-            .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
-            .then(withCtxAwait('valoper2', ctx => ctx.swarm.getValidators()[2].getValoper()))
-            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
-            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper2, 4_000_000, {maxGas: 200_000, gasPrice: 10})))
-            .then(ctx => getDelegationTotalRewards(ctx.bzSdk, ctx.auth.address))
-    );
-
-    it('should get total delegation rewards', () =>
-        startSwarmWithClient({...swarmConfig()})
-            .then(withCtxAwait('sentry', () => newBluzelleClient({
-                url: 'http://localhost:26667',
-                wallet: newLocalWallet('forget era scatter fiction write what final correct pause purchase argue scheme fire cattle play eight flag trust rely hello brick decline avoid any')
-            })))
-            .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
-            .then(passThroughAwait(ctx => send(ctx.bzSdk, ctx.sentry.address, 500_000_000, {maxGas: 200_000, gasPrice: 0.002})))
-            .then(passThroughAwait(ctx => delegate(ctx.sentry, ctx.sentry.address, ctx.valoper1, 400_000_000, {maxGas: 200_000, gasPrice: 0.002})))
-            .then(passThroughAwait(ctx => pinCid(ctx.bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {maxGas: 200_000, gasPrice: 50})))
-            .then(passThroughAwait(ctx => pinCid(ctx.bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {maxGas: 200_000, gasPrice: 50})))
-            .then(ctx => getDelegationTotalRewards(ctx.sentry, ctx.sentry.address))
-            .then(res => expect(res.rewards[0].totalReward.amount).to.be.greaterThan(0))
-    );
-
     it("should query unbonding delegations of a delegator", () =>
         startSwarmWithClient({...swarmConfig()})
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
@@ -179,6 +100,7 @@ describe('staking', function () {
     );
 
 });
+
 
 const swarmConfig = (): SwarmConfig => ({
     denom: 'bnt',
