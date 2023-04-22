@@ -1,6 +1,7 @@
 import {Collection, MasterEdition, Metadata, NFT} from "../../curium/lib/generated/nft/nft";
 import {BluzelleClient} from "../../core";
-import Long from "long";
+
+const Long = require('long');
 
 export const getNftInfo = (client: BluzelleClient, id: string) =>
     client.queryClient.nft.NFTInfo({id})

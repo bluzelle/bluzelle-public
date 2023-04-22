@@ -1,9 +1,10 @@
 import {BluzelleClient} from "../../core";
 import {QueryGrantsResponse} from "../../curium/lib/generated/cosmos/authz/v1beta1/query";
-import Long from "long";
 import {PageRequest} from "../../curium/lib/generated/cosmos/base/query/v1beta1/pagination";
 import {msgMapping, MsgType} from "./authzTypes";
 import {BluzellePageRequest, defaultPaginationOptions} from "../../shared/pagination";
+
+const Long = require('long');
 
 export type QueryAuthorizationsParams = {
     granter: string,

@@ -1,5 +1,4 @@
 import {BluzelleClient} from "../../core";
-import Long from "long";
 import {PageRequest, PageResponse} from "../../curium/lib/generated/cosmos/base/query/v1beta1/pagination";
 import {
     Delegation,
@@ -18,6 +17,7 @@ import {BluzellePageRequest, defaultPaginationOptions, defaultPaginationResponse
 import {BluzelleCoin} from "../../shared/types";
 import {parseDecTypeToNumber} from "../../shared/parse";
 
+const Long = require('long');
 
 export type BluzelleDelegatorUnbondingDelegationsResponse = {
     unbondingDelegations: BluzelleUnbondingDelegation[],

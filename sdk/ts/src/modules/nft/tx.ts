@@ -11,8 +11,9 @@ import {
     MsgUpdateMetadataAuthority,
     MsgUpdateMintAuthority
 } from "../../curium/lib/generated/nft/tx";
-import Long from "long";
 import {Creator, Metadata} from "../../curium/lib/generated/nft/nft";
+
+const Long = require('long');
 
 type MetadataHumanReadable = {
     id: number,
