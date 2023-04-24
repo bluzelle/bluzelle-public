@@ -22,6 +22,7 @@ import {MsgSetGasTaxBp, MsgSetTaxCollector, MsgSetTransferTaxBp} from "../curium
 import {MsgBeginRedelegate, MsgDelegate, MsgUndelegate} from "../curium/lib/generated/cosmos/staking/v1beta1/tx";
 import {MsgWithdrawDelegatorReward} from "../curium/lib/generated/cosmos/distribution/v1beta1/tx";
 import {MsgExec, MsgGrant, MsgRevoke} from "../curium/lib/generated/cosmos/authz/v1beta1/tx";
+import {MsgCreateVestingAccount} from "../curium/lib/generated/cosmos/vesting/v1beta1/tx";
 import {DeliverTxResponse} from "@cosmjs/stargate";
 import {toHex} from '@cosmjs/encoding'
 import {TxRaw} from "../curium/lib/generated/cosmos/tx/v1beta1/tx"
@@ -99,6 +100,7 @@ export const registerMessages = (registry: Registry) => {
     registry.register('/cosmos.authz.v1beta1.MsgRevoke', MsgRevoke)
     registry.register('/bluzelle.curium.nft.MsgUpdateCollectionUri', MsgUpdateCollectionUri)
     registry.register('/bluzelle.curium.nft.MsgUpdateCollectionMutableUri', MsgUpdateCollectionMutableUri)
+    registry.register('/cosmos.vesting.v1beta1.MsgCreateVestingAccount', MsgCreateVestingAccount)
 
     return registry
 };

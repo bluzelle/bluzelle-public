@@ -1,34 +1,17 @@
 import {createProtobufRpcClient, QueryClient, SequenceResponse, SigningStargateClient} from "@cosmjs/stargate";
 import {getRegistry} from "./registry";
 import {SigningStargateClientOptions} from "@cosmjs/stargate/build/signingstargateclient";
-import {
-    QueryClientImpl as StorageQueryClientImpl
-} from "../curium/lib/generated/storage/query";
-import {
-    QueryClientImpl as BankQueryClientImpl
-} from "../curium/lib/generated/cosmos/bank/v1beta1/query";
-import {
-    QueryClientImpl as FaucetQueryClientImpl
-} from '../curium/lib/generated/faucet/query'
+import {QueryClientImpl as StorageQueryClientImpl} from "../curium/lib/generated/storage/query";
+import {QueryClientImpl as BankQueryClientImpl} from "../curium/lib/generated/cosmos/bank/v1beta1/query";
+import {QueryClientImpl as FaucetQueryClientImpl} from '../curium/lib/generated/faucet/query'
 import {BluzelleWallet} from "../wallets/BluzelleWallet";
-import {
-    QueryClientImpl as TaxQueryClientImpl
-} from '../curium/lib/generated/tax/query';
-import {
-    QueryClientImpl as StakingQueryClientImpl
-} from "../curium/lib/generated/cosmos/staking/v1beta1/query";
-import {
-    QueryClientImpl as DistributionQueryClientImpl
-} from "../curium/lib/generated/cosmos/distribution/v1beta1/query";
-import {
-    QueryClientImpl as NftQueryClientImpl
-} from "../curium/lib/generated/nft/query";
-import {
-    QueryClientImpl as AuthzQueryClientImpl
-} from "../curium/lib/generated/cosmos/authz/v1beta1/query"
-import {
-    ServiceClientImpl
-} from "../curium/lib/generated/cosmos/tx/v1beta1/service";
+import {QueryClientImpl as TaxQueryClientImpl} from '../curium/lib/generated/tax/query';
+import {QueryClientImpl as StakingQueryClientImpl} from "../curium/lib/generated/cosmos/staking/v1beta1/query";
+import {QueryClientImpl as DistributionQueryClientImpl} from "../curium/lib/generated/cosmos/distribution/v1beta1/query";
+import {QueryClientImpl as NftQueryClientImpl} from "../curium/lib/generated/nft/query";
+import {QueryClientImpl as AuthzQueryClientImpl} from "../curium/lib/generated/cosmos/authz/v1beta1/query";
+import {MsgClientImpl as VestingClientImpl} from "../curium/lib/generated/cosmos/vesting/v1beta1/tx";
+import {ServiceClientImpl} from "../curium/lib/generated/cosmos/tx/v1beta1/service";
 import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 
 
@@ -42,6 +25,7 @@ type QueryClientImpl = {
     tx: ServiceClientImpl;
     nft: NftQueryClientImpl;
     authz: AuthzQueryClientImpl;
+    vesting: VestingClientImpl;
 }
 
 
@@ -85,7 +69,8 @@ const getRpcClient = (url: string): Promise<QueryClientImpl> =>
             distribution: new DistributionQueryClientImpl(rpcClient),
             tx: new ServiceClientImpl(rpcClient),
             nft: new NftQueryClientImpl(rpcClient),
-            authz: new AuthzQueryClientImpl(rpcClient)
+            authz: new AuthzQueryClientImpl(rpcClient),
+            vesting: new VestingClientImpl(rpcClient),
         }));
 
 export class SigningBluzelleClient extends SigningStargateClient {
