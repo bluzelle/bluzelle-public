@@ -1,10 +1,12 @@
 package keeper_test
 
 import (
+	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/bech32"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 )
 
@@ -609,24 +611,40 @@ func (suite *KeeperTestSuite) TestMsgServerUpdateMetadataAuthority() {
 }
 
 func (suite *KeeperTestSuite) TestMsgServerCreateCollection() {
+	config := sdk.GetConfig()
+	config.SetCoinType(appTypes.CoinType)
+	config.SetBech32PrefixForAccount("bluzelle", "bluzellepub")
+	config.SetAddressVerifier(func(addr []byte) error {
+		_, _, err := bech32.DecodeAndConvert(string(addr))
+		return err
+	})
+	config.Seal()
+
 	tests := []struct {
 		testCase             string
 		expectPass           bool
 		expectedCollectionId uint64
+		updateAuthority      string
 	}{
 		{
 			"create a collection",
 			true,
 			1,
+			sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes()).String(),
+		},
+		{
+			"create a collection with invalid creator address",
+			false,
+			2,
+			"bluzelle13m350fvnk3s6y5n8ugxhmka277r0t7cw48ru47",
 		},
 	}
 
 	for _, tc := range tests {
 		creator := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
-
 		msgServer := keeper.NewMsgServerImpl(*suite.NFTKeeper)
 		resp, err := msgServer.CreateCollection(sdk.WrapSDKContext(suite.ctx), types.NewMsgCreateCollection(
-			creator, "PUNK", "Punk Collection", "punk.com", "", creator.String(), false,
+			creator, "PUNK", "Punk Collection", "punk.com", "", tc.updateAuthority, false,
 		))
 		if tc.expectPass {
 			suite.Require().NoError(err)
@@ -642,7 +660,7 @@ func (suite *KeeperTestSuite) TestMsgServerCreateCollection() {
 			collection, err := suite.NFTKeeper.GetCollectionById(suite.ctx, resp.Id)
 			suite.Require().NoError(err)
 			suite.Require().Equal(collection.Id, tc.expectedCollectionId)
-			suite.Require().Equal(collection.UpdateAuthority, creator.String())
+			suite.Require().Equal(collection.UpdateAuthority, tc.updateAuthority)
 		} else {
 			suite.Require().Error(err)
 		}

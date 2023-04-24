@@ -2,10 +2,9 @@ package keeper
 
 import (
 	"context"
-	"strconv"
-
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"strconv"
 )
 
 type msgServer struct {
@@ -22,6 +21,23 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 func (m msgServer) CreateNFT(goCtx context.Context, msg *types.MsgCreateNFT) (*types.MsgCreateNFTResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	err := sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(msg.Metadata.MetadataAuthority))
+	if err != nil {
+		return nil, err
+	}
+
+	err = sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(msg.Metadata.MintAuthority))
+	if err != nil {
+		return nil, err
+	}
+
+	for _, creator := range msg.Metadata.Creators {
+		err = sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(creator.GetAddress()))
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	metadataId, nftId, err := m.Keeper.CreateNFT(ctx, msg)
 	if err != nil {
@@ -115,6 +131,13 @@ func (m msgServer) UpdateMetadata(goCtx context.Context, msg *types.MsgUpdateMet
 		return nil, types.ErrNotEnoughPermission
 	}
 
+	for _, creator := range msg.Creators {
+		err = sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(creator.GetAddress()))
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	metadata.Name = msg.Name
 	metadata.Uri = msg.Uri
 	metadata.MutableUri = msg.MutableUri
@@ -136,7 +159,12 @@ func (m msgServer) UpdateMetadata(goCtx context.Context, msg *types.MsgUpdateMet
 func (m msgServer) UpdateMetadataAuthority(goCtx context.Context, msg *types.MsgUpdateMetadataAuthority) (*types.MsgUpdateMetadataAuthorityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := m.Keeper.UpdateMetadataAuthority(ctx, msg)
+	err := sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(msg.NewAuthority))
+	if err != nil {
+		return nil, err
+	}
+
+	err = m.Keeper.UpdateMetadataAuthority(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
@@ -145,8 +173,8 @@ func (m msgServer) UpdateMetadataAuthority(goCtx context.Context, msg *types.Msg
 
 func (m msgServer) UpdateMintAuthority(goCtx context.Context, msg *types.MsgUpdateMintAuthority) (*types.MsgUpdateMintAuthorityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	err := m.Keeper.UpdateMintAuthority(ctx, msg)
+	err := sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(msg.NewAuthority))
+	err = m.Keeper.UpdateMintAuthority(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
@@ -155,6 +183,11 @@ func (m msgServer) UpdateMintAuthority(goCtx context.Context, msg *types.MsgUpda
 
 func (m msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateCollection) (*types.MsgCreateCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	err := sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(msg.UpdateAuthority))
+	if err != nil {
+		return nil, err
+	}
 
 	collectionId := m.Keeper.GetLastCollectionId(ctx) + 1
 	m.Keeper.SetLastCollectionId(ctx, collectionId)
@@ -173,7 +206,7 @@ func (m msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		Creator:      msg.Sender,
 		CollectionId: collection.Id,
 	})
-	
+
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeNftCollectionCreation,

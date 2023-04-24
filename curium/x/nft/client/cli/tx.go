@@ -53,10 +53,10 @@ func GetCmdCreateNFT() *cobra.Command {
 				--uri="https://punk.com/10"
 				--mutable-uri="https://starloop.com"
 				--seller-fee-basis-points=100
-				--creators="bluzelle13m350fvnk3s6y5n8ugxhmka277r0t7cw48ru47"
+				--creators="bluzelle1syeqq3hl327d53w6wz9fzamuhklg4qk47wl99m"
 				--creator-shares="10"
 				--mutable=false
-				--update-authority="bluzelle13m350fvnk3s6y5n8ugxhmka277r0t7cw48ru47"`,
+				--update-authority="bluzelle1syeqq3hl327d53w6wz9fzamuhklg4qk47wl99m"`,
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -158,8 +158,8 @@ func GetCmdTransferNFT() *cobra.Command {
 		Long: "Transfer a nft from sender to receiver",
 		Example: fmt.Sprintf(
 			`$ %s tx nft transfer-nft
-				--nft-id=1
-				--new-owner="bluzelle13m350fvnk3s6y5n8ugxhmka277r0t7cw48ru47"`,
+				--nft-id="1:1:0"
+				--new-owner="bluzelle1syeqq3hl327d53w6wz9fzamuhklg4qk47wl99m"`,
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -240,7 +240,7 @@ func GetCmdUpdateMetadata() *cobra.Command {
 				--uri="https://punk.com/10"
                 --mutable-uri="https://starloop.com"
 				--seller-fee-basis-points=100
-				--creators="bluzelle13m350fvnk3s6y5n8ugxhmka277r0t7cw48ru47"
+				--creators="bluzelle1syeqq3hl327d53w6wz9fzamuhklg4qk47wl99m"
 				--creator-shares="10"`,
 			version.AppName,
 		),
@@ -283,7 +283,7 @@ func GetCmdUpdateMetadataAuthority() *cobra.Command {
 		Example: fmt.Sprintf(
 			`$ %s tx nft update-metadata-authority
 				--metadata-id=1
-				--new-authority="bluzelle13m350fvnk3s6y5n8ugxhmka277r0t7cw48ru47"`,
+				--new-authority="bluzelle1syeqq3hl327d53w6wz9fzamuhklg4qk47wl99m"`,
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -325,7 +325,7 @@ func GetCmdUpdateMintAuthority() *cobra.Command {
 		Example: fmt.Sprintf(
 			`$ %s tx nft update-mint-authority
 				--metadata-id=1
-				--new-authority="bluzelle13m350fvnk3s6y5n8ugxhmka277r0t7cw48ru47"`,
+				--new-authority="bluzelle1syeqq3hl327d53w6wz9fzamuhklg4qk47wl99m"`,
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -368,7 +368,7 @@ func GetCmdCreateCollection() *cobra.Command {
 			`$ %s tx nft create-collection
 				--name="punk-collection"
 				--uri="https://punk.com"
-				--update-authority="bluzelle13m350fvnk3s6y5n8ugxhmka277r0t7cw48ru47"
+				--update-authority="bluzelle1syeqq3hl327d53w6wz9fzamuhklg4qk47wl99m"
 				--mutable-uri="https://starloop.com"
 `,
 			version.AppName,
@@ -432,7 +432,7 @@ func GetCmdUpdateCollectionAuthority() *cobra.Command {
 		Example: fmt.Sprintf(
 			`$ %s tx nft update-collection-authority
 				--collection-id=1
-				--new-authority="bluzelle13m350fvnk3s6y5n8ugxhmka277r0t7cw48ru47"`,
+				--new-authority="bluzelle1syeqq3hl327d53w6wz9fzamuhklg4qk47wl99m"`,
 			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {

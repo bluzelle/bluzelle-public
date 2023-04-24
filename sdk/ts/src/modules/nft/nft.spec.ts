@@ -71,7 +71,7 @@ describe('nft module', function () {
         })
             .then(() => createNft(client, {
                 collId: 1,
-                metadata: defaultMetadataProps(0, 'TMPMeta', true, client.address)
+                metadata: defaultMetadataProps('TMPMeta', true, client.address)
             }, {maxGas: 1000000, gasPrice: 0.002}))
             .then(x => getNftInfo(client, '1:1:0'))
             .then(info => {
@@ -105,7 +105,7 @@ describe('nft module', function () {
         })
             .then(() => createNft(client, {
                 collId: 1,
-                metadata: defaultMetadataProps(0, 'TMPMeta', true, client.address)
+                metadata: defaultMetadataProps('TMPMeta', true, client.address)
             }, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => updateMetadata(client, {
                 name: 'TMP2',
@@ -130,7 +130,7 @@ describe('nft module', function () {
             })
                 .then(() => createNft(client, {
                     collId: 1,
-                    metadata: defaultMetadataProps(0, 'TMPMeta', true, client.address)
+                    metadata: defaultMetadataProps('TMPMeta', true, client.address)
                 }, {maxGas: 1000000, gasPrice: 0.002}))
                 .then(() => updateMetadataAuthority(client, 1, newAuthority, {maxGas: 1000000, gasPrice: 0.002}))
                 .then(() => getNftMetadata(client, 1))
@@ -148,7 +148,7 @@ describe('nft module', function () {
             })
                 .then(() => createNft(client, {
                     collId: 1,
-                    metadata: defaultMetadataProps(0, 'TMPMeta', true, client.address)
+                    metadata: defaultMetadataProps('TMPMeta', true, client.address)
                 }, {maxGas: 1000000, gasPrice: 0.002}))
                 .then(() => updateMintAuthority(client, 1, newAuthority, {maxGas: 1000000, gasPrice: 0.002}))
                 .then(() => getNftMetadata(client, 1))
@@ -165,7 +165,7 @@ describe('nft module', function () {
         })
             .then(() => createNft(client, {
                 collId: 1,
-                metadata: defaultMetadataProps(0, 'TMPMeta', true, client.address)
+                metadata: defaultMetadataProps('TMPMeta', true, client.address)
             }, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => printNftEdition(client, 1, 1, client.address, {maxGas: 1000000, gasPrice: 0.002}))
             .then(x => getCollectionInfo(client, 1))
@@ -182,7 +182,7 @@ describe('nft module', function () {
         })
             .then(() => createNft(client, {
                 collId: 1,
-                metadata: defaultMetadataProps(0, 'TMPMeta', true, client.address)
+                metadata: defaultMetadataProps('TMPMeta', true, client.address)
             }, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => newBluzelleClient({
                 url: 'http://localhost:26667',
@@ -210,11 +210,11 @@ describe('nft module', function () {
         })
             .then(() => createNft(client, {
                 collId: 1,
-                metadata: defaultMetadataProps(0, 'NFT1', true, client.address)
+                metadata: defaultMetadataProps('NFT1', true, client.address)
             }, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => createNft(client, {
                 collId: 1,
-                metadata: defaultMetadataProps(1, 'NFT2', true, client.address)
+                metadata: defaultMetadataProps('NFT2', true, client.address)
             }, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => getNftByOwner(client, client.address))
             .then(resp => {
@@ -232,10 +232,10 @@ describe('nft module', function () {
             maxGas: 100000000,
             gasPrice: 0.002
         })
-            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps(1, 'NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps('NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
             .then(x => getNftMetadata(client, 1))
             .then(info => {
-                expect(info.metadata?.mutableUri).to.deep.equal(defaultMetadataProps(1, 'NFT1', true, client.address).mutableUri)
+                expect(info.metadata?.mutableUri).to.deep.equal(defaultMetadataProps('NFT1', true, client.address).mutableUri)
             })
     )
 
@@ -244,7 +244,7 @@ describe('nft module', function () {
             maxGas: 100000000,
             gasPrice: 0.002
         })
-            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps(1, 'NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+            .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps('NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
             .then(() => updateMetadata(client, {
                 name: 'NFT2',
                 uri: 'http://temp2.com',
@@ -319,8 +319,7 @@ export const defaultMasterEditionProps = ({
     maxSupply: 1_000_000
 });
 
-export const defaultMetadataProps = (id: number, name: string, isMutable: boolean, address: string) => ({
-    id,
+export const defaultMetadataProps = (name: string, isMutable: boolean, address: string) => ({
     name,
     uri: 'https://tmp.com',
     mutableUri: 'http://starloopDatabase.com',

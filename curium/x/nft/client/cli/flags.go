@@ -29,6 +29,7 @@ func FlagCreateNFT() *flag.FlagSet {
 	fs.String(FlagName, "", "Name of the nft")
 	fs.String(FlagSymbol, "", "Symbol of the nft")
 	fs.String(FlagUri, "", "Uri of the nft")
+	fs.String(FlagMutableUri, "", "Mutable uri of the nft")
 	fs.Uint32(FlagSellerFeeBasisPoints, 0, "Seller fee basis points of the nft")
 	fs.Uint64(FlagCollectionId, 0, "collection id for the nft")
 	fs.String(FlagCreators, "", "Creators of nft")
@@ -125,7 +126,7 @@ func FlagUpdateCollectionUri() *flag.FlagSet {
 	fs := flag.NewFlagSet("", flag.ContinueOnError)
 
 	fs.Uint64(FlagCollectionId, 0, "Id of the collection to verify")
-	fs.String(FlagMutableUri, "", "New uri for uri of collection")
+	fs.String(FlagUri, "", "New uri for uri of collection")
 
 	return fs
 }

@@ -16,7 +16,6 @@ import {Creator, Metadata} from "../../curium/lib/generated/nft/nft";
 const Long = require('long');
 
 type MetadataHumanReadable = {
-    id: number,
     name: string;
     uri: string;
     mutableUri?: string;
@@ -26,7 +25,7 @@ type MetadataHumanReadable = {
     creators: Creator[];
     metadataAuthority: string;
     mintAuthority: string;
-    masterEdition?: { supply: number, maxSupply: number };
+    masterEdition?: {maxSupply: number };
 }
 
 export function createNft(client: BluzelleClient, props: { collId: number, metadata?: MetadataHumanReadable }, options: BroadcastOptions) {
@@ -40,9 +39,9 @@ export function createNft(client: BluzelleClient, props: { collId: number, metad
         return ({
             ...props,
             mutableUri: props.mutableUri || '',
-            id: new Long(props.id),
+            id: new Long(1),
             masterEdition: props.masterEdition && {
-                supply: new Long(props.masterEdition.supply),
+                supply: new Long(1),
                 maxSupply: new Long(props.masterEdition.maxSupply)
             }
         })

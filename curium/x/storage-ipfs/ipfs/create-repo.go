@@ -79,6 +79,12 @@ func CreateRepo(repoPath string, configOptions CreateRepoOptions) error {
 		cfg.Experimental.StrategicProviding = true
 	}
 
+	err = config.Profiles["server"].Transform(cfg)
+
+	if err != nil {
+		return err
+	}
+
 	// Create the repo with the config
 	err = fsrepo.Init(repoPath, cfg)
 	if err != nil {
