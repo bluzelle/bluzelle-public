@@ -1,12 +1,10 @@
 package keeper_test
 
 import (
-	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/bech32"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 )
 
@@ -611,14 +609,6 @@ func (suite *KeeperTestSuite) TestMsgServerUpdateMetadataAuthority() {
 }
 
 func (suite *KeeperTestSuite) TestMsgServerCreateCollection() {
-	config := sdk.GetConfig()
-	config.SetCoinType(appTypes.CoinType)
-	config.SetBech32PrefixForAccount("bluzelle", "bluzellepub")
-	config.SetAddressVerifier(func(addr []byte) error {
-		_, _, err := bech32.DecodeAndConvert(string(addr))
-		return err
-	})
-	config.Seal()
 
 	tests := []struct {
 		testCase             string

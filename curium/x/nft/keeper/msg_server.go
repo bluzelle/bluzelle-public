@@ -22,18 +22,20 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 func (m msgServer) CreateNFT(goCtx context.Context, msg *types.MsgCreateNFT) (*types.MsgCreateNFTResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(msg.Metadata.MetadataAuthority))
+	_, err := sdk.AccAddressFromBech32(msg.Metadata.MetadataAuthority)
+
 	if err != nil {
 		return nil, err
 	}
 
-	err = sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(msg.Metadata.MintAuthority))
+	_, err = sdk.AccAddressFromBech32(msg.Metadata.MintAuthority)
+
 	if err != nil {
 		return nil, err
 	}
 
 	for _, creator := range msg.Metadata.Creators {
-		err = sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(creator.GetAddress()))
+		_, err = sdk.AccAddressFromBech32(creator.GetAddress())
 		if err != nil {
 			return nil, err
 		}
@@ -57,6 +59,12 @@ func (m msgServer) CreateNFT(goCtx context.Context, msg *types.MsgCreateNFT) (*t
 
 func (m msgServer) PrintEdition(goCtx context.Context, msg *types.MsgPrintEdition) (*types.MsgPrintEditionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	_, err := sdk.AccAddressFromBech32(msg.Owner)
+
+	if err != nil {
+		return nil, err
+	}
 
 	nftId, err := m.Keeper.PrintEdition(ctx, msg)
 	if err != nil {
@@ -132,7 +140,7 @@ func (m msgServer) UpdateMetadata(goCtx context.Context, msg *types.MsgUpdateMet
 	}
 
 	for _, creator := range msg.Creators {
-		err = sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(creator.GetAddress()))
+		_, err = sdk.AccAddressFromBech32(creator.GetAddress())
 		if err != nil {
 			return nil, err
 		}
@@ -159,7 +167,7 @@ func (m msgServer) UpdateMetadata(goCtx context.Context, msg *types.MsgUpdateMet
 func (m msgServer) UpdateMetadataAuthority(goCtx context.Context, msg *types.MsgUpdateMetadataAuthority) (*types.MsgUpdateMetadataAuthorityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(msg.NewAuthority))
+	_, err := sdk.AccAddressFromBech32(msg.NewAuthority)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +192,8 @@ func (m msgServer) UpdateMintAuthority(goCtx context.Context, msg *types.MsgUpda
 func (m msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateCollection) (*types.MsgCreateCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(msg.UpdateAuthority))
+	_, err := sdk.AccAddressFromBech32(msg.UpdateAuthority)
+
 	if err != nil {
 		return nil, err
 	}

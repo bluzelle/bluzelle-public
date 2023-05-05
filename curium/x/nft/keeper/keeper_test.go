@@ -5,7 +5,6 @@ import (
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/cosmos/cosmos-sdk/simapp"
-	"github.com/cosmos/cosmos-sdk/types/bech32"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/tendermint/spm/cosmoscmd"
 	"github.com/tendermint/tendermint/crypto/tmhash"
@@ -50,12 +49,11 @@ func (suite *KeeperTestSuite) SetupTest() {
 	config := sdk.GetConfig()
 	config.SetCoinType(appTypes.CoinType)
 	config.SetBech32PrefixForAccount("bluzelle", "bluzellepub")
-	config.SetAddressVerifier(func(addr []byte) error {
-		_, _, err := bech32.DecodeAndConvert(string(addr))
-		return err
-	})
-	config.Seal()
-
+	//config.SetAddressVerifier(func(addr []byte) error {
+	//	bech32Addr := string(addr)
+	//	_, _, err := bech32.Decode(bech32Addr, 1023)
+	//	return err
+	//})
 	suite.app, _, _ = testutil.CreateTestApp(false)
 	suite.legacyAmino = cosmoscmd.MakeEncodingConfig(app.ModuleBasics).Amino
 	suite.NFTKeeper, suite.BankKeeper, suite.AccountKeeper, suite.ctx = testkeeper.NftKeeper()

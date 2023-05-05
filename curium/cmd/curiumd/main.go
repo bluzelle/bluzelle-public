@@ -3,7 +3,6 @@ package main
 import (
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"os"
 
 	"github.com/bluzelle/bluzelle-public/curium/app"
@@ -15,10 +14,6 @@ func main() {
 	config := sdk.GetConfig()
 	config.SetCoinType(appTypes.CoinType)
 	config.SetBech32PrefixForAccount("bluzelle", "bluzellepub")
-	config.SetAddressVerifier(func(addr []byte) error {
-		_, _, err := bech32.DecodeAndConvert(string(addr))
-		return err
-	})
 	config.Seal()
 
 	rootCmd, _ := cosmoscmd.NewRootCmd(
