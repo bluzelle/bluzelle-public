@@ -14,7 +14,6 @@ func main() {
 	config := sdk.GetConfig()
 	config.SetCoinType(appTypes.CoinType)
 	config.SetBech32PrefixForAccount("bluzelle", "bluzellepub")
-	config.Seal()
 
 	rootCmd, _ := cosmoscmd.NewRootCmd(
 		appTypes.Name,
