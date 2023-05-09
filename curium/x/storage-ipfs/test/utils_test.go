@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
+	"github.com/bluzelle/ipfs-kubo/config"
 	"github.com/ipfs/go-ipfs-files"
 	"github.com/ipfs/interface-go-ipfs-core/path"
 	"io"
@@ -58,7 +59,11 @@ func withIpfsNodes(fn func(context.Context, []*curiumipfs.StorageIpfsNode) error
 		return err
 	}
 
-	err = curiumipfs.CreateRepo("./testrepo1", curiumipfs.CreateRepoOptions{})
+	err = curiumipfs.CreateRepo("./testrepo1", curiumipfs.CreateRepoOptions{
+		Transformer: func(c *config.Config) error {
+			return nil
+		},
+	})
 	if err != nil {
 		return err
 	}
@@ -66,6 +71,9 @@ func withIpfsNodes(fn func(context.Context, []*curiumipfs.StorageIpfsNode) error
 		GatewayPort: 8082,
 		ApiPort:     5002,
 		SwarmPort:   4002,
+		Transformer: func(c *config.Config) error {
+			return nil
+		},
 	})
 	if err != nil {
 		return err

@@ -14,6 +14,7 @@ type CreateRepoOptions struct {
 	SwarmPort   int64
 	ApiPort     int64
 	GatewayPort int64
+	Transformer config.Transformer
 }
 
 func RepoExists(repoPath string) bool {
@@ -79,8 +80,7 @@ func CreateRepo(repoPath string, configOptions CreateRepoOptions) error {
 		cfg.Experimental.StrategicProviding = true
 	}
 
-	err = config.Profiles["server"].Transform(cfg)
-
+	err = configOptions.Transformer(cfg)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package app
 
 import (
+	ipfsConfig "github.com/bluzelle/ipfs-kubo/config"
 	"io"
 	"net/http"
 	"os"
@@ -659,7 +660,9 @@ func startupStorageNode(storageDir string) (*curiumipfs.StorageIpfsNode, error) 
 	}
 	storageDir = strings.ReplaceAll(storageDir, "~", homeDir)
 
-	err = storagemodulekeeper.CreateRepoIfNotExist(storageDir, curiumipfs.CreateRepoOptions{})
+	err = storagemodulekeeper.CreateRepoIfNotExist(storageDir, curiumipfs.CreateRepoOptions{
+		Transformer: ipfsConfig.Profiles["server"].Transform,
+	})
 	if err != nil {
 		return nil, err
 	}

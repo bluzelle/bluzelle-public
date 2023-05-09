@@ -3,6 +3,7 @@ package storage_test
 import (
 	"context"
 	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
+	"github.com/bluzelle/ipfs-kubo/config"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -25,7 +26,11 @@ func Test(t *testing.T) {
 	t.Run("should be able to know if repo exists before starting", func(t *testing.T) {
 		os.RemoveAll("./testrepo1")
 		assert.False(t, curiumipfs.RepoExists("./testrepo1"))
-		curiumipfs.CreateRepo("./testrepo1", curiumipfs.CreateRepoOptions{})
+		curiumipfs.CreateRepo("./testrepo1", curiumipfs.CreateRepoOptions{
+			Transformer: func(c *config.Config) error {
+				return nil
+			},
+		})
 		assert.True(t, curiumipfs.RepoExists("./testrepo1"))
 	})
 
