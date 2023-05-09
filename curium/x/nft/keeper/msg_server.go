@@ -181,8 +181,7 @@ func (m msgServer) UpdateMetadataAuthority(goCtx context.Context, msg *types.Msg
 
 func (m msgServer) UpdateMintAuthority(goCtx context.Context, msg *types.MsgUpdateMintAuthority) (*types.MsgUpdateMintAuthorityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	err := sdk.GetConfig().GetAddressVerifier()(sdk.AccAddress(msg.NewAuthority))
-	err = m.Keeper.UpdateMintAuthority(ctx, msg)
+	err := m.Keeper.UpdateMintAuthority(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
