@@ -2,6 +2,7 @@ export type {BluzelleWallet} from './wallets/BluzelleWallet';
 export type {BluzelleLocalWallet} from './wallets/localWallet';
 export {newLocalWallet, LocalWalletOptions} from './wallets/localWallet';
 export {newKeplrWallet, BluzelleKeplrWallet, Ports} from './wallets/keplrWallet';
+export {newCosmostationWallet, BluzelleCosmostationWallet} from "./wallets/cosmosStation"
 export * from "./core";
 export * from "./modules/bank";
 export * from "./modules/faucet";

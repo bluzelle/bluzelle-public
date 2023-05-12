@@ -3,6 +3,8 @@ import {defaultSwarmConfig} from "@bluzelle/testing/src/defaultConfigs";
 import {getStatus, getValidators} from "./queryTendermint";
 import {expect} from "chai";
 import {Swarm} from "daemon-manager/src";
+import {newBluzelleClient} from "./sdk";
+import {newCosmostationWallet} from "../wallets/cosmosStation";
 
 
 describe('tendermint queries', () => {
