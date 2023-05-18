@@ -43,6 +43,16 @@ const addBluzelleChain = (chainId: string, nodeAddress: string, ports: Ports, pr
                 coinDecimals: 6,
                 coinGeckoId: "bluzelle",
             },
+            {
+                coinDenom: "ELT",
+                coinMinimalDenom: "uelt",
+                coinDecimals: 6,
+            },
+            {
+                coinDenom: "G4",
+                coinMinimalDenom: "ug4",
+                coinDecimals: 6,
+            },
         ],
         feeCurrencies: [
             {
