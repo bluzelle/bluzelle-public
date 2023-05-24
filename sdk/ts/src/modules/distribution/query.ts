@@ -1,9 +1,12 @@
-import {QueryDelegationTotalRewardsResponse} from "../../curium/lib/generated/cosmos/distribution/v1beta1/query";
-import {DelegationDelegatorReward} from "../../curium/lib/generated/cosmos/distribution/v1beta1/distribution";
-import {BluzelleClient} from "../../core";
-import {Coin} from "@cosmjs/proto-signing";
-import {BluzelleCoin} from "../../shared/types";
-import {parseDecTypeToNumber} from "../../shared/parse";
+import {
+  QueryDelegationTotalRewardsResponse
+} from '../../curium/lib/generated/cosmos/distribution/v1beta1/query';
+import {
+  DelegationDelegatorReward
+} from '../../curium/lib/generated/cosmos/distribution/v1beta1/distribution';
+import { BluzelleClient } from '../../core';
+import { BluzelleCoin } from '../../shared/types';
+import { parseLongCoin, sumBluzelleCoins } from '../../shared/parse';
 
 export type BluzelleDelegationTotalRewardsResponse = {
     rewards: BluzelleDelegationDelegatorReward[],
@@ -57,11 +60,3 @@ const parseDelegationDelegatorReward = (delegatorReward: DelegationDelegatorRewa
         }));
 
 
-const sumBluzelleCoins = (coins: BluzelleCoin[]): BluzelleCoin =>
-    coins.reduce((total, coin) => ({
-        denom: "ubnt",
-        amount: total.amount + coin.amount
-    }), {denom: 'ubnt', amount: 0});
-
-
-const parseLongCoin = (coin: Coin): BluzelleCoin => ({denom: 'ubnt', amount: parseDecTypeToNumber(coin.amount)});

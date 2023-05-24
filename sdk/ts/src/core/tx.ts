@@ -23,6 +23,7 @@ import {MsgBeginRedelegate, MsgDelegate, MsgUndelegate} from "../curium/lib/gene
 import {MsgWithdrawDelegatorReward} from "../curium/lib/generated/cosmos/distribution/v1beta1/tx";
 import {MsgExec, MsgGrant, MsgRevoke} from "../curium/lib/generated/cosmos/authz/v1beta1/tx";
 import {MsgCreateVestingAccount} from "../curium/lib/generated/cosmos/vesting/v1beta1/tx";
+import {MsgSubmitProposal, MsgVote, MsgVoteWeighted, MsgDeposit} from "../curium/lib/generated/cosmos/gov/v1beta1/tx";
 import {DeliverTxResponse} from "@cosmjs/stargate";
 import {toHex} from '@cosmjs/encoding'
 import {TxRaw} from "../curium/lib/generated/cosmos/tx/v1beta1/tx"
@@ -101,6 +102,10 @@ export const registerMessages = (registry: Registry) => {
     registry.register('/bluzelle.curium.nft.MsgUpdateCollectionUri', MsgUpdateCollectionUri)
     registry.register('/bluzelle.curium.nft.MsgUpdateCollectionMutableUri', MsgUpdateCollectionMutableUri)
     registry.register('/cosmos.vesting.v1beta1.MsgCreateVestingAccount', MsgCreateVestingAccount)
+    registry.register('/cosmos.gov.v1beta1.MsgSubmitProposal', MsgSubmitProposal)
+    registry.register('/cosmos.gov.v1beta1.MsgVote', MsgVote)
+    registry.register('/cosmos.gov.v1beta1.MsgVoteWeighted', MsgVoteWeighted)
+    registry.register('/cosmos.gov.v1beta1.MsgDeposit', MsgDeposit)
 
     return registry
 };
