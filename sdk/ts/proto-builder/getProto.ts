@@ -104,4 +104,3 @@ export const getGoogleDependencies = () => [
     'https://raw.githubusercontent.com/protocolbuffers/protobuf/main/src/google/protobuf/duration.proto'
 ]
 //third_party/google/protobuf/duration.proto
-

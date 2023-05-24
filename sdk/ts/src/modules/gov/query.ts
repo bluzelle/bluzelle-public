@@ -219,4 +219,3 @@ const parseUint8ArrayToNumber = (val: Uint8Array) =>
     .map(val => Decimal.fromAtomics(val, 18))
     .map(Number)
     .join();
-
