@@ -15,7 +15,6 @@ import (
 	dbm "github.com/tendermint/tm-db"
 )
 
-
 func Setup(isCheckTx bool) cosmoscmd.App {
 	db := dbm.NewMemDB()
 	app := New(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, cosmoscmd.MakeEncodingConfig(ModuleBasics), simapp.EmptyAppOptions{})

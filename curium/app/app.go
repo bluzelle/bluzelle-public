@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/bluzelle/bluzelle-public/curium/app/upgrades/firstupgrade"
 	ipfsConfig "github.com/bluzelle/ipfs-kubo/config"
 	"io"
 	"net/http"
@@ -270,7 +269,6 @@ func NewCuriumApp(
 	invCheckPeriod uint,
 	encodingConfig cosmoscmd.EncodingConfig,
 	appOpts servertypes.AppOptions,
-	configurator module.Configurator,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
 	appCodec := encodingConfig.Marshaler
@@ -348,8 +346,8 @@ func NewCuriumApp(
 	)
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
-	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
-	app.UpgradeKeeper.SetUpgradeHandler("Upgrade 1", firstupgrade.CreateUpgradeHandler(app.mm, app.Configurator))
+	//app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
+	//app.UpgradeKeeper.SetUpgradeHandler("Upgrade 1", firstupgrade.CreateUpgradeHandler(app.mm, app.Configurator))
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
@@ -642,7 +640,6 @@ func New(
 	invCheckPeriod uint,
 	encodingConfig cosmoscmd.EncodingConfig,
 	appOpts servertypes.AppOptions,
-	configurator module.Configurator,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) cosmoscmd.App {
 	return NewCuriumApp(
@@ -655,7 +652,6 @@ func New(
 		invCheckPeriod,
 		encodingConfig,
 		appOpts,
-		configurator,
 		baseAppOptions...,
 	)
 }
