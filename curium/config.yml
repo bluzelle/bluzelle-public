@@ -31,9 +31,28 @@ genesis:
         denom: ubnt
     gov:
       deposit_params:
+        max_deposit_period: "5s"
         min_deposit:
-          - amount: "1000000"
+          - amount: "1000"
             denom: ubnt
+      params:
+        expedited_min_deposit:
+          - amount: "5"
+            denom: ubnt
+        expedited_threshold: "0.670000000000000000"
+        expedited_voting_period: "5s"
+        max_deposit_period: "5s"
+        min_deposit:
+          - amount: "1000"
+            denom: ubnt
+        min_initial_deposit_ratio: "0.000000000000000000"
+        proposal_cancel_burn_rate: "0.500000000000000000"
+        quorum: "0.334000000000000000"
+        threshold: "0.500000000000000000"
+        veto_threshold: "0.334000000000000000"
+        voting_period: "5s"
+      voting_params:
+        voting_period: "5s"
     mint:
       minter:
         inflation: "0.0"
