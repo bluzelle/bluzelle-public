@@ -10,6 +10,7 @@ import { TextProposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { SoftwareUpgradeProposal } from 'cosmjs-types/cosmos/upgrade/v1beta1/upgrade';
 import { ParamChange, ParameterChangeProposal } from 'cosmjs-types/cosmos/params/v1beta1/params';
 import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
+import { encodeSoftwareUpgradeProposal } from '../upgrade/upgrade';
 
 const Long = require('long');
 
@@ -42,7 +43,7 @@ export const submitSoftwareUpgradeProposal = (
   params: {
     title: string,
     description: string,
-    plan: {
+    plan?: {
       name: string,
       height: number,
       info: string,
@@ -55,15 +56,11 @@ export const submitSoftwareUpgradeProposal = (
   Promise.resolve(sendTx(client, '/cosmos.gov.v1beta1.MsgSubmitProposal', {
     content: {
       typeUrl: '/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal',
-      value: SoftwareUpgradeProposal.encode({
+      value: encodeSoftwareUpgradeProposal({
         title: params.title,
         description: params.description,
-        plan: params.plan ? {
-          name: params.plan.name,
-          height: new Long(params.plan.height),
-          info: params.plan.info,
-        } : undefined,
-      }).finish()
+        plan: params.plan,
+      })
     },
     proposer: params.proposer,
     initialDeposit: params.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),

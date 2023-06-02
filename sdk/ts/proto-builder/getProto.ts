@@ -67,6 +67,10 @@ export const getCosmosProtoDependencies = () => [
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/gov/v1beta1/gov.proto',
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/gov/v1beta1/query.proto',
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/gov/v1beta1/tx.proto',
+
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/upgrade/v1beta1/query.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/upgrade/v1beta1/upgrade.proto',
+
 ];
 
 

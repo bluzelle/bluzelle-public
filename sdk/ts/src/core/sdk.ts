@@ -12,6 +12,7 @@ import {QueryClientImpl as NftQueryClientImpl} from "../curium/lib/generated/nft
 import {QueryClientImpl as AuthzQueryClientImpl} from "../curium/lib/generated/cosmos/authz/v1beta1/query";
 import {MsgClientImpl as VestingClientImpl} from "../curium/lib/generated/cosmos/vesting/v1beta1/tx";
 import {QueryClientImpl as GovQueryClientImpl} from "../curium/lib/generated/cosmos/gov/v1beta1/query";
+import {QueryClientImpl as UpgradeQueryClientImpl} from "../curium/lib/generated/cosmos/upgrade/v1beta1/query";
 import {ServiceClientImpl} from "../curium/lib/generated/cosmos/tx/v1beta1/service";
 import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 
@@ -28,6 +29,7 @@ type QueryClientImpl = {
     authz: AuthzQueryClientImpl;
     vesting: VestingClientImpl;
     gov: GovQueryClientImpl;
+    upgrade: UpgradeQueryClientImpl;
 }
 
 
@@ -74,6 +76,7 @@ const getRpcClient = (url: string): Promise<QueryClientImpl> =>
             authz: new AuthzQueryClientImpl(rpcClient),
             vesting: new VestingClientImpl(rpcClient),
             gov: new GovQueryClientImpl(rpcClient),
+            upgrade: new UpgradeQueryClientImpl(rpcClient),
         }));
 
 export class SigningBluzelleClient extends SigningStargateClient {

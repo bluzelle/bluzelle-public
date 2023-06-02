@@ -1,7 +1,6 @@
 import { expect } from 'chai';
-import { startSwarmWithClient } from '@bluzelle/testing/src/swarmUtils';
+import { defaultSwarmConfig, startSwarmWithClient } from '@bluzelle/testing';
 import { Swarm } from 'daemon-manager/src';
-import { defaultSwarmConfig } from '@bluzelle/testing/src/defaultConfigs';
 import {
   depositToProposal,
   submitCommunityPoolSpendProposal,
