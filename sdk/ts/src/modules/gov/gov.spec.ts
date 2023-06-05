@@ -271,4 +271,38 @@ describe.skip('local proposal tests', () => {
       .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
   );
 
+
+  it('should be able to vote on and pass an upgrade proposal', () =>
+    newBluzelleClient({
+      url: CURIUM_URL,
+      wallet: newLocalWallet(MNEMONIC)
+    })
+      .then(passThroughAwait(client => submitSoftwareUpgradeProposal(client, {
+          title: 'My title',
+          description: 'My description',
+          proposer: client.address,
+          initialDeposit: [{
+            amount: 500_000,
+            denom: 'ubnt'
+          }],
+          plan: {
+            name: 'My upgrade plan',
+            height: 100,
+            info: 'My upgrade info',
+          }
+        }, {
+          maxGas: 200_000,
+          gasPrice: 10
+        })
+      ))
+      .then(passThroughAwait(client => vote(client, {
+        proposalId: "1",
+        voter: client.address,
+        option: VoteOption.VOTE_OPTION_YES
+      }, { maxGas: 200_000, gasPrice: 10 })))
+      .then(passThroughAwait(() => delay(10_000)))
+      .then(client => getProposal(client, "1"))
+      .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
+  );
+
 });

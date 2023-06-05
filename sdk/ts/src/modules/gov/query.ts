@@ -6,15 +6,23 @@ import {
   QueryParamsResponse,
   QueryProposalRequest,
   QueryProposalResponse,
+  QueryProposalsRequest,
 } from '../../curium/lib/generated/cosmos/gov/v1beta1/query';
 import { BluzelleCoin } from '../../shared/types';
 import { Any } from '../../curium/lib/generated/google/protobuf/any';
-import {
-  ProposalStatus,
-  TallyResult,
-} from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
+import { ProposalStatus, TallyResult, } from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
 import { Decimal } from '@cosmjs/math';
 import { Some } from 'monet';
+import {
+  PageRequest,
+  PageResponse
+} from '../../curium/lib/generated/cosmos/base/query/v1beta1/pagination';
+import {
+  BluzellePageRequest,
+  defaultPaginationOptions,
+  defaultPaginationResponse
+} from '../../shared/pagination';
+import { Proposal, QueryProposalsResponse } from '../../../lib';
 
 const Long = require('long');
 
@@ -50,6 +58,11 @@ type BluzelleProposal = {
   totalDeposit: BluzelleCoin[];
   votingStartTime?: Date;
   votingEndTime?: Date;
+}
+
+type BluzelleProposals = {
+  proposals: BluzelleProposal[],
+  pagination: PageResponse,
 }
 
 type BluzelleDeposit = {
@@ -89,7 +102,31 @@ export const getProposal = (
   client.queryClient.gov.Proposal({
     proposalId: new Long(proposalId),
   } as QueryProposalRequest)
-    .then(parseProposal);
+    .then((res: QueryProposalResponse) => parseProposal(res.proposal));
+
+
+export const getProposals = (
+  client: BluzelleClient,
+  params: {
+    proposalStatus: ProposalStatus;
+    voter: string;
+    depositor: string;
+  },
+  pagination: BluzellePageRequest = defaultPaginationOptions()
+): Promise<BluzelleProposals> =>
+  client.queryClient.gov.Proposals({
+    proposalStatus: params.proposalStatus,
+    voter: params.voter,
+    depositor: params.depositor,
+    pagination: {
+      key: pagination.key,
+      offset: new Long(pagination.offset),
+      limit: new Long(pagination.limit),
+      countTotal: pagination.countTotal,
+      reverse: pagination.reverse
+    } as PageRequest
+  } as QueryProposalsRequest)
+    .then(parseProposals);
 
 export const getDeposit = (
   client: BluzelleClient,
@@ -104,20 +141,25 @@ export const getDeposit = (
   } as QueryDepositRequest)
     .then(parseDeposit);
 
-const parseProposal = (res: QueryProposalResponse): BluzelleProposal => ({
-  proposalId: res.proposal?.proposalId ? res.proposal.proposalId.toString() : '',
-  content: res.proposal?.content ? res.proposal.content : {} as Any,
-  status: res.proposal?.status ? res.proposal.status : ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
-  statusLabel: res.proposal?.status ? ProposalStatus[res.proposal.status] : 'PROPOSAL_STATUS_UNSPECIFIED',
-  finalTallyResult: res.proposal?.finalTallyResult,
-  submitTime: res.proposal?.submitTime,
-  depositEndTime: res.proposal?.depositEndTime,
-  totalDeposit: res.proposal?.totalDeposit ? res.proposal.totalDeposit.map(deposit => ({
+const parseProposal = (proposal?: Proposal): BluzelleProposal => ({
+  proposalId: proposal?.proposalId ? proposal.proposalId.toString() : '',
+  content: proposal?.content ? proposal.content : {} as Any,
+  status: proposal?.status ? proposal.status : ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
+  statusLabel: proposal?.status ? ProposalStatus[proposal.status] : 'PROPOSAL_STATUS_UNSPECIFIED',
+  finalTallyResult: proposal?.finalTallyResult,
+  submitTime: proposal?.submitTime,
+  depositEndTime: proposal?.depositEndTime,
+  totalDeposit: proposal?.totalDeposit ? proposal.totalDeposit.map(deposit => ({
     denom: 'ubnt',
     amount: Number(deposit.amount)
   })) : [],
-  votingStartTime: res.proposal?.votingStartTime,
-  votingEndTime: res.proposal?.votingEndTime,
+  votingStartTime: proposal?.votingStartTime,
+  votingEndTime: proposal?.votingEndTime,
+});
+
+const parseProposals = (res: QueryProposalsResponse): BluzelleProposals => ({
+  proposals: res.proposals.map(proposal => parseProposal(proposal)),
+  pagination: res.pagination ? res.pagination : defaultPaginationResponse(),
 });
 
 const parseDeposit = (res: QueryDepositResponse): BluzelleDeposit => ({
