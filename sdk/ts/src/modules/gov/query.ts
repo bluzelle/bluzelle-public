@@ -7,10 +7,15 @@ import {
   QueryProposalRequest,
   QueryProposalResponse,
   QueryProposalsRequest,
+  QueryProposalsResponse
 } from '../../curium/lib/generated/cosmos/gov/v1beta1/query';
 import { BluzelleCoin } from '../../shared/types';
 import { Any } from '../../curium/lib/generated/google/protobuf/any';
-import { ProposalStatus, TallyResult, } from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
+import {
+  Proposal,
+  ProposalStatus,
+  TallyResult,
+} from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
 import { Decimal } from '@cosmjs/math';
 import { Some } from 'monet';
 import {
@@ -22,7 +27,6 @@ import {
   defaultPaginationOptions,
   defaultPaginationResponse
 } from '../../shared/pagination';
-import { Proposal, QueryProposalsResponse } from '../../../lib';
 
 const Long = require('long');
 
