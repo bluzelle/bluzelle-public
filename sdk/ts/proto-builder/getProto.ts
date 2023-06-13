@@ -38,7 +38,7 @@ export const getCosmosProtoDependencies = () => [
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/authz/v1beta1/tx.proto',
 
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/feegrant/v1beta1/feegrant.proto',
-    'https://github.com/cosmos/cosmos-sdk/blob/v0.45.11/proto/cosmos/feegrant/v1beta1/genesis.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/feegrant/v1beta1/genesis.proto',
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/feegrant/v1beta1/query.proto',
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/proto/cosmos/feegrant/v1beta1/tx.proto',
 
