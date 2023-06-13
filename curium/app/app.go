@@ -1,12 +1,13 @@
 package app
 
 import (
-	ipfsConfig "github.com/bluzelle/ipfs-kubo/config"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	ipfsConfig "github.com/bluzelle/ipfs-kubo/config"
 
 	appAnte "github.com/bluzelle/bluzelle-public/curium/app/ante"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
