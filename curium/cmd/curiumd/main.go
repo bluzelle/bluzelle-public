@@ -43,8 +43,6 @@ func main() {
 			} else {
 				logger.Error("Error removing all storage history", "dir", storageDir, "err", err)
 			}
-			println("\n\n\n")
-
 		}
 	}
 }
