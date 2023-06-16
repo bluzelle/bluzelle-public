@@ -6,8 +6,7 @@ import {
   submitCommunityPoolSpendProposal,
   submitParameterChangeProposal,
   submitSoftwareUpgradeProposal,
-  submitTextProposal,
-  vote
+  submitTextProposal
 } from './tx';
 import {
   getDeposit,
@@ -21,8 +20,7 @@ import { passThroughAwait } from 'promise-passthrough';
 import { newBluzelleClient } from '../../core';
 import { newLocalWallet } from '../../wallets/localWallet';
 import { generateMnemonic } from '../../utils/generateMnemonic';
-import { ProposalStatus, VoteOption } from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
-import delay from 'delay';
+import { ProposalStatus } from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
 
 const PROPOSAL_VALUE: TextProposal = {
   title: 'My title',
@@ -229,80 +227,6 @@ describe('gov module', () => {
           denom: 'ubnt',
           amount: 100
         }]))
-  );
-
-});
-
-
-describe.skip('local proposal tests', () => {
-
-  // Run a local bluzelle instance
-  // Set genesis.app_state.gov.deposit_params.max_deposit_period to "5s" in curium/config.yml
-  // Set genesis.app_state.gov.voting_params.voting_period to "10s" in curium/config.yml
-
-  const MNEMONIC = "";
-  const CURIUM_URL = "http://localhost:26657";
-
-  it('should be able to vote on and pass a text proposal', () =>
-    newBluzelleClient({
-      url: CURIUM_URL,
-      wallet: newLocalWallet(MNEMONIC)
-    })
-      .then(passThroughAwait(client => submitTextProposal(client, {
-          title: 'My title',
-          description: 'My description',
-          proposer: client.address,
-          initialDeposit: [{
-            amount: 500_000,
-            denom: 'ubnt'
-          }],
-        }, {
-          maxGas: 200_000,
-          gasPrice: 10
-        })
-      ))
-      .then(passThroughAwait(client => vote(client, {
-        proposalId: "1",
-        voter: client.address,
-        option: VoteOption.VOTE_OPTION_YES
-      }, { maxGas: 200_000, gasPrice: 10 })))
-      .then(passThroughAwait(() => delay(10_000)))
-      .then(client => getProposal(client, "1"))
-      .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
-  );
-
-
-  it('should be able to vote on and pass an upgrade proposal', () =>
-    newBluzelleClient({
-      url: CURIUM_URL,
-      wallet: newLocalWallet(MNEMONIC)
-    })
-      .then(passThroughAwait(client => submitSoftwareUpgradeProposal(client, {
-          title: 'My title',
-          description: 'My description',
-          proposer: client.address,
-          initialDeposit: [{
-            amount: 500_000,
-            denom: 'ubnt'
-          }],
-          plan: {
-            name: 'My upgrade plan',
-            height: 100,
-            info: 'My upgrade info',
-          }
-        }, {
-          maxGas: 200_000,
-          gasPrice: 10
-        })
-      ))
-      .then(passThroughAwait(client => vote(client, {
-        proposalId: "1",
-        voter: client.address,
-        option: VoteOption.VOTE_OPTION_YES
-      }, { maxGas: 200_000, gasPrice: 10 })))
-      .then(passThroughAwait(() => delay(10_000)))
-      .then(client => getProposal(client, "1"))
-      .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
   );
 
 });

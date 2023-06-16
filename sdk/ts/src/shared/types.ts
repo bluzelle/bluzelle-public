@@ -1,4 +1,4 @@
 export type BluzelleCoin = {
-    denom: 'ubnt',
+    denom: 'ubnt' | 'ug4' | 'uelt',
     amount: number
 }

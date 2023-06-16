@@ -19,6 +19,6 @@ export const sumBluzelleCoins = (coins: BluzelleCoin[]): BluzelleCoin =>
   });
 
 export const parseLongCoin = (coin: Coin): BluzelleCoin => ({
-  denom: 'ubnt',
+  denom: ['ubnt', 'ug4', 'uelt'].includes(coin.denom) ? coin.denom as 'ubnt' | 'ug4' | 'uelt' : 'ubnt',
   amount: parseDecTypeToNumber(coin.amount)
 });

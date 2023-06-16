@@ -94,7 +94,7 @@ install: go.sum
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/curiumd
 
 build:
-	go build $(BUILD_FLAGS) -o bin/curiumd ./cmd/curiumd
+	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o bin/curiumd ./cmd/curiumd
 
 ###############################################################################
 ###                                  Proto                                  ###
