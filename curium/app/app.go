@@ -1,12 +1,14 @@
 package app
 
 import (
-	ipfsConfig "github.com/bluzelle/ipfs-kubo/config"
+	"github.com/bluzelle/bluzelle-public/curium/app/upgrades/firstupgrade"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	ipfsConfig "github.com/bluzelle/ipfs-kubo/config"
 
 	appAnte "github.com/bluzelle/bluzelle-public/curium/app/ante"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
@@ -349,6 +351,9 @@ func NewCuriumApp(
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
 	//app.UpgradeKeeper.SetUpgradeHandler("Upgrade 1", firstupgrade.CreateUpgradeHandler(app.mm, app.Configurator))
 	// register the staking hooks
+
+	app.UpgradeKeeper.SetUpgradeHandler("double_supply", firstupgrade.DoubleSupplyUpgradeHandler(app.mm, app.Configurator, app.BankKeeper))
+
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
 		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
