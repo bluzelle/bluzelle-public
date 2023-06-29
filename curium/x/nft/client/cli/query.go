@@ -26,6 +26,7 @@ func GetQueryCmd() *cobra.Command {
 		GetCmdQueryNFTsByOwner(),
 		GetCmdQueryMetadata(),
 		GetCmdQueryCollection(),
+		GetCmdQueryLastCollectionId(),
 	)
 
 	return queryCmd
@@ -152,6 +153,35 @@ func GetCmdQueryCollection() *cobra.Command {
 			res, err := queryClient.Collection(context.Background(), &types.QueryCollectionRequest{
 				Id: uint64(id),
 			})
+
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func GetCmdQueryLastCollectionId() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "last-collection-id",
+		Long:    "Query a last collection id.",
+		Example: fmt.Sprintf(`$ %s query last nft collection id`, version.AppName),
+		Args:    cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.LastCollectionId(context.Background(), &types.QueryLastCollectionIdRequest{})
 
 			if err != nil {
 				return err
