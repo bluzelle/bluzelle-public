@@ -1,0 +1,3 @@
+export {
+  getParamValue
+} from './query';

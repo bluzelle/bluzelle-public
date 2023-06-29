@@ -13,6 +13,7 @@ import {QueryClientImpl as AuthzQueryClientImpl} from "../curium/lib/generated/c
 import {MsgClientImpl as VestingClientImpl} from "../curium/lib/generated/cosmos/vesting/v1beta1/tx";
 import {QueryClientImpl as GovQueryClientImpl} from "../curium/lib/generated/cosmos/gov/v1beta1/query";
 import {QueryClientImpl as UpgradeQueryClientImpl} from "../curium/lib/generated/cosmos/upgrade/v1beta1/query";
+import {QueryClientImpl as ParamsQueryClientImpl} from "../curium/lib/generated/cosmos/params/v1beta1/query";
 import {ServiceClientImpl} from "../curium/lib/generated/cosmos/tx/v1beta1/service";
 import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 
@@ -30,6 +31,7 @@ type QueryClientImpl = {
   vesting: VestingClientImpl;
   gov: GovQueryClientImpl;
   upgrade: UpgradeQueryClientImpl;
+  params: ParamsQueryClientImpl;
 }
 
 
@@ -77,6 +79,7 @@ const getRpcClient = (url: string): Promise<QueryClientImpl> =>
       vesting: new VestingClientImpl(rpcClient),
       gov: new GovQueryClientImpl(rpcClient),
       upgrade: new UpgradeQueryClientImpl(rpcClient),
+      params: new ParamsQueryClientImpl(rpcClient),
     }));
 
 export class SigningBluzelleClient extends SigningStargateClient {
