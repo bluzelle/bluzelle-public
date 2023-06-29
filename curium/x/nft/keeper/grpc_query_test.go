@@ -288,3 +288,29 @@ func (suite *KeeperTestSuite) TestGRPCCollection() {
 		}
 	}
 }
+
+func (suite *KeeperTestSuite) TestLastCollectionId() {
+	// create nfts
+	creator := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+
+	// set params for issue fee
+	issuePrice := sdk.NewInt64Coin("stake", 1000000)
+	fundAccnt := sdk.NewInt64Coin("stake", 1000000*2)
+	suite.NFTKeeper.SetParamSet(suite.ctx, types.Params{
+		IssuePrice: issuePrice,
+	})
+
+	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator, sdk.Coins{fundAccnt})
+
+	if err != nil {
+		return
+	}
+
+	collectionInfo1 := suite.CreateCollection(creator, true)
+	collectionInfo2 := suite.CreateCollection(creator, true)
+	suite.CreateNFT(creator, collectionInfo1.Id)
+	suite.CreateNFT(creator, collectionInfo2.Id)
+	resp, err := suite.NFTKeeper.LastCollectionId(sdk.WrapSDKContext(suite.ctx), &types.QueryLastCollectionIdRequest{})
+	suite.Require().NoError(err)
+	suite.Require().Equal(resp.Id, uint64(2))
+}
