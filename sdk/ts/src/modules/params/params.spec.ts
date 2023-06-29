@@ -1,3 +1,4 @@
+import {expect} from 'chai';
 import { Swarm } from 'daemon-manager/src';
 import { defaultSwarmConfig, startSwarmWithClient } from '@bluzelle/testing';
 import { getParamValue } from './query';
@@ -14,7 +15,7 @@ describe('params module', () => {
         subspace: 'staking',
         key: 'MaxValidators'
       }))
-      .then(res => expect(res.param.value).to.equal('100'))
+      .then(res => expect(res.param?.value).to.equal('100'))
   );
 
 });
