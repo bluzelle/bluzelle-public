@@ -159,6 +159,42 @@ paths:
           format: uint64
       tags:
         - Query
+  /bluzelle/nft/last-collection-id:
+    get:
+      summary: LastCollectionId returns the id of the last collection information
+      operationId: BluzelleCuriumNftLastCollectionId
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uint64
+            title: >-
+              QueryCollectionResponse is response type for the Query/Collection
+              RPC method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
   /bluzelle/nft/metadata/{id}:
     get:
       summary: Metadata returns Metadata
@@ -31172,6 +31208,15 @@ definitions:
               title: edition nr (0 mean normal nft)
             owner:
               type: string
+    title: >-
+      QueryCollectionResponse is response type for the Query/Collection RPC
+      method
+  bluzelle.curium.nft.QueryLastCollectionIdResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
     title: >-
       QueryCollectionResponse is response type for the Query/Collection RPC
       method

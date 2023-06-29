@@ -104,3 +104,12 @@ func (k Keeper) Collection(c context.Context, req *types.QueryCollectionRequest)
 		Nfts:       nfts,
 	}, nil
 }
+
+func (k Keeper) LastCollectionId(c context.Context, req *types.QueryLastCollectionIdRequest) (*types.QueryLastCollectionIdResponse, error) {
+
+	ctx := sdk.UnwrapSDKContext(c)
+	collectionId := k.GetLastCollectionId(ctx)
+	return &types.QueryLastCollectionIdResponse{
+		Id: collectionId,
+	}, nil
+}
