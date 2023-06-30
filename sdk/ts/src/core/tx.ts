@@ -1,11 +1,11 @@
-import {BluzelleClient} from "./sdk";
-import {MsgPin} from "../curium/lib/generated/storage/tx";
-import {EncodeObject, Registry} from "@cosmjs/proto-signing";
-import {Deferred, newDeferred} from '../utils/Deferred'
-import {Left, Right, Some} from "monet";
-import {passThrough} from "promise-passthrough";
-import {identity} from "lodash";
-import {MsgSend} from "../curium/lib/generated/cosmos/bank/v1beta1/tx";
+import { BluzelleClient } from './sdk';
+import { MsgPin } from '../curium/lib/generated/storage/tx';
+import { EncodeObject, Registry } from '@cosmjs/proto-signing';
+import { Deferred, newDeferred } from '../utils/Deferred';
+import { Left, Right, Some } from 'monet';
+import { passThrough } from 'promise-passthrough';
+import { identity } from 'lodash';
+import { MsgSend } from '../curium/lib/generated/cosmos/bank/v1beta1/tx';
 import {
     MsgCreateCollection,
     MsgCreateNFT,
@@ -17,17 +17,32 @@ import {
     MsgUpdateMetadata,
     MsgUpdateMetadataAuthority,
     MsgUpdateMintAuthority
-} from "../curium/lib/generated/nft/tx";
-import {MsgSetGasTaxBp, MsgSetTaxCollector, MsgSetTransferTaxBp} from "../curium/lib/generated/tax/tx";
-import {MsgBeginRedelegate, MsgDelegate, MsgUndelegate} from "../curium/lib/generated/cosmos/staking/v1beta1/tx";
-import {MsgWithdrawDelegatorReward} from "../curium/lib/generated/cosmos/distribution/v1beta1/tx";
-import {MsgExec, MsgGrant, MsgRevoke} from "../curium/lib/generated/cosmos/authz/v1beta1/tx";
-import {MsgCreateVestingAccount} from "../curium/lib/generated/cosmos/vesting/v1beta1/tx";
-import {MsgSubmitProposal, MsgVote, MsgVoteWeighted, MsgDeposit} from "../curium/lib/generated/cosmos/gov/v1beta1/tx";
-import {DeliverTxResponse} from "@cosmjs/stargate";
-import {toHex} from '@cosmjs/encoding'
-import {TxRaw} from "../curium/lib/generated/cosmos/tx/v1beta1/tx"
-
+} from '../curium/lib/generated/nft/tx';
+import {
+    MsgSetGasTaxBp,
+    MsgSetTaxCollector,
+    MsgSetTransferTaxBp
+} from '../curium/lib/generated/tax/tx';
+import {
+    MsgBeginRedelegate,
+    MsgDelegate,
+    MsgUndelegate
+} from '../curium/lib/generated/cosmos/staking/v1beta1/tx';
+import {
+    MsgFundCommunityPool,
+    MsgWithdrawDelegatorReward
+} from '../curium/lib/generated/cosmos/distribution/v1beta1/tx';
+import { MsgExec, MsgGrant, MsgRevoke } from '../curium/lib/generated/cosmos/authz/v1beta1/tx';
+import { MsgCreateVestingAccount } from '../curium/lib/generated/cosmos/vesting/v1beta1/tx';
+import {
+    MsgDeposit,
+    MsgSubmitProposal,
+    MsgVote,
+    MsgVoteWeighted
+} from '../curium/lib/generated/cosmos/gov/v1beta1/tx';
+import { DeliverTxResponse } from '@cosmjs/stargate';
+import { toHex } from '@cosmjs/encoding';
+import { TxRaw } from '../curium/lib/generated/cosmos/tx/v1beta1/tx';
 
 interface MsgQueueItem<T> {
     msg: EncodeObject;
@@ -88,6 +103,7 @@ export const registerMessages = (registry: Registry) => {
     registry.register('/cosmos.staking.v1beta1.MsgUndelegate', MsgUndelegate)
     registry.register('/cosmos.staking.v1beta1.MsgBeginRedelegate', MsgBeginRedelegate)
     registry.register('/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward', MsgWithdrawDelegatorReward)
+    registry.register('/cosmos.distribution.v1beta1.MsgFundCommunityPool', MsgFundCommunityPool)
     registry.register('/bluzelle.curium.nft.MsgCreateNFT', MsgCreateNFT)
     registry.register('/bluzelle.curium.nft.MsgCreateCollection', MsgCreateCollection)
     registry.register('/bluzelle.curium.nft.MsgTransferNFT', MsgTransferNFT)

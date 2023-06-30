@@ -9,7 +9,7 @@ import * as bip39 from "bip39";
 import {mint} from "../faucet";
 import {stopSwarm} from "@bluzelle/testing/src/swarmUtils";
 import {getOtherTokenDefaults} from "@bluzelle/testing/src/commonUtils";
-import {withdrawDelegatorReward} from "./tx";
+import { fundCommunityPool, withdrawDelegatorReward } from './tx';
 import {getDelegationRewards, getDelegationTotalRewards} from "./query";
 import {send} from "../bank";
 import {pinCid} from "../storage";
@@ -87,6 +87,15 @@ describe('distribution module', function () {
             .then(passThroughAwait(ctx => pinCid(ctx.bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {maxGas: 200_000, gasPrice: 50})))
             .then(ctx => getDelegationTotalRewards(ctx.sentry, ctx.sentry.address))
             .then(res => expect(res.rewards[0].totalReward.amount).to.be.greaterThan(0))
+    );
+
+    it('should fund community pool', () =>
+      startSwarmWithClient({...swarmConfig()})
+          .then(ctx => fundCommunityPool(ctx.bzSdk, {
+              amount: [{amount: 100_000_000, denom: 'ubnt'}],
+              depositor: ctx.auth.address
+          }, {maxGas: 200_000, gasPrice: 10}))
+          .then(res => expect(res.code).to.equal(0))
     );
 
 });

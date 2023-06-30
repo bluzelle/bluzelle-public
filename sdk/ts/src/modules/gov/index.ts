@@ -1,6 +1,8 @@
 export {
   submitTextProposal,
   submitSoftwareUpgradeProposal,
+  submitCommunityPoolSpendProposal,
+  submitParameterChangeProposal,
   vote,
   depositToProposal
 } from  './tx';

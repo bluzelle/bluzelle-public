@@ -21,6 +21,7 @@ import { newBluzelleClient } from '../../core';
 import { newLocalWallet } from '../../wallets/localWallet';
 import { generateMnemonic } from '../../utils/generateMnemonic';
 import { ProposalStatus } from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
+import { fundCommunityPool } from '../distribution';
 
 const PROPOSAL_VALUE: TextProposal = {
   title: 'My title',
@@ -132,6 +133,10 @@ describe('gov module', () => {
 
   it('should be able to submit and query a community pool spend proposal', () =>
     startSwarmWithClient()
+      .then(passThroughAwait(ctx => fundCommunityPool(ctx.bzSdk, {
+        amount: [{amount: 100_000_000, denom: 'ubnt'}],
+        depositor: ctx.auth.address
+      }, {maxGas: 200_000, gasPrice: 10})))
       .then(passThroughAwait(client =>
         newBluzelleClient({
           url: 'http://localhost:26667',
@@ -143,12 +148,12 @@ describe('gov module', () => {
               description: 'My description',
               recipient: recipient.address,
               amount: [{
-                amount: 500,
+                amount: 100_000_000,
                 denom: `ubnt`
               }],
               proposer: client.auth.address,
               initialDeposit: [{
-                amount: 100,
+                amount: 3_000_000,
                 denom: `ubnt`
               }],
             }, {
@@ -156,6 +161,7 @@ describe('gov module', () => {
               gasPrice: 10
             })
           )
+          .then(res => expect(res.code).to.equal(0))
       ))
   );
 

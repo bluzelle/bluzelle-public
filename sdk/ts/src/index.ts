@@ -13,6 +13,7 @@ export * from "./modules/nft";
 export * from "./modules/authz";
 export * from "./modules/storage";
 export * from "./modules/params";
+export * from "./modules/gov";
 export {
     BluzelleCoin
 } from "./shared/types";

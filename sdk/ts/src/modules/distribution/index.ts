@@ -1,4 +1,5 @@
 export {
+    fundCommunityPool,
     withdrawDelegatorReward
 } from './tx';
 
