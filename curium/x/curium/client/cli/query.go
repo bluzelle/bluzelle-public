@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	// "github.com/cosmos/cosmos-sdk/client/flags"
 	// sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 
 	"github.com/bluzelle/bluzelle-public/curium/x/curium/types"
 )
@@ -25,6 +26,7 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	}
 
 	// this line is used by starport scaffolding # 1
+	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }

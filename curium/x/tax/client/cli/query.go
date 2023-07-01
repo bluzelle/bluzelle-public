@@ -2,11 +2,14 @@ package cli
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/cosmos/cosmos-sdk/client/flags"
+
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
 // GetQueryCmd returns the cli query commands for this module
@@ -55,6 +58,7 @@ func GetTaxInfoCmd() *cobra.Command {
 			return clientCtx.PrintProto(res)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }
