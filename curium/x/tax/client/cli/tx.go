@@ -2,10 +2,12 @@ package cli
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
-	"time"
 )
 
 var (
@@ -23,6 +25,7 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	// this line is used by starport scaffolding # 1
+	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }

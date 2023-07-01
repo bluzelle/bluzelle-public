@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/cosmos/cosmos-sdk/client"
-	// "github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/bluzelle/bluzelle-public/curium/x/storage/types"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 )
 
 var (
@@ -31,6 +31,7 @@ func GetTxCmd() *cobra.Command {
 
 	cmd.AddCommand(CmdPin())
 	// this line is used by starport scaffolding # 1
+	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }
