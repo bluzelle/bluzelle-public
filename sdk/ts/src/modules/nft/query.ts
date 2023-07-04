@@ -31,6 +31,13 @@ export const getNftByOwner = (client: BluzelleClient, owner: string) =>
             metadata: resp.metadata.map(longToNumberMetadata)
         }));
 
+
+export const getLastCollectionId = (client: BluzelleClient) =>
+    client.queryClient.nft.LastCollectionId({})
+        .then(resp => ({
+                id: resp.id.toNumber()
+        }))
+
 const longToNumberNFT = (nft: NFT) => ({
     ...nft,
     collId: nft.collId.toNumber(),
