@@ -18,7 +18,8 @@ import {
     updateMetadataAuthority,
     updateMintAuthority
 } from "./tx";
-import {getCollectionInfo, getNftByOwner, getNftInfo, getNftMetadata} from "./query";
+import {getCollectionInfo, getLastCollectionId, getNftByOwner, getNftInfo, getNftMetadata} from "./query";
+import { cli } from "webpack";
 
 
 describe('nft module', function () {
@@ -41,13 +42,15 @@ describe('nft module', function () {
             .catch(err => expect(err.message).to.contain('invalid nft id'))
     );
 
-    it('should create an empty collection', () =>
+    it('should create an empty collection and last collection id should be 1', () =>
         createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
             maxGas: 100000000,
             gasPrice: 0.002
         })
             .then(() => getCollectionInfo(client, 1))
             .then(({nfts}) => expect(nfts).to.be.empty)
+            .then(()=> getLastCollectionId(client))
+            .then((id) =>expect(id).to.equal(1) )
     );
 
     it('should get the info of a collection', () =>
