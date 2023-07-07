@@ -16,7 +16,7 @@ func CmdHasContent() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "has-content",
 		Short: "Query hasContent",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -26,7 +26,9 @@ func CmdHasContent() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryHasContentRequest{}
+			params := &types.QueryHasContentRequest{
+				Cid: args[0],
+			}
 
 			res, err := queryClient.HasContent(cmd.Context(), params)
 			if err != nil {
