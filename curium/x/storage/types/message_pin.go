@@ -7,9 +7,10 @@ import (
 
 var _ sdk.Msg = &MsgPin{}
 
-func NewMsgPin(creator string) *MsgPin {
+func NewMsgPin(creator string, cid string) *MsgPin {
 	return &MsgPin{
 		Creator: creator,
+		Cid:     cid,
 	}
 }
 
