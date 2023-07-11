@@ -18,12 +18,14 @@ func TestMsgPin_ValidateBasic(t *testing.T) {
 			name: "invalid address",
 			msg: MsgPin{
 				Creator: "invalid_address",
+				Cid:     "cid",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: MsgPin{
 				Creator: sample.AccAddress(),
+				Cid:     "cid",
 			},
 		},
 	}
