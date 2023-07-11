@@ -27,7 +27,7 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	cmd.AddCommand(
-		GetCmdSetBp(),
+		GetCmdSetGasTaxBp(),
 		GetCmdSetTaxCollector(),
 		GetCmdSetTransferTaxBp(),
 	)
@@ -37,10 +37,10 @@ func GetTxCmd() *cobra.Command {
 	return cmd
 }
 
-func GetCmdSetBp() *cobra.Command {
+func GetCmdSetGasTaxBp() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-bp",
-		Short: "Set the Tax bp",
+		Use:  "set-gas-tax-bp",
+		Long: "Set gas tax basis point",
 		Example: fmt.Sprintf(
 			`$ %s tx tax set-bp 200 10`,
 			version.AppName,
@@ -62,9 +62,9 @@ func GetCmdSetBp() *cobra.Command {
 
 func GetCmdSetTaxCollector() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-tax-collector",
-		Short: "Set the collector of the tax",
-		Args:  cobra.ExactArgs(1),
+		Use:  "set-tax-collector",
+		Long: "Set tax collector",
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -81,9 +81,9 @@ func GetCmdSetTaxCollector() *cobra.Command {
 
 func GetCmdSetTransferTaxBp() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-transfer-tx-bp",
-		Short: "set the transfer bp",
-		Args:  cobra.ExactArgs(1),
+		Use:  "set-transfer-tx-bp",
+		Long: "Set transfer tax basis point",
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
