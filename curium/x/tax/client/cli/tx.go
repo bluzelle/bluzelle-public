@@ -26,7 +26,11 @@ func GetTxCmd() *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	cmd.AddCommand(GetCmdSetBp())
+	cmd.AddCommand(
+		GetCmdSetBp(),
+		GetCmdSetTaxCollector(),
+		GetCmdSetTransferTaxBp(),
+	)
 	// this line is used by starport scaffolding # 1
 	flags.AddQueryFlagsToCmd(cmd)
 
@@ -69,6 +73,25 @@ func GetCmdSetTaxCollector() *cobra.Command {
 			newCollector := args[0]
 			creator := clientCtx.GetFromAddress().String()
 			msg := types.NewMsgSetTaxCollector(creator, newCollector)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+	return cmd
+}
+
+func GetCmdSetTransferTaxBp() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "set-transfer-tx-bp",
+		Short: "set the transfer bp",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			bp, err := strconv.Atoi(args[0])
+			creator := clientCtx.GetFromAddress().String()
+			msg := types.NewMsgSetTransferTaxBp(creator, int64(bp))
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
