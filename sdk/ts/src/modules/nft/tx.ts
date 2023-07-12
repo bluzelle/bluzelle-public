@@ -12,8 +12,8 @@ import {
     MsgUpdateMintAuthority
 } from "../../curium/lib/generated/nft/tx";
 import {Creator, Metadata} from "../../curium/lib/generated/nft/nft";
+import { parseNumToLong } from '../../shared/parse';
 
-const Long = require('long');
 
 type MetadataHumanReadable = {
     name: string;
@@ -31,9 +31,9 @@ type MetadataHumanReadable = {
 export function createNft(client: BluzelleClient, props: { collId: number, metadata?: MetadataHumanReadable }, options: BroadcastOptions) {
     return Promise.resolve(sendTx<MsgCreateNFT>(client, '/bluzelle.curium.nft.MsgCreateNFT', {
         sender: client.address,
-        collId: new Long(props.collId),
+        collId: parseNumToLong(props.collId),
         metadata: props.metadata ? props.metadata && adaptMetadataProps(props.metadata) : {
-          id: new Long(1),
+          id: parseNumToLong(1),
           name: "",
           uri: "",
           mutableUri: "",
@@ -44,20 +44,20 @@ export function createNft(client: BluzelleClient, props: { collId: number, metad
           metadataAuthority: client.address,
           mintAuthority: client.address,
           masterEdition: {
-            supply: new Long(1),
-            maxSupply: new Long(1)
+            supply: parseNumToLong(1),
+            maxSupply: parseNumToLong(1)
           }
-        },
+        }
     }, options));
 
     function adaptMetadataProps(props: MetadataHumanReadable): Metadata {
         return ({
             ...props,
             mutableUri: props.mutableUri || '',
-            id: new Long(1),
+            id: parseNumToLong(1),
             masterEdition: props.masterEdition && {
-                supply: new Long(1),
-                maxSupply: new Long(props.masterEdition.maxSupply)
+                supply: parseNumToLong(1),
+                maxSupply: parseNumToLong(props.masterEdition.maxSupply)
             }
         })
     }
@@ -95,8 +95,8 @@ export const transferNft = (client: BluzelleClient, id: string, toAddress: strin
 export const printNftEdition = (client: BluzelleClient, metadataId: number, collId: number, owner: string, broadcastOptions: BroadcastOptions) =>
     Promise.resolve(sendTx<MsgPrintEdition>(client, '/bluzelle.curium.nft.MsgPrintEdition', {
         sender: client.address,
-        metadataId: new Long(metadataId),
-        collId: new Long(collId),
+        metadataId: parseNumToLong(metadataId),
+        collId: parseNumToLong(collId),
         owner,
     }, broadcastOptions));
 
@@ -115,7 +115,7 @@ export function updateMetadata(client: BluzelleClient, props: {
         return ({
             ...props,
             mutableUri,
-            metadataId: new Long(id)
+            metadataId: parseNumToLong(id)
         })
     }
 }
@@ -123,33 +123,33 @@ export function updateMetadata(client: BluzelleClient, props: {
 export const updateMetadataAuthority = (client: BluzelleClient, metadataId: number, newAuthority: string, broadcastOptions: BroadcastOptions) =>
     Promise.resolve(sendTx<MsgUpdateMetadataAuthority>(client, '/bluzelle.curium.nft.MsgUpdateMetadataAuthority', {
         sender: client.address,
-        metadataId: new Long(metadataId),
+        metadataId: parseNumToLong(metadataId),
         newAuthority
     }, broadcastOptions));
 
 export const updateMintAuthority = (client: BluzelleClient, metadataId: number, newAuthority: string, broadcastOptions: BroadcastOptions) =>
     Promise.resolve(sendTx<MsgUpdateMintAuthority>(client, '/bluzelle.curium.nft.MsgUpdateMintAuthority', {
         sender: client.address,
-        metadataId: new Long(metadataId),
+        metadataId: parseNumToLong(metadataId),
         newAuthority
     }, broadcastOptions));
 
 export const updateCollectionUri = (client: BluzelleClient, collectionId: number, uri: string, broadcastOptions: BroadcastOptions) =>
     Promise.resolve(sendTx<MsgUpdateCollectionUri>(client, '/bluzelle.curium.nft.MsgUpdateCollectionUri', {
         sender: client.address,
-        collectionId: new Long(collectionId),
+        collectionId: parseNumToLong(collectionId),
         uri
     }, broadcastOptions));
 
 export const updateCollectionMutableUri = (client: BluzelleClient, collectionId: number, uri: string, broadcastOptions: BroadcastOptions) =>
     Promise.resolve(sendTx<MsgUpdateCollectionMutableUri>(client, '/bluzelle.curium.nft.MsgUpdateCollectionMutableUri', {
         sender: client.address,
-        collectionId: new Long(collectionId),
+        collectionId: parseNumToLong(collectionId),
         uri
     }, broadcastOptions));
 
 export const signMetadata = (client: BluzelleClient, metadataId: number, broadcastOptions: BroadcastOptions) =>
     Promise.resolve(sendTx<MsgSignMetadata>(client, '/bluzelle.curium.nft.MsgSignMetadata', {
         sender: client.address,
-        metadataId: new Long(metadataId)
+        metadataId: parseNumToLong(metadataId)
     }, broadcastOptions));

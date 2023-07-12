@@ -3,8 +3,7 @@ import {QueryGrantsResponse} from "../../curium/lib/generated/cosmos/authz/v1bet
 import {PageRequest} from "../../curium/lib/generated/cosmos/base/query/v1beta1/pagination";
 import {msgMapping, MsgType} from "./authzTypes";
 import {BluzellePageRequest, defaultPaginationOptions} from "../../shared/pagination";
-
-const Long = require('long');
+import { parseNumToLong } from '../../shared/parse';
 
 export type QueryAuthorizationsParams = {
     granter: string,
@@ -23,8 +22,8 @@ export const queryAuthorizations = (
         msgTypeUrl: msgMapping[params.msg],
         pagination: {
             key: options.key,
-            offset: new Long(options.offset),
-            limit: new Long(options.limit),
+            offset: parseNumToLong(options.offset),
+            limit: parseNumToLong(options.limit),
             countTotal: options.countTotal,
             reverse: options.reverse
         } as PageRequest

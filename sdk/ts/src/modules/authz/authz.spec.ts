@@ -31,8 +31,7 @@ import {QueryCollectionResponse} from "../../curium/lib/generated/nft/query";
 import {startSwarmWithClient, stopSwarm} from "@bluzelle/testing/src/swarmUtils";
 import {defaultSwarmConfig} from "@bluzelle/testing";
 import * as bip39 from "bip39";
-
-const Long = require('long');
+import { parseNumToLong } from '../../shared/parse';
 
 describe("authz module", function () {
     this.timeout(1_800_000)
@@ -287,7 +286,7 @@ describe("authz module", function () {
 
     it(' create nft authorization should be successfully created and executed.', () => {
         const testMetadata: Metadata = {
-            id: new Long(1),
+            id: parseNumToLong(1),
             name: "TMPMeta",
             uri: 'https://tmp.com',
             mutableUri: '',
@@ -302,8 +301,8 @@ describe("authz module", function () {
             metadataAuthority: testGrantee,
             mintAuthority: testGrantee,
             masterEdition: {
-                supply: new Long(100_000),
-                maxSupply: new Long(1_000_000)
+                supply: parseNumToLong(100_000),
+                maxSupply: parseNumToLong(1_000_000)
             }
         }
         return createCollection(eClient, {
@@ -324,7 +323,7 @@ describe("authz module", function () {
                 {
                     msgType: MsgType.CREATE_NFT,
                     params: {
-                        sender: testGrantee, collId: new Long(1), metadata: testMetadata
+                        sender: testGrantee, collId: parseNumToLong(1), metadata: testMetadata
                     }
                 }
             ], { maxGas: 1000000, gasPrice: 0.002 }))
@@ -341,7 +340,7 @@ describe("authz module", function () {
 
     it(' transfer nft authorization should be successfully created and executed.', () => {
         const testMetadata: any = {
-            id: new Long(1),
+            id: parseNumToLong(1),
             name: "TMPMeta",
             uri: 'https://tmp.com',
             sellerFeeBasisPoints: 100,
@@ -355,8 +354,8 @@ describe("authz module", function () {
             metadataAuthority: testGrantee,
             mintAuthority: testGrantee,
             masterEdition: {
-                supply: new Long(100_000),
-                maxSupply: new Long(1_000_000)
+                supply: parseNumToLong(100_000),
+                maxSupply: parseNumToLong(1_000_000)
             }
         }
         return createCollection(eClient, {
@@ -367,7 +366,7 @@ describe("authz module", function () {
             isMutable: true,
             updateAuthority: eClient.address
         },{ maxGas: 100000000, gasPrice: 0.002 })
-            .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
+            .then(() => createNft(eClient, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
                 msgType: MsgType.TRANSFER_NFT,
@@ -393,7 +392,7 @@ describe("authz module", function () {
 
     it(' updateMetadataAuthority authorization should be successfully created and executed.', () => {
         const testMetadata: any = {
-            id: new Long(1),
+            id: parseNumToLong(1),
             name: "TMPMeta",
             uri: 'https://tmp1.com',
             sellerFeeBasisPoints: 100,
@@ -407,8 +406,8 @@ describe("authz module", function () {
             metadataAuthority: testGrantee,
             mintAuthority: testGrantee,
             masterEdition: {
-                supply: new Long(100_000),
-                maxSupply: new Long(1_000_000)
+                supply: parseNumToLong(100_000),
+                maxSupply: parseNumToLong(1_000_000)
             }
         }
         return createCollection(eClient, {
@@ -419,7 +418,7 @@ describe("authz module", function () {
             isMutable: true,
             updateAuthority: eClient.address
         }, { maxGas: 100000000, gasPrice: 0.002 })
-            .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
+            .then(() => createNft(eClient, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
                 msgType: MsgType.UPDATE_METADATA_AUTHORITY,
@@ -437,7 +436,7 @@ describe("authz module", function () {
                 msgType: MsgType.UPDATE_METADATA_AUTHORITY,
                 params: {
                     sender: testGrantee,
-                    metadataId: new Long(ctx.nftInfo.nft.metadataId),
+                    metadataId: parseNumToLong(ctx.nftInfo.nft.metadataId),
                     newAuthority: testGranter
                 }
             }], { maxGas: 100000000, gasPrice: 0.002 })))
@@ -450,7 +449,7 @@ describe("authz module", function () {
 
     it(' updateMetadata authorization should be successfully created and executed.', () => {
         const testMetadata: any = {
-            id: new Long(1),
+            id: parseNumToLong(1),
             name: "TMPMeta",
             uri: 'https://tmp1.com',
             sellerFeeBasisPoints: 100,
@@ -464,8 +463,8 @@ describe("authz module", function () {
             metadataAuthority: testGrantee,
             mintAuthority: testGrantee,
             masterEdition: {
-                supply: new Long(100_000),
-                maxSupply: new Long(1_000_000)
+                supply: parseNumToLong(100_000),
+                maxSupply: parseNumToLong(1_000_000)
             }
         }
         return createCollection(eClient, {
@@ -476,7 +475,7 @@ describe("authz module", function () {
             isMutable: true,
             updateAuthority: eClient.address
         }, { maxGas: 100000000, gasPrice: 0.002 })
-            .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
+            .then(() => createNft(eClient, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
                 msgType: MsgType.UPDATE_METADATA,
@@ -494,7 +493,7 @@ describe("authz module", function () {
                 msgType: MsgType.UPDATE_METADATA,
                 params: {
                     sender: testGrantee,
-                    metadataId: new Long(ctx.nftInfo.nft.metadataId),
+                    metadataId: parseNumToLong(ctx.nftInfo.nft.metadataId),
                     name: "UpdatedTmpMeta",
                     uri: "https://tmp.com",
                     mutableUri: '',
@@ -514,7 +513,7 @@ describe("authz module", function () {
 
     it(' updateMintAuthority authorization should be successfully created and executed.', () => {
         const testMetadata: any = {
-            id: new Long(1),
+            id: parseNumToLong(1),
             name: "TMPMeta",
             uri: 'https://tmp1.com',
             sellerFeeBasisPoints: 100,
@@ -528,8 +527,8 @@ describe("authz module", function () {
             metadataAuthority: testGrantee,
             mintAuthority: testGrantee,
             masterEdition: {
-                supply: new Long(100_000),
-                maxSupply: new Long(1_000_000)
+                supply: parseNumToLong(100_000),
+                maxSupply: parseNumToLong(1_000_000)
             }
         }
         return createCollection(eClient, {
@@ -540,7 +539,7 @@ describe("authz module", function () {
             isMutable: true,
             updateAuthority: eClient.address
         },{ maxGas: 100000000, gasPrice: 0.002 })
-            .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
+            .then(() => createNft(eClient, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
                 msgType: MsgType.UPDATE_MINT_AUTHORITIY,
@@ -558,7 +557,7 @@ describe("authz module", function () {
                 msgType: MsgType.UPDATE_MINT_AUTHORITIY,
                 params: {
                     sender: testGrantee,
-                    metadataId: new Long(ctx.nftInfo.nft.metadataId),
+                    metadataId: parseNumToLong(ctx.nftInfo.nft.metadataId),
                     newAuthority: testGranter
                 }
             }], { maxGas: 100000000, gasPrice: 0.002 })))
@@ -570,7 +569,7 @@ describe("authz module", function () {
 
     it(' printEdition authorization should be successfully created and executed.', () => {
         const testMetadata: any = {
-            id: new Long(1),
+            id: parseNumToLong(1),
             name: "TMPMeta",
             uri: 'https://tmp1.com',
             sellerFeeBasisPoints: 100,
@@ -584,8 +583,8 @@ describe("authz module", function () {
             metadataAuthority: testGrantee,
             mintAuthority: testGrantee,
             masterEdition: {
-                supply: new Long(100_000),
-                maxSupply: new Long(1_000_000)
+                supply: parseNumToLong(100_000),
+                maxSupply: parseNumToLong(1_000_000)
             }
         }
         return createCollection(eClient,{
@@ -596,7 +595,7 @@ describe("authz module", function () {
             isMutable: true,
             updateAuthority: eClient.address
         }, { maxGas: 100000000, gasPrice: 0.002 })
-            .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
+            .then(() => createNft(eClient, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
                 msgType: MsgType.PRINT_EDITION,
@@ -615,8 +614,8 @@ describe("authz module", function () {
                 msgType: MsgType.PRINT_EDITION,
                 params: {
                     sender: testGrantee,
-                    metadataId: new Long(ctx.nftInfo.nft.metadataId),
-                    collId: new Long(1),
+                    metadataId: parseNumToLong(ctx.nftInfo.nft.metadataId),
+                    collId: parseNumToLong(1),
                     owner: testGrantee
                 }
             }], { maxGas: 100000000, gasPrice: 0.002 })))
@@ -630,7 +629,7 @@ describe("authz module", function () {
 
     it(' signMetadata authorization should be successfully created and executed.', () => {
         const testMetadata: any = {
-            id: new Long(1),
+            id: parseNumToLong(1),
             name: "TMPMeta",
             uri: 'https://tmp1.com',
             sellerFeeBasisPoints: 100,
@@ -644,8 +643,8 @@ describe("authz module", function () {
             metadataAuthority: testGrantee,
             mintAuthority: testGrantee,
             masterEdition: {
-                supply: new Long(100_000),
-                maxSupply: new Long(1_000_000)
+                supply: parseNumToLong(100_000),
+                maxSupply: parseNumToLong(1_000_000)
             }
         }
         return createCollection(eClient, {
@@ -656,7 +655,7 @@ describe("authz module", function () {
             isMutable: true,
             updateAuthority: eClient.address
         }, { maxGas: 100000000, gasPrice: 0.002 })
-            .then(() => createNft(eClient, { collId: new Long(1), metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
+            .then(() => createNft(eClient, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
                 msgType: MsgType.SIGN_METADATA,
@@ -674,7 +673,7 @@ describe("authz module", function () {
                         msgType: MsgType.SIGN_METADATA,
                         params: {
                             sender: testGrantee,
-                            metadataId: new Long(ctx.nftInfo.nft.metadataId),
+                            metadataId: parseNumToLong(ctx.nftInfo.nft.metadataId),
                         }
                     }], { maxGas: 100000000, gasPrice: 0.002 })
                         .then((res: any) => {

@@ -27,8 +27,8 @@ import {
   defaultPaginationOptions,
   defaultPaginationResponse
 } from '../../shared/pagination';
+import { parseNumToLong, parseStringToLong } from '../../shared/parse';
 
-const Long = require('long');
 
 type BluzelleVotingParams = {
   votingPeriod: {
@@ -104,7 +104,7 @@ export const getProposal = (
   proposalId: string,
 ): Promise<BluzelleProposal> =>
   client.queryClient.gov.Proposal({
-    proposalId: new Long(proposalId),
+    proposalId: parseStringToLong(proposalId),
   } as QueryProposalRequest)
     .then((res: QueryProposalResponse) => parseProposal(res.proposal));
 
@@ -124,8 +124,8 @@ export const getProposals = (
     depositor: params.depositor,
     pagination: {
       key: pagination.key,
-      offset: new Long(pagination.offset),
-      limit: new Long(pagination.limit),
+      offset: parseNumToLong(pagination.offset),
+      limit: parseNumToLong(pagination.limit),
       countTotal: pagination.countTotal,
       reverse: pagination.reverse
     } as PageRequest
@@ -140,7 +140,7 @@ export const getDeposit = (
   }
 ): Promise<BluzelleDeposit> =>
   client.queryClient.gov.Deposit({
-    proposalId: new Long(params.proposalId),
+    proposalId: parseStringToLong(params.proposalId),
     depositor: params.depositor,
   } as QueryDepositRequest)
     .then(parseDeposit);

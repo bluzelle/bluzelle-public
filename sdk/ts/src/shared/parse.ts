@@ -3,6 +3,8 @@ import { padStart } from 'lodash';
 import { BluzelleCoin } from './types';
 import { Coin } from '@cosmjs/proto-signing';
 
+const Long = require('long');
+
 export const parseDecTypeToNumber = (dec: string): number =>
     Some(padStart(dec, 18, '0'))
         .map(dec => `${dec.slice(0, dec.length - 18)}.${dec.slice(-18)}`)
@@ -22,3 +24,14 @@ export const parseLongCoin = (coin: Coin): BluzelleCoin => ({
   denom: ['ubnt', 'ug4', 'uelt'].includes(coin.denom) ? coin.denom as 'ubnt' | 'ug4' | 'uelt' : 'ubnt',
   amount: parseDecTypeToNumber(coin.amount)
 });
+
+
+export const parseNumToLong = (num: number): Long =>
+  num <= 9223372036854776000 ?
+    new Long.fromNumber(num)
+    :
+    (() => {
+      throw new Error("Number is too large.")
+    })();
+
+export const parseStringToLong = (val: string): Long => new Long.fromString(val);

@@ -10,8 +10,8 @@ import { TextProposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { ParamChange, ParameterChangeProposal } from 'cosmjs-types/cosmos/params/v1beta1/params';
 import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import { encodeSoftwareUpgradeProposal } from '../upgrade';
+import { parseStringToLong } from '../../shared/parse';
 
-const Long = require('long');
 
 export const submitTextProposal = (
   client: BluzelleClient,
@@ -131,7 +131,7 @@ export const vote = (
   options: BroadcastOptions
 ): Promise<BluzelleTxResponse> =>
   Promise.resolve(sendTx(client, '/cosmos.gov.v1beta1.MsgVote', {
-    proposalId: Long.fromString(params.proposalId),
+    proposalId: parseStringToLong(params.proposalId),
     voter: params.voter,
     option: params.option,
   } as MsgVote, options))
@@ -148,7 +148,7 @@ export const voteWithWeights = (
   options: BroadcastOptions
 ): Promise<BluzelleTxResponse> =>
   Promise.resolve(sendTx(client, '/cosmos.gov.v1beta1.MsgVoteWeighted', {
-    proposalId: Long.fromString(params.proposalId),
+    proposalId: parseStringToLong(params.proposalId),
     voter: params.voter,
     options: params.options,
   } as MsgVoteWeighted, options))
@@ -165,7 +165,7 @@ export const depositToProposal = (
   options: BroadcastOptions
 ) =>
   Promise.resolve(sendTx(client, '/cosmos.gov.v1beta1.MsgDeposit', {
-    proposalId: Long.fromString(params.proposalId),
+    proposalId: parseStringToLong(params.proposalId),
     depositor: params.depositor,
     amount: params.amount.map(({amount, denom}) => ({amount: amount.toString(), denom})),
   } as MsgDeposit, options))

@@ -1,6 +1,5 @@
 import { Plan, SoftwareUpgradeProposal } from '../../curium/lib/generated/cosmos/upgrade/v1beta1/upgrade';
-
-const Long = require('long');
+import { parseNumToLong } from '../../shared/parse';
 
 export const encodeSoftwareUpgradeProposal = (params: {
   title: string;
@@ -15,7 +14,7 @@ export const encodeSoftwareUpgradeProposal = (params: {
   description: params.description,
   plan: params.plan ? {
     name: params.plan.name,
-    height: new Long(params.plan.height),
+    height: parseNumToLong(params.plan.height),
     info: params.plan.info,
   } as Plan : undefined,
 }).finish();

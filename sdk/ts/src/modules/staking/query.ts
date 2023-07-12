@@ -1,23 +1,28 @@
-import {BluzelleClient} from "../../core";
-import {PageRequest, PageResponse} from "../../curium/lib/generated/cosmos/base/query/v1beta1/pagination";
+import { BluzelleClient } from '../../core';
+import {
+    PageRequest,
+    PageResponse
+} from '../../curium/lib/generated/cosmos/base/query/v1beta1/pagination';
 import {
     Delegation,
     DelegationResponse,
     UnbondingDelegation,
     UnbondingDelegationEntry,
     Validator
-} from "../../curium/lib/generated/cosmos/staking/v1beta1/staking";
-import {Coin} from "@cosmjs/proto-signing";
+} from '../../curium/lib/generated/cosmos/staking/v1beta1/staking';
+import { Coin } from '@cosmjs/proto-signing';
 import {
     QueryDelegatorDelegationsResponse,
     QueryDelegatorUnbondingDelegationsResponse,
     QueryValidatorsResponse
-} from "../../curium/lib/generated/cosmos/staking/v1beta1/query";
-import {BluzellePageRequest, defaultPaginationOptions, defaultPaginationResponse} from "../../shared/pagination";
-import {BluzelleCoin} from "../../shared/types";
-import {parseDecTypeToNumber} from "../../shared/parse";
-
-const Long = require('long');
+} from '../../curium/lib/generated/cosmos/staking/v1beta1/query';
+import {
+    BluzellePageRequest,
+    defaultPaginationOptions,
+    defaultPaginationResponse
+} from '../../shared/pagination';
+import { BluzelleCoin } from '../../shared/types';
+import { parseDecTypeToNumber, parseNumToLong } from '../../shared/parse';
 
 export type BluzelleDelegatorUnbondingDelegationsResponse = {
     unbondingDelegations: BluzelleUnbondingDelegation[],
@@ -91,8 +96,8 @@ export const getDelegatorDelegations = (
         delegatorAddr: delegatorAddress,
         pagination: {
             key: options.key,
-            offset: new Long(options.offset),
-            limit: new Long(options.limit),
+            offset: parseNumToLong(options.offset),
+            limit: parseNumToLong(options.limit),
             countTotal: options.countTotal,
             reverse: options.reverse
         } as PageRequest
@@ -142,8 +147,8 @@ export const getDelegatorUnbondingDelegations = (
         delegatorAddr: delegatorAddress,
         pagination: {
             key: options.key,
-            offset: new Long(options.offset),
-            limit: new Long(options.limit),
+            offset: parseNumToLong(options.offset),
+            limit: parseNumToLong(options.limit),
             countTotal: options.countTotal,
             reverse: options.reverse
         } as PageRequest
@@ -160,8 +165,8 @@ export const getValidatorsInfo = (
         status,
         pagination: {
             key: options.key,
-            offset: new Long(options.offset),
-            limit: new Long(options.limit),
+            offset: parseNumToLong(options.offset),
+            limit: parseNumToLong(options.limit),
             countTotal: options.countTotal,
             reverse: options.reverse
         } as PageRequest

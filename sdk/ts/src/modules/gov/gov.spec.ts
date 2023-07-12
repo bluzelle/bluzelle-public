@@ -20,8 +20,8 @@ import { passThroughAwait } from 'promise-passthrough';
 import { newBluzelleClient } from '../../core';
 import { newLocalWallet } from '../../wallets/localWallet';
 import { generateMnemonic } from '../../utils/generateMnemonic';
-import { ProposalStatus } from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
 import { fundCommunityPool } from '../distribution';
+import { ProposalStatus } from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
 
 const PROPOSAL_VALUE: TextProposal = {
   title: 'My title',

@@ -1,7 +1,7 @@
 import {Collection, MasterEdition, Metadata, NFT} from "../../curium/lib/generated/nft/nft";
 import {BluzelleClient} from "../../core";
+import { parseNumToLong } from '../../shared/parse';
 
-const Long = require('long');
 
 export const getNftInfo = (client: BluzelleClient, id: string) =>
     client.queryClient.nft.NFTInfo({id})
@@ -11,7 +11,7 @@ export const getNftInfo = (client: BluzelleClient, id: string) =>
         }));
 
 export const getCollectionInfo = (client: BluzelleClient, id: number) =>
-    client.queryClient.nft.Collection({id: new Long(id)})
+    client.queryClient.nft.Collection({id: parseNumToLong(id)})
         .then(resp => ({
             ...resp,
             collection: resp.collection && longToNumberCollection(resp.collection),
@@ -19,7 +19,7 @@ export const getCollectionInfo = (client: BluzelleClient, id: number) =>
         }));
 
 export const getNftMetadata = (client: BluzelleClient, id: number) =>
-    client.queryClient.nft.Metadata({id: new Long(id)})
+    client.queryClient.nft.Metadata({id: parseNumToLong(id)})
         .then(resp => ({
             metadata: resp.metadata && longToNumberMetadata(resp.metadata)
         }));
@@ -33,10 +33,10 @@ export const getNftByOwner = (client: BluzelleClient, owner: string) =>
 
 
 export const getLastCollectionId = (client: BluzelleClient) =>
-    client.queryClient.nft.LastCollectionId({})
-        .then(resp => ({
-                id: resp.id.toNumber()
-        }))
+  client.queryClient.nft.LastCollectionId({})
+    .then(res => ({
+      id: res.id.toNumber()
+    }))
 
 const longToNumberNFT = (nft: NFT) => ({
     ...nft,
