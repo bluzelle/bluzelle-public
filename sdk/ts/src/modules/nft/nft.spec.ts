@@ -1,26 +1,30 @@
-import {startSwarmWithClient} from "@bluzelle/testing";
-import {stopSwarm} from "@bluzelle/testing/src/swarmUtils";
-import {BluzelleClient, newBluzelleClient} from "../../core";
-import {expect} from 'chai';
-import {Creator} from "../../curium/lib/generated/nft/nft";
-import {createAddress} from "../faucet";
-import {newLocalWallet} from "../../wallets/localWallet";
-import {generateMnemonic} from "../../utils/generateMnemonic";
-import {passThroughAwait} from "promise-passthrough";
+import { startSwarmWithClient } from '@bluzelle/testing';
+import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
+import { BluzelleClient, newBluzelleClient } from '../../core';
+import { expect } from 'chai';
+import { Creator } from '../../curium/lib/generated/nft/nft';
+import { createAddress } from '../faucet';
+import { newLocalWallet } from '../../wallets/localWallet';
+import { generateMnemonic } from '../../utils/generateMnemonic';
+import { passThroughAwait } from 'promise-passthrough';
 import {
-    createCollection,
-    createNft,
-    printNftEdition,
-    transferNft,
-    updateCollectionMutableUri,
-    updateCollectionUri,
-    updateMetadata,
-    updateMetadataAuthority,
-    updateMintAuthority
-} from "./tx";
-import {getCollectionInfo, getLastCollectionId, getNftByOwner, getNftInfo, getNftMetadata} from "./query";
-import { cli } from "webpack";
-
+  createCollection,
+  createNft,
+  printNftEdition,
+  transferNft,
+  updateCollectionMutableUri,
+  updateCollectionUri,
+  updateMetadata,
+  updateMetadataAuthority,
+  updateMintAuthority
+} from './tx';
+import {
+  getCollectionInfo,
+  getLastCollectionId,
+  getNftByOwner,
+  getNftInfo,
+  getNftMetadata
+} from './query';
 
 describe('nft module', function () {
     this.timeout(10_800_000)
@@ -42,15 +46,22 @@ describe('nft module', function () {
             .catch(err => expect(err.message).to.contain('invalid nft id'))
     );
 
-    it('should create an empty collection and last collection id should be 1', () =>
+    it('should create a collection and last collection id should be 1', () =>
+        createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
+            maxGas: 100000000,
+            gasPrice: 0.002
+        })
+            .then(()=> getLastCollectionId(client))
+            .then((info) =>expect(info.id).to.equal(1) )
+    );
+
+    it('should create an empty collection', () =>
         createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
             maxGas: 100000000,
             gasPrice: 0.002
         })
             .then(() => getCollectionInfo(client, 1))
             .then(({nfts}) => expect(nfts).to.be.empty)
-            .then(()=> getLastCollectionId(client))
-            .then((id) =>expect(id).to.equal(1) )
     );
 
     it('should get the info of a collection', () =>
