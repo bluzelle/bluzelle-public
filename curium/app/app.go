@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/bluzelle/bluzelle-public/curium/app/upgrades/firstupgrade"
 	"io"
 	"net/http"
 	"os"
@@ -352,7 +351,7 @@ func NewCuriumApp(
 	//app.UpgradeKeeper.SetUpgradeHandler("Upgrade 1", firstupgrade.CreateUpgradeHandler(app.mm, app.Configurator))
 	// register the staking hooks
 
-	app.UpgradeKeeper.SetUpgradeHandler("double_supply", firstupgrade.DoubleSupplyUpgradeHandler(app.mm, app.Configurator, app.BankKeeper))
+	//app.UpgradeKeeper.SetUpgradeHandler("double_supply", firstupgrade.DoubleSupplyUpgradeHandler(app.mm, app.Configurator, app.BankKeeper))
 
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
