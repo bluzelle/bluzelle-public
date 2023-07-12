@@ -195,7 +195,7 @@ describe('gov module', () => {
           description: 'My description',
           proposer: client.auth.address,
           initialDeposit: [{
-            amount: 500_000_000_000,
+            amount: 50,
             denom: 'ubnt'
           }],
         }, {
