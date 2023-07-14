@@ -49,7 +49,6 @@ func GetCmdCreateNFT() *cobra.Command {
 		Example: fmt.Sprintf(
 			`$ %s tx nft create-nft
 				--name="Punk10"
-				--symbol="PUNK"
 				--uri="https://punk.com/10"
 				--mutable-uri="https://starloop.com"
 				--seller-fee-basis-points=100
