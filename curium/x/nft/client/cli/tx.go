@@ -474,7 +474,8 @@ func GetCmdUpdateCollectionUri() *cobra.Command {
 		Example: fmt.Sprintf(
 			`$ %s tx nft update-collection-uri
 				--collection-id=1
-				--uri="https://punk.com"`, version.AppName,
+				--uri="https://punk.com"`,
+			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -515,7 +516,8 @@ func GetCmdUpdateCollectionMutableUri() *cobra.Command {
 		Example: fmt.Sprintf(
 			`$ %s tx nft update-collection-mutable-uri
 				--collection-id=1
-				--mutable-uri="https://punk.com"`, version.AppName,
+				--mutable-uri="https://punk.com"`,
+			version.AppName,
 		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
