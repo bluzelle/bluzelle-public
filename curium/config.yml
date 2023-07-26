@@ -31,7 +31,7 @@ genesis:
         denom: ubnt
     gov:
       voting_params:
-        voting_period: 10s
+        voting_period: 30s
       deposit_params:
         min_deposit:
           - amount: "1000000"
