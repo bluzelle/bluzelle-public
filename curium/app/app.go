@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -272,6 +273,9 @@ func NewCuriumApp(
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
+
+	fmt.Println("NEW CURIUM APP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
@@ -349,6 +353,25 @@ func NewCuriumApp(
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
 	//app.UpgradeKeeper.SetUpgradeHandler("Upgrade 1", firstupgrade.CreateUpgradeHandler(app.mm, app.Configurator))
+
+	app.UpgradeKeeper.SetUpgradeHandler("do_nothing", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		return app.mm.RunMigrations(ctx, app.Configurator, fromVM)
+	})
+
+	app.UpgradeKeeper.SetUpgradeHandler("double_supply", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+
+		fmt.Println("UPGRADE HANDLER FOR 'double_supply' HAS BEEN SET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
+		currentSupply := app.BankKeeper.GetSupply(ctx, "ubnt")
+		err := app.BankKeeper.MintCoins(ctx, minttypes.ModuleName, sdk.NewCoins(sdk.NewCoin("ubnt", currentSupply.Amount)))
+
+		if err != nil {
+			println("error doubling supply")
+			return nil, err
+		}
+
+		return app.mm.RunMigrations(ctx, app.Configurator, fromVM)
+	})
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
