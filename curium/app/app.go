@@ -412,7 +412,8 @@ func NewCuriumApp(
 	curiumModule := curiummodule.NewAppModule(appCodec, &app.CuriumKeeper)
 
 	storageDir := appOpts.Get("storage-dir").(string)
-	storageNode, err := startupStorageNode(storageDir)
+	filter := appOpts.Get("filter").(string)
+	storageNode, err := startupStorageNode(storageDir, filter)
 
 	app.StorageKeeper = *storagemodulekeeper.NewKeeper(
 		appCodec,
@@ -658,7 +659,7 @@ func New(
 	)
 }
 
-func startupStorageNode(storageDir string) (*curiumipfs.StorageIpfsNode, error) {
+func startupStorageNode(storageDir string, filter string) (*curiumipfs.StorageIpfsNode, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return nil, err
@@ -666,7 +667,7 @@ func startupStorageNode(storageDir string) (*curiumipfs.StorageIpfsNode, error) 
 	storageDir = strings.ReplaceAll(storageDir, "~", homeDir)
 
 	err = storagemodulekeeper.CreateRepoIfNotExist(storageDir, curiumipfs.CreateRepoOptions{
-		Transformer: ipfsConfig.Profiles["server"].Transform,
+		Transformer: ipfsConfig.Profiles[filter].Transform,
 	})
 	if err != nil {
 		return nil, err

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/bluzelle/ipfs-kubo/commands"
-	"github.com/bluzelle/ipfs-kubo/config"
 	"github.com/bluzelle/ipfs-kubo/core"
 	"github.com/bluzelle/ipfs-kubo/core/coreapi"
 	"github.com/bluzelle/ipfs-kubo/core/corehttp"
@@ -172,12 +171,6 @@ func SpawnStorageIpfsNode(ctx context.Context, repoPath string) (*StorageIpfsNod
 func startApiServer(node *StorageIpfsNode) error {
 
 	repoConfig, err := node.Repo.Config()
-
-	if err != nil {
-		return err
-	}
-
-	err = config.Profiles["server"].Transform(repoConfig)
 
 	if err != nil {
 		return err

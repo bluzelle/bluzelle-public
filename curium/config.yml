@@ -57,6 +57,7 @@ validators:
         enable: true
       minimum-gas-prices: 0ubnt
       storage-dir: ~/.curium/storage
+      filter: server
     config:
       consensus:
         timeout_commit: 5s
