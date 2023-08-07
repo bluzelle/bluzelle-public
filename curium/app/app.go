@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -413,6 +414,7 @@ func NewCuriumApp(
 
 	storageDir := appOpts.Get("storage-dir").(string)
 	filter := appOpts.Get("filter").(string)
+	fmt.Println(filter)
 	storageNode, err := startupStorageNode(storageDir, filter)
 
 	app.StorageKeeper = *storagemodulekeeper.NewKeeper(
