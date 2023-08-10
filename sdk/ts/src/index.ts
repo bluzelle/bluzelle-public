@@ -14,6 +14,7 @@ export * from "./modules/authz";
 export * from "./modules/storage";
 export * from "./modules/params";
 export * from "./modules/gov";
+export * from "./modules/upgrade";
 export {
     BluzelleCoin
 } from "./shared/types";

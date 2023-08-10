@@ -15,3 +15,7 @@ export {
   getProposal,
   getDeposit,
 } from './query';
+
+export {
+  VoteOption
+} from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';

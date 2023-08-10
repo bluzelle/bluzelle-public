@@ -5,5 +5,6 @@ export {
 
 export {
   getCurrentPlan,
-  getModuleVersions
+  getModuleVersions,
+  getAppliedPlan
 } from './query';
