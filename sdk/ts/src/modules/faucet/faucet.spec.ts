@@ -5,6 +5,7 @@ import {Swarm} from "daemon-manager/src";
 import {BluzelleClient} from "../../core";
 import {getAccountBalance} from "../bank";
 import {withCtxAwait} from "@scottburch/with-context";
+import { passThroughAwait } from 'promise-passthrough';
 
 describe('faucet module', function () {
 
@@ -75,5 +76,17 @@ describe('faucet module', function () {
             .then(info => mint(info.bzSdk))
             .catch(err => expect(err.message.includes('invalid request')).to.be.true)
     );
+
+    it('should not be able to create an account named "minter" then use it to mint tokens if faucet is off', () => {
+      let client: BluzelleClient;
+      return startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: false})
+        .then(passThroughAwait(ctx => ctx.swarm.getValidators()[0].exec(`curiumd keys add minter`)))
+        .then(({bzSdk}) => client = bzSdk)
+        .then(() => mint(client, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
+        .then(() => expect(true).to.be.false)
+        .catch(err => expect(err.stack).to.contain('invalid request'))
+        .then(() => getAccountBalance(client, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
+        .then(bal => expect(bal).to.equal(0))
+    });
 
 });
