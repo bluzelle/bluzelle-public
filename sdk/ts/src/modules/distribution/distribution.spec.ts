@@ -114,6 +114,7 @@ const swarmConfig = (): SwarmConfig => ({
     bluzelleFaucet: true,
     storageBaseDir: '',
     storageMount: '/home/ubuntu/storage',
+    filter: 'local-discovery',
     daemons: [{
         host: `local:a.validator`,
         restPort: 1317,
