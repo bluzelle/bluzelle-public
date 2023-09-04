@@ -26,12 +26,29 @@ export const parseLongCoin = (coin: Coin): BluzelleCoin => ({
 });
 
 
-export const parseNumToLong = (num: number): Long =>
-  num <= 9223372036854776000 ?
-    new Long.fromNumber(num)
-    :
-    (() => {
-      throw new Error("Number is too large.")
-    })();
+export const parseNumToLong = (num: number): Long => new Long.fromNumber(num);
 
 export const parseStringToLong = (val: string): Long => new Long.fromString(val);
+
+
+export type ParseFn = ((params: object) => unknown)
+
+
+export const deepParseLong = (obj: object, paths: string[]): object => {
+  const setAtPath = (object: Record<string, unknown>, pathParts: string[]): void => {
+    pathParts.reduce((acc: Record<string, unknown>, part, idx, arr) => {
+      if (idx === arr.length - 1) {
+        if (typeof acc[part] === "string" || typeof acc[part] === "number") {
+          acc[part] = parseNumToLong(Number(acc[part]));
+        }
+      } else {
+        acc[part] = acc[part] || {};
+      }
+      return acc[part] as Record<string, unknown>;
+    }, object);
+  }
+
+  paths.forEach(path => setAtPath(obj as Record<string, unknown>, path.split('.')));
+
+  return obj;
+};

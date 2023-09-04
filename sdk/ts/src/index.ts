@@ -25,6 +25,11 @@ export {
 } from "./shared/pagination";
 export {generateMnemonic} from "./utils/generateMnemonic";
 
+export {
+    ParseFn,
+    deepParseLong,
+} from "./shared/parse";
+
 // export {newKeplrWallet, BluzelleKeplrWallet}
 //
 // (global as any).newKeplerWallet = newKeplrWallet;

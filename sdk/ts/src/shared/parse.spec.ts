@@ -1,6 +1,6 @@
-import {expect} from "chai";
-import {parseDecTypeToNumber} from "./parse";
-
+import { expect } from 'chai';
+import { deepParseLong, parseDecTypeToNumber } from './parse';
+import * as Long from 'long';
 
 describe('parse', function () {
     this.timeout(600_000);
@@ -12,5 +12,30 @@ describe('parse', function () {
         expect(parseDecTypeToNumber("20500000000000000000")).to.equal(20.5)
     });
 
+  it('should parse all numbers in an object into Long', () =>
+    Promise.resolve({
+      a: 1,
+      b: "b",
+      c: 2,
+      d: {
+        e: 3,
+        f: {
+          g: 4
+        }
+      }
+    })
+      .then(obj => deepParseLong(obj, ['a', 'c', 'd.e', 'd.f.g']))
+      .then(obj => expect(obj).to.deep.equal({
+        a: Long.fromNumber(1),
+        b: "b",
+        c: Long.fromNumber(2),
+        d: {
+          e: Long.fromNumber(3),
+          f: {
+            g: Long.fromNumber(4)
+          }
+        }
+      }))
+  );
 
 });
