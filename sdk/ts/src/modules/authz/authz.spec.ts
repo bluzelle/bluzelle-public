@@ -104,13 +104,13 @@ describe("authz module", function () {
         }, {
             maxGas: 1000000, gasPrice: 0.002
         })
-            .then(() => getAccountBalance(client, testGrantee))
+            .then(() => getAccountBalance(client, testGranter))
             .then((balance: any) => createCtx("beforeBalance", () => balance))
             .then(withCtxAwait("result", () => executeAuthorization(eClient, testGrantee, [{
                 msgType: MsgType.SEND,
                 params: {
-                    fromAddress: testGrantee,
-                    toAddress: testGranter,
+                    fromAddress: testGranter,
+                    toAddress: testGrantee,
                     amount: [{
                         denom: "ubnt",
                         amount: "100"
@@ -119,7 +119,7 @@ describe("authz module", function () {
             }], {
                 maxGas: 1000000, gasPrice: 0.002
             })))
-            .then(withCtxAwait("afterBalance", () => getAccountBalance(client, testGrantee)))
+            .then(withCtxAwait("afterBalance", () => getAccountBalance(client, testGranter)))
             .then((ctx: any) => {
                 expect(ctx.beforeBalance - ctx.afterBalance).to.equal(100)
             })
@@ -130,6 +130,9 @@ describe("authz module", function () {
             grantType: GrantType.STAKE,
             stakeAuthorization: {
                 authorizationType: AuthorizationType.AUTHORIZATION_TYPE_DELEGATE,
+                allowList: {
+                    address: [testValAddress]
+                }
             },
             expiration
         }, {
@@ -140,14 +143,14 @@ describe("authz module", function () {
                 expect(res.grants[0].authorization?.typeUrl).to.equal("/cosmos.staking.v1beta1.StakeAuthorization")
                 expect(StakeAuthorization.decode(res.grants[0].authorization?.value as any).authorizationType).to.equal(AuthorizationType.AUTHORIZATION_TYPE_DELEGATE)
             })
-            .then(() => getDelegation(eClient, testGrantee, testValAddress)
+            .then(() => getDelegation(eClient, testGranter, testValAddress)
                 .then((delegation: BluzelleDelegationResponse) => createCtx("initialAmount", () => delegation.delegation.shares))
                 .catch(() => createCtx("initialAmount", () => 0))
             )
             .then(withCtxAwait("result", () => executeAuthorization(eClient, testGrantee, [{
                 msgType: MsgType.DELEGATE,
                 params: {
-                    delegatorAddress: testGrantee,
+                    delegatorAddress: testGranter,
                     validatorAddress: testValAddress,
                     amount: {
                         denom: "ubnt",
@@ -155,7 +158,7 @@ describe("authz module", function () {
                     }
                 }
             }], { maxGas: 1000000, gasPrice: 0.002 })))
-            .then(withCtxAwait("delegationInfo", () => getDelegation(client, testGrantee, testValAddress)))
+            .then(withCtxAwait("delegationInfo", () => getDelegation(client, testGranter, testValAddress)))
             .then((ctx: any) => {
                 expect(ctx.delegationInfo.delegation.shares - ctx.initialAmount).to.equal(100);
             })
@@ -166,6 +169,9 @@ describe("authz module", function () {
             grantType: GrantType.STAKE,
             stakeAuthorization: {
                 authorizationType: AuthorizationType.AUTHORIZATION_TYPE_DELEGATE,
+                allowList:{
+                    address: [testValAddress]
+                }
             },
             expiration
         }, {
@@ -174,7 +180,7 @@ describe("authz module", function () {
             .then(() => executeAuthorization(eClient, testGrantee, [{
                 msgType: MsgType.DELEGATE,
                 params: {
-                    delegatorAddress: testGrantee,
+                    delegatorAddress: testGranter,
                     validatorAddress: testValAddress,
                     amount: {
                         denom: "ubnt",
@@ -185,7 +191,10 @@ describe("authz module", function () {
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.STAKE,
                 stakeAuthorization: {
-                    authorizationType: AuthorizationType.AUTHORIZATION_TYPE_UNDELEGATE
+                    authorizationType: AuthorizationType.AUTHORIZATION_TYPE_UNDELEGATE,
+                    allowList: {
+                        address: [testValAddress]
+                    }
                 },
                 expiration
             }, { maxGas: 1000000, gasPrice: 0.002 }))
@@ -198,14 +207,14 @@ describe("authz module", function () {
                 expect(res.grants[0].authorization?.typeUrl).to.equal("/cosmos.staking.v1beta1.StakeAuthorization")
                 expect(StakeAuthorization.decode(res.grants[0].authorization?.value as any).authorizationType).to.equal(AuthorizationType.AUTHORIZATION_TYPE_UNDELEGATE)
             })
-            .then(() => getDelegation(eClient, testGrantee, testValAddress)
+            .then(() => getDelegation(eClient, testGranter, testValAddress)
                 .then((delegation: BluzelleDelegationResponse) => createCtx("initialAmount", () => delegation.delegation.shares))
                 .catch(() => createCtx("initialAmount", () => 0))
             )
             .then(withCtxAwait("result", () => executeAuthorization(eClient, testGrantee, [{
                 msgType: MsgType.UNDELEGATE,
                 params: {
-                    delegatorAddress: testGrantee,
+                    delegatorAddress: testGranter,
                     validatorAddress: testValAddress,
                     amount: {
                         denom: "ubnt",
@@ -213,7 +222,7 @@ describe("authz module", function () {
                     }
                 }
             }], { maxGas: 1000000, gasPrice: 0.002 })))
-            .then(withCtxAwait("delegationInfo", () => getDelegation(client, testGrantee, testValAddress)))
+            .then(withCtxAwait("delegationInfo", () => getDelegation(client, testGranter, testValAddress)))
             .then((ctx: any) => expect(ctx.delegationInfo.delegation.shares - ctx.initialAmount).to.equal(-100))
     );
 
@@ -240,8 +249,8 @@ describe("authz module", function () {
                 if (ctx.validators.length >= 2) {
                     const testValAddress1 = ctx.validators[0].operatorAddress
                     const testValAddress2 = ctx.validators[1].operatorAddress
-                    return delegate(eClient, testGrantee, testValAddress1, 100, { maxGas: 1000000, gasPrice: 0.002 })
-                        .then(() => getDelegation(eClient, testGrantee, testValAddress1))
+                    return delegate(client, testGranter, testValAddress1, 100, { maxGas: 1000000, gasPrice: 0.002 })
+                        .then(() => getDelegation(client, testGranter, testValAddress1))
                         .then((delegationInfo: BluzelleDelegationResponse) => createCtx("initialAmount", () => delegationInfo.delegation.shares))
                         .then(withCtxAwait("result", () => executeAuthorization(eClient, testGrantee, [
                             {
@@ -249,11 +258,11 @@ describe("authz module", function () {
                                 params: {
                                     validatorDstAddress: testValAddress2,
                                     validatorSrcAddress: testValAddress1,
-                                    delegatorAddress: testGrantee
+                                    delegatorAddress: testGranter
                                 }
                             }
                         ], { maxGas: 1000000, gasPrice: 0.002 })))
-                        .then(withCtxAwait("delegationInfo", () => getDelegation(eClient, testGrantee, testValAddress1)))
+                        .then(withCtxAwait("delegationInfo", () => getDelegation(eClient, testGranter, testValAddress1)))
                         .then((ctx: any) => expect(ctx.delegationInfo.delegation.shares - ctx.initialAmount).to.equal(-100))
                 }
             })
@@ -266,16 +275,16 @@ describe("authz module", function () {
             msgType: MsgType.CREATE_COLLECTION,
             expiration
         }, { maxGas: 1000000, gasPrice: 0.002 })
-            .then(executeAuthorization(eClient, testGrantee, [{
+            .then(()=>executeAuthorization(eClient, testGrantee, [{
                 msgType: MsgType.CREATE_COLLECTION,
                 params: {
-                    sender: testGrantee,
+                    sender: testGranter,
                     symbol: "TMP",
                     name: "Temp",
                     uri: "https://temp.com",
                     mutableUri: '',
                     isMutable: true,
-                    updateAuthority: testGrantee
+                    updateAuthority: testGranter
                 }
             }], { maxGas: 1000000, gasPrice: 0.002 }))
             .then(() => getCollectionInfo(eClient, 1))
@@ -305,13 +314,13 @@ describe("authz module", function () {
                 maxSupply: parseNumToLong(1_000_000)
             }
         }
-        return createCollection(eClient, {
-            sender: eClient.address,
+        return createCollection(client, {
+            sender: client.address,
             name: 'Temp',
             symbol: 'TMP',
             uri: 'http://temp.com',
             isMutable: true,
-            updateAuthority: eClient.address
+            updateAuthority: client.address
             },
             { maxGas: 100000000, gasPrice: 0.002 })
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
@@ -323,11 +332,11 @@ describe("authz module", function () {
                 {
                     msgType: MsgType.CREATE_NFT,
                     params: {
-                        sender: testGrantee, collId: parseNumToLong(1), metadata: testMetadata
+                        sender: testGranter, collId: parseNumToLong(1), metadata: testMetadata
                     }
                 }
             ], { maxGas: 1000000, gasPrice: 0.002 }))
-            .then(() => getNftByOwner(eClient, testGrantee))
+            .then(() => getNftByOwner(eClient, testGranter))
             .then((nftInfo: any) => {
                 const nft = nftInfo.nfts.pop();
                 const id = nft?.collId.toString() + ":" + nft?.metadataId.toString() + ":" + nft?.seq.toString();
@@ -358,21 +367,21 @@ describe("authz module", function () {
                 maxSupply: parseNumToLong(1_000_000)
             }
         }
-        return createCollection(eClient, {
-            sender: eClient.address,
+        return createCollection(client, {
+            sender: client.address,
             name: 'Temp',
             symbol: 'TMP',
             uri: 'http://temp.com',
             isMutable: true,
-            updateAuthority: eClient.address
+            updateAuthority: client.address
         },{ maxGas: 100000000, gasPrice: 0.002 })
-            .then(() => createNft(eClient, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
+            .then(() => createNft(client, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
                 msgType: MsgType.TRANSFER_NFT,
                 expiration
             }, { maxGas: 100000000, gasPrice: 0.002 }))
-            .then(() => getNftByOwner(eClient, testGrantee))
+            .then(() => getNftByOwner(eClient, testGranter))
             .then((nftInfo: any) => createCtx("nftId", () => {
                 const nft = nftInfo.nfts.pop();
                 return nft?.collId.toString() + ":" + nft?.metadataId.toString() + ":" + nft?.seq.toString();
@@ -380,12 +389,12 @@ describe("authz module", function () {
             .then(passThroughAwait((ctx) => executeAuthorization(eClient, testGrantee, [{
                 msgType: MsgType.TRANSFER_NFT,
                 params: {
-                    sender: testGrantee, id: ctx.nftId, newOwner: testGranter
+                    sender: testGranter, id: ctx.nftId, newOwner: testGrantee
                 }
             }], { maxGas: 100000000, gasPrice: 0.002 })))
             .then((ctx) => getNftInfo(eClient, ctx.nftId))
             .then((nftInfo: any) => {
-                expect(nftInfo.nft?.owner).to.equal(testGranter);
+                expect(nftInfo.nft?.owner).to.equal(testGrantee);
             })
     });
 
@@ -410,21 +419,21 @@ describe("authz module", function () {
                 maxSupply: parseNumToLong(1_000_000)
             }
         }
-        return createCollection(eClient, {
-            sender: eClient.address,
+        return createCollection(client, {
+            sender: client.address,
             name: 'Temp',
             symbol: 'TMP',
             uri: 'http://temp.com',
             isMutable: true,
-            updateAuthority: eClient.address
+            updateAuthority: client.address
         }, { maxGas: 100000000, gasPrice: 0.002 })
-            .then(() => createNft(eClient, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
+            .then(() => createNft(client, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
                 msgType: MsgType.UPDATE_METADATA_AUTHORITY,
                 expiration
             }, { maxGas: 100000000, gasPrice: 0.002 }))
-            .then(() => getNftByOwner(eClient, testGrantee))
+            .then(() => getNftByOwner(eClient, testGranter))
             .then((nftInfo: any) => createCtx("nftInfo", () => {
                 const nft = nftInfo.nfts.pop();
                 return {
@@ -435,14 +444,14 @@ describe("authz module", function () {
             .then(passThroughAwait((ctx) => executeAuthorization(eClient, testGrantee, [{
                 msgType: MsgType.UPDATE_METADATA_AUTHORITY,
                 params: {
-                    sender: testGrantee,
+                    sender: testGranter,
                     metadataId: parseNumToLong(ctx.nftInfo.nft.metadataId),
-                    newAuthority: testGranter
+                    newAuthority: testGrantee
                 }
             }], { maxGas: 100000000, gasPrice: 0.002 })))
             .then((ctx) => getNftInfo(eClient, ctx.nftInfo.id))
             .then((updatedNftInfo) => {
-                expect(updatedNftInfo.metadata?.metadataAuthority).to.equal(testGranter);
+                expect(updatedNftInfo.metadata?.metadataAuthority).to.equal(testGrantee);
             })
     });
 
@@ -456,32 +465,32 @@ describe("authz module", function () {
             primarySaleHappened: false,
             isMutable: true,
             creators: [{
-                address: testGrantee,
+                address: testGranter,
                 verified: true,
                 share: 10,
             }],
-            metadataAuthority: testGrantee,
-            mintAuthority: testGrantee,
+            metadataAuthority: testGranter,
+            mintAuthority: testGranter,
             masterEdition: {
                 supply: parseNumToLong(100_000),
                 maxSupply: parseNumToLong(1_000_000)
             }
         }
-        return createCollection(eClient, {
-            sender: eClient.address,
+        return createCollection(client, {
+            sender: client.address,
             name: 'Temp',
             symbol: 'TMP',
             uri: 'http://temp.com',
             isMutable: true,
-            updateAuthority: eClient.address
+            updateAuthority: client.address
         }, { maxGas: 100000000, gasPrice: 0.002 })
-            .then(() => createNft(eClient, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
+            .then(() => createNft(client, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
                 msgType: MsgType.UPDATE_METADATA,
                 expiration
             }, { maxGas: 100000000, gasPrice: 0.002 }))
-            .then(() => getNftByOwner(eClient, testGrantee))
+            .then(() => getNftByOwner(eClient, testGranter))
             .then((nftInfo: any) => createCtx("nftInfo", () => {
                 const nft = nftInfo.nfts.pop();
                 return {
@@ -492,7 +501,7 @@ describe("authz module", function () {
             .then(passThroughAwait((ctx) => executeAuthorization(eClient, testGrantee, [{
                 msgType: MsgType.UPDATE_METADATA,
                 params: {
-                    sender: testGrantee,
+                    sender: testGranter,
                     metadataId: parseNumToLong(ctx.nftInfo.nft.metadataId),
                     name: "UpdatedTmpMeta",
                     uri: "https://tmp.com",
@@ -520,32 +529,32 @@ describe("authz module", function () {
             primarySaleHappened: false,
             isMutable: true,
             creators: [{
-                address: testGrantee,
+                address: testGranter,
                 verified: true,
                 share: 10,
             }],
-            metadataAuthority: testGrantee,
-            mintAuthority: testGrantee,
+            metadataAuthority: testGranter,
+            mintAuthority: testGranter,
             masterEdition: {
                 supply: parseNumToLong(100_000),
                 maxSupply: parseNumToLong(1_000_000)
             }
         }
-        return createCollection(eClient, {
-            sender: eClient.address,
+        return createCollection(client, {
+            sender: client.address,
             name: 'Temp',
             symbol: 'TMP',
             uri: 'http://temp.com',
             isMutable: true,
-            updateAuthority: eClient.address
+            updateAuthority: client.address
         },{ maxGas: 100000000, gasPrice: 0.002 })
-            .then(() => createNft(eClient, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
+            .then(() => createNft(client, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
                 msgType: MsgType.UPDATE_MINT_AUTHORITIY,
                 expiration
             }, { maxGas: 100000000, gasPrice: 0.002 }))
-            .then(() => getNftByOwner(eClient, testGrantee))
+            .then(() => getNftByOwner(eClient, testGranter))
             .then((nftInfo: any) => createCtx("nftInfo", () => {
                 const nft = nftInfo.nfts.pop();
                 return {
@@ -556,14 +565,14 @@ describe("authz module", function () {
             .then(passThroughAwait((ctx) => executeAuthorization(eClient, testGrantee, [{
                 msgType: MsgType.UPDATE_MINT_AUTHORITIY,
                 params: {
-                    sender: testGrantee,
+                    sender: testGranter,
                     metadataId: parseNumToLong(ctx.nftInfo.nft.metadataId),
-                    newAuthority: testGranter
+                    newAuthority: testGrantee
                 }
             }], { maxGas: 100000000, gasPrice: 0.002 })))
             .then((ctx) => getNftInfo(eClient, ctx.nftInfo.id))
             .then((updatedNftInfo) => {
-                expect(updatedNftInfo.metadata?.mintAuthority).to.equal(testGranter);
+                expect(updatedNftInfo.metadata?.mintAuthority).to.equal(testGrantee);
             })
     });
 
@@ -576,32 +585,32 @@ describe("authz module", function () {
             primarySaleHappened: false,
             isMutable: true,
             creators: [{
-                address: testGrantee,
+                address: testGranter,
                 verified: true,
                 share: 10,
             }],
-            metadataAuthority: testGrantee,
-            mintAuthority: testGrantee,
+            metadataAuthority: testGranter,
+            mintAuthority: testGranter,
             masterEdition: {
                 supply: parseNumToLong(100_000),
                 maxSupply: parseNumToLong(1_000_000)
             }
         }
-        return createCollection(eClient,{
-            sender: eClient.address,
+        return createCollection(client,{
+            sender: client.address,
             name: 'Temp',
             symbol: 'TMP',
             uri: 'http://temp.com',
             isMutable: true,
-            updateAuthority: eClient.address
+            updateAuthority: client.address
         }, { maxGas: 100000000, gasPrice: 0.002 })
-            .then(() => createNft(eClient, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
+            .then(() => createNft(client, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
                 msgType: MsgType.PRINT_EDITION,
                 expiration
             }, { maxGas: 100000000, gasPrice: 0.002 }))
-            .then(() => getNftByOwner(eClient, testGrantee))
+            .then(() => getNftByOwner(eClient, testGranter))
             .then((nftInfo: any) => createCtx("nftInfo", () => {
                 const nft = nftInfo.nfts.pop();
                 return {
@@ -613,10 +622,10 @@ describe("authz module", function () {
             .then(passThroughAwait((ctx) => executeAuthorization(eClient, testGrantee, [{
                 msgType: MsgType.PRINT_EDITION,
                 params: {
-                    sender: testGrantee,
+                    sender: testGranter,
                     metadataId: parseNumToLong(ctx.nftInfo.nft.metadataId),
                     collId: parseNumToLong(1),
-                    owner: testGrantee
+                    owner: testGranter
                 }
             }], { maxGas: 100000000, gasPrice: 0.002 })))
             .then((ctx: any) => getNftInfo(eClient, ctx.nftInfo.id)
@@ -636,32 +645,32 @@ describe("authz module", function () {
             primarySaleHappened: false,
             isMutable: true,
             creators: [{
-                address: testGrantee,
+                address: testGranter,
                 verified: true,
                 share: 10,
             }],
-            metadataAuthority: testGrantee,
-            mintAuthority: testGrantee,
+            metadataAuthority: testGranter,
+            mintAuthority: testGranter,
             masterEdition: {
                 supply: parseNumToLong(100_000),
                 maxSupply: parseNumToLong(1_000_000)
             }
         }
-        return createCollection(eClient, {
-            sender: eClient.address,
+        return createCollection(client, {
+            sender: client.address,
             name: 'Temp',
             symbol: 'TMP',
             uri: 'http://temp.com',
             isMutable: true,
-            updateAuthority: eClient.address
+            updateAuthority: client.address
         }, { maxGas: 100000000, gasPrice: 0.002 })
-            .then(() => createNft(eClient, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
+            .then(() => createNft(client, { collId: 1, metadata: testMetadata }, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => grantAuthorization(client, testGranter, testGrantee, {
                 grantType: GrantType.GENERIC,
                 msgType: MsgType.SIGN_METADATA,
                 expiration
             }, { maxGas: 100000000, gasPrice: 0.002 }))
-            .then(() => getNftByOwner(eClient, testGrantee))
+            .then(() => getNftByOwner(eClient, testGranter))
             .then((nftInfo: any) => createCtx("nftInfo", () => {
                 const nft = nftInfo.nfts.pop();
                 return {
@@ -672,7 +681,7 @@ describe("authz module", function () {
             .then(passThroughAwait((ctx) => executeAuthorization(eClient, testGrantee, [{
                         msgType: MsgType.SIGN_METADATA,
                         params: {
-                            sender: testGrantee,
+                            sender: testGranter,
                             metadataId: parseNumToLong(ctx.nftInfo.nft.metadataId),
                         }
                     }], { maxGas: 100000000, gasPrice: 0.002 })
