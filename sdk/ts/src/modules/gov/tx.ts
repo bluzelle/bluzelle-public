@@ -10,8 +10,13 @@ import { TextProposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { ParamChange, ParameterChangeProposal } from 'cosmjs-types/cosmos/params/v1beta1/params';
 import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import { encodeSoftwareUpgradeProposal } from '../upgrade';
-import { parseStringToLong } from '../../shared/parse';
+import { parseStringToLong, scaleTo18 } from '../../shared/parse';
 
+
+export type BluzelleWeightedVoteOption = {
+  option: VoteOption;
+  weight: number;
+}
 
 export const submitTextProposal = (
   client: BluzelleClient,
@@ -143,16 +148,21 @@ export const voteWithWeights = (
   params: {
     proposalId: string,
     voter: string,
-    options: WeightedVoteOption[]
+    options: BluzelleWeightedVoteOption[]
   },
   options: BroadcastOptions
 ): Promise<BluzelleTxResponse> =>
   Promise.resolve(sendTx(client, '/cosmos.gov.v1beta1.MsgVoteWeighted', {
     proposalId: parseStringToLong(params.proposalId),
     voter: params.voter,
-    options: params.options,
+    options: params.options.map(parseBluzelleWeightedVoteOption),
   } as MsgVoteWeighted, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
+
+const parseBluzelleWeightedVoteOption = (vote: BluzelleWeightedVoteOption) => ({
+  ...vote,
+  weight: scaleTo18(vote.weight)
+});
 
 
 export const depositToProposal = (

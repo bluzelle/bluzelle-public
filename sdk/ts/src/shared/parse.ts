@@ -52,3 +52,6 @@ export const deepParseLong = (obj: object, paths: string[]): object => {
 
   return obj;
 };
+
+
+export const scaleTo18 = (num: number) => (num * 1e18).toString();

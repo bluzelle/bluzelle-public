@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { deepParseLong, parseDecTypeToNumber } from './parse';
+import { deepParseLong, parseDecTypeToNumber, scaleTo18 } from './parse';
 import * as Long from 'long';
 
 describe('parse', function () {
@@ -36,6 +36,12 @@ describe('parse', function () {
           }
         }
       }))
+  );
+
+  it('should scale number to 10^18 string', () =>
+    Promise.resolve(0.5)
+      .then(scaleTo18)
+      .then(value => expect(value).to.equal("500000000000000000"))
   );
 
 });

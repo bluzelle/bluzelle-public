@@ -4,6 +4,7 @@ export {
   submitCommunityPoolSpendProposal,
   submitParameterChangeProposal,
   vote,
+  voteWithWeights,
   depositToProposal
 } from  './tx';
 

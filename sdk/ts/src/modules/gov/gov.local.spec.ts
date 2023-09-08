@@ -7,7 +7,8 @@ import {
   submitParameterChangeProposal,
   submitSoftwareUpgradeProposal,
   submitTextProposal,
-  vote
+  vote,
+  voteWithWeights
 } from './tx';
 import { getProposal } from './query';
 import { passThroughAwait } from 'promise-passthrough';
@@ -23,6 +24,7 @@ import { getAccountBalance, getTotalSupply } from '../bank/query';
 import { getParamValue } from '../params';
 import { fundCommunityPool } from '../distribution';
 import { generateMnemonic } from '../../utils/generateMnemonic';
+import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
 
 describe.skip('gov module, local docker', () => {
 
@@ -512,6 +514,53 @@ describe.skip('gov module, local machine', () => {
       }, { maxGas: 200_000, gasPrice: 10 })))
       .then(passThroughAwait(() => delay(10_000)))
       .then(client => getProposal(client, "1"))
+      .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
+  );
+
+});
+
+
+describe.skip('gov votes', function () {
+  this.timeout(2_000_000);
+
+  beforeEach(stopSwarm);
+
+  it('should be able to vote with weight', () =>
+    startSwarmWithClient()
+      .then(passThroughAwait(client => submitTextProposal(client.bzSdk, {
+          title: 'My title',
+          description: 'My description',
+          proposer: client.auth.address,
+          initialDeposit: [{
+            amount: 500_000,
+            denom: 'ubnt'
+          }],
+        }, {
+          maxGas: 200_000,
+          gasPrice: 10
+        })
+      ))
+      .then(passThroughAwait(client => depositToProposal(client.bzSdk, {
+        proposalId: "1",
+        depositor: client.auth.address,
+        amount: [{
+          amount: 1_000_000,
+          denom: 'ubnt'
+        }]
+      }, {
+        maxGas: 200_000,
+        gasPrice: 10
+      })))
+      .then(passThroughAwait(client => voteWithWeights(client.bzSdk, {
+        proposalId: "1",
+        voter: client.auth.address,
+        options: [
+          { option: VoteOption.VOTE_OPTION_YES, weight: 0.5 },
+          { option: VoteOption.VOTE_OPTION_ABSTAIN, weight: 0.5 }
+        ]
+      }, { maxGas: 200_000, gasPrice: 10 })))
+      .then(passThroughAwait(() => delay(15_000)))
+      .then(client => getProposal(client.bzSdk, "1"))
       .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
   );
 
