@@ -1,6 +1,6 @@
 import {getBlzClient, restartIpfsServerAndSwarm} from "@bluzelle/testing/src/commonUtils";
 import {generateContent} from "@bluzelle/testing/src/fileUtils";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, of} from "rxjs";
 import {times} from "lodash";
 import {passThroughAwait} from "promise-passthrough";
 import {createCtx, withCtxAwait} from "@scottburch/with-context";
@@ -13,6 +13,8 @@ import {hasContent} from "./query";
 import {getAccountBalance} from "../bank";
 import {pinCid} from "./tx";
 import {getTx, withTransaction} from "../../core";
+import {ensureImageExists} from "explorer-manager/docker-helpers/imageBuilder";
+import {ensureIpfsImageExists} from "ipfs/src";
 
 const ipfsClient = create({host: '127.0.0.1', port: 5001, protocol: 'http'})
 
@@ -23,20 +25,23 @@ describe('storage module', function () {
     this.timeout(600_000);
 
     beforeEach(() =>
-        restartIpfsServerAndSwarm(({...defaultSwarmConfig, targetBranch: 'experimental'}))
+        restartIpfsServerAndSwarm(({...defaultSwarmConfig}))
             .then((swarmMnemonic) => mnemonic.next(swarmMnemonic))
     );
 
-    it.skip('hasContent should return true if content is pinned', () =>
+    it('hasContent should return true if content is pinned', () =>
         Promise.all(times(2).map(() =>
             Promise.resolve(generateContent(0.01))
                 .then((content) => ipfsClient.add(content))
         ))
+            .then(x =>
+                x
+            )
             .then((addResults) => createCtx('addResults', () => addResults))
             .then(withCtxAwait('client', () => getBlzClient(curiumUrl, mnemonic.getValue())))
             .then(passThroughAwait((ctx) =>
                 Promise.all(ctx.addResults.map((addResult) =>
-                    pinCid(ctx.client, addResult.path, {maxGas: 200000, gasPrice: 0.002, mode: 'sync'})
+                    pinCid(ctx.client, {cid: addResult.path}, {maxGas: 200000, gasPrice: 0.002, mode: 'sync'})
                 ))
             ))
             .then(ctx => Promise.all(ctx.addResults.map(addResult =>
@@ -69,7 +74,7 @@ describe('storage module', function () {
             .then((contents) => createCtx('contents', () => contents))
             .then(withCtxAwait('client', () => getBlzClient(curiumUrl, mnemonic.getValue())))
             .then(passThroughAwait(ctx => withTransaction(ctx.client, () =>
-                ctx.contents.forEach((contentObj) => pinCid(ctx.client, contentObj.cid, {
+                ctx.contents.forEach((contentObj) => pinCid(ctx.client, {cid: contentObj.cid}, {
                     maxGas: 200000,
                     gasPrice: 0.002,
                     mode: 'sync'
@@ -82,7 +87,7 @@ describe('storage module', function () {
     it('should query for v1 cids', () =>
         getBlzClient(curiumUrl, mnemonic.getValue())
             .then(passThroughAwait(bzSdk =>
-                pinCid(bzSdk, 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi', {
+                pinCid(bzSdk, {cid: 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi'}, {
                     maxGas: 10000000,
                     gasPrice: 0.002,
                     mode: 'sync'
@@ -97,7 +102,7 @@ describe('storage module', function () {
     it('should query for the same cid with either v0 or v1', () =>
         getBlzClient(curiumUrl, mnemonic.getValue())
             .then(passThroughAwait(bzSdk =>
-                pinCid(bzSdk, CID.parse('bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi').toV0().toString(), {
+                pinCid(bzSdk, {cid: CID.parse('bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi').toV0().toString()}, {
                     maxGas: 10000000,
                     gasPrice: 0.002,
                     mode: 'sync'
@@ -112,7 +117,7 @@ describe('storage module', function () {
     it('should query for the same cid with either v0 or v1 other direction', () =>
         getBlzClient(curiumUrl, mnemonic.getValue())
             .then(passThroughAwait(bzSdk =>
-                (pinCid(bzSdk, 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi', {
+                (pinCid(bzSdk, {cid: 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi'}, {
                     maxGas: 10000000,
                     gasPrice: 0.002,
                     mode: 'sync'
@@ -128,7 +133,7 @@ describe('storage module', function () {
     it('should query a transaction by hash', () => {
         return getBlzClient(curiumUrl, mnemonic.getValue())
             .then(bzSdk =>
-                (pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {
+                (pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {
                     maxGas: 10000000,
                     gasPrice: 0.002,
                     mode: 'sync'
@@ -140,5 +145,22 @@ describe('storage module', function () {
             )
             .then(({resp, bzSdk}) => getTx(bzSdk, resp.transactionHash))
     });
+
+    it('should allow multiaddr to nodes holding content', () => {
+        const addr = '/ip4/45.32.211.194/udp/4001/quic-v1/p2p/12D3KooWDpD6gVGLAr7UZGUUgzVfXA6C3wotrBzY9CT8hQFhrKA7/p2p-circuit/p2p/12D3KooWM7UBZn1hS96xXMvE2UthmXTMmXq3w1p4r14MiSZqkaMa'
+        return getBlzClient(curiumUrl, mnemonic.getValue())
+            .then(bzSdk => (pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', addresses: ['/ip4/45.32.211.194/udp/4001/quic-v1/p2p/12D3KooWDpD6gVGLAr7UZGUUgzVfXA6C3wotrBzY9CT8hQFhrKA7/p2p-circuit/p2p/12D3KooWM7UBZn1hS96xXMvE2UthmXTMmXq3w1p4r14MiSZqkaMa']}, {
+                    maxGas: 10000000,
+                    gasPrice: 0.002,
+                    mode: 'sync'
+                }) as any)
+                    .then((resp: any) => ({
+                        resp,
+                        bzSdk
+                    }))
+            )
+           // .then(({resp, bzSdk}) => hasContent(bzSdk, ))
+
+    })
 
 });
