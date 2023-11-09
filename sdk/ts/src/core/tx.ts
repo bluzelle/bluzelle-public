@@ -30,7 +30,9 @@ import {
 } from '../curium/lib/generated/cosmos/staking/v1beta1/tx';
 import {
     MsgFundCommunityPool,
-    MsgWithdrawDelegatorReward
+    MsgSetWithdrawAddress,
+    MsgWithdrawDelegatorReward,
+    MsgWithdrawValidatorCommission
 } from '../curium/lib/generated/cosmos/distribution/v1beta1/tx';
 import { MsgExec, MsgGrant, MsgRevoke } from '../curium/lib/generated/cosmos/authz/v1beta1/tx';
 import { MsgCreateVestingAccount } from '../curium/lib/generated/cosmos/vesting/v1beta1/tx';
@@ -104,6 +106,8 @@ export const registerMessages = (registry: Registry) => {
     registry.register('/cosmos.staking.v1beta1.MsgBeginRedelegate', MsgBeginRedelegate)
     registry.register('/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward', MsgWithdrawDelegatorReward)
     registry.register('/cosmos.distribution.v1beta1.MsgFundCommunityPool', MsgFundCommunityPool)
+    registry.register('/cosmos.distribution.v1beta1.MsgSetWithdrawAddress', MsgSetWithdrawAddress)
+    registry.register('/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission', MsgWithdrawValidatorCommission)
     registry.register('/bluzelle.curium.nft.MsgCreateNFT', MsgCreateNFT)
     registry.register('/bluzelle.curium.nft.MsgCreateCollection', MsgCreateCollection)
     registry.register('/bluzelle.curium.nft.MsgTransferNFT', MsgTransferNFT)

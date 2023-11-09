@@ -1,5 +1,5 @@
 import {BluzelleClient, BluzelleTxResponse, BroadcastOptions, sendTx} from "../../core";
-import {MsgWithdrawDelegatorReward, MsgFundCommunityPool} from "../../curium/lib/generated/cosmos/distribution/v1beta1/tx";
+import {MsgWithdrawDelegatorReward, MsgFundCommunityPool, MsgSetWithdrawAddress, MsgWithdrawValidatorCommission} from "../../curium/lib/generated/cosmos/distribution/v1beta1/tx";
 
 export const withdrawDelegatorReward = (
     client: BluzelleClient,
@@ -26,3 +26,23 @@ export const fundCommunityPool = (
     depositor: params.depositor,
   } as MsgFundCommunityPool, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
+
+export const setWithdrawAddress = (
+    client: BluzelleClient,
+    delegatorAddress: string,
+    withdrawAddress: string,
+    options: BroadcastOptions
+) => Promise.resolve(sendTx(client, '/cosmos.distribution.v1beta1.MsgSetWithdrawAddress', {
+        delegatorAddress,
+        withdrawAddress
+    } as MsgSetWithdrawAddress, options ))
+        .then(res => res? res as BluzelleTxResponse: {} as BluzelleTxResponse)
+
+export const withdrawValidatorCommission = (
+    client: BluzelleClient,
+    validatorAddress: string,
+    options: BroadcastOptions
+) => Promise.resolve(sendTx(client, '/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission', {
+    validatorAddress
+    } as MsgWithdrawValidatorCommission, options))
+        .then(res => res? res as BluzelleTxResponse: {} as BluzelleTxResponse)

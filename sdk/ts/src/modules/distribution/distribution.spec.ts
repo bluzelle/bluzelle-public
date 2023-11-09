@@ -9,8 +9,8 @@ import * as bip39 from "bip39";
 import {mint} from "../faucet";
 import {stopSwarm} from "@bluzelle/testing/src/swarmUtils";
 import {getOtherTokenDefaults} from "@bluzelle/testing/src/commonUtils";
-import { fundCommunityPool, withdrawDelegatorReward } from './tx';
-import {getDelegationRewards, getDelegationTotalRewards} from "./query";
+import { fundCommunityPool, setWithdrawAddress, withdrawDelegatorReward, withdrawValidatorCommission } from './tx';
+import {getCommission, getDelegationRewards, getDelegationTotalRewards, getParams, getOutstandingRewards, getSlashes, getDelegatorValidators, getWithdrawAddress, getCommunityPoolBalances} from "./query";
 import {send} from "../bank";
 import {pinCid} from "../storage";
 import {delegate} from "../staking";
@@ -98,6 +98,133 @@ describe('distribution module', function () {
           .then(res => expect(res.code).to.equal(0))
     );
 
+    it('should get params', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(ctx => getParams(ctx.bzSdk))
+            .then(result => expect(result.withdrawAddrEnabled).to.equal(true))
+    );
+
+    it('should get commissions', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(ctx => getCommission(ctx.bzSdk, ctx.valoper))
+            .then(result => expect(result.length).equal(0))
+    );
+
+    it('should get commissions and should be greater than 0', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(passThroughAwait(ctx => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 100_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => getCommission(ctx.bzSdk, ctx.valoper))
+            .then(result => expect(result[0].amount).to.greaterThan(0))
+    );
+
+    it('should get outstanding rewards', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(ctx => getOutstandingRewards(ctx.bzSdk, ctx.valoper))
+            .then(result => expect(result.length).to.equal(0))
+    );
+
+    it('should get outstanding rewards and should be greater than 0', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(passThroughAwait(ctx => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 100_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => getOutstandingRewards(ctx.bzSdk, ctx.valoper))
+            .then(result => expect(result[0].amount).to.greaterThan(0))
+    );
+
+    it('should get slashes info', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => getSlashes(ctx.bzSdk, ctx.valoper, 1, 10))
+            .then(result => expect(result.slashes.length).to.equal(0))
+    );
+
+    it('should get slashes info', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => getSlashes(ctx.bzSdk, ctx.valoper, 1, 10))
+            .then(result => expect(result.slashes.length).to.equal(0))
+        );
+
+    it('should get validators info which a given delegator delegate its tokens', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => getDelegatorValidators(ctx.bzSdk, ctx.auth.address))
+            .then(result => expect(result.validators.length).to.equal(2))
+    );
+
+    it('should get withdraw address of the delegator', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => getWithdrawAddress(ctx.bzSdk, ctx.auth.address))
+            .then(result => expect(result.length).to.equal(47))
+    );
+
+    it('should get balances of the community pool', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => getCommunityPoolBalances(ctx.bzSdk))
+            .then(result => expect(result.length).to.equal(0))
+    );
+
+
+    it('Balances of the community pool should be greater than 0 after sending transaction', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(passThroughAwait(ctx => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 100_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => getCommunityPoolBalances(ctx.bzSdk))
+            .then(result => expect(result[0].amount).to.greaterThan(0))
+    );
+
+
+    it('It should be able to set withdraw address successfully with code 0', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => setWithdrawAddress(ctx.bzSdk, ctx.auth.address, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', {maxGas: 200_000, gasPrice: 0.002}))
+            .then(result => expect(result.code).to.equal(0))
+    );
+
+    it('the withdraw address should be changed after setting the withdraw address', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(passThroughAwait(ctx => setWithdrawAddress(ctx.bzSdk, ctx.auth.address, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', {maxGas: 200_000, gasPrice: 10})))
+            .then(ctx => getWithdrawAddress(ctx.bzSdk, ctx.auth.address))
+            .then(result => expect(result).to.equal('bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj'))
+    );
+
+
+    it('should be able to withdraw commssion successfully with code 0', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[0].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(passThroughAwait(ctx => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 100_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(withCtxAwait('beforeWithdrawState',ctx => getCommission(ctx.bzSdk, ctx.valoper)))
+            .then(ctx => withdrawValidatorCommission(ctx.bzSdk, ctx.valoper, {maxGas: 200_000, gasPrice: 0.002}))
+            .then(result => expect(result.code).to.equal(0))
+    );
+
+    it('the commission reward amount should be reduced after withdraw', () =>
+        startSwarmWithClient({...swarmConfig()})
+            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[0].getValoper()))
+            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(passThroughAwait(ctx => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 100_000_000, {maxGas: 200_000, gasPrice: 10})))
+            .then(withCtxAwait('beforeWithdrawState',ctx => getCommission(ctx.bzSdk, ctx.valoper)))
+            .then(passThroughAwait(ctx => withdrawValidatorCommission(ctx.bzSdk, ctx.valoper, {maxGas: 200_000, gasPrice: 0.002})))
+            .then(withCtxAwait('afterWithdrawState', ctx => getCommission(ctx.bzSdk, ctx.valoper)))
+            .then(ctx => expect(ctx.afterWithdrawState[0].amount).to.lessThan(ctx.beforeWithdrawState[0].amount))
+    );
 });
 
 
