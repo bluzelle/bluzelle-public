@@ -10,7 +10,7 @@ import {mint} from "../faucet";
 import {stopSwarm} from "@bluzelle/testing/src/swarmUtils";
 import {getOtherTokenDefaults} from "@bluzelle/testing/src/commonUtils";
 import { fundCommunityPool, setWithdrawAddress, withdrawDelegatorReward, withdrawValidatorCommission } from './tx';
-import {getCommission, getDelegationRewards, getDelegationTotalRewards, getParams, getOutstandingRewards, getSlashes, getDelegatorValidators, getWithdrawAddress, getCommunityPoolBalances} from "./query";
+import {getCommission, getDelegationRewards, getDelegationTotalRewards, getOutstandingRewards, getSlashes, getDelegatorValidators, getWithdrawAddress, getCommunityPoolBalances, getDistributionParams} from "./query";
 import {send} from "../bank";
 import {pinCid} from "../storage";
 import {delegate} from "../staking";
@@ -100,7 +100,7 @@ describe('distribution module', function () {
 
     it('should get params', () =>
         startSwarmWithClient({...swarmConfig()})
-            .then(ctx => getParams(ctx.bzSdk))
+            .then(ctx => getDistributionParams(ctx.bzSdk))
             .then(result => expect(result.withdrawAddrEnabled).to.equal(true))
     );
 

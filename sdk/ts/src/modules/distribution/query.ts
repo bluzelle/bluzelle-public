@@ -52,7 +52,7 @@ export const getDelegationTotalRewards = (
     })
         .then(parseQueryDelegationTotalRewardsResponse);
 
-export const getParams = (client: BluzelleClient) : Promise<DistributionParamsType> => 
+export const getDistributionParams = (client: BluzelleClient) : Promise<DistributionParamsType> => 
     client.queryClient.distribution.Params({})
         .then((result) => result.params as DistributionParamsType);
 

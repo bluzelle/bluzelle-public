@@ -8,7 +8,7 @@ export {
 export {
     getDelegationRewards,
     getDelegationTotalRewards,
-    getParams,
+    getDistributionParams,
     getCommission,
     getCommunityPoolBalances,
     getOutstandingRewards,
