@@ -144,14 +144,6 @@ describe('distribution module', function () {
             .then(result => expect(result.slashes.length).to.equal(0))
     );
 
-    it('should get slashes info', () =>
-        startSwarmWithClient({...swarmConfig()})
-            .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
-            .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
-            .then(ctx => getSlashes(ctx.bzSdk, ctx.valoper, 1, 10))
-            .then(result => expect(result.slashes.length).to.equal(0))
-        );
-
     it('should get validators info which a given delegator delegate its tokens', () =>
         startSwarmWithClient({...swarmConfig()})
             .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
