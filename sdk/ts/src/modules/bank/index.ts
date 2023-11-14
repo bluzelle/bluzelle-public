@@ -1,8 +1,15 @@
 export {
     getAccountBalance,
-    getTotalSupply
+    getTotalSupply,
+    getAllBalances,
+    getSpendableBalances,
+    getSupplyOf,
+    getParams,
+    getDenomMetadata,
+    getDenomsMetadata
 } from './query';
 
 export {
-    send
+    send,
+    multiSend
 } from './tx';

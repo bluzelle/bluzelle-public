@@ -5,7 +5,7 @@ import { Deferred, newDeferred } from '../utils/Deferred';
 import { Left, Right, Some } from 'monet';
 import { passThrough } from 'promise-passthrough';
 import { identity } from 'lodash';
-import { MsgSend } from '../curium/lib/generated/cosmos/bank/v1beta1/tx';
+import { MsgMultiSend, MsgSend } from '../curium/lib/generated/cosmos/bank/v1beta1/tx';
 import {
     MsgCreateCollection,
     MsgCreateNFT,
@@ -98,6 +98,7 @@ const endTransaction = (queue: MsgQueue, client: BluzelleClient) => {
 export const registerMessages = (registry: Registry) => {
     registry.register('/bluzelle.curium.storage.MsgPin', MsgPin);
     registry.register('/cosmos.bank.v1beta1.MsgSend', MsgSend)
+    registry.register('/cosmos.bank.v1beta1.MsgMultiSend', MsgMultiSend)
     registry.register('/bluzelle.curium.tax.MsgSetGasTaxBp', MsgSetGasTaxBp)
     registry.register('/bluzelle.curium.tax.MsgSetTransferTaxBp', MsgSetTransferTaxBp)
     registry.register('/bluzelle.curium.tax.MsgSetTaxCollector', MsgSetTaxCollector)
