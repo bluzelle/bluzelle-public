@@ -114,11 +114,11 @@ describe('bank module', function () {
       .then((ctx) => expect(ctx.fromTotal.supply[0].amount).to.be.equal(ctx.fromSupplyOf))
   );
 
-  it('getParams should return the params of the bank module', () =>
-    startSwarmWithClient(defaultSwarmConfig)
-      .then((ctx) => getBankParams(ctx.bzSdk))
-      .then((result) => expect((result as Params).defaultSendEnabled).to.be.equal(true))
-  );
+    it("getBankParams should return the params of the bank module", () => 
+        startSwarmWithClient(defaultSwarmConfig)
+            .then((ctx) => getBankParams(ctx.bzSdk))
+            .then((result) => expect((result as Params).defaultSendEnabled).to.be.equal(true))
+    );
 
   it.skip('getDenomMetadata should return the metadata of the bank module', () =>
     startSwarmWithClient(defaultSwarmConfig)
