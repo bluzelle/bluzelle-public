@@ -2,6 +2,13 @@ import { throwError } from "rxjs";
 import {BluzelleClient, BroadcastOptions, sendTx} from "../../core";
 import {MsgMultiSend, MsgSend} from "../../curium/lib/generated/cosmos/bank/v1beta1/tx";
 import { Input, Output } from "../../curium/lib/generated/cosmos/bank/v1beta1/bank";
+import { Coin } from "@cosmjs/proto-signing";
+
+
+export type MultiSendParam = {
+    outputAddress: string,
+    coins: Coin[]
+}
 
 export const send = (client: BluzelleClient, toAddress: string, amount: number, options: BroadcastOptions, denom: string = "ubnt") =>
     sendTx(client, '/cosmos.bank.v1beta1.MsgSend', {
@@ -11,28 +18,19 @@ export const send = (client: BluzelleClient, toAddress: string, amount: number, 
     } as MsgSend, options);
 
 export const multiSend = ( client: BluzelleClient, 
-    outputAddresses: string[], 
-    amounts: number[], 
-    denoms: string[], 
+    params: MultiSendParam[], 
     options: BroadcastOptions 
 ) => {
-    if(outputAddresses.length == amounts.length && outputAddresses.length == denoms.length){
         const inputs: Input[] = [];
         const outputs: Output[] = [];
-        outputAddresses.map((addr, idx) => {
+        params.map((param, idx) => {
             inputs.push({
                 address: client.address,
-                coins: [{
-                    amount: amounts[idx].toString(),
-                    denom: denoms[idx]
-                }]
+                coins: param.coins
             });
             outputs.push({
-                address: addr,
-                coins: [{
-                    amount: amounts[idx].toString(),
-                    denom: denoms[idx]
-                }]
+                address: param.outputAddress,
+                coins: param.coins
             })
         });
         return sendTx(client, '/cosmos.bank.v1beta1.MsgMultiSend', {
@@ -40,7 +38,3 @@ export const multiSend = ( client: BluzelleClient,
             outputs
         } as MsgMultiSend, options)
     }
-    else{
-        throwError('Inputs are invalid. outputAddresses, amounts, denoms should have same length.');
-    }
-}

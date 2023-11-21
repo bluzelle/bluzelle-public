@@ -10,6 +10,48 @@ import { passThroughAwait } from "promise-passthrough";
 
 const curiumUrl = 'http://localhost:26667';
 const mnemonic = new BehaviorSubject<string>("");
+const testAddresses = [
+    'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
+    'bluzelle1kaxu3n8tmtzsmg3zvlfwa7gs04tr07du554h40',
+    'bluzelle1daqsqhtdldrpt68qauf5wvtyanen2fmfjww7dl',
+    'bluzelle14gren5katxznytnhqjl6zt3u0asg2erqgngjzk',
+    'bluzelle1kq7tqye24lr6muyvdgjwk3vv90ad90z2mrsgcm',
+    'bluzelle1x9jw9wtle47uy0m8dytcz63jj5gkn08d3uuqtt',
+    'bluzelle1jn3zxn6c827zught0aanmalr5ehzfg8txjd927',
+    'bluzelle1c4r64lj9a8442d7luacpq2fwyag5nchld3cuxm',
+    'bluzelle13td8dk0unl7u5g58qp4wy304zr8hjlnw9kn35l',
+    'bluzelle1nwng2q2m42eu8wwpekf44ktnev45mqlk8kdgjd',
+    'bluzelle18gm2ngpud3ys9v84vnwy05y6srawahdk507xs5',
+    'bluzelle1aa65hq82qwg2uwfuas7gq04dgaxcaj2feqrnzf',
+    'bluzelle1w64thav7r7t6xhx3nsvda9purd7ax5rn8aukj7',
+    'bluzelle1pc6ncwdlx70uc4ryh0d8unzfeql0eme76q3ykz',
+];
+
+const testMultiSendUbntParams = testAddresses.map((addr) => ({
+    outputAddress: addr,
+    coins: [{
+        amount: '100',
+        denom: 'ubnt'
+    }]
+}));
+
+const testMultiSendUg4Params = testAddresses.map((addr) => ({
+    outputAddress: addr,
+    coins: [{
+        amount: '200',
+        denom: 'ug4'
+    }]
+}));
+
+const testMultiSendUeltParams = testAddresses.map((addr) => ({
+    outputAddress: addr,
+    coins: [{
+        amount: '300',
+        denom: 'uelt'
+    }]
+}));
+
+const testMultiSendParams = [...testMultiSendUbntParams, ...testMultiSendUeltParams, ...testMultiSendUg4Params];
 
 describe('bank module', function () {
     this.timeout(600_000);
@@ -81,76 +123,35 @@ describe('bank module', function () {
 
     it("balances should be changed after multiSend 2 different tokens to one address", () => 
         startSwarmWithClient(defaultSwarmConfig)
-            .then((ctx) => multiSend(ctx.bzSdk, 
-                [
-                    'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
-                    'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj'
-                ],
-                [100, 200],
-                ['ubnt', 'ug4'],
-                {maxGas: 200_000, gasPrice: 0.1}))
-            .then(result => console.log(result))
-            // .then((ctx) => getAllBalances(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',))
-            // .then((result)=>{
-            //     expect(result.balances[0].amount).equal(100);
-            //     expect(result.balances[1].amount).equal(200);
-            // })
+            .then(passThroughAwait((ctx) => multiSend(ctx.bzSdk, 
+                [{
+                    outputAddress: 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
+                    coins: [{
+                        amount: '100',
+                        denom: 'ubnt'
+                    }]
+                },
+                {
+                    outputAddress: 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
+                    coins: [{
+                        amount: '200',
+                        denom: 'ug4'
+                    }]
+                }
+                ], 
+                {maxGas: 200_000, gasPrice: 0.1})))
+            // .then(result => console.log(result))
+            .then((ctx) => getAllBalances(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',))
+            .then((result)=>{
+                expect(result.balances[0].amount).equal('100');
+                expect(result.balances[1].amount).equal('200');
+            })
     );
 
     it("The gas used for multiSend should be smaller than sending several times", () => 
         startSwarmWithClient(defaultSwarmConfig)
             .then(withCtxAwait('multiSendResult', (ctx) => multiSend(ctx.bzSdk, 
-                [
-                    'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
-                    'bluzelle1kaxu3n8tmtzsmg3zvlfwa7gs04tr07du554h40',
-                    'bluzelle1daqsqhtdldrpt68qauf5wvtyanen2fmfjww7dl',
-                    'bluzelle14gren5katxznytnhqjl6zt3u0asg2erqgngjzk',
-                    'bluzelle1kq7tqye24lr6muyvdgjwk3vv90ad90z2mrsgcm',
-                    'bluzelle1x9jw9wtle47uy0m8dytcz63jj5gkn08d3uuqtt',
-                    'bluzelle1jn3zxn6c827zught0aanmalr5ehzfg8txjd927',
-                    'bluzelle1c4r64lj9a8442d7luacpq2fwyag5nchld3cuxm',
-                    'bluzelle13td8dk0unl7u5g58qp4wy304zr8hjlnw9kn35l',
-                    'bluzelle1nwng2q2m42eu8wwpekf44ktnev45mqlk8kdgjd',
-                    'bluzelle18gm2ngpud3ys9v84vnwy05y6srawahdk507xs5',
-                    'bluzelle1aa65hq82qwg2uwfuas7gq04dgaxcaj2feqrnzf',
-                    'bluzelle1w64thav7r7t6xhx3nsvda9purd7ax5rn8aukj7',
-                    'bluzelle1pc6ncwdlx70uc4ryh0d8unzfeql0eme76q3ykz',
-                    'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
-                    'bluzelle1kaxu3n8tmtzsmg3zvlfwa7gs04tr07du554h40',
-                    'bluzelle1daqsqhtdldrpt68qauf5wvtyanen2fmfjww7dl',
-                    'bluzelle14gren5katxznytnhqjl6zt3u0asg2erqgngjzk',
-                    'bluzelle1kq7tqye24lr6muyvdgjwk3vv90ad90z2mrsgcm',
-                    'bluzelle1x9jw9wtle47uy0m8dytcz63jj5gkn08d3uuqtt',
-                    'bluzelle1jn3zxn6c827zught0aanmalr5ehzfg8txjd927',
-                    'bluzelle1c4r64lj9a8442d7luacpq2fwyag5nchld3cuxm',
-                    'bluzelle13td8dk0unl7u5g58qp4wy304zr8hjlnw9kn35l',
-                    'bluzelle1nwng2q2m42eu8wwpekf44ktnev45mqlk8kdgjd',
-                    'bluzelle18gm2ngpud3ys9v84vnwy05y6srawahdk507xs5',
-                    'bluzelle1aa65hq82qwg2uwfuas7gq04dgaxcaj2feqrnzf',
-                    'bluzelle1w64thav7r7t6xhx3nsvda9purd7ax5rn8aukj7',
-                    'bluzelle1pc6ncwdlx70uc4ryh0d8unzfeql0eme76q3ykz',
-                    'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
-                    'bluzelle1kaxu3n8tmtzsmg3zvlfwa7gs04tr07du554h40',
-                    'bluzelle1daqsqhtdldrpt68qauf5wvtyanen2fmfjww7dl',
-                    'bluzelle14gren5katxznytnhqjl6zt3u0asg2erqgngjzk',
-                    'bluzelle1kq7tqye24lr6muyvdgjwk3vv90ad90z2mrsgcm',
-                    'bluzelle1x9jw9wtle47uy0m8dytcz63jj5gkn08d3uuqtt',
-                    'bluzelle1jn3zxn6c827zught0aanmalr5ehzfg8txjd927',
-                    'bluzelle1c4r64lj9a8442d7luacpq2fwyag5nchld3cuxm',
-                    'bluzelle13td8dk0unl7u5g58qp4wy304zr8hjlnw9kn35l',
-                    'bluzelle1nwng2q2m42eu8wwpekf44ktnev45mqlk8kdgjd',
-                    'bluzelle18gm2ngpud3ys9v84vnwy05y6srawahdk507xs5',
-                    'bluzelle1aa65hq82qwg2uwfuas7gq04dgaxcaj2feqrnzf',
-                    'bluzelle1w64thav7r7t6xhx3nsvda9purd7ax5rn8aukj7',
-                    'bluzelle1pc6ncwdlx70uc4ryh0d8unzfeql0eme76q3ykz',
-                ],
-                [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
-                    200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 
-                    300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, ],
-                ['ubnt','ubnt','ubnt','ubnt','ubnt','ubnt','ubnt','ubnt','ubnt','ubnt','ubnt','ubnt','ubnt','ubnt',
-                'ug4', 'ug4', 'ug4', 'ug4', 'ug4', 'ug4', 'ug4', 'ug4', 'ug4', 'ug4', 'ug4', 'ug4', 'ug4', 'ug4', 
-                'uelt','uelt','uelt','uelt','uelt','uelt','uelt','uelt','uelt','uelt','uelt','uelt','uelt','uelt',
-                ],
+                testMultiSendParams,
                 {maxGas: 200_000, gasPrice: 0.1})))
             .then(withCtxAwait('singleSendResult', (ctx) => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 100, {maxGas: 200_000, gasPrice: 0.1})))
             .then((ctx) => {
