@@ -4,7 +4,7 @@ export {
     getAllBalances,
     getSpendableBalances,
     getSupplyOf,
-    getParams,
+    getBankParams,
     getDenomMetadata,
     getDenomsMetadata
 } from './query';

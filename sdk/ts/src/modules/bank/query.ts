@@ -82,7 +82,7 @@ export const getSupplyOf = (client: BluzelleClient,
         .then(res => res.amount ? Number(res.amount?.amount): 0);
 
 
-export const getParams = (client: BluzelleClient): Promise<Params | string> => 
+export const getBankParams = (client: BluzelleClient): Promise<Params | string> => 
     client.queryClient.bank.Params({})
         .then((res) => res.params? res.params : 'no params')
 
