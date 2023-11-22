@@ -1,6 +1,6 @@
 import { Some } from 'monet';
 import { padStart } from 'lodash';
-import { BluzelleCoin } from './types';
+import { BluzelleCoin, BluzelleDenom } from './types';
 import { Coin } from '@cosmjs/proto-signing';
 
 const Long = require('long');
@@ -21,7 +21,7 @@ export const sumBluzelleCoins = (coins: BluzelleCoin[]): BluzelleCoin =>
   });
 
 export const parseLongCoin = (coin: Coin): BluzelleCoin => ({
-  denom: ['ubnt', 'ug4', 'uelt'].includes(coin.denom) ? coin.denom as 'ubnt' | 'ug4' | 'uelt' : 'ubnt',
+  denom: ['ubnt', 'ug4', 'uelt'].includes(coin.denom) ? coin.denom as BluzelleDenom : 'ubnt',
   amount: parseDecTypeToNumber(coin.amount)
 });
 
@@ -34,7 +34,10 @@ export const parseStringToLong = (val: string): Long => new Long.fromString(val)
 export type ParseFn = ((params: object) => unknown)
 
 
-export const parseCoin = (coin: Coin): BluzelleCoin => ({denom: 'ubnt', amount: Number(coin.amount)});
+export const parseCoin = (coin: Coin): BluzelleCoin => ({
+  denom: ['ubnt', 'ug4', 'uelt'].includes(coin.denom) ? coin.denom as BluzelleDenom : 'ubnt',
+  amount: Number(coin.amount)
+});
 
 export const deepParseLong = (obj: object, paths: string[]): object => {
   const setAtPath = (object: Record<string, unknown>, pathParts: string[]): void => {
