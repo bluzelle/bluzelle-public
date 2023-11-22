@@ -67,10 +67,11 @@ func DoPinFile(addPinFn func(cid string) error, msg *types.MsgPin, store sdk.KVS
 
 func (k Keeper) PinFile(ctx sdk.Context, msg *types.MsgPin) {
 
-	err := AttemptConnections(k.storageNode.Context, k.storageNode, msg.Addrs)
-
-	if err != nil {
-		return
+	if len(msg.Addrs) != 0 {
+		err := AttemptConnections(k.storageNode.Context, k.storageNode, msg.Addrs)
+		if err != nil {
+			return
+		}
 	}
 
 	DoPinFile(
