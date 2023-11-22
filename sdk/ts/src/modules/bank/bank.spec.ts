@@ -3,7 +3,7 @@ import {BehaviorSubject} from "rxjs";
 import {createCtxAwait, withCtxAwait} from "@scottburch/with-context";
 import {expect} from "chai";
 import {defaultSwarmConfig} from "@bluzelle/testing";
-import {getAccountBalance, getAllBalances, getDenomMetadata, getDenomsMetadata, getParams, getSpendableBalances, getSupplyOf, getTotalSupply} from "./query";
+import {getAccountBalance, getAllBalances, getDenomMetadata, getDenomsMetadata, getBankParams, getSpendableBalances, getSupplyOf, getTotalSupply} from "./query";
 import { startSwarmWithClient, stopSwarm } from "@bluzelle/testing/src/swarmUtils";
 import { multiSend, send } from "./tx";
 import { passThroughAwait } from "promise-passthrough";
@@ -112,7 +112,7 @@ describe('bank module', function () {
 
     it("getParams should return the params of the bank module", () => 
         startSwarmWithClient(defaultSwarmConfig)
-            .then((ctx) => getParams(ctx.bzSdk))
+            .then((ctx) => getBankParams(ctx.bzSdk))
             .then((result) => expect((result as Params).defaultSendEnabled).to.be.equal(true))
     );
 
