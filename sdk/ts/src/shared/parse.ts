@@ -34,6 +34,8 @@ export const parseStringToLong = (val: string): Long => new Long.fromString(val)
 export type ParseFn = ((params: object) => unknown)
 
 
+export const parseCoin = (coin: Coin): BluzelleCoin => ({denom: 'ubnt', amount: Number(coin.amount)});
+
 export const deepParseLong = (obj: object, paths: string[]): object => {
   const setAtPath = (object: Record<string, unknown>, pathParts: string[]): void => {
     pathParts.reduce((acc: Record<string, unknown>, part, idx, arr) => {

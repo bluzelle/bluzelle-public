@@ -7,6 +7,7 @@ import {getAccountBalance, getAllBalances, getDenomMetadata, getDenomsMetadata, 
 import { startSwarmWithClient, stopSwarm } from "@bluzelle/testing/src/swarmUtils";
 import { multiSend, send } from "./tx";
 import { passThroughAwait } from "promise-passthrough";
+import { Params } from "../../curium/lib/generated/cosmos/bank/v1beta1/bank";
 
 const curiumUrl = 'http://localhost:26667';
 const mnemonic = new BehaviorSubject<string>("");
@@ -83,31 +84,41 @@ describe('bank module', function () {
     it("getAllBalances should return all 3 balances for ubnt, uelt, ug4", () =>
         startSwarmWithClient(defaultSwarmConfig)
             .then((ctx) => getAllBalances(ctx.bzSdk, ctx.auth.address))
-            .then((result) => expect(result.balances.length).to.be.equal(3))
+            .then((result) => {
+                expect(result.balances.length).to.be.equal(3)
+                expect(result.balances[0].amount).to.be.greaterThan(0)
+                expect(result.balances[1].amount).to.be.greaterThan(0)
+                expect(result.balances[2].amount).to.be.greaterThan(0)
+            })
     );
 
     it("getSpendableBalances should return all 3 balances for ubnt, uelt, ug4", () =>
         startSwarmWithClient(defaultSwarmConfig)
-                .then((ctx) => getSpendableBalances(ctx.bzSdk, ctx.auth.address))
-                .then((result) => expect(result.balances.length).to.be.equal(3))
+            .then((ctx) => getSpendableBalances(ctx.bzSdk, ctx.auth.address))
+            .then((result) => {
+                expect(result.balances.length).to.be.equal(3)
+                expect(result.balances[0].amount).to.be.greaterThan(0)
+                expect(result.balances[1].amount).to.be.greaterThan(0)
+                expect(result.balances[2].amount).to.be.greaterThan(0)
+            })
     );
 
     it("getSupplyOf should return the same balance with the balance from the getTotalSupply", () =>
         startSwarmWithClient(defaultSwarmConfig)
             .then(withCtxAwait('fromTotal', (ctx) => getTotalSupply(ctx.bzSdk)))
             .then(withCtxAwait('fromSupplyOf', (ctx) => getSupplyOf(ctx.bzSdk, 'ubnt')))
-            .then((ctx) => expect(ctx.fromTotal.supply[0].amount).to.be.equal(ctx.fromSupplyOf.toString()) )
+            .then((ctx) => expect(ctx.fromTotal.supply[0].amount).to.be.equal(ctx.fromSupplyOf) )
     );
 
     it("getParams should return the params of the bank module", () => 
         startSwarmWithClient(defaultSwarmConfig)
             .then((ctx) => getParams(ctx.bzSdk))
-            .then((result) => expect(result?.defaultSendEnabled).to.be.equal(true))
+            .then((result) => expect((result as Params).defaultSendEnabled).to.be.equal(true))
     );
 
-    it.skip("getDenomMetadata should return the params of the bank module", () => 
+    it.skip("getDenomMetadata should return the metadata of the bank module", () => 
         startSwarmWithClient(defaultSwarmConfig)
-            .then((ctx) => getDenomsMetadata(ctx.bzSdk))
+            .then((ctx) => getDenomMetadata(ctx.bzSdk, 'ubnt'))
             .then((result) => console.log(result))
     );
 
@@ -143,8 +154,8 @@ describe('bank module', function () {
             // .then(result => console.log(result))
             .then((ctx) => getAllBalances(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',))
             .then((result)=>{
-                expect(result.balances[0].amount).equal('100');
-                expect(result.balances[1].amount).equal('200');
+                expect(result.balances[0].amount).equal(100);
+                expect(result.balances[1].amount).equal(200);
             })
     );
 
@@ -155,7 +166,7 @@ describe('bank module', function () {
                 {maxGas: 200_000, gasPrice: 0.1})))
             .then(withCtxAwait('singleSendResult', (ctx) => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 100, {maxGas: 200_000, gasPrice: 0.1})))
             .then((ctx) => {
-                expect((ctx.multiSendResult as any).gasUsed).to.be.lessThan((ctx.singleSendResult as any).gasUsed * 42)
+                expect((ctx.multiSendResult as unknown as {gasUsed: number}).gasUsed).to.be.lessThan((ctx.singleSendResult as any).gasUsed * 42)
             })
     );
 });

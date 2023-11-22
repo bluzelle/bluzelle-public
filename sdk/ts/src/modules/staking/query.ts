@@ -22,7 +22,7 @@ import {
     defaultPaginationResponse
 } from '../../shared/pagination';
 import { BluzelleCoin } from '../../shared/types';
-import { parseDecTypeToNumber, parseNumToLong } from '../../shared/parse';
+import { parseCoin, parseDecTypeToNumber, parseNumToLong } from '../../shared/parse';
 
 export type BluzelleDelegatorUnbondingDelegationsResponse = {
     unbondingDelegations: BluzelleUnbondingDelegation[],
@@ -199,7 +199,6 @@ const parseDelegation = (delegation: Delegation): BluzelleDelegation => ({
 });
 
 
-const parseCoin = (coin: Coin): BluzelleCoin => ({denom: 'ubnt', amount: Number(coin.amount)});
 
 
 const parseQueryValidatorsResponse = (res: QueryValidatorsResponse): BluzelleValidatorsResponse => ({
