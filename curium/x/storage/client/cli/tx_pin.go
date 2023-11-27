@@ -3,7 +3,6 @@ package cli
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -32,18 +31,9 @@ func CmdPin() *cobra.Command {
 				return err
 			}
 			cid := args[0]
-			addrString, err := cmd.Flags().GetString("addresses")
-			if err != nil {
-				return err
-			}
-			nodeAddrs := []string{}
-			if addrString != "" {
-				nodeAddrs = strings.Split(addrString, ",")
-			}
 			msg := types.NewMsgPin(
 				clientCtx.GetFromAddress().String(),
 				cid,
-				nodeAddrs,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -53,6 +43,6 @@ func CmdPin() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-	cmd.Flags().String("addresses", "", "Comma-separated list of node addresses")
+
 	return cmd
 }
