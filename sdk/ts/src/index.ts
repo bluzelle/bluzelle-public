@@ -16,7 +16,8 @@ export * from "./modules/params";
 export * from "./modules/gov";
 export * from "./modules/upgrade";
 export {
-    BluzelleCoin
+    BluzelleCoin,
+    BluzelleDenom
 } from "./shared/types";
 export {
     BluzellePageRequest,
