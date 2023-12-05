@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -43,6 +44,36 @@ func main() {
 			} else {
 				logger.Error("Error removing all storage history", "dir", storageDir, "err", err)
 			}
+		}
+
+		if len(os.Args) > 1 && os.Args[1] == "init" {
+			logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout))
+			rootDir := app.DefaultNodeHome
+
+			for i, arg := range os.Args {
+				if arg == "--home" && i+1 < len(os.Args) {
+					rootDir = os.Args[i+1]
+					break
+				}
+			}
+
+			storageDir := filepath.Join(rootDir, "storage")
+
+			newContent := "storage-dir = " + "\"" + storageDir + "\"\n" + "filter = \"server\"\n"
+			appFilePath := filepath.Join(rootDir, "config/app.toml")
+			existingContent, err := ioutil.ReadFile(appFilePath)
+			if err != nil {
+				logger.Error("Error reading file:", err)
+				return
+			}
+			fullContent := newContent + string(existingContent)
+			err = ioutil.WriteFile(appFilePath, []byte(fullContent), 0644)
+			if err != nil {
+				logger.Error("Error writing to file:", err)
+				return
+			}
+			logger.Info("Storage Config successfully added into app.toml")
+
 		}
 	}
 }
