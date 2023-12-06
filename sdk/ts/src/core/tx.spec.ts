@@ -13,6 +13,7 @@ import {pinCid} from "../modules/storage";
 import {getAccountBalance, send} from "../modules/bank";
 import {mint} from "../modules/faucet";
 import {withCtxAwait} from "@scottburch/with-context";
+import {getForkTestSwarmConfig} from "infra-control-test/specs/fork/genesisToLocal.spec";
 
 
 describe('sending transactions', function () {
@@ -23,11 +24,11 @@ describe('sending transactions', function () {
     );
 
     it('should have a withTransaction that can bundle messages', () => {
-        return startSwarmWithClient({...defaultSwarmConfig})
+        return startSwarmWithClient(getForkTestSwarmConfig('test'))
             .then(({bzSdk}) => withTransaction(bzSdk, () => {
-                pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000, mode: 'sync'});
-                pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000, mode: 'sync'});
-                pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: 0.002, maxGas: 200000, mode: 'sync'});
+                pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {gasPrice: 0.002, maxGas: 200000, mode: 'sync'});
+                pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {gasPrice: 0.002, maxGas: 200000, mode: 'sync'});
+                pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {gasPrice: 0.002, maxGas: 200000, mode: 'sync'});
             }))
     });
 
@@ -65,7 +66,7 @@ describe('sending transactions', function () {
         let client: BluzelleClient;
         return startSwarmWithClient()
             .then(({bzSdk}) =>
-                (pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {
+                (pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {
                     gasPrice: 0.02,
                     maxGas: 1000000,
                     mode: 'async'
@@ -82,7 +83,7 @@ describe('sending transactions', function () {
 
     it('should reject a transaction if the gas price is too low', () =>
         startSwarmWithClient({...defaultSwarmConfig, minGasPrice: defaultSwarmConfig.minGasPrice * 10})
-            .then(({bzSdk}) => pinCid(bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {gasPrice: defaultSwarmConfig.minGasPrice, maxGas: 200000, mode: 'sync'}))
+            .then(({bzSdk}) => pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {gasPrice: defaultSwarmConfig.minGasPrice, maxGas: 200000, mode: 'sync'}))
             .then(x =>
                 {throw x}
             )
