@@ -40,7 +40,7 @@ func main() {
 			storageDir := filepath.Join(config.RootDir, "storage")
 			logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 			if err := os.RemoveAll(storageDir); err == nil {
-				logger.Info("Removed all storage history", "dir", storageDir)
+				logger.Debug("Removed all storage history", "dir", storageDir)
 			} else {
 				logger.Error("Error removing all storage history", "dir", storageDir, "err", err)
 			}
@@ -72,7 +72,7 @@ func main() {
 				logger.Error("Error writing to file:", err)
 				return
 			}
-			logger.Info("Storage Config successfully added into app.toml")
+			logger.Debug("Storage Config successfully added into app.toml")
 
 		}
 	}
