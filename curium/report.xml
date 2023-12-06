@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+	<testsuite tests="12" failures="0" time="6.983" name="github.com/bluzelle/bluzelle-public/curium/app/ante">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="ante" name="TestNewSetupContextDecorator" time="0.020"></testcase>
+		<testcase classname="ante" name="TestNewSetupContextDecorator/NewSetUpContextDecorator_should_return_a_SetUpContextDecorator" time="0.000"></testcase>
+		<testcase classname="ante" name="TestNewSetupContextDecorator/SetGasMeter()" time="0.010"></testcase>
+		<testcase classname="ante" name="TestNewSetupContextDecorator/SetGasMeter()/should_returns_a_new_context_with_a_gas_meter_with_0_consumed_gas_if_block_height_is_0" time="0.000"></testcase>
+		<testcase classname="ante" name="TestNewSetupContextDecorator/SetGasMeter()/should_returns_a_new_context_with_a_charging_gas_meter" time="0.000"></testcase>
+		<testcase classname="ante" name="TestNewSetupContextDecorator/SetGasMeter()/should_return_error_message_if_gas_price_is_too_low" time="0.000"></testcase>
+		<testcase classname="ante" name="TestNewSetupContextDecorator/SetUpContextDecorator_AnteHandle" time="0.010"></testcase>
+		<testcase classname="ante" name="TestNewSetupContextDecorator/SetUpContextDecorator_AnteHandle/should_return_context_with_a_gas_meter" time="0.010"></testcase>
+		<testcase classname="ante" name="TestNewTaxDecorator" time="0.000"></testcase>
+		<testcase classname="ante" name="TestNewTaxDecorator/should_return_a_TaxDecorator" time="0.000"></testcase>
+		<testcase classname="ante" name="TestAnte" time="0.010"></testcase>
+		<testcase classname="ante" name="TestAnte/NewAnteHandler_should_return_an_antehandler" time="0.010"></testcase>
+	</testsuite>
+	<testsuite tests="25" failures="0" time="1.620" name="github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="gasmeter" name="TestChargingGasMeterWhiteBox" time="0.010"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeterWhiteBox/addUint64Overflow()" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeterWhiteBox/addUint64Overflow()/should_returns_sum_of_0_if_overflows" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeterWhiteBox/addUint64Overflow()/should_return_correct_sum_if_not_overflow" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeterWhiteBox/calculateGasFee()_should_return_correct_gas_fee" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeterWhiteBox/deductFees()" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeterWhiteBox/deductFees()/should_not_return_error_if_fees_are_valid" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeterWhiteBox/deductFees()/should_make_no_deduction_when_address_has_balance_of_0" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeter" time="0.010"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeter/NewChargingGasMeter()_should_create_a_gas_meter" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeter/GasConsumed()_should_return_correct_result_when_gas_is_consumed" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeter/IsOutOfGas()" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeter/IsOutOfGas()/should_return_false_if_there_is_gas" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeter/IsOutOfGas()/should_return_true_if_there_no_gas" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeter/Limit()_should_return_the_correct_limit_of_the_gas_meter" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeter/GasConsumedToLimit_should_return_the_amount_of_gas_consumed_up_to_the_limit" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeter/IsPastLimit()_should_return_true_if_gas_consumed_is_past_limit" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestChargingGasMeter/GetGasPrice()_should_get_gas_price" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestGasMeterKeeper" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestGasMeterKeeper/NewGasMeterKeeper_should_return_a_new_gas_meter_keeper" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestGasMeterKeeper/Gas_Meter_Keeper" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestGasMeterKeeper/Gas_Meter_Keeper/should_contain_no_gas_meters_if_none_are_added" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestGasMeterKeeper/Gas_Meter_Keeper/should_contain_gas_meter_if_it_is_added" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestGasMeterKeeper/Gas_Meter_Keeper/should_contain_all_the_gas_meters_that_were_added" time="0.000"></testcase>
+		<testcase classname="gasmeter" name="TestGasMeterKeeper/Gas_Meter_Keeper/should_contain_no_gas_meters_when_the_gas_meter_keeper_is_cleared" time="0.000"></testcase>
+	</testsuite>
+	<testsuite tests="1" failures="0" time="3.504" name="github.com/bluzelle/bluzelle-public/curium/x/curium">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="curium" name="TestGenesis" time="0.000"></testcase>
+	</testsuite>
+	<testsuite tests="3" failures="0" time="0.451" name="github.com/bluzelle/bluzelle-public/curium/x/curium/types">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="types" name="TestGenesisState_Validate" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate/default_is_valid" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate/valid_genesis_state" time="0.000"></testcase>
+	</testsuite>
+	<testsuite tests="2" failures="0" time="2.282" name="github.com/bluzelle/bluzelle-public/curium/x/faucet/keeper">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="keeper" name="TestParamsQuery" time="0.000"></testcase>
+		<testcase classname="keeper" name="TestGetParams" time="0.000"></testcase>
+	</testsuite>
+	<testsuite tests="6" failures="0" time="0.623" name="github.com/bluzelle/bluzelle-public/curium/x/faucet/types">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="types" name="TestMsgMint_ValidateBasic" time="0.000"></testcase>
+		<testcase classname="types" name="TestMsgMint_ValidateBasic/invalid_address" time="0.000"></testcase>
+		<testcase classname="types" name="TestMsgMint_ValidateBasic/valid_address" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate/default_is_valid" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate/valid_genesis_state" time="0.000"></testcase>
+	</testsuite>
+	<testsuite tests="19" failures="0" time="5.400" name="github.com/bluzelle/bluzelle-public/curium/x/nft/keeper">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="keeper" name="TestKeeperSuite" time="0.160"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestCollectionGetSet" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestCollectionNftsCreationAndQuery" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestGRPCCollection" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestGRPCMetadata" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestGRPCNFTInfo" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestGRPCNFTsByOwner" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestLastCollectionIdGetSet" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestLastMetadataIdGetSet" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestMetadataGetSet" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestMsgServerCreateCollection" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestMsgServerCreateNFT" time="0.020"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestMsgServerPrintEdition" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestMsgServerSignMetadata" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestMsgServerTransferNFT" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestMsgServerUpdateCollectionAuthority" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestMsgServerUpdateMetadata" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestMsgServerUpdateMetadataAuthority" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestKeeperSuite/TestNftGetSet" time="0.010"></testcase>
+	</testsuite>
+	<testsuite tests="4" failures="0" time="1.530" name="github.com/bluzelle/bluzelle-public/curium/x/storage">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="storage" name="TestGenesis" time="0.000"></testcase>
+		<testcase classname="storage" name="TestGenesis/should_initialize_genesis" time="0.000"></testcase>
+		<testcase classname="storage" name="TestGenesis/should_export_genesis" time="0.000"></testcase>
+		<testcase classname="storage" name="TestGenesis/should_import_and_pin_cids_from_genesis" time="0.000"></testcase>
+	</testsuite>
+	<testsuite tests="5" failures="0" time="4.271" name="github.com/bluzelle/bluzelle-public/curium/x/storage/keeper">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="keeper" name="TestStorageKeeper" time="0.000"></testcase>
+		<testcase classname="keeper" name="TestStorageKeeper/should_add_pin_to_storage_node" time="0.000"></testcase>
+		<testcase classname="keeper" name="TestStorageKeeper/should_store_pin" time="0.000"></testcase>
+		<testcase classname="keeper" name="TestStorageKeeper/should_get_pin_from_kvstore" time="0.000"></testcase>
+		<testcase classname="keeper" name="TestStorageKeeper/should_export_pins" time="0.000"></testcase>
+	</testsuite>
+	<testsuite tests="6" failures="0" time="0.558" name="github.com/bluzelle/bluzelle-public/curium/x/storage/types">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="types" name="TestMsgPin_ValidateBasic" time="0.000"></testcase>
+		<testcase classname="types" name="TestMsgPin_ValidateBasic/invalid_address" time="0.000"></testcase>
+		<testcase classname="types" name="TestMsgPin_ValidateBasic/valid_address" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate/default_is_valid" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate/valid_genesis_state" time="0.000"></testcase>
+	</testsuite>
+	<testsuite tests="5" failures="0" time="7.047" name="github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/test">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="test" name="Test" time="5.250"></testcase>
+		<testcase classname="test" name="Test/should_start_up_a_node" time="2.010"></testcase>
+		<testcase classname="test" name="Test/should_be_able_to_know_if_repo_exists_before_starting" time="0.110"></testcase>
+		<testcase classname="test" name="Test/should_be_able_to_know_if_a_properly_intialized_ipfs_repo_exists" time="0.000"></testcase>
+		<testcase classname="test" name="Test/should_replicate_between_nodes" time="3.120"></testcase>
+	</testsuite>
+	<testsuite tests="1" failures="0" time="7.810" name="github.com/bluzelle/bluzelle-public/curium/x/tax">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="tax" name="TestGenesis" time="0.000"></testcase>
+	</testsuite>
+	<testsuite tests="5" failures="0" time="6.053" name="github.com/bluzelle/bluzelle-public/curium/x/tax/keeper">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="keeper" name="TestTaxKeeper" time="0.010"></testcase>
+		<testcase classname="keeper" name="TestTaxKeeper/SetTaxInfo_should_return_no_error" time="0.000"></testcase>
+		<testcase classname="keeper" name="TestTaxKeeper/GetTaxInfoKeep" time="0.000"></testcase>
+		<testcase classname="keeper" name="TestTaxKeeper/GetTaxInfoKeep/should_return_genesis_state" time="0.000"></testcase>
+		<testcase classname="keeper" name="TestTaxKeeper/GetTaxInfoKeep/should_return_the_same_genesis_state_that_was_set" time="0.000"></testcase>
+	</testsuite>
+	<testsuite tests="16" failures="0" time="1.187" name="github.com/bluzelle/bluzelle-public/curium/x/tax/types">
+		<properties>
+			<property name="go.version" value="go1.18.9"></property>
+		</properties>
+		<testcase classname="types" name="TestMsgSetGasTaxBp_ValidateBasic" time="0.000"></testcase>
+		<testcase classname="types" name="TestMsgSetGasTaxBp_ValidateBasic/invalid_address" time="0.000"></testcase>
+		<testcase classname="types" name="TestMsgSetGasTaxBp_ValidateBasic/valid_address" time="0.000"></testcase>
+		<testcase classname="types" name="TestMsgSetTaxCollector_ValidateBasic" time="0.000"></testcase>
+		<testcase classname="types" name="TestMsgSetTaxCollector_ValidateBasic/invalid_address" time="0.000"></testcase>
+		<testcase classname="types" name="TestMsgSetTaxCollector_ValidateBasic/valid_address" time="0.000"></testcase>
+		<testcase classname="types" name="TestMsgSetTransferTaxBp_ValidateBasic" time="0.000"></testcase>
+		<testcase classname="types" name="TestMsgSetTransferTaxBp_ValidateBasic/invalid_address" time="0.000"></testcase>
+		<testcase classname="types" name="TestMsgSetTransferTaxBp_ValidateBasic/valid_address" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate/should_return_error_if_fee_basis_point_is_invalid" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate/should_return_error_if_transfer_basis_point_is_invalid" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate/should_return_error_if_tax_collector_is_empty_string" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate/should_return_error_if_tax_collector_is_not_prefixed_with_bluzelle" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate/should_return_error_if_tax_collector_is_not_of_the_correct_address_length" time="0.000"></testcase>
+		<testcase classname="types" name="TestGenesisState_Validate/should_return_nil_if_GenesisState_is_valid" time="0.000"></testcase>
+	</testsuite>
+</testsuites>

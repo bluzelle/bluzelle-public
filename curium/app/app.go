@@ -1,21 +1,16 @@
 package app
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 
-	ipfsConfig "github.com/bluzelle/ipfs-kubo/config"
-
 	appAnte "github.com/bluzelle/bluzelle-public/curium/app/ante"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
-	"github.com/bluzelle/bluzelle-public/curium/x/curium"
 	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -106,9 +101,6 @@ import (
 	curiummodule "github.com/bluzelle/bluzelle-public/curium/x/curium"
 	curiummodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/curium/keeper"
 	curiummoduletypes "github.com/bluzelle/bluzelle-public/curium/x/curium/types"
-	faucetmodule "github.com/bluzelle/bluzelle-public/curium/x/faucet"
-	faucetmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/faucet/keeper"
-	faucetmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft"
 	nftmodule "github.com/bluzelle/bluzelle-public/curium/x/nft"
 	nftkeeper "github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
@@ -169,7 +161,6 @@ var (
 		authzmodule.AppModuleBasic{},
 		curiummodule.AppModuleBasic{},
 		storagemodule.AppModuleBasic{},
-		faucetmodule.AppModuleBasic{},
 		taxmodule.AppModuleBasic{},
 		nft.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
@@ -185,7 +176,6 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		nfttypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
-		faucetmoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		taxmoduletypes.ModuleName:      nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
@@ -250,8 +240,6 @@ type App struct {
 
 	StorageKeeper storagemodulekeeper.Keeper
 
-	FaucetKeeper faucetmodulekeeper.Keeper
-
 	TaxKeeper taxmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
@@ -289,7 +277,6 @@ func NewCuriumApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		curiummoduletypes.StoreKey,
 		storagemoduletypes.StoreKey,
-		faucetmoduletypes.StoreKey,
 		taxmoduletypes.StoreKey,
 		nfttypes.StoreKey,
 		authzkeeper.StoreKey, icahosttypes.StoreKey,
@@ -349,7 +336,6 @@ func NewCuriumApp(
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
-	//app.UpgradeKeeper.SetUpgradeHandler("Upgrade 1", firstupgrade.CreateUpgradeHandler(app.mm, app.Configurator))
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
@@ -413,9 +399,7 @@ func NewCuriumApp(
 	curiumModule := curiummodule.NewAppModule(appCodec, &app.CuriumKeeper)
 
 	storageDir := appOpts.Get("storage-dir").(string)
-	filter := appOpts.Get("filter").(string)
-	fmt.Println(filter)
-	storageNode, err := startupStorageNode(storageDir, filter)
+	storageNode, err := startupStorageNode(storageDir)
 
 	app.StorageKeeper = *storagemodulekeeper.NewKeeper(
 		appCodec,
@@ -425,18 +409,6 @@ func NewCuriumApp(
 		storageNode,
 	)
 	storageModule := storagemodule.NewAppModule(appCodec, app.StorageKeeper)
-
-	app.FaucetKeeper = *faucetmodulekeeper.NewKeeper(
-		appCodec,
-		keys[faucetmoduletypes.StoreKey],
-		keys[faucetmoduletypes.MemStoreKey],
-		app.GetSubspace(faucetmoduletypes.ModuleName),
-		app.BankKeeper,
-		curium.NewKeyRingReader(appOpts.Get(flags.FlagHome).(string)),
-		curiummodulekeeper.NewMsgBroadcaster(&app.AccountKeeper, cast.ToString(appOpts.Get(flags.FlagHome))),
-	)
-
-	faucetModule := faucetmodule.NewAppModule(appCodec, app.FaucetKeeper, app.AccountKeeper, app.BankKeeper)
 
 	app.TaxKeeper = *taxmodulekeeper.NewKeeper(
 		appCodec,
@@ -492,7 +464,6 @@ func NewCuriumApp(
 		transferModule,
 		&curiumModule,
 		storageModule,
-		faucetModule,
 		taxModule,
 		nftModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
@@ -522,7 +493,6 @@ func NewCuriumApp(
 		genutiltypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
-		faucetmoduletypes.ModuleName,
 		crisistypes.ModuleName,
 		taxmoduletypes.ModuleName,
 		storagemoduletypes.ModuleName,
@@ -546,7 +516,6 @@ func NewCuriumApp(
 		genutiltypes.ModuleName,
 		authtypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		faucetmoduletypes.ModuleName,
 		banktypes.ModuleName,
 		capabilitytypes.ModuleName,
 		evidencetypes.ModuleName,
@@ -578,7 +547,6 @@ func NewCuriumApp(
 		nfttypes.ModuleName,
 		curiummoduletypes.ModuleName,
 		storagemoduletypes.ModuleName,
-		faucetmoduletypes.ModuleName,
 		taxmoduletypes.ModuleName,
 
 		paramstypes.ModuleName,
@@ -593,7 +561,6 @@ func NewCuriumApp(
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
 	app.Configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterServices(app.Configurator)
-
 	// initialize stores
 	app.MountKVStores(keys)
 	app.MountTransientStores(tkeys)
@@ -620,6 +587,7 @@ func NewCuriumApp(
 
 	app.SetAnteHandler(anteHandler)
 	app.SetEndBlocker(app.EndBlocker)
+	app.setupUpgradeHandlers(app.Configurator)
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -661,16 +629,14 @@ func New(
 	)
 }
 
-func startupStorageNode(storageDir string, filter string) (*curiumipfs.StorageIpfsNode, error) {
+func startupStorageNode(storageDir string) (*curiumipfs.StorageIpfsNode, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return nil, err
 	}
 	storageDir = strings.ReplaceAll(storageDir, "~", homeDir)
 
-	err = storagemodulekeeper.CreateRepoIfNotExist(storageDir, curiumipfs.CreateRepoOptions{
-		Transformer: ipfsConfig.Profiles[filter].Transform,
-	})
+	err = storagemodulekeeper.CreateRepoIfNotExist(storageDir, curiumipfs.CreateRepoOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -823,7 +789,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(curiummoduletypes.ModuleName)
 	paramsKeeper.Subspace(storagemoduletypes.ModuleName)
-	paramsKeeper.Subspace(faucetmoduletypes.ModuleName)
 	paramsKeeper.Subspace(taxmoduletypes.ModuleName)
 	paramsKeeper.Subspace(nfttypes.ModuleName)
 
