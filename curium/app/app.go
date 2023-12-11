@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	ipfsConfig "github.com/bluzelle/ipfs-kubo/config"
+
 	appAnte "github.com/bluzelle/bluzelle-public/curium/app/ante"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
@@ -399,7 +401,8 @@ func NewCuriumApp(
 	curiumModule := curiummodule.NewAppModule(appCodec, &app.CuriumKeeper)
 
 	storageDir := appOpts.Get("storage-dir").(string)
-	storageNode, err := startupStorageNode(storageDir)
+	filter := appOpts.Get("filter").(string)
+	storageNode, err := startupStorageNode(storageDir, filter)
 
 	app.StorageKeeper = *storagemodulekeeper.NewKeeper(
 		appCodec,
@@ -629,14 +632,16 @@ func New(
 	)
 }
 
-func startupStorageNode(storageDir string) (*curiumipfs.StorageIpfsNode, error) {
+func startupStorageNode(storageDir string, filter string) (*curiumipfs.StorageIpfsNode, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return nil, err
 	}
 	storageDir = strings.ReplaceAll(storageDir, "~", homeDir)
 
-	err = storagemodulekeeper.CreateRepoIfNotExist(storageDir, curiumipfs.CreateRepoOptions{})
+	err = storagemodulekeeper.CreateRepoIfNotExist(storageDir, curiumipfs.CreateRepoOptions{
+		Transformer: ipfsConfig.Profiles[filter].Transform,
+	})
 	if err != nil {
 		return nil, err
 	}
