@@ -26,6 +26,7 @@ import {
 import {
     MsgBeginRedelegate,
     MsgDelegate,
+    MsgEditValidator,
     MsgUndelegate
 } from '../curium/lib/generated/cosmos/staking/v1beta1/tx';
 import {
@@ -75,7 +76,7 @@ export const withTransaction = (client: BluzelleClient, fn: () => unknown) => {
     msgQueue = undefined;
     return endTransaction(queue, client)
         .then(passThrough(response => queue.map((it, idx) =>
-            it.deferred.resolve({...response, rawLog: response.rawLog?.[idx]})
+            it.deferred.resolve({ ...response, rawLog: response.rawLog?.[idx] })
         )))
 
 };
@@ -90,7 +91,7 @@ const endTransaction = (queue: MsgQueue, client: BluzelleClient) => {
             ...options,
             maxGas: options.maxGas + item.options.maxGas,
             gasPrice: item.options.gasPrice
-        }), {maxGas: 0} as BroadcastOptions)
+        }), { maxGas: 0 } as BroadcastOptions)
     }
 };
 
@@ -105,6 +106,7 @@ export const registerMessages = (registry: Registry) => {
     registry.register('/cosmos.staking.v1beta1.MsgDelegate', MsgDelegate)
     registry.register('/cosmos.staking.v1beta1.MsgUndelegate', MsgUndelegate)
     registry.register('/cosmos.staking.v1beta1.MsgBeginRedelegate', MsgBeginRedelegate)
+    registry.register('/cosmos.staking.v1beta1.MsgEditValidator', MsgEditValidator)
     registry.register('/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward', MsgWithdrawDelegatorReward)
     registry.register('/cosmos.distribution.v1beta1.MsgFundCommunityPool', MsgFundCommunityPool)
     registry.register('/cosmos.distribution.v1beta1.MsgSetWithdrawAddress', MsgSetWithdrawAddress)
@@ -189,7 +191,7 @@ const broadcastTxAsync = <T>(client: BluzelleClient, msgs: EncodeObject[], optio
             client.tmClient.broadcastTxAsync({
                 tx: txBytes
             }))
-        .then(({hash}) => toHex(hash).toUpperCase());
+        .then(({ hash }) => toHex(hash).toUpperCase());
 
 const tryJson = (s: string = '') => {
     try {

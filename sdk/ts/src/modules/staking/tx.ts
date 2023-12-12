@@ -1,5 +1,5 @@
-import {BluzelleClient, BluzelleTxResponse, BroadcastOptions, sendTx} from "../../core";
-import {MsgBeginRedelegate, MsgDelegate, MsgUndelegate} from "../../curium/lib/generated/cosmos/staking/v1beta1/tx";
+import { BluzelleClient, BluzelleTxResponse, BroadcastOptions, sendTx } from "../../core";
+import { MsgBeginRedelegate, MsgDelegate, MsgEditValidator, MsgUndelegate } from "../../curium/lib/generated/cosmos/staking/v1beta1/tx";
 
 export const delegate = (
     client: BluzelleClient,
@@ -10,7 +10,7 @@ export const delegate = (
     Promise.resolve(sendTx(client, '/cosmos.staking.v1beta1.MsgDelegate', {
         delegatorAddress,
         validatorAddress,
-        amount: {denom: 'ubnt', amount: amount.toString()},
+        amount: { denom: 'ubnt', amount: amount.toString() },
     } as MsgDelegate, options))
         .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
@@ -24,7 +24,7 @@ export const undelegate = (
     Promise.resolve(sendTx(client, '/cosmos.staking.v1beta1.MsgUndelegate', {
         delegatorAddress,
         validatorAddress,
-        amount: {denom: 'ubnt', amount: amount.toString()},
+        amount: { denom: 'ubnt', amount: amount.toString() },
     } as MsgUndelegate, options))
         .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
@@ -40,7 +40,22 @@ export const redelegate = (
         delegatorAddress,
         validatorSrcAddress,
         validatorDstAddress,
-        amount: {denom: 'ubnt', amount: amount.toString()},
+        amount: { denom: 'ubnt', amount: amount.toString() },
     } as MsgBeginRedelegate, options))
         .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
+export const editValidator = (
+    client: BluzelleClient,
+    validatorAddress: string,
+    commissionRate: string,
+    minSelfDelegation: string,
+    options: BroadcastOptions,
+    description?: string,
+): Promise<BluzelleTxResponse> =>
+    Promise.resolve(sendTx(client, '/cosmos.staking.v1beta1.MsgEditValidator', {
+        description,
+        validatorAddress,
+        commissionRate,
+        minSelfDelegation
+    } as MsgEditValidator, options))
+        .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
