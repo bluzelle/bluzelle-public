@@ -352,7 +352,7 @@ export const getRedelegations = (
             pagination: res.pagination ? res.pagination : defaultPaginationResponse()
         }))
 
-export const getDelegatorValidators = (
+export const getDelegatorValidatorsInfo = (
     client: BluzelleClient,
     delegatorAddr: string,
     options: BluzellePageRequest = defaultPaginationOptions()
