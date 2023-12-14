@@ -10,7 +10,7 @@ export { getDelegatorDelegations } from "./query";
 export { getStakingParams } from "./query";
 export { getDelegatorValidatorsInfo } from "./query";
 export { getDelegatorValidator } from "./query";
-export { getValiatorUnbondingDelegations } from "./query";
+export { getValidatorUnbondingDelegations } from "./query";
 export { getPoolInfo } from "./query";
 export { getUnbondingDelegation } from "./query";
 export { getRedelegations } from "./query";

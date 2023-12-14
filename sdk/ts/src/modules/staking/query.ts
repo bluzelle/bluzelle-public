@@ -30,8 +30,8 @@ import {
 } from '../../shared/pagination';
 import { BluzelleCoin } from '../../shared/types';
 import { parseCoin, parseDecTypeToNumber, parseNumToLong } from '../../shared/parse';
-import { cli } from 'webpack';
-
+import { Bech32Address } from '@keplr-wallet/cosmos';
+import {Bech32} from '@cosmjs/encoding'
 /************************Bluzelle Type Definitions for staking query*/
 export type BluzelleDelegatorUnbondingDelegationsResponse = {
     unbondingDelegations: BluzelleUnbondingDelegation[],
@@ -105,7 +105,7 @@ export type BluzelleValidatorResponse = {
 }
 
 export type BluzelleValidatorDelegationsResponse = {
-    delegationResponses: BluzelleDelegation[],
+    delegationResponses: BluzelleDelegationResponse[],
     pagination: PageResponse
 }
 
@@ -221,12 +221,12 @@ export const getValidatorDelegations = (
         } as PageRequest
     })
         .then((res) => ({
-            delegationResponses: res.delegationResponses,
+            delegationResponses: res.delegationResponses.map(parseDelegationResponse),
             pagination: res.pagination ? res.pagination : defaultPaginationResponse()
         } as BluzelleValidatorDelegationsResponse))
 
 
-export const getValiatorUnbondingDelegations = (
+export const getValidatorUnbondingDelegations = (
     client: BluzelleClient,
     validatorAddr: string,
     options: BluzellePageRequest = defaultPaginationOptions()
@@ -585,7 +585,7 @@ const parseHistoricalInfo = (hist: HistoricalInfo): BluzelleHistoricalInfo => ({
         appHash: parseUint8ArrayToStr(hist.header.appHash),
         lastResultsHash: parseUint8ArrayToStr(hist.header.lastResultsHash),
         evidenceHash: parseUint8ArrayToStr(hist.header.evidenceHash),
-        proposerAddress: parseUint8ArrayToStr(hist.header.proposerAddress),
+        proposerAddress: parseUint8ArrayToAddr(hist.header.proposerAddress),
     } : {
         version: {
             block: 0,
@@ -608,8 +608,12 @@ const parseHistoricalInfo = (hist: HistoricalInfo): BluzelleHistoricalInfo => ({
 })
 
 const parseUint8ArrayToStr = (val: Uint8Array): string => {
-    const decoder = new TextDecoder();
-    return decoder.decode(val);
+    return Array.from(val).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+}
+
+const parseUint8ArrayToAddr = (val: Uint8Array): string => {
+    const bech32Addr = Bech32.encode('bluzellevaloper', val);
+    return bech32Addr;
 }
 
 const parsePool = (pool: Pool): BluzellePool => ({
