@@ -72,7 +72,7 @@ func main() {
 				logger.Error("Error writing to file:", err)
 				return
 			}
-			logger.Debug("Storage Config successfully added into app.toml")
+			//logger.Debug("Storage Config successfully added into app.toml")
 
 		}
 	}
