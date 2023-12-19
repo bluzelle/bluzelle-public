@@ -24,7 +24,7 @@ describe('sending transactions', function () {
     );
 
     it('should have a withTransaction that can bundle messages', () => {
-        return startSwarmWithClient({...defaultSwarmConfig, targetBranch: 'v10.0'})
+        return startSwarmWithClient({...defaultSwarmConfig})
             .then(({bzSdk}) => withTransaction(bzSdk, () => {
                 pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {gasPrice: 0.002, maxGas: 200000, mode: 'sync'});
                 pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {gasPrice: 0.002, maxGas: 200000, mode: 'sync'});

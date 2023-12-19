@@ -83,8 +83,8 @@ describe('distribution module', function () {
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(passThroughAwait(ctx => send(ctx.bzSdk, ctx.sentry.address, 500_000_000, {maxGas: 200_000, gasPrice: 0.002})))
             .then(passThroughAwait(ctx => delegate(ctx.sentry, ctx.sentry.address, ctx.valoper1, 400_000_000, {maxGas: 200_000, gasPrice: 0.002})))
-            .then(passThroughAwait(ctx => pinCid(ctx.bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {maxGas: 200_000, gasPrice: 50})))
-            .then(passThroughAwait(ctx => pinCid(ctx.bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', {maxGas: 200_000, gasPrice: 50})))
+            .then(passThroughAwait(ctx => pinCid(ctx.bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {maxGas: 200_000, gasPrice: 50})))
+            .then(passThroughAwait(ctx => pinCid(ctx.bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {maxGas: 200_000, gasPrice: 50})))
             .then(ctx => getDelegationTotalRewards(ctx.sentry, ctx.sentry.address))
             .then(res => expect(res.rewards[0].totalReward.amount).to.be.greaterThan(0))
     );
