@@ -13,8 +13,6 @@ import {hasContent} from "./query";
 import {getAccountBalance} from "../bank";
 import {pinCid} from "./tx";
 import {getTx, withTransaction} from "../../core";
-import {ensureImageExists} from "explorer-manager/docker-helpers/imageBuilder";
-import {ensureIpfsImageExists} from "ipfs/src";
 
 const ipfsClient = create({host: '127.0.0.1', port: 5001, protocol: 'http'})
 
