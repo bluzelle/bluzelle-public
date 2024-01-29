@@ -852,3 +852,78 @@ func (suite *KeeperTestSuite) TestMsgServerImmutableCollection() {
 		}
 	}
 }
+
+func (suite *KeeperTestSuite) TestMsgServerMultiSendNFT() {
+	creator1 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+	creator2 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+	creator3 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+
+	err := suite.FundAccount(creator1, 1000000000)
+	if err != nil {
+		return
+	}
+	err = suite.FundAccount(creator2, 1000000000)
+
+	if err != nil {
+		return
+	}
+	err = suite.FundAccount(creator3, 1000000000)
+	if err != nil {
+		return
+	}
+
+	suite.NFTKeeper.SetParamSet(suite.ctx, types.Params{
+		IssuePrice: sdk.NewInt64Coin("stake", 1000),
+	})
+
+	collInfo1 := suite.CreateCollection(creator1, true)
+	collInfo2 := suite.CreateCollection(creator1, true)
+	nftInfo1 := suite.CreateNFT(creator1, collInfo1.Id)
+	nftInfo2 := suite.CreateNFT(creator1, collInfo1.Id)
+	nftInfo3 := suite.CreateNFT(creator1, collInfo2.Id)
+
+	var multiSendOutput []*types.MultiSendNFTOutput;
+	multiSendOutput = append(multiSendOutput, &types.MultiSendNFTOutput{
+		Receiver: creator2.String(),
+		NftId: nftInfo1.Id,
+	})
+	multiSendOutput = append(multiSendOutput, &types.MultiSendNFTOutput{
+		Receiver: creator2.String(),
+		NftId: nftInfo2.Id,
+	})
+	multiSendOutput = append(multiSendOutput, &types.MultiSendNFTOutput{
+		Receiver: creator2.String(),
+		NftId: nftInfo3.Id,
+	})
+
+	tests := []struct {
+		testCase   string
+		sender     sdk.AccAddress
+		multiSendOutputs    []*types.MultiSendNFTOutput
+		expectPass bool
+	}{
+		{
+			"3 nfts should be successfully sent",
+			creator1,
+			multiSendOutput,
+			true,
+		},
+	}
+
+	for _, tc := range tests {
+		msgServer := keeper.NewMsgServerImpl(*suite.NFTKeeper)
+		_, err := msgServer.MultiSendNFT(sdk.WrapSDKContext(suite.ctx), types.NewMsgMultiSendNFT(
+			tc.sender, tc.multiSendOutputs,
+		))
+		if tc.expectPass {
+			suite.Require().NoError(err)
+
+			nft, err := suite.NFTKeeper.GetNFTById(suite.ctx, nftInfo1.Id)
+			suite.Require().NoError(err)
+			suite.Require().Equal(nft.Owner, creator2.String())
+		} else {
+			suite.Require().Error(err)
+		}
+	}
+
+}

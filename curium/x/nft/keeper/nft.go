@@ -1,9 +1,10 @@
 package keeper
 
 import (
+	"strconv"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"strconv"
 
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 )
@@ -261,6 +262,25 @@ func (k Keeper) TransferNFT(ctx sdk.Context, msg *types.MsgTransferNFT) error {
 		Sender:   msg.Sender,
 		Receiver: msg.NewOwner,
 	})
+
+	return nil
+}
+
+func (k Keeper) MultiSendNFT(ctx sdk.Context, msg *types.MsgMultiSendNFT) error {
+	// checking the valid nft and the valid owner of each nft.
+	for _, output := range msg.MultiSendOutputs {
+		nft, err := k.GetNFTById(ctx, output.NftId);
+		if err != nil {
+			return err;
+		}
+		nft.Owner = output.Receiver
+		k.SetNFT(ctx, nft)
+		ctx.EventManager().EmitTypedEvent(&types.EventNFTTransfer{
+			NftId:    nft.Id(),
+			Sender:   msg.Sender,
+			Receiver: nft.Owner,
+		})
+	}
 
 	return nil
 }

@@ -2,9 +2,10 @@ package keeper
 
 import (
 	"context"
+	"strconv"
+
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"strconv"
 )
 
 type msgServer struct {
@@ -303,4 +304,31 @@ func (m msgServer) UpdateCollectionMutableUri(goCtx context.Context, msg *types.
 	})
 
 	return &types.MsgUpdateCollectionMutableUriResponse{}, nil
+}
+
+func (m msgServer) MultiSendNFT(goCtx context.Context, msg *types.MsgMultiSendNFT) (*types.MsgMultiSendNFTResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	
+	// validate the MultiSendNFT Msg
+	err := msg.ValidateBasic()
+	if err != nil {
+		return nil, err
+	}
+	// checking the valid nft and the valid owner of each nft.
+	for _, output := range msg.MultiSendOutputs {
+		nft, err := m.Keeper.GetNFTById(ctx, output.NftId);
+		if err != nil {
+			return nil, err;
+		}
+		if nft.Owner != msg.Sender {
+			return nil, types.ErrNotNFTOwner;
+		}
+	}
+	
+	err = m.Keeper.MultiSendNFT(ctx, msg);
+	if err != nil {
+		return nil, err;
+	}
+
+	return &types.MsgMultiSendNFTResponse{}, nil;
 }

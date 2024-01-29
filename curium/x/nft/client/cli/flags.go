@@ -21,6 +21,8 @@ const (
 	FlagNewAuthority           = "new-authority"
 	FlagCollectionId           = "collection-id"
 	FlagOwner                  = "owner"
+	FlagNftIds								 = "nft-ids"
+	FlagReceivers							 = "receivers" 
 )
 
 func FlagCreateNFT() *flag.FlagSet {
@@ -139,3 +141,13 @@ func FlagUpdateCollectionMutableUri() *flag.FlagSet {
 
 	return fs
 }
+
+func FlagMultiSendNFT() *flag.FlagSet {
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+
+	fs.String(FlagNftIds, "", `Ids of the nfts to send`)
+	fs.String(FlagReceivers, "", `The addresses of the receivers "")`)
+
+	return fs
+}
+

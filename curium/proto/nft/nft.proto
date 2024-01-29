@@ -151,3 +151,8 @@ message EventUpdateCollectionMutableUri {
   uint64 collection_id = 1;
   string uri = 2;
 }
+
+message MultiSendNFTOutput {
+  string receiver = 1;
+  string nft_id =2;
+}

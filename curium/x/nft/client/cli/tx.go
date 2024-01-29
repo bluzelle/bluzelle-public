@@ -13,6 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // NewTxCmd returns the transaction commands for the nft module.
@@ -37,6 +38,7 @@ func NewTxCmd() *cobra.Command {
 		GetCmdUpdateCollectionAuthority(),
 		GetCmdUpdateCollectionUri(),
 		GetCmdUpdateCollectionMutableUri(),
+		GetCmdMultiSendNFT(),
 	)
 
 	return txCmd
@@ -550,6 +552,66 @@ func GetCmdUpdateCollectionMutableUri() *cobra.Command {
 	return cmd
 }
 
+
+func GetCmdMultiSendNFT() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "multi-send-nft",
+		Long: "send multiple nfts",
+		Example: fmt.Sprintf(
+			`$ %s tx nft multi-send-nft
+				--nft-ids="1:1:0,1:2:0"
+				--receivers="bluzelle1ev2xu82y6mkjws4ndz76cfyk8hcavp29u49dst,bluzelle1y45zr9mp6r44tztkczggn9r79p48c6pf6cq363"`,
+			version.AppName,
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			nftIdsParam, err := cmd.Flags().GetString(FlagNftIds);
+			if err != nil {
+				return err
+			}
+
+			nftIds := strings.Split(nftIdsParam, ",");
+
+			receiversParam, err := cmd.Flags().GetString(FlagReceivers)
+			if err != nil {
+				return err
+			}
+
+			receivers := strings.Split(receiversParam, ",");
+
+			var multiSendOutput []*types.MultiSendNFTOutput;
+
+			if len(nftIds) != len(receivers) {
+				return sdkerrors.Wrapf(sdkerrors.ErrIO, "No match of receivers and nfts %s", err)
+			}
+
+			for idx := range nftIds {
+				multiSendOutput = append(multiSendOutput, &types.MultiSendNFTOutput{
+					Receiver: receivers[idx],
+					NftId: nftIds[idx],
+				})
+			}
+							
+			msg := types.NewMsgMultiSendNFT(clientCtx.GetFromAddress(), multiSendOutput)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FlagMultiSendNFT())
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
 func CollectCreatorsData(cmd *cobra.Command) ([]types.Creator, error) {
 	creators := []types.Creator{}
 	creatorAccsStr, err := cmd.Flags().GetString(FlagCreators)
@@ -613,3 +675,4 @@ func collectNftData(cmd *cobra.Command) (types.Metadata, error) {
 		Creators:             creators,
 	}, nil
 }
+
