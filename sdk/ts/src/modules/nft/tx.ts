@@ -2,6 +2,7 @@ import {BluzelleClient, BroadcastOptions, sendTx} from "../../core";
 import {
     MsgCreateCollection,
     MsgCreateNFT,
+    MsgMultiSendNFT,
     MsgPrintEdition,
     MsgSignMetadata,
     MsgTransferNFT,
@@ -11,7 +12,7 @@ import {
     MsgUpdateMetadataAuthority,
     MsgUpdateMintAuthority
 } from "../../curium/lib/generated/nft/tx";
-import {Creator, Metadata} from "../../curium/lib/generated/nft/nft";
+import {Creator, Metadata, MultiSendNFTOutput} from "../../curium/lib/generated/nft/nft";
 import { parseNumToLong } from '../../shared/parse';
 
 
@@ -152,4 +153,10 @@ export const signMetadata = (client: BluzelleClient, metadataId: number, broadca
     Promise.resolve(sendTx<MsgSignMetadata>(client, '/bluzelle.curium.nft.MsgSignMetadata', {
         sender: client.address,
         metadataId: parseNumToLong(metadataId)
+    }, broadcastOptions));
+
+export const multiSendNft = (client: BluzelleClient, multiSendOutputs: MultiSendNFTOutput[], broadcastOptions: BroadcastOptions) => 
+    Promise.resolve(sendTx<MsgMultiSendNFT>(client, '/bluzelle.curium.nft.MsgMultiSendNFT', {
+        sender: client.address,
+        multiSendOutputs
     }, broadcastOptions));

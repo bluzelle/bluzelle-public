@@ -24,6 +24,8 @@ service Msg {
 
   rpc UpdateCollectionUri(MsgUpdateCollectionUri) returns (MsgUpdateCollectionUriResponse);
   rpc UpdateCollectionMutableUri(MsgUpdateCollectionMutableUri) returns (MsgUpdateCollectionMutableUriResponse);
+
+  rpc MultiSendNFT(MsgMultiSendNFT) returns (MsgMultiSendNFTResponse);
 }
 
 message MsgCreateNFT {
@@ -126,3 +128,10 @@ message MsgUpdateCollectionMutableUri {
 }
 
 message MsgUpdateCollectionMutableUriResponse {}
+
+message MsgMultiSendNFT {
+  string sender = 1;
+  repeated bluzelle.curium.nft.MultiSendNFTOutput multi_send_outputs = 2;
+}
+
+message MsgMultiSendNFTResponse {}

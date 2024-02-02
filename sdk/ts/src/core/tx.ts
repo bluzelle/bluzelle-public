@@ -9,6 +9,7 @@ import { MsgMultiSend, MsgSend } from '../curium/lib/generated/cosmos/bank/v1bet
 import {
     MsgCreateCollection,
     MsgCreateNFT,
+    MsgMultiSendNFT,
     MsgPrintEdition,
     MsgSignMetadata,
     MsgTransferNFT,
@@ -119,6 +120,7 @@ export const registerMessages = (registry: Registry) => {
     registry.register('/bluzelle.curium.nft.MsgUpdateMetadataAuthority', MsgUpdateMetadataAuthority)
     registry.register('/bluzelle.curium.nft.MsgPrintEdition', MsgPrintEdition)
     registry.register('/bluzelle.curium.nft.MsgSignMetadata', MsgSignMetadata)
+    registry.register('/bluzelle.curium.nft.MsgMultiSendNFT', MsgMultiSendNFT)
     registry.register('/cosmos.authz.v1beta1.MsgGrant', MsgGrant)
     registry.register('/cosmos.authz.v1beta1.MsgExec', MsgExec)
     registry.register('/cosmos.authz.v1beta1.MsgRevoke', MsgRevoke)
