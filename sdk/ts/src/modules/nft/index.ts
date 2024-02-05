@@ -9,6 +9,7 @@ export {transferNft} from "./tx";
 export {createCollection} from "./tx";
 export {createNft} from "./tx";
 export {multiSendNft} from "./tx";
+export {BluzelleMultiSendNFTOutput} from "./tx";
 export {getNftByOwner} from "./query";
 export {getNftMetadata} from "./query";
 export {getCollectionInfo} from "./query";
