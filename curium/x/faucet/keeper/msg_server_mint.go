@@ -16,18 +16,32 @@ func (k msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMi
 	}
 	coins := sdk.NewCoins(sdk.NewCoin("ubnt", sdk.NewInt(2000*100000)))
 	eltCoins := sdk.NewCoins(sdk.NewCoin("uelt", sdk.NewInt(2000*100000)))
-	G4coins := sdk.NewCoins(sdk.NewCoin("ug4", sdk.NewInt(2000*100000)))
+	g4coins := sdk.NewCoins(sdk.NewCoin("ug4", sdk.NewInt(2000*100000)))
 
 	err = k.bankKeeper.MintCoins(ctx, "faucet", coins)
 	err = k.bankKeeper.MintCoins(ctx, "faucet", eltCoins)
-	err = k.bankKeeper.MintCoins(ctx, "faucet", G4coins)
+	err = k.bankKeeper.MintCoins(ctx, "faucet", g4coins)
+	
 	if err != nil {
 		return nil, err
 	}
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, "faucet", addr, coins)
+	
 	if err != nil {
 		return nil, err
 	}
+	
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, "faucet", addr, eltCoins)
+	
+	if err != nil {
+		return nil, err
+	}
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, "faucet", addr, g4coins)
+	
+	if err != nil {
+		return nil, err
+	}
+	
 
 	response := types.MsgMintResponse{
 		Address: msg.Address,
