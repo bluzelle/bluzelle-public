@@ -70,6 +70,22 @@ describe('faucet module', function () {
             .then(balance => expect(balance).to.equal(200_000_000))
     );
 
+    it('should be able to mint ELT tokens to a new given', () =>
+        startSwarmWithClient()
+            .then(info => ({client: info.bzSdk}))
+            .then(withCtxAwait('mintResult', ctx => mint(ctx.client, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj')))
+            .then(ctx => getAccountBalance(ctx.client, ctx.mintResult.address, 'uelt'))
+            .then(balance => expect(balance).to.equal(200_000_000))
+    );
+
+    it('should be able to mint G4 tokens to a new given', () =>
+        startSwarmWithClient()
+            .then(info => ({client: info.bzSdk}))
+            .then(withCtxAwait('mintResult', ctx => mint(ctx.client, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj')))
+            .then(ctx => getAccountBalance(ctx.client, ctx.mintResult.address, 'ug4'))
+            .then(balance => expect(balance).to.equal(200_000_000))
+    );
+
     it('should not mint if bluzelleFaucet is not turned on', () =>
         startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: false})
             .then(info => mint(info.bzSdk))
