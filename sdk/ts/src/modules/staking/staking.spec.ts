@@ -21,7 +21,6 @@ import {
     getValidatorUnbondingDelegations,
     getValidatorsInfo
 } from './query';
-import exp from 'constants';
 
 describe('staking module', function () {
     this.timeout(2_000_000);

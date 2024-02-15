@@ -18,27 +18,30 @@ import {
     queryAuthorizations,
     revokeAuthorization
 } from '../../index';
-import {QueryGrantsResponse} from "../../curium/lib/generated/cosmos/authz/v1beta1/query";
-import {expect} from "chai";
-import {BluzelleClient} from "../../core";
-import {AuthorizationType, StakeAuthorization} from "../../curium/lib/generated/cosmos/staking/v1beta1/authz";
-import {GenericAuthorization} from "../../curium/lib/generated/cosmos/authz/v1beta1/authz";
-import {createCtx, withCtxAwait} from "@scottburch/with-context";
-import {passThroughAwait} from "promise-passthrough";
-import {Metadata} from "../../curium/lib/generated/nft/nft";
-import {GrantType, msgMapping, MsgType} from "./authzTypes";
-import {QueryCollectionResponse} from "../../curium/lib/generated/nft/query";
-import {startSwarmWithClient, stopSwarm} from "@bluzelle/testing/src/swarmUtils";
-import {defaultSwarmConfig} from "@bluzelle/testing";
-import * as bip39 from "bip39";
+import { expect } from 'chai';
+import { BluzelleClient } from '../../core';
+import {
+    AuthorizationType,
+    StakeAuthorization
+} from '../../curium/lib/generated/cosmos/staking/v1beta1/authz';
+import { GenericAuthorization } from '../../curium/lib/generated/cosmos/authz/v1beta1/authz';
+import { createCtx, withCtxAwait } from '@scottburch/with-context';
+import { passThroughAwait } from 'promise-passthrough';
+import { Metadata } from '../../curium/lib/generated/nft/nft';
+import { GrantType, msgMapping, MsgType } from './authzTypes';
+import { QueryCollectionResponse } from '../../curium/lib/generated/nft/query';
+import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
+import { defaultSwarmConfig, startSwarmWithClient } from '@bluzelle/testing';
+import * as bip39 from 'bip39';
 import { parseNumToLong } from '../../shared/parse';
+import { BluzelleQueryGrantsResponse } from './query';
 
 describe("authz module", function () {
     this.timeout(1_800_000)
 
     let testGranter: string;
     let testGrantee: string;
-    const expiration = new Date("1/1/2024");
+    const expiration = new Date("1/1/2099");
 
     let client: BluzelleClient;
     let eClient: BluzelleClient;
@@ -48,11 +51,14 @@ describe("authz module", function () {
     beforeEach(() =>
         stopSwarm()
             .then(() => startSwarmWithClient(({...defaultSwarmConfig})))
-            .then(ctx => {
-                client = ctx.bzSdk;
-                testGranter = ctx.bzSdk.address;
-                return ctx;
-            })
+            .then(ctx => ({
+                client: ctx.bzSdk,
+                testGranter: ctx.bzSdk.address
+            }))
+            .then(passThroughAwait(ctx => {
+                client = ctx.client;
+                testGranter = ctx.testGranter;
+            }))
             .then(withCtxAwait('mnemonic', () => Promise.resolve(bip39.generateMnemonic(256))))
             .then(ctx =>
                 newBluzelleClient({
@@ -70,7 +76,7 @@ describe("authz module", function () {
                         return ctx;
                     })
             )
-            .then(ctx => mint(ctx.bzSdk, testGrantee))
+            .then(ctx => mint(ctx.client, testGrantee))
     );
 
 
@@ -87,9 +93,9 @@ describe("authz module", function () {
                 grantee: testGrantee,
                 msg: MsgType.VERIFY_INVARIANT
             }))
-            .then((res: QueryGrantsResponse) => {
-                expect(res.grants[0].authorization?.typeUrl).to.equal("/cosmos.authz.v1beta1.GenericAuthorization")
-                expect(GenericAuthorization.decode(res.grants[0].authorization?.value as any).msg).to.equal(msgMapping[MsgType.VERIFY_INVARIANT])
+            .then((res: BluzelleQueryGrantsResponse) => {
+                expect(res.grants[0]?.authorization.typeUrl).to.equal("/cosmos.authz.v1beta1.GenericAuthorization");
+                expect(GenericAuthorization.decode(res.grants[0]?.authorization.value).msg).to.equal(msgMapping[MsgType.VERIFY_INVARIANT]);
             })
     );
 
@@ -105,7 +111,7 @@ describe("authz module", function () {
             maxGas: 1000000, gasPrice: 0.002
         })
             .then(() => getAccountBalance(client, testGranter))
-            .then((balance: any) => createCtx("beforeBalance", () => balance))
+            .then((balance: number) => createCtx("beforeBalance", () => balance))
             .then(withCtxAwait("result", () => executeAuthorization(eClient, testGrantee, [{
                 msgType: MsgType.SEND,
                 params: {
@@ -139,9 +145,9 @@ describe("authz module", function () {
             maxGas: 1000000, gasPrice: 0.002
         })
             .then(() => queryAuthorizations(client, { granter: testGranter, grantee: testGrantee, msg: MsgType.DELEGATE }))
-            .then((res: QueryGrantsResponse) => {
-                expect(res.grants[0].authorization?.typeUrl).to.equal("/cosmos.staking.v1beta1.StakeAuthorization")
-                expect(StakeAuthorization.decode(res.grants[0].authorization?.value as any).authorizationType).to.equal(AuthorizationType.AUTHORIZATION_TYPE_DELEGATE)
+            .then((res: BluzelleQueryGrantsResponse) => {
+                expect(res.grants[0]?.authorization.typeUrl).to.equal("/cosmos.staking.v1beta1.StakeAuthorization")
+                expect(StakeAuthorization.decode(res.grants[0]?.authorization.value).authorizationType).to.equal(AuthorizationType.AUTHORIZATION_TYPE_DELEGATE)
             })
             .then(() => getDelegation(eClient, testGranter, testValAddress)
                 .then((delegation: BluzelleDelegationResponse) => createCtx("initialAmount", () => delegation.delegation.shares))
@@ -203,9 +209,9 @@ describe("authz module", function () {
                 grantee: testGrantee,
                 msg: MsgType.UNDELEGATE
             }))
-            .then((res: QueryGrantsResponse) => {
-                expect(res.grants[0].authorization?.typeUrl).to.equal("/cosmos.staking.v1beta1.StakeAuthorization")
-                expect(StakeAuthorization.decode(res.grants[0].authorization?.value as any).authorizationType).to.equal(AuthorizationType.AUTHORIZATION_TYPE_UNDELEGATE)
+            .then((res: BluzelleQueryGrantsResponse) => {
+                expect(res.grants[0]?.authorization.typeUrl).to.equal("/cosmos.staking.v1beta1.StakeAuthorization")
+                expect(StakeAuthorization.decode(res.grants[0]?.authorization.value).authorizationType).to.equal(AuthorizationType.AUTHORIZATION_TYPE_UNDELEGATE)
             })
             .then(() => getDelegation(eClient, testGranter, testValAddress)
                 .then((delegation: BluzelleDelegationResponse) => createCtx("initialAmount", () => delegation.delegation.shares))
@@ -239,9 +245,9 @@ describe("authz module", function () {
                 grantee: testGrantee,
                 msg: MsgType.REDELEGATE
             }))
-            .then((res: QueryGrantsResponse) => {
-                expect(res.grants[0].authorization?.typeUrl).to.equal("/cosmos.staking.v1beta1.StakeAuthorization")
-                expect(StakeAuthorization.decode(res.grants[0].authorization?.value as any).authorizationType).to.equal(AuthorizationType.AUTHORIZATION_TYPE_REDELEGATE)
+            .then((res: BluzelleQueryGrantsResponse) => {
+                expect(res.grants[0]?.authorization.typeUrl).to.equal("/cosmos.staking.v1beta1.StakeAuthorization")
+                expect(StakeAuthorization.decode(res.grants[0]?.authorization.value).authorizationType).to.equal(AuthorizationType.AUTHORIZATION_TYPE_REDELEGATE)
             })
             .then(() => getValidatorsInfo(eClient))
             .then((info: BluzelleValidatorsResponse) => createCtx("validators", () => info.validators))
@@ -703,9 +709,9 @@ describe("authz module", function () {
                 grantee: testGrantee,
                 msg: MsgType.SUBMIT_PROPOSAL
             }))
-            .then((res: QueryGrantsResponse) => {
-                expect(res.grants[0].authorization?.typeUrl).to.equal("/cosmos.authz.v1beta1.GenericAuthorization")
-                expect(GenericAuthorization.decode(res.grants[0].authorization?.value as any).msg).to.equal(msgMapping[MsgType.SUBMIT_PROPOSAL])
+            .then((res: BluzelleQueryGrantsResponse) => {
+                expect(res.grants[0]?.authorization.typeUrl).to.equal("/cosmos.authz.v1beta1.GenericAuthorization")
+                expect(GenericAuthorization.decode(res.grants[0]?.authorization.value).msg).to.equal(msgMapping[MsgType.SUBMIT_PROPOSAL])
             })
             .then(() => revokeAuthorization(client, testGranter, testGrantee, MsgType.SUBMIT_PROPOSAL, { maxGas: 100000000, gasPrice: 0.002 }))
             .then(() => queryAuthorizations(client, {
