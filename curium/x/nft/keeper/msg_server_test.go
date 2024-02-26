@@ -927,3 +927,74 @@ func (suite *KeeperTestSuite) TestMsgServerMultiSendNFT() {
 	}
 
 }
+
+
+func (suite *KeeperTestSuite) TestMsgServerBurnNFT() {
+	creator1 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+
+	err := suite.FundAccount(creator1, 1000000000)
+	if err != nil {
+		return
+	}
+
+	creator2 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
+
+	err = suite.FundAccount(creator2, 1000000000)
+
+	if err != nil {
+		return
+	}
+
+	suite.NFTKeeper.SetParamSet(suite.ctx, types.Params{
+		IssuePrice: sdk.NewInt64Coin("stake", 1000),
+	})
+
+	collInfo1 := suite.CreateCollection(creator1, true)
+	nftInfo1 := suite.CreateNFT(creator1, collInfo1.Id)
+
+	collInfo2 := suite.CreateCollection(creator2, true)
+	nftInfo2 := suite.CreateNFT(creator2, collInfo2.Id)
+
+	tests := []struct {
+		testCase   string
+		sender     sdk.AccAddress
+		nftId    	 string
+		expectPass bool
+	}{
+		{
+			"nft should be burnt.",
+			creator1,
+			nftInfo1.Id,
+			true,
+		},
+		{
+			"should not burn the nft of others",
+			creator1,
+			nftInfo2.Id,
+			false,
+		},
+		{
+			"wrong nft id",
+			creator1,
+			"2:2:0",
+			false,
+		},
+	}
+
+	for _, tc := range tests {
+		msgServer := keeper.NewMsgServerImpl(*suite.NFTKeeper)
+		_, err := msgServer.BurnNFT(sdk.WrapSDKContext(suite.ctx), types.NewMsgBurnNFT(
+			tc.sender, tc.nftId,
+		))
+		if tc.expectPass {
+			suite.Require().NoError(err)
+
+			nft, err := suite.NFTKeeper.GetNFTById(suite.ctx, tc.nftId)
+			suite.Require().NoError(err)
+			suite.Require().Equal(nft.Owner, "bluzelle1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxmrapv")
+		} else {
+			suite.Require().Error(err)
+		}
+	}
+
+}

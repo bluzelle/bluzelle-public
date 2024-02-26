@@ -292,6 +292,10 @@ func (k Keeper) BurnNFT( ctx sdk.Context, msg *types.MsgBurnNFT) error {
 		return err
 	}
 
+	if nft.Owner != msg.Sender {
+		return types.ErrNotNFTOwner;
+	}
+	
 	nft.Owner = "bluzelle1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxmrapv"
 	k.SetNFT(ctx, nft)
 	ctx.EventManager().EmitTypedEvent(&types.EventNFTTransfer{
