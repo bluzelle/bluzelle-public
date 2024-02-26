@@ -31114,6 +31114,11 @@ definitions:
           max_supply:
             type: string
             format: uint64
+  bluzelle.curium.nft.MsgBurnNFTResponse:
+    type: object
+    properties:
+      nft_id:
+        type: string
   bluzelle.curium.nft.MsgCreateCollectionResponse:
     type: object
     properties:

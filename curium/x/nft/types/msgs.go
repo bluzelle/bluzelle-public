@@ -19,7 +19,8 @@ const (
 	TypeMsgUpdateCollectionAuthority  = "update_collection_authority"
 	TypeMsgUpdateCollectionUri        = "update_collection_uri"
 	TypeMsgUpdateCollectionMutableUri = "update_collection_mutable_uri"
-	TypeMsgMultiSendNFT = "multi_send_nft"
+	TypeMsgMultiSendNFT 							= "multi_send_nft"
+	TypeMsgBurnNFT 										= "burn_nft"
 )
 
 var _ sdk.Msg = &MsgCreateNFT{}
@@ -568,6 +569,48 @@ func (msg MsgMultiSendNFT) GetSignBytes() []byte {
 
 // GetSigners Implements Msg.
 func (msg MsgMultiSendNFT) GetSigners() []sdk.AccAddress {
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{sender}
+}
+
+
+
+
+var _ sdk.Msg = &MsgBurnNFT{}
+
+func NewMsgBurnNFT(sender sdk.AccAddress, nft_id string) *MsgBurnNFT {
+	return &MsgBurnNFT{
+		Sender:       sender.String(),
+		NftId: nft_id,
+	}
+}
+
+func (msg MsgBurnNFT) Route() string { return RouterKey }
+
+func (msg MsgBurnNFT) Type() string { return TypeMsgBurnNFT }
+
+func (msg MsgBurnNFT) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+	}
+	return nil
+}
+
+// GetSignBytes Implements Msg.
+func (msg MsgBurnNFT) GetSignBytes() []byte {
+	b, err := ModuleCdc.MarshalJSON(&msg)
+	if err != nil {
+		panic(err)
+	}
+	return sdk.MustSortJSON(b)
+}
+
+// GetSigners Implements Msg.
+func (msg MsgBurnNFT) GetSigners() []sdk.AccAddress {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		panic(err)

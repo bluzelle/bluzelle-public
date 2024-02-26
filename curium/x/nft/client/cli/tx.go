@@ -39,6 +39,7 @@ func NewTxCmd() *cobra.Command {
 		GetCmdUpdateCollectionUri(),
 		GetCmdUpdateCollectionMutableUri(),
 		GetCmdMultiSendNFT(),
+		GetCmdBurnNFT(),
 	)
 
 	return txCmd
@@ -597,6 +598,39 @@ func GetCmdMultiSendNFT() *cobra.Command {
 			}
 							
 			msg := types.NewMsgMultiSendNFT(clientCtx.GetFromAddress(), multiSendOutput)
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().AddFlagSet(FlagMultiSendNFT())
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+
+func GetCmdBurnNFT() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "burn-nft",
+		Long: "burn nft",
+		Example: fmt.Sprintf(
+			`$ %s tx nft burn-nft
+				1:1:0
+				`,
+			version.AppName,
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgBurnNFT(clientCtx.GetFromAddress(), args[0])
 
 			if err := msg.ValidateBasic(); err != nil {
 				return err

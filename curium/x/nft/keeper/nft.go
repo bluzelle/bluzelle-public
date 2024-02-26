@@ -284,3 +284,20 @@ func (k Keeper) MultiSendNFT(ctx sdk.Context, msg *types.MsgMultiSendNFT) error 
 
 	return nil
 }
+
+func (k Keeper) BurnNFT( ctx sdk.Context, msg *types.MsgBurnNFT) error {
+	nft, err := k.GetNFTById(ctx, msg.NftId)
+	
+	if err != nil {
+		return err
+	}
+
+	nft.Owner = "bluzelle1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxmrapv"
+	k.SetNFT(ctx, nft)
+	ctx.EventManager().EmitTypedEvent(&types.EventNFTTransfer{
+		NftId:    nft.Id(),
+		Sender:   msg.Sender,
+		Receiver: nft.Owner,
+	})
+	return nil
+}

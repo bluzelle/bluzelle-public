@@ -332,3 +332,22 @@ func (m msgServer) MultiSendNFT(goCtx context.Context, msg *types.MsgMultiSendNF
 
 	return &types.MsgMultiSendNFTResponse{}, nil;
 }
+
+func (m msgServer) BurnNFT(goCtx context.Context, msg *types.MsgBurnNFT) (*types.MsgBurnNFTResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	
+	// validate the MultiSendNFT Msg
+	err := msg.ValidateBasic()
+	if err != nil {
+		return nil, err
+	}
+
+	err = m.Keeper.BurnNFT(ctx, msg);
+	if err != nil {
+		return nil, err;
+	}
+
+	return &types.MsgBurnNFTResponse{
+		NftId: msg.NftId,
+	}, nil;
+}
