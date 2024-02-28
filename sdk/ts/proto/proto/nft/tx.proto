@@ -26,6 +26,7 @@ service Msg {
   rpc UpdateCollectionMutableUri(MsgUpdateCollectionMutableUri) returns (MsgUpdateCollectionMutableUriResponse);
 
   rpc MultiSendNFT(MsgMultiSendNFT) returns (MsgMultiSendNFTResponse);
+  rpc BurnNFT(MsgBurnNFT) returns (MsgBurnNFTResponse);
 }
 
 message MsgCreateNFT {
@@ -36,6 +37,15 @@ message MsgCreateNFT {
 message MsgCreateNFTResponse {
   string id = 1;
   uint64 metadata_id = 2;
+}
+
+message MsgBurnNFT {
+  string sender =1;
+  string nft_id = 2;
+}
+
+message MsgBurnNFTResponse {
+  string nft_id = 1;
 }
 
 message MsgPrintEdition {
@@ -105,6 +115,8 @@ message MsgCreateCollection {
 message MsgCreateCollectionResponse {
     uint64 id = 1;
 }
+
+
 
 message MsgUpdateCollectionAuthority {
   string sender = 1;

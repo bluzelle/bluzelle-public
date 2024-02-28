@@ -8,6 +8,7 @@ import { newLocalWallet } from '../../wallets/localWallet';
 import { generateMnemonic } from '../../utils/generateMnemonic';
 import { passThroughAwait } from 'promise-passthrough';
 import {
+  burnNFT,
   createCollection,
   createNft,
   multiSendNft,
@@ -415,6 +416,41 @@ describe('nft module', function () {
           .lessThan((ctx.singleSendResult as unknown as { gasUsed: number }).gasUsed * 5);
       })
   )
+
+  it('should burn the nft', () =>
+    createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
+      maxGas: 100000000,
+      gasPrice: 0.002
+    })
+      .then(() => createNft(client, {
+        collId: 1,
+        metadata: defaultMetadataProps('TMPMeta', true, client.address)
+      }, {maxGas: 1000000, gasPrice: 0.002}))
+      .then(() => burnNFT(client, '1:1:0', {maxGas: 1000000, gasPrice: 0.002}))
+      .then(() => getNftInfo(client, '1:1:0'))
+      .then(resp => {
+        console.log(resp);
+        expect(resp.nft?.owner).to.equal('bluzelle1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxmrapv')
+      })
+  )
+
+  it('should burn the nft', () =>
+    createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
+      maxGas: 100000000,
+      gasPrice: 0.002
+    })
+      .then(() => createNft(client, {
+        collId: 1,
+        metadata: defaultMetadataProps('TMPMeta', true, client.address)
+      }, {maxGas: 1000000, gasPrice: 0.002}))
+      .then(() => transferNft(client, '1:1:0', 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', {maxGas: 1000000, gasPrice: 0.002}))
+      .then(() => burnNFT(client, '1:1:0', {maxGas: 1000000, gasPrice: 0.002}))
+      .then(resp => {
+        expect((resp as unknown as { rawLog: string })?.rawLog).to.contains('not the owner of nft');
+      })
+  )
+
+
 });
 
 export const defaultCreators = (address: string): Creator => ({

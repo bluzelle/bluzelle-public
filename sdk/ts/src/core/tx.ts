@@ -7,6 +7,7 @@ import { passThrough } from 'promise-passthrough';
 import { identity } from 'lodash';
 import { MsgMultiSend, MsgSend } from '../curium/lib/generated/cosmos/bank/v1beta1/tx';
 import {
+    MsgBurnNFT,
     MsgCreateCollection,
     MsgCreateNFT,
     MsgMultiSendNFT,
@@ -17,7 +18,7 @@ import {
     MsgUpdateCollectionUri,
     MsgUpdateMetadata,
     MsgUpdateMetadataAuthority,
-    MsgUpdateMintAuthority
+    MsgUpdateMintAuthority,
 } from '../curium/lib/generated/nft/tx';
 import {
     MsgSetGasTaxBp,
@@ -121,6 +122,7 @@ export const registerMessages = (registry: Registry) => {
     registry.register('/bluzelle.curium.nft.MsgPrintEdition', MsgPrintEdition)
     registry.register('/bluzelle.curium.nft.MsgSignMetadata', MsgSignMetadata)
     registry.register('/bluzelle.curium.nft.MsgMultiSendNFT', MsgMultiSendNFT)
+    registry.register('/bluzelle.curium.nft.MsgBurnNFT', MsgBurnNFT)
     registry.register('/cosmos.authz.v1beta1.MsgGrant', MsgGrant)
     registry.register('/cosmos.authz.v1beta1.MsgExec', MsgExec)
     registry.register('/cosmos.authz.v1beta1.MsgRevoke', MsgRevoke)

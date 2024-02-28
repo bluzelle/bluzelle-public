@@ -1,5 +1,6 @@
 import {BluzelleClient, BroadcastOptions, sendTx} from "../../core";
 import {
+    MsgBurnNFT,
     MsgCreateCollection,
     MsgCreateNFT,
     MsgMultiSendNFT,
@@ -165,3 +166,9 @@ export const multiSendNft = (client: BluzelleClient, multiSendOutputs: BluzelleM
         sender: client.address,
         multiSendOutputs
     }, broadcastOptions));
+
+export const burnNFT = (client: BluzelleClient, nftId: string, broadcastOptions: BroadcastOptions) => 
+    Promise.resolve(sendTx<MsgBurnNFT>(client, '/bluzelle.curium.nft.MsgBurnNFT', {
+        sender: client.address,
+        nftId
+    }, broadcastOptions))
