@@ -20,6 +20,6 @@ func (app *App) setupUpgradeHandlers(
 	}
 
 	if storeUpgrades != nil {
-		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(3333333, storeUpgrades))
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(25, storeUpgrades))
 	}
 }
