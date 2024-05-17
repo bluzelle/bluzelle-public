@@ -10,7 +10,7 @@ import (
 func (app *App) setupUpgradeHandlers(
 	configurator module.Configurator,
 ) {
-	app.UpgradeKeeper.SetUpgradeHandler("10.0", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+	app.UpgradeKeeper.SetUpgradeHandler("bravo", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		return app.mm.RunMigrations(ctx, configurator, fromVM)
 	})
 	var storeUpgrades *storetypes.StoreUpgrades
@@ -20,6 +20,6 @@ func (app *App) setupUpgradeHandlers(
 	}
 
 	if storeUpgrades != nil {
-		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(25, storeUpgrades))
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(30, storeUpgrades))
 	}
 }
