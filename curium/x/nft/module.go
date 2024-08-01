@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -117,17 +116,17 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
 
 // Route returns the message routing key for the module.
-func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
-}
+// func (am AppModule) Route() sdk.Route {
+// 	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
+// }
 
 // QuerierRoute returns the module's querier route name.
 func (AppModule) QuerierRoute() string { return types.RouterKey }
 
 // LegacyQuerierHandler returns the module sdk.Querier.
-func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return keeper.NewQuerier(am.keeper, legacyQuerierCdc)
-}
+// func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
+// 	return keeper.NewQuerier(am.keeper, legacyQuerierCdc)
+// }
 
 // InitGenesis performs genesis initialization for the module. It returns
 // no validator updates.
@@ -171,9 +170,9 @@ func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedP
 }
 
 // RandomizedParams creates randomized param changes for the simulator.
-func (AppModule) RandomizedParams(r *rand.Rand) []simtypes.ParamChange {
-	return nil
-}
+// func (AppModule) RandomizedParams(r *rand.Rand) []simtypes.ParamChange {
+// 	return nil
+// }
 
 // RegisterStoreDecoder registers a decoder for module's types
 func (am AppModule) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {

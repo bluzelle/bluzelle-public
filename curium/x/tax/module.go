@@ -3,6 +3,7 @@ package tax
 import (
 	"encoding/json"
 	"fmt"
+
 	// this line is used by starport scaffolding # 1
 
 	"github.com/gorilla/mux"
@@ -123,21 +124,22 @@ func (am AppModule) Name() string {
 }
 
 // Route returns the capability module's message routing key.
-func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
-}
+// func (am AppModule) Route() sdk.Route {
+// 	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
+// }
 
 // QuerierRoute returns the capability module's query routing key.
 func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 
 // LegacyQuerierHandler returns the capability module's Querier.
-func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return nil
-}
+// func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
+// 	return nil
+// }
 
 // RegisterServices registers a GRPC query service to respond to the
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
+
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 

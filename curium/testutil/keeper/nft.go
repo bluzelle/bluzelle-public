@@ -1,12 +1,12 @@
 package keeper
 
 import (
+	simapp "cosmossdk.io/simapp"
 	curiumapp "github.com/bluzelle/bluzelle-public/curium/app"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	simapp "github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/store"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"

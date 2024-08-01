@@ -7,7 +7,6 @@ import (
 	taxsimulation "github.com/bluzelle/bluzelle-public/curium/x/tax/simulation"
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -18,7 +17,7 @@ import (
 var (
 	_ = sample.AccAddress
 	_ = taxsimulation.FindAccount
-	_ = simappparams.StakePerAccount
+	// _ = simappparams.StakePerAccount
 	_ = simulation.MsgEntryKind
 	_ = baseapp.Paramspace
 )
@@ -57,10 +56,10 @@ func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedP
 }
 
 // RandomizedParams creates randomized  param changes for the simulator
-func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.ParamChange {
+// func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.ParamChange {
 
-	return []simtypes.ParamChange{}
-}
+// 	return []simtypes.ParamChange{}
+// }
 
 // RegisterStoreDecoder registers a decoder
 func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}

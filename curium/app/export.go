@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"log"
 
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
+	tmtypes "github.com/cometbft/cometbft/types"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	tmtypes "github.com/tendermint/tendermint/types"
 
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 )
@@ -35,13 +35,13 @@ func (app *App) ExportAppStateAndValidators(
 	}
 	genState := app.mm.ExportGenesis(ctx, app.appCodec)
 
-	genState["staking"] = app.appCodec.MustMarshalJSON(ExportStakingGenesis(ctx, app.StakingKeeper))
+	genState["staking"] = app.appCodec.MustMarshalJSON(ExportStakingGenesis(ctx, *app.StakingKeeper))
 	appState, err := json.MarshalIndent(genState, "", "  ")
 	if err != nil {
 		return servertypes.ExportedApp{}, err
 	}
 
-	validators, err := WriteUnjailedValidators(ctx, app.StakingKeeper)
+	validators, err := WriteUnjailedValidators(ctx, *app.StakingKeeper)
 	if err != nil {
 		return servertypes.ExportedApp{}, err
 	}
@@ -121,7 +121,8 @@ func ExportStakingGenesis(ctx sdk.Context, keeper stakingkeeper.Keeper) *staking
 
 // prepare for fresh start at zero height
 // NOTE zero height genesis is a temporary feature which will be deprecated
-//      in favour of export at a block height
+//
+//	in favour of export at a block height
 func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []string) {
 	applyAllowedAddrs := false
 

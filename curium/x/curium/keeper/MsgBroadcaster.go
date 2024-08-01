@@ -2,11 +2,13 @@ package keeper
 
 import (
 	"context"
+	"time"
+
+	"cosmossdk.io/simapp"
 	sdkclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -15,7 +17,6 @@ import (
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	abcitypes "github.com/tendermint/tendermint/abci/types"
 	tenderminttypes "github.com/tendermint/tendermint/types"
-	"time"
 )
 
 type KeyRingReader struct{ keyringDir string }

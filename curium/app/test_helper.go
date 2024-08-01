@@ -3,21 +3,46 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
+	dbm "github.com/cometbft/cometbft-db"
+	abci "github.com/cometbft/cometbft/abci/types"
+	"github.com/cometbft/cometbft/libs/log"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	tmtypes "github.com/cometbft/cometbft/types"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	bankcli "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 	"github.com/tendermint/spm/cosmoscmd"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/cli"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 )
 
-func Setup(isCheckTx bool) cosmoscmd.App {
+var DefaultConsensusParams = &tmproto.ConsensusParams{
+	Block: &tmproto.BlockParams{
+		MaxBytes: 200000,
+		MaxGas:   2000000,
+	},
+	Evidence: &tmproto.EvidenceParams{
+		MaxAgeNumBlocks: 302400,
+		MaxAgeDuration:  504 * time.Hour, // 3 weeks is the max duration
+		MaxBytes:        10000,
+	},
+	Validator: &tmproto.ValidatorParams{
+		PubKeyTypes: []string{
+			tmtypes.ABCIPubKeyTypeEd25519,
+		},
+	},
+}
+
+type EmptyAppOptions struct{}
+
+func (EmptyAppOptions) Get(_ string) interface{} { return nil }
+
+func Setup(isCheckTx bool) *App {
 	db := dbm.NewMemDB()
-	app := New(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, cosmoscmd.MakeEncodingConfig(ModuleBasics), simapp.EmptyAppOptions{})
+	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, cosmoscmd.MakeEncodingConfig(ModuleBasics), EmptyAppOptions{}, baseapp.SetChainID("testing"))
 	if !isCheckTx {
 		genesisState := NewDefaultGenesisState(cosmoscmd.MakeEncodingConfig(ModuleBasics).Marshaler)
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
@@ -28,7 +53,7 @@ func Setup(isCheckTx bool) cosmoscmd.App {
 		app.InitChain(
 			abci.RequestInitChain{
 				Validators:      []abci.ValidatorUpdate{},
-				ConsensusParams: simapp.DefaultConsensusParams,
+				ConsensusParams: DefaultConsensusParams,
 				AppStateBytes:   stateBytes,
 			},
 		)

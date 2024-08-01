@@ -15,6 +15,10 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 )
 
+type EmptyAppOptions struct{}
+
+func (EmptyAppOptions) Get(_ string) interface{} { return nil }
+
 func main() {
 	config := sdk.GetConfig()
 	config.SetCoinType(appTypes.CoinType)
@@ -30,7 +34,7 @@ func main() {
 		// this line is used by starport scaffolding # root/arguments
 	)
 
-	if err := svrcmd.Execute(rootCmd, app.DefaultNodeHome); err != nil {
+	if err := svrcmd.Execute(rootCmd, "bluzelle", app.DefaultNodeHome); err != nil {
 
 		os.Exit(1)
 	} else {

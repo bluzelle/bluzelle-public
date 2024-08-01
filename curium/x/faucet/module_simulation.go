@@ -3,11 +3,11 @@ package faucet
 import (
 	"math/rand"
 
+	simappparams "cosmossdk.io/simapp/params"
 	"github.com/bluzelle/bluzelle-public/curium/testutil/sample"
 	faucetsimulation "github.com/bluzelle/bluzelle-public/curium/x/faucet/simulation"
 	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"

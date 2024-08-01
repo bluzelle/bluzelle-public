@@ -3,19 +3,21 @@ package keeper
 import (
 	"context"
 	"fmt"
+
 	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
-	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/bluzelle/bluzelle-public/curium/x/storage/types"
+	log "github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type (
 	Keeper struct {
 		Cdc         codec.BinaryCodec
-		StoreKey    sdk.StoreKey
-		memKey      sdk.StoreKey
+		StoreKey    storetypes.StoreKey
+		memKey      storetypes.StoreKey
 		storageDir  string
 		storageNode *curiumipfs.StorageIpfsNode
 	}
@@ -24,7 +26,7 @@ type (
 func NewKeeper(
 	Cdc codec.BinaryCodec,
 	StoreKey,
-	memKey sdk.StoreKey,
+	memKey storetypes.StoreKey,
 	storageDir string,
 	storageNode *curiumipfs.StorageIpfsNode,
 
