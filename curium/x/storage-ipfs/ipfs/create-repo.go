@@ -3,11 +3,12 @@ package curiumipfs
 import (
 	"flag"
 	"fmt"
-	"github.com/bluzelle/ipfs-kubo/config"
-	"github.com/bluzelle/ipfs-kubo/repo/fsrepo"
-	"github.com/tendermint/tendermint/libs/os"
 	"io/ioutil"
 	"sync"
+
+	"github.com/bluzelle/ipfs-kubo/config"
+	"github.com/bluzelle/ipfs-kubo/repo/fsrepo"
+	"github.com/cometbft/cometbft/libs/os"
 )
 
 type CreateRepoOptions struct {

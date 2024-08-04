@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"cosmossdk.io/simapp"
+	abcitypes "github.com/cometbft/cometbft/abci/types"
+	tenderminttypes "github.com/cometbft/cometbft/types"
 	sdkclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto"
@@ -15,8 +17,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
-	abcitypes "github.com/tendermint/tendermint/abci/types"
-	tenderminttypes "github.com/tendermint/tendermint/types"
 )
 
 type KeyRingReader struct{ keyringDir string }

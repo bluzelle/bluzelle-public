@@ -3,13 +3,14 @@ package curium
 import (
 	"encoding/json"
 	"fmt"
+
 	// this line is used by starport scaffolding # 1
 
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	abci "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/cometbft/cometbft/abci/types"
 
 	"github.com/bluzelle/bluzelle-public/curium/x/curium/client/cli"
 	"github.com/bluzelle/bluzelle-public/curium/x/curium/keeper"

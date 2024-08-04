@@ -2,9 +2,10 @@ package keeper
 
 import (
 	"fmt"
+
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 
-	"github.com/tendermint/tendermint/libs/log"
+	"github.com/cometbft/cometbft/libs/log"
 
 	"github.com/bluzelle/bluzelle-public/curium/x/curium/types"
 	"github.com/cosmos/cosmos-sdk/codec"
