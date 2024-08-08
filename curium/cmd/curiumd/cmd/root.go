@@ -323,7 +323,7 @@ func NewLevelDB(name, dir string) (db dbm.DB, err error) {
 		}
 	}()
 
-	return dbm.NewDB(name, backend, dir)
+	return dbm.NewDB(name, dbm.GoLevelDBBackend, dir)
 }
 
 // newApp creates a new Cosmos SDK app
