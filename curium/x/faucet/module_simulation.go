@@ -3,7 +3,6 @@ package faucet
 import (
 	"math/rand"
 
-	simappparams "cosmossdk.io/simapp/params"
 	"github.com/bluzelle/bluzelle-public/curium/testutil/sample"
 	faucetsimulation "github.com/bluzelle/bluzelle-public/curium/x/faucet/simulation"
 	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
@@ -18,7 +17,7 @@ import (
 var (
 	_ = sample.AccAddress
 	_ = faucetsimulation.FindAccount
-	_ = simappparams.StakePerAccount
+	// _ = simappparams.StakePerAccount
 	_ = simulation.MsgEntryKind
 	_ = baseapp.Paramspace
 )
@@ -49,14 +48,14 @@ func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedP
 }
 
 // RandomizedParams creates randomized  param changes for the simulator
-func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.ParamChange {
-	faucetParams := types.DefaultParams()
-	return []simtypes.ParamChange{
-		simulation.NewSimParamChange(types.ModuleName, string(types.KeyTestnet), func(r *rand.Rand) string {
-			return string(types.Amino.MustMarshalJSON(faucetParams.Testnet))
-		}),
-	}
-}
+// func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.ParamChange {
+// 	faucetParams := types.DefaultParams()
+// 	return []simtypes.ParamChange{
+// 		simulation.NewSimParamChange(types.ModuleName, string(types.KeyTestnet), func(r *rand.Rand) string {
+// 			return string(types.Amino.MustMarshalJSON(faucetParams.Testnet))
+// 		}),
+// 	}
+// }
 
 // RegisterStoreDecoder registers a decoder
 func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}

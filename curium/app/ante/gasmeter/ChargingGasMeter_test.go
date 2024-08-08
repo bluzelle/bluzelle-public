@@ -11,14 +11,17 @@ import (
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestChargingGasMeter(t *testing.T) {
-
-	app := simapp.Setup(false)
+	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
+	govAuthAddrStr := govAuthAddr.String()
+	app := simapp.Setup(t, false)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 	_, _, addr := testdata.KeyTestPubAddr()
 	accountKeeper := app.AccountKeeper
@@ -28,8 +31,8 @@ func TestChargingGasMeter(t *testing.T) {
 		app.AppCodec(),
 		app.GetKey(banktypes.StoreKey),
 		accountKeeper,
-		app.GetSubspace(banktypes.ModuleName),
-		app.ModuleAccountAddrs())
+		simapp.BlockedAddresses(),
+		govAuthAddrStr)
 	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdk.NewInt(2)))
 
 	taxKeeper := *taxmodulekeeper.NewKeeper(

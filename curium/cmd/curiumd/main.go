@@ -9,10 +9,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/bluzelle/bluzelle-public/curium/app"
+	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
 	cmd "github.com/cometbft/cometbft/cmd/cometbft/commands"
 	"github.com/cometbft/cometbft/libs/log"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
-	"github.com/tendermint/spm/cosmoscmd"
 )
 
 type EmptyAppOptions struct{}
@@ -24,7 +24,7 @@ func main() {
 	config.SetCoinType(appTypes.CoinType)
 	config.SetBech32PrefixForAccount("bluzelle", "bluzellepub")
 
-	rootCmd, _ := cosmoscmd.NewRootCmd(
+	rootCmd, _ := curiumcmd.NewRootCmd(
 		appTypes.Name,
 		appTypes.AccountAddressPrefix,
 		app.DefaultNodeHome,

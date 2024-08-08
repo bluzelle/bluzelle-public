@@ -7,6 +7,7 @@ import (
 	"github.com/bluzelle/bluzelle-public/curium/x/tax"
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/types"
+	tmdb "github.com/cometbft/cometbft-db"
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -18,19 +19,21 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankKeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/stretchr/testify/require"
-	tmdb "github.com/tendermint/tm-db"
 )
 
-func TaxKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
+func TaxKeeper(t *testing.T) (*keeper.Keeper, sdk.Context) {
+	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
+	govAuthAddrStr := govAuthAddr.String()
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
 	db := tmdb.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db)
-	stateStore.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, db)
-	stateStore.MountStoreWithDB(memStoreKey, sdk.StoreTypeMemory, nil)
+	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
+	stateStore.MountStoreWithDB(memStoreKey, storetypes.StoreTypeMemory, nil)
 	require.NoError(t, stateStore.LoadLatestVersion())
 
 	registry := codectypes.NewInterfaceRegistry()
@@ -43,13 +46,12 @@ func TaxKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 		"TaxParams",
 	)
 
-	app := simapp.Setup(false)
+	app := simapp.Setup(t, false)
 	bankKeeper := app.BankKeeper.(bankkeeper.BaseKeeper)
 
-	accKey := app.GetKey(authtypes.StoreKey)
-	accountKeeper := acctypes.NewAccountKeeper(cdc, accKey, app.GetSubspace(authtypes.ModuleName),
-		authtypes.ProtoBaseAccount, simapp.GetMaccPerms())
-
+	maccPerms := map[string][]string{}
+	//accKey := app.GetKey(authtypes.StoreKey)
+	accountKeeper := acctypes.NewAccountKeeper(cdc, storeKey, authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(), govAuthAddrStr)
 	k := keeper.NewKeeper(
 		cdc,
 		storeKey,
@@ -67,15 +69,17 @@ func TaxKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 	return k, ctx
 }
 
-func GetKeepers(t testing.TB) (*keeper.Keeper, bankKeeper.Keeper, acctypes.AccountKeeper, sdk.Context) {
+func GetKeepers(t *testing.T) (*keeper.Keeper, bankKeeper.Keeper, acctypes.AccountKeeper, sdk.Context) {
 	//storeKey := sdk.NewKVStoreKey(types.StoreKey)
+	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
+	govAuthAddrStr := govAuthAddr.String()
 	storeKey := sdk.NewKVStoreKey(authtypes.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
 	db := tmdb.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db)
-	stateStore.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, db)
-	stateStore.MountStoreWithDB(memStoreKey, sdk.StoreTypeMemory, nil)
+	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
+	stateStore.MountStoreWithDB(memStoreKey, storetypes.StoreTypeMemory, nil)
 	require.NoError(t, stateStore.LoadLatestVersion())
 
 	registry := codectypes.NewInterfaceRegistry()
@@ -90,10 +94,11 @@ func GetKeepers(t testing.TB) (*keeper.Keeper, bankKeeper.Keeper, acctypes.Accou
 		"TaxParams",
 	)
 
-	app := simapp.Setup(false)
+	app := simapp.Setup(t, false)
 	bankKeeper := app.BankKeeper.(bankkeeper.BaseKeeper)
-	accountKeeper := acctypes.NewAccountKeeper(cdc, storeKey, app.GetSubspace(authtypes.ModuleName),
-		authtypes.ProtoBaseAccount, simapp.GetMaccPerms())
+	maccPerms := map[string][]string{}
+	//accKey := app.GetKey(authtypes.StoreKey)
+	accountKeeper := acctypes.NewAccountKeeper(cdc, storeKey, authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(), govAuthAddrStr)
 
 	//accKey := *app.GetKey(authtypes.StoreKey)
 	//accKey := sdk.NewKVStoreKey(authtypes.StoreKey)
@@ -118,7 +123,7 @@ func GetKeepers(t testing.TB) (*keeper.Keeper, bankKeeper.Keeper, acctypes.Accou
 	return k, bankKeeper, accountKeeper, ctx
 }
 
-func SetupTaxKeepersAndCtx(t testing.TB) (*keeper.Keeper, bankkeeper.Keeper, acctypes.AccountKeeper, sdk.Context) {
+func SetupTaxKeepersAndCtx(t *testing.T) (*keeper.Keeper, bankkeeper.Keeper, acctypes.AccountKeeper, sdk.Context) {
 	genesisState := types.GenesisState{
 		GasTaxBp:      10,
 		TransferTaxBp: 15,

@@ -2,6 +2,7 @@ package ante
 
 import (
 	"fmt"
+
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
@@ -115,8 +116,8 @@ func SetGasMeter(options SetGasMeterOptions) (sdk.Context, error) {
 	feeTx := options.Tx.(sdk.FeeTx)
 	maxGas := feeTx.GetGas()
 
-	maxGasInt := sdk.NewIntFromUint64(maxGas).ToDec()
-	feeInt := feeTx.GetFee().AmountOf(global.Denom).ToDec()
+	maxGasInt := sdk.NewIntFromUint64(maxGas).ToLegacyDec()
+	feeInt := feeTx.GetFee().AmountOf(global.Denom).ToLegacyDec()
 
 	gasPrice := feeInt.Quo(maxGasInt)
 	gasPriceCoin := sdk.NewDecCoinFromDec(global.Denom, gasPrice)

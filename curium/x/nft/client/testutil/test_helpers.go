@@ -28,7 +28,7 @@ func CreateNFT(clientCtx client.Context, from string, bondDenom string) (testuti
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.FlagTimeoutHeight),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(bondDenom, sdk.NewInt(100))).String()),
 	})
 }
@@ -43,7 +43,7 @@ func CreateCollection(clientCtx client.Context, from string, bondDenom string) (
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
 
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.FlagTimeoutHeight),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(bondDenom, sdk.NewInt(100))).String()),
 	})
 }

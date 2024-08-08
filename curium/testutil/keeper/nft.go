@@ -1,10 +1,13 @@
 package keeper
 
 import (
+	"testing"
+
 	simapp "cosmossdk.io/simapp"
 	curiumapp "github.com/bluzelle/bluzelle-public/curium/app"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
+	tmdb "github.com/cometbft/cometbft-db"
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -15,20 +18,21 @@ import (
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/tendermint/spm/cosmoscmd"
-	tmdb "github.com/tendermint/tm-db"
 )
 
-func NftKeeper() (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.AccountKeeper, sdk.Context) {
+func NftKeeper(t *testing.T) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.AccountKeeper, sdk.Context) {
+	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
+	govAuthAddrStr := govAuthAddr.String()
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
 	db := tmdb.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db)
-	stateStore.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, db)
-	stateStore.MountStoreWithDB(memStoreKey, sdk.StoreTypeMemory, nil)
+	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
+	stateStore.MountStoreWithDB(memStoreKey, storetypes.StoreTypeMemory, nil)
 	_ = stateStore.LoadLatestVersion()
 
 	registry := codectypes.NewInterfaceRegistry()
@@ -40,14 +44,12 @@ func NftKeeper() (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.AccountKeepe
 		memStoreKey,
 		types.ModuleName,
 	)
-	app := simapp.Setup(false)
-
+	maccPerms := map[string][]string{}
 	//accKey := app.GetKey(authtypes.StoreKey)
-	accountKeeper := acctypes.NewAccountKeeper(cdc, storeKey, app.GetSubspace(authtypes.ModuleName),
-		authtypes.ProtoBaseAccount, curiumapp.GetMaccPerms())
+	accountKeeper := acctypes.NewAccountKeeper(cdc, storeKey, authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(), govAuthAddrStr)
 
 	bankKeeper := bankkeeper.NewBaseKeeper(
-		cdc, storeKey, accountKeeper, app.GetSubspace(banktypes.ModuleName), app.ModuleAccountAddrs(),
+		cdc, storeKey, accountKeeper, simapp.BlockedAddresses(), govAuthAddrStr,
 	)
 
 	k := keeper.NewKeeper(

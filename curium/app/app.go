@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
+
 	ipfsConfig "github.com/bluzelle/ipfs-kubo/config"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
@@ -94,7 +96,6 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 	"github.com/spf13/cast"
 
-	"github.com/tendermint/spm/cosmoscmd"
 	"github.com/tendermint/spm/openapiconsole"
 
 	"github.com/bluzelle/bluzelle-public/curium/docs"
@@ -216,6 +217,7 @@ var (
 var (
 	// _ cosmoscmd.CosmosApp     = (*App)(nil)
 	_ servertypes.Application = (*App)(nil)
+	_ curiumcmd.ExportableApp = (*App)(nil)
 )
 
 func init() {
@@ -292,7 +294,7 @@ func NewCuriumApp(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig cosmoscmd.EncodingConfig,
+	encodingConfig curiumcmd.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
@@ -683,10 +685,10 @@ func New(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig cosmoscmd.EncodingConfig,
+	encodingConfig curiumcmd.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
-) *App {
+) curiumcmd.App {
 	return NewCuriumApp(
 		logger,
 		db,

@@ -10,21 +10,25 @@ import (
 	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestGasMeterKeeper(t *testing.T) {
-
-	app := simapp.Setup(false)
+	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
+	govAuthAddrStr := govAuthAddr.String()
+	app := simapp.Setup(t, false)
 	accountKeeper := app.AccountKeeper
 	bankKeeper := bankkeeper.NewBaseKeeper(
 		app.AppCodec(),
 		app.GetKey(banktypes.StoreKey),
 		accountKeeper,
-		app.GetSubspace(banktypes.ModuleName),
-		app.ModuleAccountAddrs())
+		simapp.BlockedAddresses(),
+		govAuthAddrStr,
+	)
 	_, _, addr := testdata.KeyTestPubAddr()
 	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdk.NewInt(2)))
 

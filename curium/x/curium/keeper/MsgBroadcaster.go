@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"cosmossdk.io/simapp"
+	params "github.com/bluzelle/bluzelle-public/curium/app/params"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	tenderminttypes "github.com/cometbft/cometbft/types"
 	sdkclient "github.com/cosmos/cosmos-sdk/client"
@@ -27,7 +27,7 @@ func NewKeyRingReader(keyringDir string) *KeyRingReader {
 	}
 }
 func (krr KeyRingReader) GetAddress(name string) (sdk.AccAddress, error) {
-	kr, err := keyring.New("curium", keyring.BackendTest, krr.keyringDir, nil)
+	kr, err := keyring.New("curium", keyring.BackendTest, krr.keyringDir, nil, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,11 @@ func (krr KeyRingReader) GetAddress(name string) (sdk.AccAddress, error) {
 	if err != nil {
 		return nil, err
 	}
-	return keys.GetAddress(), nil
+	addr, err := keys.GetAddress()
+	if err != nil {
+		return nil, err
+	}
+	return addr, nil
 
 }
 
@@ -61,7 +65,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 
 			// Choose your codec: Amino or Protobuf. Here, we use Protobuf, given by the
 			// following function.
-			encCfg := simapp.MakeTestEncodingConfig()
+			encCfg := params.MakeEncodingConfig()
 
 			// Create a new TxBuilder.
 			txBuilder := encCfg.TxConfig.NewTxBuilder()
@@ -79,7 +83,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 			txBuilder.SetMemo("memo")
 			txBuilder.SetTimeoutHeight(uint64(ctx.BlockHeight() + 20))
 
-			kr, err := keyring.New("curium", keyring.BackendTest, keyringDir, nil)
+			kr, err := keyring.New("curium", keyring.BackendTest, keyringDir, nil, nil, nil)
 			if err != nil {
 				returnError(err)
 				return
@@ -90,7 +94,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 				return
 			}
 
-			addr := keys.GetAddress()
+			addr, _ := keys.GetAddress()
 			accnt := accKeeper.GetAccount(ctx, addr)
 			if accnt == nil {
 				returnError(sdkerrors.New("curium", 2, "Cannot broadcast message, accnt does not exist"))
@@ -108,9 +112,9 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 				returnError(err)
 				return
 			}
-
+			pubKey, _ := keys.GetPubKey()
 			sigV2 := signing.SignatureV2{
-				PubKey: keys.GetPubKey(),
+				PubKey: pubKey,
 				Data: &signing.SingleSignatureData{
 					SignMode:  encCfg.TxConfig.SignModeHandler().DefaultMode(),
 					Signature: nil,

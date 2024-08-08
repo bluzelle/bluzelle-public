@@ -27,7 +27,7 @@ const (
 var (
 	owner    = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest")))
 	uri      = "ipfs://"
-	initAmt  = sdk.NewIntWithDecimal(100000000, int(6))
+	initAmt  = sdk.NewInt(100000000)
 	initCoin = sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, initAmt)}
 	symbol   = "btc"
 	name     = "Bitcoin Network"
@@ -45,7 +45,7 @@ type KeeperTestSuite struct {
 	app           *simapp.SimApp
 }
 
-func (suite *KeeperTestSuite) SetupTest() {
+func (suite *KeeperTestSuite) SetupTest(t *testing.T) {
 
 	config := sdk.GetConfig()
 	config.SetCoinType(appTypes.CoinType)
@@ -55,9 +55,9 @@ func (suite *KeeperTestSuite) SetupTest() {
 	//	_, _, err := bech32.Decode(bech32Addr, 1023)
 	//	return err
 	//})
-	suite.app, _, _ = testutil.CreateTestApp(false)
+	suite.app, _, _ = testutil.CreateTestApp(t, false)
 	suite.legacyAmino = cosmoscmd.MakeEncodingConfig(app.ModuleBasics).Amino
-	suite.NFTKeeper, suite.BankKeeper, suite.AccountKeeper, suite.ctx = testkeeper.NftKeeper()
+	suite.NFTKeeper, suite.BankKeeper, suite.AccountKeeper, suite.ctx = testkeeper.NftKeeper(t)
 	suite.NFTKeeper.SetParamSet(suite.ctx, types.NewParams(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1_000_000_000))))
 
 	err := suite.BankKeeper.MintCoins(suite.ctx, types.ModuleName, initCoin)

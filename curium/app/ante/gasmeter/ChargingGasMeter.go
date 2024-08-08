@@ -2,6 +2,8 @@ package gasmeter
 
 import (
 	"fmt"
+	"math"
+
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
 	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -9,7 +11,6 @@ import (
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	"math"
 )
 
 type ChargingGasMeter struct {
@@ -60,6 +61,13 @@ func (g *ChargingGasMeter) ConsumeGas(amount sdk.Gas, descriptor string) {
 	if g.consumed > g.limit && g.limit != 0 {
 		panic(sdk.ErrorOutOfGas{Descriptor: descriptor})
 	}
+}
+
+func (g *ChargingGasMeter) GasRemaining() sdk.Gas {
+	if g.IsPastLimit() {
+		return 0
+	}
+	return g.limit - g.consumed
 }
 
 // addUint64Overflow performs the addition operation on two uint64 integers and

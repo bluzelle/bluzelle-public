@@ -1,8 +1,11 @@
 package ante
 
 import (
+	"testing"
+
 	"cosmossdk.io/simapp"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
+	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -23,9 +26,12 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
-func NewAnteHandlerOptions() *appTypes.AnteHandlerOptions {
-	app := simapp.Setup(false)
-	appCodec := simapp.MakeTestEncodingConfig().Marshaler
+func NewAnteHandlerOptions(t *testing.T) *appTypes.AnteHandlerOptions {
+	// app := simapp.Setup(t, false)
+	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
+	govAuthAddrStr := govAuthAddr.String()
+	app, _, _ := testutil.CreateTestApp(t, false)
+	appCodec := app.AppCodec()
 	keys := sdk.NewKVStoreKeys(
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
@@ -33,23 +39,20 @@ func NewAnteHandlerOptions() *appTypes.AnteHandlerOptions {
 		evidencetypes.StoreKey, capabilitytypes.StoreKey, authzkeeper.StoreKey,
 	)
 	maccPerms := map[string][]string{}
-
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
-		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
+		appCodec, keys[authtypes.StoreKey], authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(), govAuthAddrStr,
 	)
 	bankKeeper := bankkeeper.NewBaseKeeper(
-		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), app.ModuleAccountAddrs(),
+		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, simapp.BlockedAddresses(), govAuthAddrStr,
 	)
 	app.BankKeeper = bankKeeper
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
-
-	encodingConfig := simapp.MakeTestEncodingConfig()
 
 	return &appTypes.AnteHandlerOptions{
 		AccountKeeper:   app.AccountKeeper,
 		BankKeeper:      bankKeeper,
 		FeegrantKeeper:  app.FeeGrantKeeper,
-		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+		SignModeHandler: app.TxConfig().SignModeHandler(),
 		SigGasConsumer:  sdkante.DefaultSigVerificationGasConsumer,
 	}
 }
