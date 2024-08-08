@@ -32,20 +32,17 @@ describe('storage module', function () {
             Promise.resolve(generateContent(0.01))
                 .then((content) => ipfsClient.add(content))
         ))
-            .then(x =>
-                x
-            )
             .then((addResults) => createCtx('addResults', () => addResults))
             .then(withCtxAwait('client', () => getBlzClient(curiumUrl, mnemonic.getValue())))
             .then(passThroughAwait((ctx) =>
-                Promise.all(ctx.addResults.map((addResult) =>
-                    pinCid(ctx.client, {cid: addResult.path}, {maxGas: 200000, gasPrice: 0.002, mode: 'sync'})
-                ))
+              ctx.addResults.map((addResult) =>
+                pinCid(ctx.client, { cid: addResult.path }, { maxGas: 200000, gasPrice: 0.002, mode: 'sync' })
+              )
             ))
-            .then(ctx => Promise.all(ctx.addResults.map(addResult =>
+            .then(ctx => ctx.addResults.map(addResult =>
                 hasContent(ctx.client, addResult.path)
                     .then((confirm) => expect(confirm).to.be.true)
-            )))
+            ))
     );
 
 
