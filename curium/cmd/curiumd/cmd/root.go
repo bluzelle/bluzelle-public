@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -22,7 +23,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/snapshots"
 	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
 	"github.com/cosmos/cosmos-sdk/store"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
@@ -315,6 +315,17 @@ func overwriteFlagDefaults(c *cobra.Command, defaults map[string]string) {
 	}
 }
 
+// NewLevelDB instantiate a new LevelDB instance according to DBBackend.
+func NewLevelDB(name, dir string) (db dbm.DB, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("couldn't create db: %v", r)
+		}
+	}()
+
+	return dbm.NewDB(name, backend, dir)
+}
+
 // newApp creates a new Cosmos SDK app
 func (a appCreator) newApp(
 	logger log.Logger,
@@ -339,7 +350,7 @@ func (a appCreator) newApp(
 	}
 
 	snapshotDir := filepath.Join(cast.ToString(appOpts.Get(flags.FlagHome)), "data", "snapshots")
-	snapshotDB, err := storetypes.NewLevelDB("metadata", snapshotDir)
+	snapshotDB, err := NewLevelDB("metadata", snapshotDir)
 	if err != nil {
 		panic(err)
 	}

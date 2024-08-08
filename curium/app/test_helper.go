@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/cli"
@@ -16,7 +17,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	bankcli "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
-	"github.com/tendermint/spm/cosmoscmd"
 )
 
 var DefaultConsensusParams = &tmproto.ConsensusParams{
@@ -42,9 +42,9 @@ func (EmptyAppOptions) Get(_ string) interface{} { return nil }
 
 func Setup(isCheckTx bool) *App {
 	db := dbm.NewMemDB()
-	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, cosmoscmd.MakeEncodingConfig(ModuleBasics), EmptyAppOptions{}, baseapp.SetChainID("testing"))
+	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, curiumcmd.MakeEncodingConfig(ModuleBasics), EmptyAppOptions{}, baseapp.SetChainID("testing"))
 	if !isCheckTx {
-		genesisState := NewDefaultGenesisState(cosmoscmd.MakeEncodingConfig(ModuleBasics).Marshaler)
+		genesisState := NewDefaultGenesisState(curiumcmd.MakeEncodingConfig(ModuleBasics).Marshaler)
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 		if err != nil {
 			panic(err)
