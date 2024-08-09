@@ -6,10 +6,10 @@ import (
 	"cosmossdk.io/simapp"
 	"github.com/bluzelle/bluzelle-public/curium/app"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
+	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	"github.com/tendermint/spm/cosmoscmd"
 
 	testkeeper "github.com/bluzelle/bluzelle-public/curium/testutil/keeper"
 	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
@@ -56,7 +56,7 @@ func (suite *KeeperTestSuite) SetupTest(t *testing.T) {
 	//	return err
 	//})
 	suite.app, _, _ = testutil.CreateTestApp(t, false)
-	suite.legacyAmino = cosmoscmd.MakeEncodingConfig(app.ModuleBasics).Amino
+	suite.legacyAmino = curiumcmd.MakeEncodingConfig(app.ModuleBasics).Amino
 	suite.NFTKeeper, suite.BankKeeper, suite.AccountKeeper, suite.ctx = testkeeper.NftKeeper(t)
 	suite.NFTKeeper.SetParamSet(suite.ctx, types.NewParams(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1_000_000_000))))
 

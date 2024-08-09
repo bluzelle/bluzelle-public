@@ -96,7 +96,7 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 	"github.com/spf13/cast"
 
-	"github.com/tendermint/spm/openapiconsole"
+	"github.com/bluzelle/bluzelle-public/curium/app/openapiconsole"
 
 	"github.com/bluzelle/bluzelle-public/curium/docs"
 	ibcclienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"

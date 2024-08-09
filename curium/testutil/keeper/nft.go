@@ -5,6 +5,7 @@ import (
 
 	simapp "cosmossdk.io/simapp"
 	curiumapp "github.com/bluzelle/bluzelle-public/curium/app"
+	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	tmdb "github.com/cometbft/cometbft-db"
@@ -20,7 +21,6 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
-	"github.com/tendermint/spm/cosmoscmd"
 )
 
 func NftKeeper(t *testing.T) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.AccountKeeper, sdk.Context) {
@@ -39,7 +39,7 @@ func NftKeeper(t *testing.T) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.
 	registry.RegisterImplementations((*authtypes.AccountI)(nil), &authtypes.BaseAccount{}, &authtypes.ModuleAccount{})
 	cdc := codec.NewProtoCodec(registry)
 	paramsSubspace := typesparams.NewSubspace(cdc,
-		cosmoscmd.MakeEncodingConfig(curiumapp.ModuleBasics).Amino,
+		curiumcmd.MakeEncodingConfig(curiumapp.ModuleBasics).Amino,
 		storeKey,
 		memStoreKey,
 		types.ModuleName,
