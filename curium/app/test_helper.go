@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
+	curiumparams "github.com/bluzelle/bluzelle-public/curium/app/params"
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/cli"
@@ -42,9 +42,9 @@ func (EmptyAppOptions) Get(_ string) interface{} { return nil }
 
 func Setup(isCheckTx bool) *App {
 	db := dbm.NewMemDB()
-	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, curiumcmd.MakeEncodingConfig(ModuleBasics), EmptyAppOptions{}, baseapp.SetChainID("testing"))
+	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, curiumparams.MakeEncodingConfig(), EmptyAppOptions{}, baseapp.SetChainID("testing"))
 	if !isCheckTx {
-		genesisState := NewDefaultGenesisState(curiumcmd.MakeEncodingConfig(ModuleBasics).Marshaler)
+		genesisState := NewDefaultGenesisState(curiumparams.MakeEncodingConfig().Marshaler)
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 		if err != nil {
 			panic(err)

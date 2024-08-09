@@ -24,15 +24,7 @@ func main() {
 	config.SetCoinType(appTypes.CoinType)
 	config.SetBech32PrefixForAccount("bluzelle", "bluzellepub")
 
-	rootCmd, _ := curiumcmd.NewRootCmd(
-		appTypes.Name,
-		appTypes.AccountAddressPrefix,
-		app.DefaultNodeHome,
-		appTypes.Name,
-		app.ModuleBasics,
-		app.New,
-		// this line is used by starport scaffolding # root/arguments
-	)
+	rootCmd, _ := curiumcmd.NewRootCmd()
 
 	if err := svrcmd.Execute(rootCmd, "bluzelle", app.DefaultNodeHome); err != nil {
 

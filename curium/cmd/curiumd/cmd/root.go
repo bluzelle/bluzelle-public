@@ -7,9 +7,12 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/bluzelle/bluzelle-public/curium/app"
+	"github.com/bluzelle/bluzelle-public/curium/app/params"
 	dbm "github.com/cometbft/cometbft-db"
-	cbcli "github.com/cometbft/cometbft/libs/cli"
+	tmcli "github.com/cometbft/cometbft/libs/cli"
 	"github.com/cometbft/cometbft/libs/log"
+	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
@@ -24,51 +27,22 @@ import (
 	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/module"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
+	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
 
 type (
-	// AppBuilder is a method that allows to build an app
-	AppBuilder func(
-		logger log.Logger,
-		db dbm.DB,
-		traceStore io.Writer,
-		loadLatest bool,
-		skipUpgradeHeights map[int64]bool,
-		homePath string,
-		invCheckPeriod uint,
-		encodingConfig EncodingConfig,
-		appOpts servertypes.AppOptions,
-		baseAppOptions ...func(*baseapp.BaseApp),
-	) App
-
-	// App represents a Cosmos SDK application that can be run as a server and with an exportable state
-	App interface {
-		servertypes.Application
-		ExportableApp
-	}
-
-	// ExportableApp represents an app with an exportable state
-	ExportableApp interface {
-		ExportAppStateAndValidators(
-			forZeroHeight bool,
-			jailAllowedAddrs []string,
-		) (servertypes.ExportedApp, error)
-		LoadHeight(height int64) error
-	}
-
 	// appCreator is an app creator
 	appCreator struct {
-		encodingConfig EncodingConfig
-		buildApp       AppBuilder
+		encodingConfig params.EncodingConfig
 	}
 )
 
@@ -116,21 +90,9 @@ func WithEnvPrefix(envPrefix string) Option {
 }
 
 // NewRootCmd creates a new root command for a Cosmos SDK application
-func NewRootCmd(
-	appName,
-	accountAddressPrefix,
-	defaultNodeHome,
-	defaultChainID string,
-	moduleBasics module.BasicManager,
-	buildApp AppBuilder,
-	options ...Option,
-) (*cobra.Command, EncodingConfig) {
-	rootOptions := newRootOptions(options...)
+func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 
-	// Set config for prefixes
-	SetPrefixes(accountAddressPrefix)
-
-	encodingConfig := MakeEncodingConfig(moduleBasics)
+	encodingConfig := params.MakeEncodingConfig()
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Marshaler).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
@@ -139,11 +101,11 @@ func NewRootCmd(
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.FlagBroadcastMode).
-		WithHomeDir(defaultNodeHome).
-		WithViper(rootOptions.envPrefix)
+		WithHomeDir(app.DefaultNodeHome).
+		WithViper("")
 
 	rootCmd := &cobra.Command{
-		Use:   appName + "d",
+		Use:   "curiumd",
 		Short: "Curium App",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			// set the default command outputs
@@ -171,80 +133,58 @@ func NewRootCmd(
 	initRootCmd(
 		rootCmd,
 		encodingConfig,
-		defaultNodeHome,
-		moduleBasics,
-		buildApp,
-		rootOptions,
 	)
-	overwriteFlagDefaults(rootCmd, map[string]string{
-		flags.FlagChainID:        defaultChainID,
-		flags.FlagKeyringBackend: "test",
-	})
-
 	return rootCmd, encodingConfig
 }
 
 func initRootCmd(
 	rootCmd *cobra.Command,
-	encodingConfig EncodingConfig,
-	defaultNodeHome string,
-	moduleBasics module.BasicManager,
-	buildApp AppBuilder,
-	options rootOptions,
+	encodingConfig params.EncodingConfig,
 ) {
+	gentxModule := app.ModuleBasics[genutiltypes.ModuleName].(genutil.AppModuleBasic)
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(moduleBasics, defaultNodeHome),
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, defaultNodeHome, nil),
-		genutilcli.MigrateGenesisCmd(),
-		genutilcli.GenTxCmd(
-			moduleBasics,
-			encodingConfig.TxConfig,
-			banktypes.GenesisBalancesIterator{},
-			defaultNodeHome,
-		),
-		genutilcli.ValidateGenesisCmd(moduleBasics),
-		AddGenesisAccountCmd(defaultNodeHome),
-		cbcli.NewCompletionCmd(rootCmd, true),
+		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome, gentxModule.GenTxValidator),
+		AddGenesisAccountCmd(app.DefaultNodeHome),
+		tmcli.NewCompletionCmd(rootCmd, true),
 		debug.Cmd(),
 		config.Cmd(),
 	)
 
-	a := appCreator{
-		encodingConfig,
-		buildApp,
+	ac := appCreator{
+		encodingConfig: encodingConfig,
 	}
-
 	// add server commands
 	server.AddCommands(
 		rootCmd,
-		defaultNodeHome,
-		a.newApp,
-		a.appExport,
-		func(cmd *cobra.Command) {
-			addModuleInitFlags(cmd)
-
-			if options.startCmdCustomizer != nil {
-				options.startCmdCustomizer(cmd)
-			}
-		},
+		app.DefaultNodeHome,
+		ac.newApp,
+		ac.appExport,
+		addModuleInitFlags,
 	)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
-		queryCommand(moduleBasics),
-		txCommand(moduleBasics),
-		keys.Commands(defaultNodeHome),
+		genesisCommand(encodingConfig),
+		queryCommand(),
+		txCommand(),
+		keys.Commands(app.DefaultNodeHome),
 	)
 
-	// add user given sub commands.
-	for _, cmd := range options.addSubCmds {
-		rootCmd.AddCommand(cmd)
+}
+
+// genesisCommand builds genesis-related `simd genesis` command. Users may provide application specific commands as a parameter
+func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
+	cmd := genutilcli.GenesisCoreCommand(encodingConfig.TxConfig, app.ModuleBasics, app.DefaultNodeHome)
+
+	for _, subCmd := range cmds {
+		cmd.AddCommand(subCmd)
 	}
+	return cmd
 }
 
 // queryCommand returns the sub-command to send queries to the app
-func queryCommand(moduleBasics module.BasicManager) *cobra.Command {
+func queryCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "query",
 		Aliases:                    []string{"q"},
@@ -262,14 +202,14 @@ func queryCommand(moduleBasics module.BasicManager) *cobra.Command {
 		authcmd.QueryTxCmd(),
 	)
 
-	moduleBasics.AddQueryCommands(cmd)
+	app.ModuleBasics.AddQueryCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
 }
 
 // txCommand returns the sub-command to send transactions to the app
-func txCommand(moduleBasics module.BasicManager) *cobra.Command {
+func txCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "tx",
 		Short:                      "Transactions subcommands",
@@ -282,14 +222,16 @@ func txCommand(moduleBasics module.BasicManager) *cobra.Command {
 		authcmd.GetSignCommand(),
 		authcmd.GetSignBatchCommand(),
 		authcmd.GetMultiSignCommand(),
+		authcmd.GetMultiSignBatchCmd(),
 		authcmd.GetValidateSignaturesCommand(),
 		flags.LineBreak,
 		authcmd.GetBroadcastCommand(),
 		authcmd.GetEncodeCommand(),
 		authcmd.GetDecodeCommand(),
+		authcmd.GetAuxToFeeCommand(),
 	)
 
-	moduleBasics.AddTxCommands(cmd)
+	app.ModuleBasics.AddTxCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
@@ -349,6 +291,17 @@ func (a appCreator) newApp(
 		panic(err)
 	}
 
+	homeDir := cast.ToString(appOpts.Get(flags.FlagHome))
+	chainID := cast.ToString(appOpts.Get(flags.FlagChainID))
+	if chainID == "" {
+		// fallback to genesis chain-id
+		appGenesis, err := tmtypes.GenesisDocFromFile(filepath.Join(homeDir, "config", "genesis.json"))
+		if err != nil {
+			panic(err)
+		}
+
+		chainID = appGenesis.ChainID
+	}
 	snapshotDir := filepath.Join(cast.ToString(appOpts.Get(flags.FlagHome)), "data", "snapshots")
 	snapshotDB, err := NewLevelDB("metadata", snapshotDir)
 	if err != nil {
@@ -362,7 +315,7 @@ func (a appCreator) newApp(
 	snapshotInterval := cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent))
 	keepRecent := cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent))
 	snapshotOpts := snapshottypes.NewSnapshotOptions(snapshotInterval, keepRecent)
-	return a.buildApp(
+	return app.New(
 		logger,
 		db,
 		traceStore,
@@ -374,13 +327,14 @@ func (a appCreator) newApp(
 		appOpts,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
-		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
 		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
 		baseapp.SetHaltTime(cast.ToUint64(appOpts.Get(server.FlagHaltTime))),
+		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
 		baseapp.SetInterBlockCache(cache),
 		baseapp.SetTrace(cast.ToBool(appOpts.Get(server.FlagTrace))),
 		baseapp.SetIndexEvents(cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents))),
 		baseapp.SetSnapshot(snapshotStore, snapshotOpts),
+		baseapp.SetChainID(chainID),
 	)
 }
 
@@ -393,17 +347,15 @@ func (a appCreator) appExport(
 	forZeroHeight bool,
 	jailAllowedAddrs []string,
 	appOpts servertypes.AppOptions,
-	addrs []string,
+	modulesToExport []string,
 ) (servertypes.ExportedApp, error) {
-
-	var exportableApp ExportableApp
-
+	var curiumApp *app.App
 	homePath, ok := appOpts.Get(flags.FlagHome).(string)
 	if !ok || homePath == "" {
 		return servertypes.ExportedApp{}, errors.New("application home not set")
 	}
 
-	exportableApp = a.buildApp(
+	curiumApp = app.New(
 		logger,
 		db,
 		traceStore,
@@ -416,12 +368,12 @@ func (a appCreator) appExport(
 	)
 
 	if height != -1 {
-		if err := exportableApp.LoadHeight(height); err != nil {
+		if err := curiumApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	}
 
-	return exportableApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
+	return curiumApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
 }
 
 // initAppConfig helps to override default appConfig template and configs.
