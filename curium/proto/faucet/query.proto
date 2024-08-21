@@ -1,5 +1,5 @@
 syntax = "proto3";
-package bluzelle.curium.faucet;
+package faucet;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";

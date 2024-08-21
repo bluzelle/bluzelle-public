@@ -1,5 +1,5 @@
 syntax = "proto3";
-package bluzelle.curium.curium;
+package curium;
 
 // this line is used by starport scaffolding # genesis/proto/import
 

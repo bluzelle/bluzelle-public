@@ -1,5 +1,5 @@
 syntax = "proto3";
-package bluzelle.curium.storage;
+package storage;
 
 import "gogoproto/gogo.proto";
 import "storage/tx.proto";
