@@ -1,6 +1,6 @@
 module github.com/bluzelle/bluzelle-public/curium
 
-go 1.22.2
+go 1.19
 
 require (
 	cosmossdk.io/api v0.3.1
@@ -363,3 +363,7 @@ require (
 )
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+
+replace golang.org/x/exp => golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb
+
+replace golang.org/x/crypto => golang.org/x/crypto v0.23.0
