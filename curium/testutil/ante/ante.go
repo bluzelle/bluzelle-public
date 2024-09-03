@@ -3,9 +3,8 @@ package ante
 import (
 	"testing"
 
-	"cosmossdk.io/simapp"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
-	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
+	"github.com/bluzelle/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -30,7 +29,7 @@ func NewAnteHandlerOptions(t *testing.T) *appTypes.AnteHandlerOptions {
 	// app := simapp.Setup(t, false)
 	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
 	govAuthAddrStr := govAuthAddr.String()
-	app, _, _ := testutil.CreateTestApp(t, false)
+	app := simapp.Setup(t, false)
 	appCodec := app.AppCodec()
 	keys := sdk.NewKVStoreKeys(
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,

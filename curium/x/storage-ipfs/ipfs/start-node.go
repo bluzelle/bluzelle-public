@@ -3,22 +3,25 @@ package curiumipfs
 import (
 	"context"
 	"fmt"
+	"log"
+	"path/filepath"
+	"sync"
+
 	"github.com/bluzelle/ipfs-kubo/commands"
 	"github.com/bluzelle/ipfs-kubo/core"
 	"github.com/bluzelle/ipfs-kubo/core/coreapi"
 	"github.com/bluzelle/ipfs-kubo/core/corehttp"
+	coreiface "github.com/bluzelle/ipfs-kubo/core/coreiface"
 	"github.com/bluzelle/ipfs-kubo/core/node/libp2p"
 	"github.com/bluzelle/ipfs-kubo/plugin/loader"
 	"github.com/bluzelle/ipfs-kubo/repo"
 	"github.com/bluzelle/ipfs-kubo/repo/fsrepo"
 	"github.com/ipfs/go-cid"
-	"github.com/ipfs/interface-go-ipfs-core"
-	"github.com/ipfs/interface-go-ipfs-core/path"
+
+	// "github.com/ipfs/interface-go-ipfs-core/path"
+	"github.com/ipfs/boxo/path"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multiaddr"
-	"log"
-	"path/filepath"
-	"sync"
 )
 
 var setupRun = false
@@ -61,7 +64,7 @@ func createNode(ctx context.Context, repo repo.Repo) (*core.IpfsNode, error) {
 }
 
 type StorageIpfsNode struct {
-	IpfsApi  iface.CoreAPI
+	IpfsApi  coreiface.CoreAPI
 	Context  context.Context
 	Repo     repo.Repo
 	IpfsNode *core.IpfsNode
@@ -69,7 +72,8 @@ type StorageIpfsNode struct {
 }
 
 func (storageNode *StorageIpfsNode) AddPin(pathString string) error {
-	return storageNode.IpfsApi.Pin().Add(storageNode.Context, path.New(pathString))
+	mPath, _ := path.NewPath(pathString)
+	return storageNode.IpfsApi.Pin().Add(storageNode.Context, mPath)
 }
 
 func (storageNode *StorageIpfsNode) Stop() error {
@@ -178,7 +182,7 @@ func startApiServer(node *StorageIpfsNode) error {
 
 	addr := repoConfig.Addresses.API[0]
 	var opts = []corehttp.ServeOption{
-		corehttp.GatewayOption(true, "/ipfs", "/ipns"),
+		corehttp.GatewayOption("/ipfs", "/ipns"),
 		corehttp.WebUIOption,
 		corehttp.CommandsOption(cmdCtx(node)),
 	}
@@ -189,7 +193,7 @@ func startApiServer(node *StorageIpfsNode) error {
 	return nil
 }
 
-func connectToPeers(ctx context.Context, ipfs iface.CoreAPI, peers []string) error {
+func connectToPeers(ctx context.Context, ipfs coreiface.CoreAPI, peers []string) error {
 	var wg sync.WaitGroup
 	peerInfos := make(map[peer.ID]*peer.AddrInfo, len(peers))
 	for _, addrStr := range peers {

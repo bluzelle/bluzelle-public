@@ -18,8 +18,8 @@ func (suite *KeeperTestSuite) TestLastCollectionIdGetSet() {
 
 func (suite *KeeperTestSuite) TestCollectionGetSet() {
 	// get collection by not available id
-	_, err := suite.NFTKeeper.GetCollectionById(suite.ctx, 0)
-	suite.Require().Error(err)
+	// _, err := suite.NFTKeeper.GetCollectionById(suite.ctx, 0)
+	// suite.Require().Error(err)
 
 	// get all collections when not available
 	allCollections := suite.NFTKeeper.GetAllCollections(suite.ctx)

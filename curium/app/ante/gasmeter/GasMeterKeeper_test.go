@@ -3,11 +3,11 @@ package gasmeter_test
 import (
 	"testing"
 
-	"cosmossdk.io/simapp"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
 	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
+	"github.com/bluzelle/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"

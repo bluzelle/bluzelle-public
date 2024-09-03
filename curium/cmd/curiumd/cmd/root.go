@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -10,6 +9,7 @@ import (
 	"github.com/bluzelle/bluzelle-public/curium/app"
 	"github.com/bluzelle/bluzelle-public/curium/app/params"
 	dbm "github.com/cometbft/cometbft-db"
+	tmcfg "github.com/cometbft/cometbft/config"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
 	"github.com/cometbft/cometbft/libs/log"
 	tmtypes "github.com/cometbft/cometbft/types"
@@ -27,6 +27,7 @@ import (
 	snapshottypes "github.com/cosmos/cosmos-sdk/snapshots/types"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/module"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -40,6 +41,36 @@ import (
 )
 
 type (
+	// AppBuilder is a method that allows to build an app
+	// AppBuilder func(
+	// 	logger log.Logger,
+	// 	db dbm.DB,
+	// 	traceStore io.Writer,
+	// 	loadLatest bool,
+	// 	skipUpgradeHeights map[int64]bool,
+	// 	homePath string,
+	// 	invCheckPeriod uint,
+	// 	encodingConfig EncodingConfig,
+	// 	appOpts servertypes.AppOptions,
+	// 	baseAppOptions ...func(*baseapp.BaseApp),
+	// ) App
+
+	// // App represents a Cosmos SDK application that can be run as a server and with an exportable state
+	// App interface {
+	// 	servertypes.Application
+	// 	ExportableApp
+	// }
+
+	// // ExportableApp represents an app with an exportable state
+	// ExportableApp interface {
+	// 	ExportAppStateAndValidators(
+	// 		forZeroHeight bool,
+	// 		jailAllowedAddrs []string,
+	// 		modulesToExport []string,
+	// 	) (servertypes.ExportedApp, error)
+	// 	LoadHeight(height int64) error
+	// }
+
 	// appCreator is an app creator
 	appCreator struct {
 		encodingConfig params.EncodingConfig
@@ -53,7 +84,6 @@ type Option func(*rootOptions)
 type rootOptions struct {
 	addSubCmds         []*cobra.Command
 	startCmdCustomizer func(*cobra.Command)
-	envPrefix          string
 }
 
 func newRootOptions(options ...Option) rootOptions {
@@ -82,15 +112,19 @@ func CustomizeStartCmd(h func(startCmd *cobra.Command)) Option {
 	}
 }
 
-// WithEnvPrefix accepts a new prefix for environment variables.
-func WithEnvPrefix(envPrefix string) Option {
-	return func(o *rootOptions) {
-		o.envPrefix = envPrefix
-	}
-}
-
 // NewRootCmd creates a new root command for a Cosmos SDK application
-func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
+func NewRootCmd(
+	appName,
+	accountAddressPrefix,
+	defaultNodeHome,
+	defaultChainID string,
+	moduleBasics module.BasicManager,
+	options ...Option,
+) (*cobra.Command, params.EncodingConfig) {
+	rootOptions := newRootOptions(options...)
+
+	// Set config for prefixes
+	SetPrefixes(accountAddressPrefix)
 
 	encodingConfig := params.MakeEncodingConfig()
 	initClientCtx := client.Context{}.
@@ -101,16 +135,13 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.FlagBroadcastMode).
-		WithHomeDir(app.DefaultNodeHome).
+		WithHomeDir(defaultNodeHome).
 		WithViper("")
 
 	rootCmd := &cobra.Command{
-		Use:   "curiumd",
-		Short: "Curium App",
+		Use:   appName + "d",
+		Short: "Stargate CosmosHub App",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-			// set the default command outputs
-			cmd.SetOut(cmd.OutOrStdout())
-			cmd.SetErr(cmd.ErrOrStderr())
 			initClientCtx, err := client.ReadPersistentCommandFlags(initClientCtx, cmd.Flags())
 			if err != nil {
 				return err
@@ -125,66 +156,86 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 			}
 
 			customAppTemplate, customAppConfig := initAppConfig()
-
-			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, nil)
+			cfg := tmcfg.DefaultConfig()
+			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, cfg)
 		},
 	}
 
 	initRootCmd(
 		rootCmd,
 		encodingConfig,
+		defaultNodeHome,
+		moduleBasics,
+		rootOptions,
 	)
+	overwriteFlagDefaults(rootCmd, map[string]string{
+		flags.FlagChainID:        defaultChainID,
+		flags.FlagKeyringBackend: "test",
+	})
+
 	return rootCmd, encodingConfig
 }
 
 func initRootCmd(
 	rootCmd *cobra.Command,
 	encodingConfig params.EncodingConfig,
+	defaultNodeHome string,
+	moduleBasics module.BasicManager,
+	options rootOptions,
 ) {
 	gentxModule := app.ModuleBasics[genutiltypes.ModuleName].(genutil.AppModuleBasic)
 	rootCmd.AddCommand(
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome, gentxModule.GenTxValidator),
-		AddGenesisAccountCmd(app.DefaultNodeHome),
+		genutilcli.InitCmd(moduleBasics, defaultNodeHome),
+		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, defaultNodeHome, gentxModule.GenTxValidator),
+		genutilcli.MigrateGenesisCmd(),
+		genutilcli.GenTxCmd(
+			moduleBasics,
+			encodingConfig.TxConfig,
+			banktypes.GenesisBalancesIterator{},
+			defaultNodeHome,
+		),
+		genutilcli.ValidateGenesisCmd(moduleBasics),
+		AddGenesisAccountCmd(defaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		debug.Cmd(),
 		config.Cmd(),
 	)
 
-	ac := appCreator{
-		encodingConfig: encodingConfig,
+	a := appCreator{
+		encodingConfig,
 	}
+
 	// add server commands
 	server.AddCommands(
 		rootCmd,
-		app.DefaultNodeHome,
-		ac.newApp,
-		ac.appExport,
-		addModuleInitFlags,
+		defaultNodeHome,
+		a.newApp,
+		a.appExport,
+		func(cmd *cobra.Command) {
+			addModuleInitFlags(cmd)
+
+			if options.startCmdCustomizer != nil {
+				options.startCmdCustomizer(cmd)
+			}
+		},
 	)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
-		genesisCommand(encodingConfig),
-		queryCommand(),
-		txCommand(),
-		keys.Commands(app.DefaultNodeHome),
+		queryCommand(moduleBasics),
+		txCommand(moduleBasics),
+		keys.Commands(defaultNodeHome),
 	)
 
-}
-
-// genesisCommand builds genesis-related `simd genesis` command. Users may provide application specific commands as a parameter
-func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
-	cmd := genutilcli.GenesisCoreCommand(encodingConfig.TxConfig, app.ModuleBasics, app.DefaultNodeHome)
-
-	for _, subCmd := range cmds {
-		cmd.AddCommand(subCmd)
+	// add user given sub commands.
+	for _, cmd := range options.addSubCmds {
+		rootCmd.AddCommand(cmd)
 	}
-	return cmd
 }
 
 // queryCommand returns the sub-command to send queries to the app
-func queryCommand() *cobra.Command {
+func queryCommand(moduleBasics module.BasicManager) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "query",
 		Aliases:                    []string{"q"},
@@ -202,14 +253,14 @@ func queryCommand() *cobra.Command {
 		authcmd.QueryTxCmd(),
 	)
 
-	app.ModuleBasics.AddQueryCommands(cmd)
+	moduleBasics.AddQueryCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
 }
 
 // txCommand returns the sub-command to send transactions to the app
-func txCommand() *cobra.Command {
+func txCommand(moduleBasics module.BasicManager) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "tx",
 		Short:                      "Transactions subcommands",
@@ -222,16 +273,14 @@ func txCommand() *cobra.Command {
 		authcmd.GetSignCommand(),
 		authcmd.GetSignBatchCommand(),
 		authcmd.GetMultiSignCommand(),
-		authcmd.GetMultiSignBatchCmd(),
 		authcmd.GetValidateSignaturesCommand(),
 		flags.LineBreak,
 		authcmd.GetBroadcastCommand(),
 		authcmd.GetEncodeCommand(),
 		authcmd.GetDecodeCommand(),
-		authcmd.GetAuxToFeeCommand(),
 	)
 
-	app.ModuleBasics.AddTxCommands(cmd)
+	moduleBasics.AddTxCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
@@ -255,17 +304,6 @@ func overwriteFlagDefaults(c *cobra.Command, defaults map[string]string) {
 	for _, c := range c.Commands() {
 		overwriteFlagDefaults(c, defaults)
 	}
-}
-
-// NewLevelDB instantiate a new LevelDB instance according to DBBackend.
-func NewLevelDB(name, dir string) (db dbm.DB, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("couldn't create db: %v", r)
-		}
-	}()
-
-	return dbm.NewDB(name, dbm.GoLevelDBBackend, dir)
 }
 
 // newApp creates a new Cosmos SDK app
@@ -302,8 +340,9 @@ func (a appCreator) newApp(
 
 		chainID = appGenesis.ChainID
 	}
+
 	snapshotDir := filepath.Join(cast.ToString(appOpts.Get(flags.FlagHome)), "data", "snapshots")
-	snapshotDB, err := NewLevelDB("metadata", snapshotDir)
+	snapshotDB, err := dbm.NewDB("metadata", server.GetAppDBBackend(appOpts), snapshotDir)
 	if err != nil {
 		panic(err)
 	}
@@ -312,9 +351,11 @@ func (a appCreator) newApp(
 		panic(err)
 	}
 
-	snapshotInterval := cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent))
-	keepRecent := cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent))
-	snapshotOpts := snapshottypes.NewSnapshotOptions(snapshotInterval, keepRecent)
+	snapshotOptions := snapshottypes.NewSnapshotOptions(
+		cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotInterval)),
+		cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent)),
+	)
+
 	return app.New(
 		logger,
 		db,
@@ -325,16 +366,16 @@ func (a appCreator) newApp(
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		a.encodingConfig,
 		appOpts,
+		baseapp.SetChainID(chainID),
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
+		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
 		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
 		baseapp.SetHaltTime(cast.ToUint64(appOpts.Get(server.FlagHaltTime))),
-		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
 		baseapp.SetInterBlockCache(cache),
 		baseapp.SetTrace(cast.ToBool(appOpts.Get(server.FlagTrace))),
 		baseapp.SetIndexEvents(cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents))),
-		baseapp.SetSnapshot(snapshotStore, snapshotOpts),
-		baseapp.SetChainID(chainID),
+		baseapp.SetSnapshot(snapshotStore, snapshotOptions),
 	)
 }
 

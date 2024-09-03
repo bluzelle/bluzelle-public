@@ -3,11 +3,11 @@ package keeper
 import (
 	"testing"
 
-	simapp "cosmossdk.io/simapp"
 	curiumapp "github.com/bluzelle/bluzelle-public/curium/app"
 	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
+	simapp "github.com/bluzelle/simapp"
 	tmdb "github.com/cometbft/cometbft-db"
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"

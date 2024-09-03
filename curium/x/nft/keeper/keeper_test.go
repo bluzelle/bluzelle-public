@@ -3,11 +3,11 @@ package keeper_test
 import (
 	"testing"
 
-	"cosmossdk.io/simapp"
 	"github.com/bluzelle/bluzelle-public/curium/app"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
 	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
+	"github.com/bluzelle/simapp"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
