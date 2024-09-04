@@ -2,11 +2,13 @@ package storage_test
 
 import (
 	"context"
-	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
-	"github.com/bluzelle/ipfs-kubo/config"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
+	"github.com/bluzelle/ipfs-kubo/config"
+	"github.com/ipfs/go-cid"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test(t *testing.T) {
@@ -50,14 +52,18 @@ func Test(t *testing.T) {
 			if err != nil {
 				return err
 			}
+			mCid, err := cid.Decode(cidPath.String())
 
-			isLocal, err := nodes[0].HasLocal(ctx, cidPath.Cid())
+			if err != nil {
+				return err
+			}
+			isLocal, err := nodes[0].HasLocal(ctx, mCid)
 			if err != nil {
 				return err
 			}
 			assert.True(t, isLocal)
 
-			if isLocal, err = nodes[1].HasLocal(ctx, cidPath.Cid()); err != nil {
+			if isLocal, err = nodes[1].HasLocal(ctx, mCid); err != nil {
 				return err
 			}
 			assert.False(t, isLocal)
@@ -70,7 +76,7 @@ func Test(t *testing.T) {
 				return err
 			}
 
-			if isLocal, err = nodes[1].HasLocal(ctx, cidPath.Cid()); err != nil {
+			if isLocal, err = nodes[1].HasLocal(ctx, mCid); err != nil {
 				return err
 			}
 			assert.True(t, isLocal)

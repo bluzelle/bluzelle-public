@@ -2,8 +2,6 @@ module github.com/bluzelle/bluzelle-public/curium
 
 go 1.22
 
-toolchain go1.22.2
-
 require (
 	cosmossdk.io/api v0.3.1
 	github.com/bluzelle/ipfs-kubo v0.28.1
@@ -21,7 +19,6 @@ require (
 	github.com/ipfs/boxo v0.20.0
 	github.com/ipfs/go-cid v0.4.1
 	github.com/ipfs/go-ipfs-files v0.3.0
-	github.com/ipfs/interface-go-ipfs-core v0.10.0
 	github.com/libp2p/go-libp2p v0.34.1
 	github.com/multiformats/go-multiaddr v0.12.4
 	github.com/spf13/cast v1.6.0
@@ -35,11 +32,8 @@ require (
 
 require (
 	github.com/ChainSafe/go-schnorrkel v1.0.0 // indirect
-	github.com/DataDog/zstd v1.5.5 // indirect
 	github.com/Jorropo/jsync v1.0.1 // indirect
-	github.com/cockroachdb/pebble v1.1.0 // indirect
-	github.com/cockroachdb/tokenbucket v0.0.0-20230807174530-cc333fc44b06 // indirect
-	github.com/cosmos/cosmos-db v1.0.2 // indirect
+	github.com/bluzelle/go-exp v0.0.2 // indirect
 	github.com/creachadair/taskgroup v0.4.2 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
@@ -222,7 +216,6 @@ require (
 	github.com/ipfs/go-log/v2 v2.5.1 // indirect
 	github.com/ipfs/go-merkledag v0.11.0 // indirect
 	github.com/ipfs/go-metrics-interface v0.0.1 // indirect
-	github.com/ipfs/go-path v0.3.1 // indirect
 	github.com/ipfs/go-peertaskqueue v0.8.1 // indirect
 	github.com/ipfs/go-unixfsnode v1.9.0 // indirect
 	github.com/ipfs/go-verifcid v0.0.3 // indirect
@@ -379,4 +372,8 @@ replace golang.org/x/exp => golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb
 
 replace golang.org/x/crypto => golang.org/x/crypto v0.23.0
 
-replace github.com/cosmos/iavl => github.com/cosmos/iavl v0.21.0
+replace github.com/cosmos/iavl => github.com/cosmos/iavl v0.20.1
+
+replace github.com/multiformats/go-multiaddr => github.com/multiformats/go-multiaddr v0.10.1
+
+replace github.com/libp2p/go-libp2p => github.com/bluzelle/go-libp2p v0.34.2

@@ -3,17 +3,20 @@ package storage_test
 import (
 	"context"
 	"fmt"
-	"github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
-	"github.com/bluzelle/ipfs-kubo/config"
-	"github.com/ipfs/go-ipfs-files"
-	"github.com/ipfs/interface-go-ipfs-core/path"
 	"io"
 	"net"
 	"os"
 	"time"
+
+	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
+	"github.com/bluzelle/ipfs-kubo/config"
+	files "github.com/ipfs/go-ipfs-files"
+
+	// "github.com/ipfs/interface-go-ipfs-core/path"
+	"github.com/ipfs/boxo/path"
 )
 
-func getFile(ctx context.Context, node *curiumipfs.StorageIpfsNode, cid path.Resolved) ([]byte, error) {
+func getFile(ctx context.Context, node *curiumipfs.StorageIpfsNode, cid path.Path) ([]byte, error) {
 	file, err := node.IpfsApi.Unixfs().Get(ctx, cid)
 	if err != nil {
 		return nil, err
@@ -26,7 +29,7 @@ func getFile(ctx context.Context, node *curiumipfs.StorageIpfsNode, cid path.Res
 
 }
 
-func uploadFile(ctx context.Context, inputFile string, node *curiumipfs.StorageIpfsNode) (path.Resolved, error) {
+func uploadFile(ctx context.Context, inputFile string, node *curiumipfs.StorageIpfsNode) (path.Path, error) {
 	someFile, err := getUnixfsNode(inputFile)
 	if err != nil {
 		panic(fmt.Errorf("could not get File: %s", err))
