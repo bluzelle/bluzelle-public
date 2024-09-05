@@ -16,6 +16,5 @@ func CreateTestApp(t *testing.T, isCheckTx bool) (*simapp.SimApp, sdk.Context, k
 	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
 	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
 	accountKeeper := app.AccountKeeper
-
 	return app, ctx, accountKeeper
 }

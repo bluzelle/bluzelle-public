@@ -124,9 +124,7 @@ func NewRootCmd(
 	rootOptions := newRootOptions(options...)
 
 	// Set config for prefixes
-	SetPrefixes(accountAddressPrefix)
-
-	encodingConfig := params.MakeEncodingConfig()
+	encodingConfig := MakeEncodingConfig(moduleBasics)
 	initClientCtx := client.Context{}.
 		WithCodec(encodingConfig.Marshaler).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/bluzelle/bluzelle-public/curium/app/params"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -19,13 +20,13 @@ type EncodingConfig struct {
 }
 
 // makeEncodingConfig creates an EncodingConfig for an amino based test configuration.
-func makeEncodingConfig() EncodingConfig {
+func makeEncodingConfig() params.EncodingConfig {
 	amino := codec.NewLegacyAmino()
 	interfaceRegistry := types.NewInterfaceRegistry()
 	marshaler := codec.NewProtoCodec(interfaceRegistry)
 	txCfg := tx.NewTxConfig(marshaler, tx.DefaultSignModes)
 
-	return EncodingConfig{
+	return params.EncodingConfig{
 		InterfaceRegistry: interfaceRegistry,
 		Marshaler:         marshaler,
 		TxConfig:          txCfg,
@@ -34,7 +35,7 @@ func makeEncodingConfig() EncodingConfig {
 }
 
 // MakeEncodingConfig creates an EncodingConfig for testing
-func MakeEncodingConfig(moduleBasics module.BasicManager) EncodingConfig {
+func MakeEncodingConfig(moduleBasics module.BasicManager) params.EncodingConfig {
 	encodingConfig := makeEncodingConfig()
 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
