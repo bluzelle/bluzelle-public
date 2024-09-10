@@ -11,6 +11,9 @@ func (suite *KeeperTestSuite) TestNftGetSet() {
 	addr2 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
 
 	// get nft by not available id
+	println("\n\n\n")
+	println(suite.ctx.ChainID())
+	println("\n\n\n")
 	_, err := suite.NFTKeeper.GetNFTById(suite.ctx, "")
 	suite.Require().Error(err)
 

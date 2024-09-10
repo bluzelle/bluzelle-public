@@ -377,3 +377,5 @@ replace github.com/cosmos/iavl => github.com/cosmos/iavl v0.20.1
 replace github.com/multiformats/go-multiaddr => github.com/multiformats/go-multiaddr v0.10.1
 
 replace github.com/libp2p/go-libp2p => github.com/bluzelle/go-libp2p v0.34.2
+
+replace github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7

@@ -5,7 +5,6 @@ import (
 
 	"github.com/bluzelle/bluzelle-public/curium/app/ante"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
-	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
 	testutilante "github.com/bluzelle/bluzelle-public/curium/testutil/ante"
 	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
@@ -17,7 +16,6 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	sdkante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -144,7 +142,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				simapp.BlockedAddresses(),
 				govAuthAddrStr)
 
-			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(global.Denom, 19))
+			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(global.Denom, 10))
 			txBuilder.SetFeeAmount(feeAmount)
 			txBuilder.SetFeePayer(addr)
 			newTx := txBuilder.GetTx()
@@ -159,8 +157,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				AccountKeeper:    accountKeeper,
 				MinGasPriceCoins: minGasPriceCoins,
 			})
-
-			require.Equal(t, sdkerrors.New(appTypes.Name, 2, appTypes.ErrLowGasPrice), err)
+			require.Equal(t, "Specified gas price too low", err.Error())
 		})
 
 	})

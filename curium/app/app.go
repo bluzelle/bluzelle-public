@@ -381,7 +381,7 @@ func NewCuriumApp(
 		keys[authtypes.StoreKey],
 		authtypes.ProtoBaseAccount,
 		maccPerms,
-		sdk.Bech32PrefixAccAddr,
+		appTypes.AccountAddressPrefix,
 		govAuthAddrStr,
 	)
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
