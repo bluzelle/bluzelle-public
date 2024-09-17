@@ -3,11 +3,12 @@ package keeper
 import (
 	"testing"
 
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+
 	curiumapp "github.com/bluzelle/bluzelle-public/curium/app"
 	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
-	simapp "github.com/bluzelle/simapp"
 	tmdb "github.com/cometbft/cometbft-db"
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
@@ -23,16 +24,20 @@ import (
 	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
-func NftKeeper(t *testing.T) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.AccountKeeper, sdk.Context) {
+func NftKeeper(t testing.TB) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.AccountKeeper, sdk.Context) {
 	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
 	govAuthAddrStr := govAuthAddr.String()
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
+	authStoreKey := sdk.NewKVStoreKey(authtypes.StoreKey)
+	bankStoreKey := sdk.NewKVStoreKey(banktypes.StoreKey)
 
 	db := tmdb.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db)
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
 	stateStore.MountStoreWithDB(memStoreKey, storetypes.StoreTypeMemory, nil)
+	stateStore.MountStoreWithDB(authStoreKey, storetypes.StoreTypeIAVL, db)
+	stateStore.MountStoreWithDB(bankStoreKey, storetypes.StoreTypeIAVL, db)
 	_ = stateStore.LoadLatestVersion()
 
 	registry := codectypes.NewInterfaceRegistry()
@@ -44,12 +49,18 @@ func NftKeeper(t *testing.T) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.
 		memStoreKey,
 		types.ModuleName,
 	)
-	maccPerms := map[string][]string{}
-	//accKey := app.GetKey(authtypes.StoreKey)
-	accountKeeper := acctypes.NewAccountKeeper(cdc, storeKey, authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(), govAuthAddrStr)
+	maccPerms := map[string][]string{
+		types.ModuleName: {authtypes.Minter, authtypes.Burner},
+	}
+	accountKeeper := acctypes.NewAccountKeeper(cdc, authStoreKey, authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(), govAuthAddrStr)
+
+	maccPermsBool := make(map[string]bool)
+	for k := range maccPerms {
+		maccPermsBool[k] = true
+	}
 
 	bankKeeper := bankkeeper.NewBaseKeeper(
-		cdc, storeKey, accountKeeper, simapp.BlockedAddresses(), govAuthAddrStr,
+		cdc, bankStoreKey, accountKeeper, maccPermsBool, govAuthAddrStr,
 	)
 
 	k := keeper.NewKeeper(
@@ -60,6 +71,9 @@ func NftKeeper(t *testing.T) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.
 	)
 
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
+
+	nftModuleAccount := authtypes.NewEmptyModuleAccount(types.ModuleName, authtypes.Minter, authtypes.Burner)
+	accountKeeper.SetModuleAccount(ctx, nftModuleAccount)
 
 	return k, &bankKeeper, &accountKeeper, ctx
 }

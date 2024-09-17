@@ -6,13 +6,14 @@ import (
 	"github.com/bluzelle/bluzelle-public/curium/app"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
 	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
+	testkeeper "github.com/bluzelle/bluzelle-public/curium/testutil/keeper"
+	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
+
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/bluzelle/simapp"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
-	testkeeper "github.com/bluzelle/bluzelle-public/curium/testutil/keeper"
-	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -45,24 +46,25 @@ type KeeperTestSuite struct {
 	app           *simapp.SimApp
 }
 
-func (suite *KeeperTestSuite) SetupTest(t *testing.T) {
-
+func (suite *KeeperTestSuite) SetupTest() {
 	config := sdk.GetConfig()
 	config.SetCoinType(appTypes.CoinType)
 	config.SetBech32PrefixForAccount("bluzelle", "bluzellepub")
-	//config.SetAddressVerifier(func(addr []byte) error {
-	//	bech32Addr := string(addr)
-	//	_, _, err := bech32.Decode(bech32Addr, 1023)
-	//	return err
-	//})
-	suite.app, _, _ = testutil.CreateTestApp(t, false)
+	suite.app, _, _ = testutil.CreateTestApp(suite.T(), false)
 	suite.legacyAmino = curiumcmd.MakeEncodingConfig(app.ModuleBasics).Amino
-	suite.NFTKeeper, suite.BankKeeper, suite.AccountKeeper, suite.ctx = testkeeper.NftKeeper(t)
+	suite.NFTKeeper, suite.BankKeeper, suite.AccountKeeper, suite.ctx = testkeeper.NftKeeper(suite.T())
+
+	suite.T().Log("AccountKeeper set up")
+
+	moduleAcc := suite.AccountKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
+	suite.Require().NotNil(moduleAcc, "NFT module account should exist")
+
 	suite.NFTKeeper.SetParamSet(suite.ctx, types.NewParams(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1_000_000_000))))
 
 	err := suite.BankKeeper.MintCoins(suite.ctx, types.ModuleName, initCoin)
 	suite.NoError(err)
 
+	suite.T().Logf("Owner address: %s", owner.String())
 }
 
 func TestKeeperSuite(t *testing.T) {
