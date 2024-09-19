@@ -5,7 +5,6 @@ import (
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 )
 
 func (suite *KeeperTestSuite) CreateNFT(creator sdk.AccAddress, collectionId uint64) *types.MsgCreateNFTResponse {
@@ -79,8 +78,9 @@ func (suite *KeeperTestSuite) TestMsgServerCreateNFT() {
 		})
 
 		// mint coins for issue fee
-		suite.BankKeeper.MintCoins(suite.ctx, minttypes.ModuleName, sdk.Coins{issuePrice})
-		suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, minttypes.ModuleName, creator, sdk.Coins{issuePrice})
+		// suite.BankKeeper.MintCoins(suite.ctx, minttypes.ModuleName, sdk.Coins{issuePrice})
+		// suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, minttypes.ModuleName, creator, sdk.Coins{issuePrice})
+		suite.FundAccount(creator, 1000000)
 
 		collInfo := suite.CreateCollection(creator, true)
 
@@ -243,9 +243,10 @@ func (suite *KeeperTestSuite) TestMsgServerPrintEdition() {
 		})
 
 		// mint coins for issue fee
-		suite.BankKeeper.MintCoins(suite.ctx, minttypes.ModuleName, sdk.Coins{issuePrice})
-		suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, minttypes.ModuleName, tc.sender, sdk.Coins{issuePrice})
+		// suite.BankKeeper.MintCoins(suite.ctx, minttypes.ModuleName, sdk.Coins{issuePrice})
+		// suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, minttypes.ModuleName, tc.sender, sdk.Coins{issuePrice})
 
+		suite.FundAccount(tc.sender, 1000000)
 		// get old balance for future check
 		oldBalance := suite.BankKeeper.GetBalance(suite.ctx, tc.sender, "stake")
 
@@ -882,25 +883,25 @@ func (suite *KeeperTestSuite) TestMsgServerMultiSendNFT() {
 	nftInfo2 := suite.CreateNFT(creator1, collInfo1.Id)
 	nftInfo3 := suite.CreateNFT(creator1, collInfo2.Id)
 
-	var multiSendOutput []*types.MultiSendNFTOutput;
+	var multiSendOutput []*types.MultiSendNFTOutput
 	multiSendOutput = append(multiSendOutput, &types.MultiSendNFTOutput{
 		Receiver: creator2.String(),
-		NftId: nftInfo1.Id,
+		NftId:    nftInfo1.Id,
 	})
 	multiSendOutput = append(multiSendOutput, &types.MultiSendNFTOutput{
 		Receiver: creator2.String(),
-		NftId: nftInfo2.Id,
+		NftId:    nftInfo2.Id,
 	})
 	multiSendOutput = append(multiSendOutput, &types.MultiSendNFTOutput{
 		Receiver: creator2.String(),
-		NftId: nftInfo3.Id,
+		NftId:    nftInfo3.Id,
 	})
 
 	tests := []struct {
-		testCase   string
-		sender     sdk.AccAddress
-		multiSendOutputs    []*types.MultiSendNFTOutput
-		expectPass bool
+		testCase         string
+		sender           sdk.AccAddress
+		multiSendOutputs []*types.MultiSendNFTOutput
+		expectPass       bool
 	}{
 		{
 			"3 nfts should be successfully sent",
@@ -927,7 +928,6 @@ func (suite *KeeperTestSuite) TestMsgServerMultiSendNFT() {
 	}
 
 }
-
 
 func (suite *KeeperTestSuite) TestMsgServerBurnNFT() {
 	creator1 := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
@@ -958,7 +958,7 @@ func (suite *KeeperTestSuite) TestMsgServerBurnNFT() {
 	tests := []struct {
 		testCase   string
 		sender     sdk.AccAddress
-		nftId    	 string
+		nftId      string
 		expectPass bool
 	}{
 		{
