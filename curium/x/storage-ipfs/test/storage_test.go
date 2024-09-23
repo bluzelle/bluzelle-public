@@ -52,7 +52,7 @@ func Test(t *testing.T) {
 			if err != nil {
 				return err
 			}
-			mCid, err := cid.Decode(cidPath.String())
+			mCid, err := cid.Parse(cidPath.String())
 
 			if err != nil {
 				return err
