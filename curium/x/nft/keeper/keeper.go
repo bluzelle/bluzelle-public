@@ -8,7 +8,7 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
-	log "github.com/cometbft/cometbft/libs/log"
+	"github.com/cometbft/cometbft/libs/log"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 )
 

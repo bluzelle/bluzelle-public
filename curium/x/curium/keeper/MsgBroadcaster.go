@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	params "github.com/bluzelle/bluzelle-public/curium/app/params"
+	"github.com/bluzelle/bluzelle-public/curium/app/params"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	tenderminttypes "github.com/cometbft/cometbft/types"
 	sdkclient "github.com/cosmos/cosmos-sdk/client"

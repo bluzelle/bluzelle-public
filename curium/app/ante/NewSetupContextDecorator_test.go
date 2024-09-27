@@ -142,7 +142,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				simapp.BlockedAddresses(),
 				govAuthAddrStr)
 
-			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(global.Denom, 10))
+			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(global.Denom, 19))
 			txBuilder.SetFeeAmount(feeAmount)
 			txBuilder.SetFeePayer(addr)
 			newTx := txBuilder.GetTx()

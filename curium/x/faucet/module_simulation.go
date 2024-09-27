@@ -48,6 +48,16 @@ func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedP
 	return nil
 }
 
+// RandomizedParams creates randomized  param changes for the simulator
+func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.LegacyParamChange {
+	faucetParams := types.DefaultParams()
+	return []simtypes.LegacyParamChange{
+		simulation.NewSimLegacyParamChange(types.ModuleName, string(types.KeyTestnet), func(r *rand.Rand) string {
+			return string(types.Amino.MustMarshalJSON(faucetParams.Testnet))
+		}),
+	}
+}
+
 // RegisterStoreDecoder registers a decoder
 func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
 

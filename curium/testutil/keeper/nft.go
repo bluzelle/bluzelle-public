@@ -20,13 +20,11 @@ import (
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 func NftKeeper(t testing.TB) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.AccountKeeper, sdk.Context) {
-	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
-	govAuthAddrStr := govAuthAddr.String()
+	testAddr := authtypes.NewModuleAddress("").String()
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 	authStoreKey := sdk.NewKVStoreKey(authtypes.StoreKey)
@@ -52,7 +50,7 @@ func NftKeeper(t testing.TB) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.
 	maccPerms := map[string][]string{
 		types.ModuleName: {authtypes.Minter, authtypes.Burner},
 	}
-	accountKeeper := acctypes.NewAccountKeeper(cdc, authStoreKey, authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(), govAuthAddrStr)
+	accountKeeper := acctypes.NewAccountKeeper(cdc, authStoreKey, authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(), testAddr)
 
 	maccPermsBool := make(map[string]bool)
 	for k := range maccPerms {
@@ -60,7 +58,7 @@ func NftKeeper(t testing.TB) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.
 	}
 
 	bankKeeper := bankkeeper.NewBaseKeeper(
-		cdc, bankStoreKey, accountKeeper, maccPermsBool, govAuthAddrStr,
+		cdc, bankStoreKey, accountKeeper, maccPermsBool, testAddr,
 	)
 
 	k := keeper.NewKeeper(

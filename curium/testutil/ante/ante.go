@@ -26,7 +26,6 @@ import (
 )
 
 func NewAnteHandlerOptions(t *testing.T) *appTypes.AnteHandlerOptions {
-	// app := simapp.Setup(t, false)
 	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
 	govAuthAddrStr := govAuthAddr.String()
 	app := simapp.Setup(t, false)
