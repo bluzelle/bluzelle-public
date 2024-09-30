@@ -370,7 +370,7 @@ replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alp
 
 replace golang.org/x/exp => golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb
 
-replace golang.org/x/crypto => golang.org/x/crypto v0.23.0
+replace golang.org/x/crypto => golang.org/x/crypto v0.11.0
 
 replace github.com/cosmos/iavl => github.com/cosmos/iavl v0.20.1
 
