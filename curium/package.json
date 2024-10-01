@@ -7,6 +7,7 @@
     "test-ci": "go test -v ./... 2>&1 | go-junit-report > report.xml"
   },
   "dependencies": {
-    "@bluzelle/testing": "^1.0.0"
+    "@bluzelle/testing": "^1.0.0",
+    "cosmjs-types": "^0.9.0"
   }
 }

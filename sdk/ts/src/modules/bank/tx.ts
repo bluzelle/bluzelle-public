@@ -17,28 +17,43 @@ export const send = (client: BluzelleClient, toAddress: string, amount: number, 
     fromAddress: client.address
   } as MsgSend, options);
 
-export const multiSend = (client: BluzelleClient,
+
+export const multiSend = (
+  client: BluzelleClient,
   params: MultiSendParam[],
   options: BroadcastOptions
 ) =>
   Promise.resolve(params)
     .then(params => ({
-        inputs: params.map(param => ({
-          address: client.address,
-          coins: param.coins
-        })),
+        inputs: [
+          {
+            address: client.address,
+            coins: aggregateCoins(params)
+          }
+        ],
         outputs: params.map(param => ({
           address: param.outputAddress,
           coins: param.coins
         }))
-      })
-    )
-    .then(({
-        inputs,
-        outputs
-      }) =>
-        sendTx(client, '/cosmos.bank.v1beta1.MsgMultiSend', {
-          inputs,
-          outputs
-        } as MsgMultiSend, options)
+    }))
+    .then(({ inputs, outputs }) =>
+      sendTx(client, '/cosmos.bank.v1beta1.MsgMultiSend', { inputs, outputs } as MsgMultiSend, options)
     );
+
+
+const aggregateCoins = (params: MultiSendParam[]) =>
+  params.reduce((acc, param) => {
+    param.coins.forEach(coin => {
+      const existing = acc.find(c => c.denom === coin.denom);
+      if (existing) {
+        acc = acc.map(c =>
+          c.denom === coin.denom
+            ? { ...c, amount: (parseInt(c.amount) + parseInt(coin.amount)).toString() }
+            : c
+        );
+      } else {
+        acc.push({ ...coin });
+      }
+    });
+    return acc;
+  }, [] as Coin[]);

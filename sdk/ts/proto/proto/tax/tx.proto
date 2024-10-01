@@ -1,5 +1,5 @@
 syntax = "proto3";
-package bluzelle.curium.tax;
+package tax;
 
 // this line is used by starport scaffolding # proto/tx/import
 

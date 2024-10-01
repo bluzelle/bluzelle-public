@@ -1,6 +1,6 @@
 import {createProtobufRpcClient, QueryClient, SequenceResponse, SigningStargateClient} from "@cosmjs/stargate";
 import {getRegistry} from "./registry";
-import {SigningStargateClientOptions} from "@cosmjs/stargate/build/signingstargateclient";
+import {SigningStargateClientOptions} from "@cosmjs/stargate";
 import {QueryClientImpl as StorageQueryClientImpl} from "../curium/lib/generated/storage/query";
 import {QueryClientImpl as BankQueryClientImpl} from "../curium/lib/generated/cosmos/bank/v1beta1/query";
 import {QueryClientImpl as FaucetQueryClientImpl} from '../curium/lib/generated/faucet/query'
@@ -15,8 +15,9 @@ import {QueryClientImpl as GovQueryClientImpl} from "../curium/lib/generated/cos
 import {QueryClientImpl as UpgradeQueryClientImpl} from "../curium/lib/generated/cosmos/upgrade/v1beta1/query";
 import {QueryClientImpl as ParamsQueryClientImpl} from "../curium/lib/generated/cosmos/params/v1beta1/query";
 import {ServiceClientImpl} from "../curium/lib/generated/cosmos/tx/v1beta1/service";
-import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
+import {Tendermint37Client} from "@cosmjs/tendermint-rpc";
 
+// import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 
 type QueryClientImpl = {
   storage: StorageQueryClientImpl;
@@ -40,7 +41,7 @@ export interface BluzelleClient {
   address: string;
   sgClient: SigningStargateClient;
   queryClient: QueryClientImpl;
-  tmClient: Tendermint34Client;
+  tmClient: Tendermint37Client;
 }
 
 
@@ -52,7 +53,7 @@ export const newBluzelleClient = (config: { wallet: () => Promise<BluzelleWallet
           getRpcClient(config.url),
           sgClient,
           wallet.getAccounts().then(acc => acc[0].address),
-          Tendermint34Client.connect(config.url)
+          Tendermint37Client.connect(config.url)
         ])))
     .then(([queryClient, sgClient, address, tmClient]) => ({
       url: config.url,
@@ -63,7 +64,7 @@ export const newBluzelleClient = (config: { wallet: () => Promise<BluzelleWallet
     }));
 
 const getRpcClient = (url: string): Promise<QueryClientImpl> =>
-  Tendermint34Client.connect(url)
+  Tendermint37Client.connect(url)
     .then(tendermintClient => new QueryClient(tendermintClient))
     .then(createProtobufRpcClient)
     .then(rpcClient => Promise.resolve({
@@ -86,7 +87,7 @@ export class SigningBluzelleClient extends SigningStargateClient {
 
   private wallet: BluzelleWallet
 
-  protected constructor(tmClient: Tendermint34Client | undefined, signer: BluzelleWallet, options: SigningStargateClientOptions) {
+  protected constructor(tmClient: Tendermint37Client | undefined, signer: BluzelleWallet, options: SigningStargateClientOptions) {
     super(tmClient, signer, options);
     this.wallet = signer
   }
@@ -101,7 +102,7 @@ export class SigningBluzelleClient extends SigningStargateClient {
   }
 
   static async connectWithSigner(endpoint: string, signer: BluzelleWallet, options = {}) {
-    return Tendermint34Client.connect(endpoint)
+    return Tendermint37Client.connect(endpoint)
       .then(tmClient => new SigningBluzelleClient(tmClient, signer, options))
   }
 }

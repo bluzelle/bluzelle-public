@@ -6,13 +6,8 @@ import {Window} from '@keplr-wallet/types';
 import {AccountData, DirectSignResponse, OfflineDirectSigner} from "@cosmjs/proto-signing/build/signer";
 import {newLocalWallet} from "./localWallet";
 import * as bip39 from 'bip39';
+import { SignDoc } from "@cosmjs/proto-signing/node_modules/cosmjs-types/cosmos/tx/v1beta1/tx";
 
-interface SignDoc {
-    bodyBytes: Uint8Array;
-    authInfoBytes: Uint8Array;
-    chainId: string;
-    accountNumber: Long;
-}
 
 export type Ports = {
     rpcPort: number,
@@ -69,11 +64,6 @@ const addBluzelleChain = (chainId: string, nodeAddress: string, ports: Ports, pr
             coinGeckoId: "bluzelle",
         },
         coinType: 483,
-        gasPriceStep: {
-            low: 0.002,
-            average: 0.002,
-            high: 0.002,
-        }
     });
 
 export const newKeplrWallet = (

@@ -1,4 +1,4 @@
-import {OfflineDirectSigner} from "@cosmjs/proto-signing/build/signer";
+import {OfflineDirectSigner} from "@cosmjs/proto-signing";
 import {SequenceResponse} from "@cosmjs/stargate";
 import {SigningBluzelleClient} from "../core";
 

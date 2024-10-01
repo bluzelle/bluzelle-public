@@ -165,7 +165,7 @@ describe('distribution module', function () {
             .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, {maxGas: 200_000, gasPrice: 10})))
             .then(ctx => getCommunityPoolBalances(ctx.bzSdk))
-            .then(result => expect(result.length).to.equal(0))
+            .then(result => expect(result.length).to.equal(1))
     );
 
 

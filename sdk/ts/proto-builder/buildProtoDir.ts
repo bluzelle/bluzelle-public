@@ -23,8 +23,13 @@ export const createDir = (dir: string, parent: string = 'proto') =>
     mkdir(parent + '/' + dir, {recursive: true});
 
 export const getPathFromLink = (link: string): string =>
-    link.replace(/.*?\/v0.45.11\/(.*)/, "$1");
+    link.replace(/.*?\/v0.47.12\/(.*)/, "$1");
 
+export const getThirdPartyPathFromLink = (link: string): string =>
+    'third_party/proto/' + link.replace(/.*?\/proto\/(.*)/, "$1");
+
+// export const getPathFromOldLink = (link: string): string =>
+//     link.replace(/.*?\/v0.45.11\/(.*)/, "$1");
 export const getGooglePathFromLink = (link: string): string =>
     'third_party/proto/' + link.replace(/.*?\/src\/(.*)/, "$1");
 
@@ -47,6 +52,7 @@ const getCuriumProto = () =>
 
 export const downloadAllProto = () =>
     Promise.all(getCosmosProtoDependencies().map(link => getProtoFile(link, getPathFromLink)))
+        // .then(() => Promise.all(getThirdPartyDependencies().map(link => getProtoFile(link, getThirdPartyPathFromLink))))
         .then(() => Promise.all(getThirdPartyDependencies().map(link => getProtoFile(link, getPathFromLink))))
         .then(() => Promise.all(getGoogleDependencies().map(link => getProtoFile(link, getGooglePathFromLink))))
         .then(() => getCuriumProto());

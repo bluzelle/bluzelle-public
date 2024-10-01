@@ -1,14 +1,19 @@
-import {BluzelleWallet} from "./BluzelleWallet";
-import {AccountData, DirectSignResponse, OfflineDirectSigner} from "@cosmjs/proto-signing/build/signer";
-import {SequenceResponse} from "@cosmjs/stargate";
-import {getStatus, newBluzelleClient, SigningBluzelleClient} from "../core";
-import {passThrough, passThroughAwait} from "promise-passthrough";
-import {Window as KeplrWindow} from "@keplr-wallet/types"
-import {newLocalWallet} from "./localWallet";
-import * as bip39 from "bip39";
-import {Cosmos} from "@cosmostation/extension-client"
-import {addChain, requestAccount} from "@cosmostation/extension-client/cosmos";
-import {getExtensionOfflineSigner, connectWallet} from "@cosmostation/cosmos-client"
+import { BluzelleWallet } from './BluzelleWallet';
+import {
+  AccountData,
+  DirectSignResponse,
+  OfflineDirectSigner
+} from '@cosmjs/proto-signing/build/signer';
+import { SequenceResponse } from '@cosmjs/stargate';
+import { getStatus, newBluzelleClient, SigningBluzelleClient } from '../core';
+import { passThrough, passThroughAwait } from 'promise-passthrough';
+import { Window as KeplrWindow } from '@keplr-wallet/types';
+import { newLocalWallet } from './localWallet';
+import * as bip39 from 'bip39';
+import { Cosmos } from '@cosmostation/extension-client';
+import { addChain, requestAccount } from '@cosmostation/extension-client/cosmos';
+import { getExtensionOfflineSigner } from '@cosmostation/cosmos-client';
+import { SignDoc } from '@cosmjs/proto-signing/node_modules/cosmjs-types/cosmos/tx/v1beta1/tx';
 
 interface Window extends KeplrWindow {
     cosmostation?: Cosmos
@@ -16,12 +21,6 @@ interface Window extends KeplrWindow {
 
 type AccountAddress = string;
 
-interface SignDoc {
-    bodyBytes: Uint8Array;
-    authInfoBytes: Uint8Array;
-    chainId: string;
-    accountNumber: Long;
-}
 
 export type Ports = {
     rpcPort: number,

@@ -48,7 +48,7 @@ describe('faucet module', function () {
             .then(({bzSdk}) => client = bzSdk)
             .then(() => mint(client, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
             .then(() => expect(true).to.be.false)
-            .catch(err => expect(err.stack).to.contain('invalid request'))
+            .catch(err => expect(err.stack).to.contain('unknown request'))
             .then(() => getAccountBalance(client, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
             .then(bal => expect(bal).to.equal(0))
     });
@@ -89,7 +89,7 @@ describe('faucet module', function () {
     it('should not mint if bluzelleFaucet is not turned on', () =>
         startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: false})
             .then(info => mint(info.bzSdk))
-            .catch(err => expect(err.message.includes('invalid request')).to.be.true)
+            .catch(err => expect(err.message.includes('unknown request')).to.be.true)
     );
 
 });

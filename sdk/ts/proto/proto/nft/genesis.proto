@@ -1,5 +1,5 @@
 syntax = "proto3";
-package bluzelle.curium.nft;
+package nft;
 
 import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
@@ -11,9 +11,9 @@ option (gogoproto.goproto_getters_all) = false;
 // GenesisState defines the nft module's genesis state
 message GenesisState {
   nft.Params params = 1 [ (gogoproto.nullable) = false ];
-  repeated bluzelle.curium.nft.Metadata metadata = 2 [ (gogoproto.nullable) = false ];
+  repeated nft.Metadata metadata = 2 [ (gogoproto.nullable) = false ];
   uint64 last_metadata_id = 3;
-  repeated bluzelle.curium.nft.NFT nfts = 4 [ (gogoproto.nullable) = false ];
-  repeated bluzelle.curium.nft.Collection collections = 5 [ (gogoproto.nullable) = false ];
+  repeated nft.NFT nfts = 4 [ (gogoproto.nullable) = false ];
+  repeated nft.Collection collections = 5 [ (gogoproto.nullable) = false ];
   uint64 last_collection_id = 6;
 }

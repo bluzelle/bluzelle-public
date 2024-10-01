@@ -101,16 +101,16 @@ export const msgMapping: MsgTypeToTypeUrlMap = {
     [MsgType.VOTE_WEIGHTED]: "/cosmos.gov.v1beta1.MsgVoteWeighted",
     [MsgType.UNJAIL]: "/cosmos.slashing.v1beta1.MsgUnjail",
 
-    [MsgType.CREATE_NFT]: "/bluzelle.curium.nft.MsgCreateNFT",
-    [MsgType.PRINT_EDITION]: "/bluzelle.curium.nft.MsgPrintEdition",
-    [MsgType.TRANSFER_NFT]: "/bluzelle.curium.nft.MsgTransferNFT",
-    [MsgType.SIGN_METADATA]: "/bluzelle.curium.nft.MsgSignMetadata",
-    [MsgType.UPDATE_METADATA]: "/bluzelle.curium.nft.MsgUpdateMetadata",
-    [MsgType.UPDATE_METADATA_AUTHORITY]: "/bluzelle.curium.nft.MsgUpdateMetadataAuthority",
-    [MsgType.UPDATE_MINT_AUTHORITIY]: "/bluzelle.curium.nft.MsgUpdateMintAuthority",
-    [MsgType.CREATE_COLLECTION]: "/bluzelle.curium.nft.MsgCreateCollection",
-    [MsgType.UPDATE_COLLECTION_AUTHORITY]: "/bluzelle.curium.nft.MsgUpdateCollectionAuthority",
-    [MsgType.PIN]: "/bluzelle.curium.storage.MsgPin",
+    [MsgType.CREATE_NFT]: "/nft.MsgCreateNFT",
+    [MsgType.PRINT_EDITION]: "/nft.MsgPrintEdition",
+    [MsgType.TRANSFER_NFT]: "/nft.MsgTransferNFT",
+    [MsgType.SIGN_METADATA]: "/nft.MsgSignMetadata",
+    [MsgType.UPDATE_METADATA]: "/nft.MsgUpdateMetadata",
+    [MsgType.UPDATE_METADATA_AUTHORITY]: "/nft.MsgUpdateMetadataAuthority",
+    [MsgType.UPDATE_MINT_AUTHORITIY]: "/nft.MsgUpdateMintAuthority",
+    [MsgType.CREATE_COLLECTION]: "/nft.MsgCreateCollection",
+    [MsgType.UPDATE_COLLECTION_AUTHORITY]: "/nft.MsgUpdateCollectionAuthority",
+    [MsgType.PIN]: "/storage.MsgPin",
 };
 
 

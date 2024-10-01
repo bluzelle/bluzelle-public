@@ -1,50 +1,9 @@
 import { BluzelleClient } from './sdk';
-import { MsgPin } from '../curium/lib/generated/storage/tx';
-import { EncodeObject, Registry } from '@cosmjs/proto-signing';
+import { EncodeObject } from '@cosmjs/proto-signing';
 import { Deferred, newDeferred } from '../utils/Deferred';
 import { Left, Right, Some } from 'monet';
 import { passThrough } from 'promise-passthrough';
 import { identity } from 'lodash';
-import { MsgMultiSend, MsgSend } from '../curium/lib/generated/cosmos/bank/v1beta1/tx';
-import {
-    MsgBurnNFT,
-    MsgCreateCollection,
-    MsgCreateNFT,
-    MsgMultiSendNFT,
-    MsgPrintEdition,
-    MsgSignMetadata,
-    MsgTransferNFT,
-    MsgUpdateCollectionMutableUri,
-    MsgUpdateCollectionUri,
-    MsgUpdateMetadata,
-    MsgUpdateMetadataAuthority,
-    MsgUpdateMintAuthority,
-} from '../curium/lib/generated/nft/tx';
-import {
-    MsgSetGasTaxBp,
-    MsgSetTaxCollector,
-    MsgSetTransferTaxBp
-} from '../curium/lib/generated/tax/tx';
-import {
-    MsgBeginRedelegate,
-    MsgDelegate,
-    MsgEditValidator,
-    MsgUndelegate
-} from '../curium/lib/generated/cosmos/staking/v1beta1/tx';
-import {
-    MsgFundCommunityPool,
-    MsgSetWithdrawAddress,
-    MsgWithdrawDelegatorReward,
-    MsgWithdrawValidatorCommission
-} from '../curium/lib/generated/cosmos/distribution/v1beta1/tx';
-import { MsgExec, MsgGrant, MsgRevoke } from '../curium/lib/generated/cosmos/authz/v1beta1/tx';
-import { MsgCreateVestingAccount } from '../curium/lib/generated/cosmos/vesting/v1beta1/tx';
-import {
-    MsgDeposit,
-    MsgSubmitProposal,
-    MsgVote,
-    MsgVoteWeighted
-} from '../curium/lib/generated/cosmos/gov/v1beta1/tx';
 import { DeliverTxResponse } from '@cosmjs/stargate';
 import { toHex } from '@cosmjs/encoding';
 import { TxRaw } from '../curium/lib/generated/cosmos/tx/v1beta1/tx';
@@ -95,46 +54,6 @@ const endTransaction = (queue: MsgQueue, client: BluzelleClient) => {
             gasPrice: item.options.gasPrice
         }), { maxGas: 0 } as BroadcastOptions)
     }
-};
-
-
-export const registerMessages = (registry: Registry) => {
-    registry.register('/bluzelle.curium.storage.MsgPin', MsgPin);
-    registry.register('/cosmos.bank.v1beta1.MsgSend', MsgSend)
-    registry.register('/cosmos.bank.v1beta1.MsgMultiSend', MsgMultiSend)
-    registry.register('/bluzelle.curium.tax.MsgSetGasTaxBp', MsgSetGasTaxBp)
-    registry.register('/bluzelle.curium.tax.MsgSetTransferTaxBp', MsgSetTransferTaxBp)
-    registry.register('/bluzelle.curium.tax.MsgSetTaxCollector', MsgSetTaxCollector)
-    registry.register('/cosmos.staking.v1beta1.MsgDelegate', MsgDelegate)
-    registry.register('/cosmos.staking.v1beta1.MsgUndelegate', MsgUndelegate)
-    registry.register('/cosmos.staking.v1beta1.MsgBeginRedelegate', MsgBeginRedelegate)
-    registry.register('/cosmos.staking.v1beta1.MsgEditValidator', MsgEditValidator)
-    registry.register('/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward', MsgWithdrawDelegatorReward)
-    registry.register('/cosmos.distribution.v1beta1.MsgFundCommunityPool', MsgFundCommunityPool)
-    registry.register('/cosmos.distribution.v1beta1.MsgSetWithdrawAddress', MsgSetWithdrawAddress)
-    registry.register('/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission', MsgWithdrawValidatorCommission)
-    registry.register('/bluzelle.curium.nft.MsgCreateNFT', MsgCreateNFT)
-    registry.register('/bluzelle.curium.nft.MsgCreateCollection', MsgCreateCollection)
-    registry.register('/bluzelle.curium.nft.MsgTransferNFT', MsgTransferNFT)
-    registry.register('/bluzelle.curium.nft.MsgUpdateMintAuthority', MsgUpdateMintAuthority)
-    registry.register('/bluzelle.curium.nft.MsgUpdateMetadata', MsgUpdateMetadata)
-    registry.register('/bluzelle.curium.nft.MsgUpdateMetadataAuthority', MsgUpdateMetadataAuthority)
-    registry.register('/bluzelle.curium.nft.MsgPrintEdition', MsgPrintEdition)
-    registry.register('/bluzelle.curium.nft.MsgSignMetadata', MsgSignMetadata)
-    registry.register('/bluzelle.curium.nft.MsgMultiSendNFT', MsgMultiSendNFT)
-    registry.register('/bluzelle.curium.nft.MsgBurnNFT', MsgBurnNFT)
-    registry.register('/cosmos.authz.v1beta1.MsgGrant', MsgGrant)
-    registry.register('/cosmos.authz.v1beta1.MsgExec', MsgExec)
-    registry.register('/cosmos.authz.v1beta1.MsgRevoke', MsgRevoke)
-    registry.register('/bluzelle.curium.nft.MsgUpdateCollectionUri', MsgUpdateCollectionUri)
-    registry.register('/bluzelle.curium.nft.MsgUpdateCollectionMutableUri', MsgUpdateCollectionMutableUri)
-    registry.register('/cosmos.vesting.v1beta1.MsgCreateVestingAccount', MsgCreateVestingAccount)
-    registry.register('/cosmos.gov.v1beta1.MsgSubmitProposal', MsgSubmitProposal)
-    registry.register('/cosmos.gov.v1beta1.MsgVote', MsgVote)
-    registry.register('/cosmos.gov.v1beta1.MsgVoteWeighted', MsgVoteWeighted)
-    registry.register('/cosmos.gov.v1beta1.MsgDeposit', MsgDeposit)
-
-    return registry
 };
 
 export interface BroadcastOptions {
