@@ -22,8 +22,8 @@ func NewAnteHandler(options appTypes.AnteHandlerOptions) (sdk.AnteHandler, error
 
 	anteDecorators := []sdk.AnteDecorator{
 		NewSetUpContextDecorator(options.GasMeterKeeper, options.BankKeeper, options.AccountKeeper, options.TaxKeeper, minGasPriceCoins), // outermost AnteDecorator. SetUpContext must be called first
-		ante.NewExtensionOptionsDecorator(nil),
-		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, nil),
+		//ante.NewExtensionOptionsDecorator(nil),
+		//ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, nil),
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
