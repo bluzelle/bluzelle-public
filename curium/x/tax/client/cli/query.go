@@ -36,7 +36,7 @@ func GetTaxInfoCmd() *cobra.Command {
 		Use:   "info",
 		Short: "Query for tax info",
 		Long: strings.TrimSpace(
-			fmt.Sprintf(`Query for tax info`,
+			fmt.Sprintf(`Query for tax info %s %s %s %s`,
 				version.AppName, types.ModuleName, version.AppName, types.ModuleName,
 			),
 		),
