@@ -104,7 +104,9 @@ export const getDenomMetadata = (client: BluzelleClient,
       base: '',
       display: '',
       name: '',
-      symbol: ''
+      symbol: '',
+      uri: '',
+      uriHash: ''
     });
 
 export const getDenomsMetadata = (client: BluzelleClient,

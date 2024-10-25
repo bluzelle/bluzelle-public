@@ -106,6 +106,7 @@ describe("authz module", function () {
                 denom: "ubnt",
                 amount: "100"
             }],
+            allowList: [],
             expiration
         }, {
             maxGas: 1000000, gasPrice: 0.002
