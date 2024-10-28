@@ -3,6 +3,7 @@ package ante
 import (
 	"fmt"
 
+	"cosmossdk.io/errors"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
@@ -37,6 +38,10 @@ type SetUpContextDecorator struct {
 	taxKeeper        taxmodulekeeper.Keeper
 	minGasPriceCoins sdk.DecCoins
 }
+
+var (
+	ErrLowGasPrice = errors.New(appTypes.Name, 1104, appTypes.ErrLowGasPrice)
+)
 
 func NewSetUpContextDecorator(gasMeterKeeper *gasmeter.Keeper, bankKeeper bankkeeper.Keeper, accountKeeper acctypes.AccountKeeper, taxKeeper taxmodulekeeper.Keeper, minGasPriceCoins sdk.DecCoins) SetUpContextDecorator {
 	return SetUpContextDecorator{
@@ -126,7 +131,7 @@ func SetGasMeter(options SetGasMeterOptions) (sdk.Context, error) {
 	feePayer := feeTx.FeePayer()
 
 	if gasPriceCoins.AmountOf(global.Denom).LT(options.MinGasPriceCoins.AmountOf(global.Denom)) {
-		return options.Ctx, sdkerrors.New(appTypes.Name, 2, appTypes.ErrLowGasPrice)
+		return options.Ctx, ErrLowGasPrice
 	}
 
 	gm := gasmeter.NewChargingGasMeter(options.BankKeeper, options.AccountKeeper, options.TaxKeeper, options.GasLimit, feePayer, gasPriceCoins)

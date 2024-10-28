@@ -7,16 +7,16 @@ import (
 )
 
 const (
-	CoinUnit      = "btsg"
-	MicroCoinUnit = "ubtsg"
+	CoinUnit      = "bnt"
+	MicroCoinUnit = "ubnt"
 	CoinExponent  = 6
 
 	DefaultBondDenom = MicroCoinUnit
 
 	// Bech32PrefixAccAddr defines the Bech32 prefix of an account's address
-	Bech32PrefixAccAddr = "bitsong"
+	Bech32PrefixAccAddr = "bluzelle"
 
-	CoinType = 639
+	CoinType = 483
 )
 
 var (

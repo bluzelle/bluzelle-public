@@ -1,7 +1,6 @@
 package types
 
 import (
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"strings"
 )
 
@@ -15,15 +14,15 @@ func DefaultGenesis() *GenesisState {
 func (gs GenesisState) Validate() error {
 	// this line is used by starport scaffolding # genesis/types/validate
 	if gs.GasTaxBp < 0 {
-		return sdkerrors.New("tax", 1, "Invalid GasTaxBp")
+		return ErrInvalidGasTaxBp
 	}
 
 	if gs.TransferTaxBp < 0 {
-		return sdkerrors.New("tax", 1, "Invalid TransferTaxBp")
+		return ErrInvalidTransferTaxBp
 	}
 
 	if len(gs.TaxCollector) != 47 || !strings.HasPrefix(gs.TaxCollector, AccountAddressPrefix) {
-		return sdkerrors.New("tax", 1, "Invalid TaxCollector")
+		return ErrInvalidTaxCollector
 	}
 
 	return nil

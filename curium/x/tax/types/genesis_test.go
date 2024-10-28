@@ -15,6 +15,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			TaxCollector:  "",
 		}
 		err := gs.Validate()
+		if err != nil {
+			t.Logf("Validation error: %v", err)
+		}
 		require.NotNil(t, err)
 	})
 
@@ -25,6 +28,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			TaxCollector:  "bluzelle197xx52k9tw08e7h0jqahptwucyv3e6pxex3xfe",
 		}
 		err := gs.Validate()
+		if err != nil {
+			t.Logf("Validation error: %v", err)
+		}
 		require.NotNil(t, err)
 	})
 
@@ -35,6 +41,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			TaxCollector:  "",
 		}
 		err := gs.Validate()
+		if err != nil {
+			t.Logf("Validation error: %v", err)
+		}
 		require.NotNil(t, err)
 	})
 
@@ -45,6 +54,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			TaxCollector:  "123456781dvc2u4l84hyfeem5fmfm9eyjlndpsycwwfhtln",
 		}
 		err := gs.Validate()
+		if err != nil {
+			t.Logf("Validation error: %v", err)
+		}
 		require.NotNil(t, err)
 	})
 
@@ -60,7 +72,13 @@ func TestGenesisState_Validate(t *testing.T) {
 			TaxCollector:  "bluzelle",
 		}
 		err := gs.Validate()
+		if err != nil {
+			t.Logf("Validation error: %v", err)
+		}
 		err2 := gs2.Validate()
+		if err2 != nil {
+			t.Logf("Validation error: %v", err2)
+		}
 		require.NotNil(t, err)
 		require.NotNil(t, err2)
 	})
@@ -72,6 +90,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			TaxCollector:  "bluzelle197xx52k9tw08e7h0jqahptwucyv3e6pxex3xfe",
 		}
 		err := gs.Validate()
+		if err != nil {
+			t.Logf("Validation error: %v", err)
+		}
 		require.Nil(t, err)
 	})
 
