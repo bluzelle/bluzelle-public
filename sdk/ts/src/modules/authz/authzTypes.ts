@@ -215,7 +215,7 @@ type BaseGrantParam = {
 }
 
 type GenericGrantParam = BaseGrantParam[GrantType.GENERIC] & { msgType: MsgType }
-type SendGrantParam = BaseGrantParam[GrantType.SEND] & { spendLimit: Coin[], allowList: string[] }
+type SendGrantParam = BaseGrantParam[GrantType.SEND] & { spendLimit: Coin[] }
 type StakeGrantParam = BaseGrantParam[GrantType.STAKE] & { stakeAuthorization: StakeAuthorization }
 
 export type GrantParam = GenericGrantParam | SendGrantParam | StakeGrantParam
@@ -232,7 +232,7 @@ type GrantTypeToEncodeFnMap = {
 
 export const grantTypeToEncodeFnMap: GrantTypeToEncodeFnMap = {
     [GrantType.GENERIC]: (params: GenericGrantParam) => GenericAuthorization.encode({msg: msgMapping[params.msgType]}).finish(),
-    [GrantType.SEND]: (params: SendGrantParam) => SendAuthorization.encode({spendLimit: params.spendLimit, allowList: params.allowList}).finish(),
+    [GrantType.SEND]: (params: SendGrantParam) => SendAuthorization.encode({spendLimit: params.spendLimit}).finish(),
     [GrantType.STAKE]: (params: StakeGrantParam) => StakeAuthorization.encode(params.stakeAuthorization).finish(),
 }
 

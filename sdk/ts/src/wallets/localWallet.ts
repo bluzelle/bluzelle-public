@@ -1,9 +1,14 @@
-import { SigningBluzelleClient } from '../core';
-import { SequenceResponse } from '@cosmjs/stargate';
-import { DirectSecp256k1HdWallet, DirectSecp256k1HdWalletOptions } from '@cosmjs/proto-signing';
-import { Bip39, EnglishMnemonic, HdPath, Slip10RawIndex } from '@cosmjs/crypto';
-import { passThrough } from 'promise-passthrough';
-import { BluzelleWallet } from './BluzelleWallet';
+import {SigningBluzelleClient} from "../core";
+import {SequenceResponse} from "@cosmjs/stargate";
+import {
+    DirectSecp256k1HdWallet,
+    DirectSecp256k1HdWalletOptions
+} from "@cosmjs/proto-signing/build/directsecp256k1hdwallet";
+import {Bip39, EnglishMnemonic} from "@cosmjs/crypto";
+import {passThrough} from "promise-passthrough";
+import {BluzelleWallet} from "./BluzelleWallet";
+import {Slip10RawIndex, HdPath} from "@cosmjs/proto-signing/node_modules/@cosmjs/crypto/build/slip10";
+
 
 export interface LocalWalletOptions {
     coinType?: number
