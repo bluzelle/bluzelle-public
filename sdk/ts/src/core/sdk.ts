@@ -16,9 +16,9 @@ import {QueryClientImpl as GovQueryClientImpl} from "../curium/lib/generated/cos
 import {QueryClientImpl as UpgradeQueryClientImpl} from "../curium/lib/generated/cosmos/upgrade/v1beta1/query";
 import {QueryClientImpl as ParamsQueryClientImpl} from "../curium/lib/generated/cosmos/params/v1beta1/query";
 import {ServiceClientImpl} from "../curium/lib/generated/cosmos/tx/v1beta1/service";
-// import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
+import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 
-import {Tendermint34Client} from "@cosmjs/stargate/node_modules/@cosmjs/tendermint-rpc/build/tendermint34/tendermint34client";
+// import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 
 type QueryClientImpl = {
   storage: StorageQueryClientImpl;

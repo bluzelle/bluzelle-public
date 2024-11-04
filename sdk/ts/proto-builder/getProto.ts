@@ -165,12 +165,11 @@ export const getThirdPartyDependencies = () => [
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/third_party/proto/confio/proofs.proto',
 
 
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/third_party/proto/gogoproto/gogo.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.12/third_party/proto/gogoproto/gogo.proto',
 
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/third_party/proto/google/api/annotations.proto',
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/third_party/proto/google/api/http.proto',
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/third_party/proto/google/api/httpbody.proto',
-
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.12/third_party/proto/google/api/annotations.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.12/third_party/proto/google/api/http.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.12/third_party/proto/google/api/httpbody.proto',
 
 ];
 

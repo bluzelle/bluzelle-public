@@ -7,7 +7,7 @@ import {
 import {Bip39, EnglishMnemonic} from "@cosmjs/crypto";
 import {passThrough} from "promise-passthrough";
 import {BluzelleWallet} from "./BluzelleWallet";
-import {Slip10RawIndex, HdPath} from "@cosmjs/proto-signing/node_modules/@cosmjs/crypto/build/slip10";
+import {Slip10RawIndex, HdPath} from "@cosmjs/crypto";
 
 
 export interface LocalWalletOptions {
