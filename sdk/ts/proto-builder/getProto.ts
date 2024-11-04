@@ -125,7 +125,7 @@ export const getCosmosProtoDependencies = () => [
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.12/proto/cosmos/params/v1beta1/query.proto',
 
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/refs/tags/v0.47.12/proto/cosmos/msg/v1/msg.proto',
-    
+
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/refs/tags/v0.47.12/proto/cosmos/capability/module/v1//module.proto',
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/refs/tags/v0.47.12/proto/cosmos/capability/v1beta1/capability.proto',
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/refs/tags/v0.47.12/proto/cosmos/capability/v1beta1/genesis.proto',
@@ -165,11 +165,12 @@ export const getThirdPartyDependencies = () => [
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/third_party/proto/confio/proofs.proto',
 
 
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.12/third_party/proto/gogoproto/gogo.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/third_party/proto/gogoproto/gogo.proto',
 
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.12/third_party/proto/google/api/annotations.proto',
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.12/third_party/proto/google/api/http.proto',
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.12/third_party/proto/google/api/httpbody.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/third_party/proto/google/api/annotations.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/third_party/proto/google/api/http.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.11/third_party/proto/google/api/httpbody.proto',
+
 
 ];
 
