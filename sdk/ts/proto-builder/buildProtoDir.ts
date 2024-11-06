@@ -57,7 +57,8 @@ const getCuriumProto = () =>
 
 export const downloadAllProto = () =>
     Promise.all(getCosmosProtoDependencies().map(link => getProtoFile(link, getPathFromLink)))
-        .then(() => Promise.all(getThirdPartyDependencies().map(link => getProtoFile(link, getThirdPartyPathFromLink))))
+        // .then(() => Promise.all(getThirdPartyDependencies().map(link => getProtoFile(link, getThirdPartyPathFromLink))))
+        .then(() => Promise.all(getThirdPartyDependencies().map(link => getProtoFile(link, getPathFromLink))))
         .then(() => Promise.all(getGoogleDependencies().map(link => getProtoFile(link, getGooglePathFromLink))))
         .then(() => getCuriumProto());
 
