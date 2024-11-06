@@ -1,6 +1,5 @@
 import {createProtobufRpcClient, QueryClient, SequenceResponse, SigningStargateClient} from "@cosmjs/stargate";
 import {getRegistry} from "./registry";
-// import {SigningStargateClientOptions} from "@cosmjs/stargate/build/signingstargateclient";
 import {SigningStargateClientOptions} from "@cosmjs/stargate";
 import {QueryClientImpl as StorageQueryClientImpl} from "../curium/lib/generated/storage/query";
 import {QueryClientImpl as BankQueryClientImpl} from "../curium/lib/generated/cosmos/bank/v1beta1/query";
@@ -16,7 +15,7 @@ import {QueryClientImpl as GovQueryClientImpl} from "../curium/lib/generated/cos
 import {QueryClientImpl as UpgradeQueryClientImpl} from "../curium/lib/generated/cosmos/upgrade/v1beta1/query";
 import {QueryClientImpl as ParamsQueryClientImpl} from "../curium/lib/generated/cosmos/params/v1beta1/query";
 import {ServiceClientImpl} from "../curium/lib/generated/cosmos/tx/v1beta1/service";
-import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
+import {Tendermint37Client} from "@cosmjs/tendermint-rpc";
 
 // import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 

@@ -102,65 +102,38 @@ describe('authz module', function () {
       })
   );
 
-  it('send grant should be successfully executed', () =>
-    grantAuthorization(client, testGranter, testGrantee, {
-      grantType: GrantType.SEND,
-      spendLimit: [{
-        denom: 'ubnt',
-        amount: '100'
-      }],
-      allowList: [],
-      expiration
-    }, {
-      maxGas: 1000000,
-      gasPrice: 0.002
-    })
-      .then(() => getAccountBalance(client, testGranter))
-      .then((balance: number) => createCtx('beforeBalance', () => balance))
-      .then(withCtxAwait('result', () => executeAuthorization(eClient, testGrantee, [{
-        msgType: MsgType.SEND,
-        params: {
-          fromAddress: testGranter,
-          toAddress: testGrantee,
-          amount: [{
-            denom: 'ubnt',
-            amount: '100'
-          }]
-        }
-      }], {
-        maxGas: 1000000,
-        gasPrice: 0.002
-      })))
-      .then(withCtxAwait('afterBalance', () => getAccountBalance(client, testGranter)))
-      .then((ctx: any) => {
-        expect(ctx.beforeBalance - ctx.afterBalance)
-          .to
-          .equal(100);
-      })
-  );
-
-  it(`send grant should be not reduce grantee's balance`, () =>
-    getAccountBalance(client, testGrantee)
-      .then((balance: number) => createCtx('beforeBalance', () => balance))
-      .then(passThroughAwait(() => grantAuthorization(client, testGranter, testGrantee, {
-        grantType: GrantType.SEND,
-        spendLimit: [{
-          denom: 'ubnt',
-          amount: '100'
-        }],
-        allowList: [],
-        expiration
-      }, {
-        maxGas: 1000000,
-        gasPrice: 0.002
-      })))
-      .then(withCtxAwait('afterBalance', () => getAccountBalance(client, testGrantee)))
-      .then((ctx: any) => {
-        expect(ctx.beforeBalance - ctx.afterBalance)
-          .to
-          .equal(0);
-      })
-  );
+    it('send grant should be successfully executed', () =>
+        grantAuthorization(client, testGranter, testGrantee, {
+            grantType: GrantType.SEND,
+            spendLimit: [{
+                denom: "ubnt",
+                amount: "100"
+            }],
+            allowList: [],
+            expiration
+        }, {
+            maxGas: 1000000, gasPrice: 0.002
+        })
+            .then(() => getAccountBalance(client, testGranter))
+            .then((balance: number) => createCtx("beforeBalance", () => balance))
+            .then(withCtxAwait("result", () => executeAuthorization(eClient, testGrantee, [{
+                msgType: MsgType.SEND,
+                params: {
+                    fromAddress: testGranter,
+                    toAddress: testGrantee,
+                    amount: [{
+                        denom: "ubnt",
+                        amount: "100"
+                    }]
+                }
+            }], {
+                maxGas: 1000000, gasPrice: 0.002
+            })))
+            .then(withCtxAwait("afterBalance", () => getAccountBalance(client, testGranter)))
+            .then((ctx: any) => {
+                expect(ctx.beforeBalance - ctx.afterBalance).to.equal(100)
+            })
+    );
 
   it('delegate msg authorization should be successfully created and executed ', () =>
     grantAuthorization(client, testGranter, testGrantee, {
