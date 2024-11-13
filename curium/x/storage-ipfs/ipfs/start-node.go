@@ -17,7 +17,6 @@ import (
 	"github.com/bluzelle/ipfs-kubo/repo"
 	"github.com/bluzelle/ipfs-kubo/repo/fsrepo"
 	"github.com/ipfs/go-cid"
-	ipfscid "github.com/ipfs/go-cid"
 
 	// "github.com/ipfs/interface-go-ipfs-core/path"
 	"github.com/ipfs/boxo/path"
@@ -72,10 +71,9 @@ type StorageIpfsNode struct {
 	RepoPath string
 }
 
-func (storageNode *StorageIpfsNode) AddPin(cid string) error {
-	ipfsCid, _ := ipfscid.Decode(cid)
-	ipfsPath := path.FromCid(ipfsCid)
-	return storageNode.IpfsApi.Pin().Add(storageNode.Context, ipfsPath)
+func (storageNode *StorageIpfsNode) AddPin(pathString string) error {
+	mPath, _ := path.NewPath(pathString)
+	return storageNode.IpfsApi.Pin().Add(storageNode.Context, mPath)
 }
 
 func (storageNode *StorageIpfsNode) Stop() error {
