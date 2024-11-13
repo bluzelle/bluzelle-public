@@ -68,7 +68,7 @@ func Test(t *testing.T) {
 			}
 			assert.False(t, isLocal)
 
-			if err = nodes[1].AddPin(cidPath.String()); err != nil {
+			if err = nodes[1].AddPin(mCid.String()); err != nil {
 				return err
 			}
 
