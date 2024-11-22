@@ -27,7 +27,8 @@ func NewKeyRingReader(keyringDir string) *KeyRingReader {
 	}
 }
 func (krr KeyRingReader) GetAddress(name string) (sdk.AccAddress, error) {
-	kr, err := keyring.New("curium", keyring.BackendTest, krr.keyringDir, nil, nil, nil)
+	encCfg := params.MakeEncodingConfig()
+	kr, err := keyring.New("curium", keyring.BackendTest, krr.keyringDir, nil, encCfg.Marshaler)
 	if err != nil {
 		return nil, err
 	}

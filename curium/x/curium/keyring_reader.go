@@ -1,6 +1,7 @@
 package curium
 
 import (
+	"github.com/bluzelle/bluzelle-public/curium/app/params"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -14,7 +15,8 @@ func NewKeyRingReader(keyringDir string) *KeyRingReader {
 }
 
 func (krr KeyRingReader) GetAddress(name string) (sdk.AccAddress, error) {
-	kr, err := keyring.New("curium", keyring.BackendTest, krr.keyringDir, nil, nil, nil)
+	encCfg := params.MakeEncodingConfig()
+	kr, err := keyring.New("curium", keyring.BackendTest, krr.keyringDir, nil, encCfg.Marshaler)
 	if err != nil {
 		return nil, err
 	}
