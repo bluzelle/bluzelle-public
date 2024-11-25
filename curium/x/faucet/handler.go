@@ -18,6 +18,9 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 		switch msg := msg.(type) {
 		case *types.MsgMint:
+			println("\n\n\n")
+			println("testing")
+			println("\n\n\n")
 			res, err := msgServer.Mint(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 			// this line is used by starport scaffolding # 1

@@ -8,6 +8,10 @@ import (
 )
 
 func (k msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintResponse, error) {
+
+	println("\n\n\n")
+	println("test")
+	println("\n\n\n")
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	addr, err := sdk.AccAddressFromBech32(msg.Address)
@@ -21,27 +25,25 @@ func (k msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMi
 	err = k.bankKeeper.MintCoins(ctx, "faucet", coins)
 	err = k.bankKeeper.MintCoins(ctx, "faucet", eltCoins)
 	err = k.bankKeeper.MintCoins(ctx, "faucet", g4coins)
-	
 	if err != nil {
 		return nil, err
 	}
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, "faucet", addr, coins)
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, "faucet", addr, eltCoins)
-	
+
 	if err != nil {
 		return nil, err
 	}
 	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, "faucet", addr, g4coins)
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
 
 	response := types.MsgMintResponse{
 		Address: msg.Address,
