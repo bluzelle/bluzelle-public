@@ -1,6 +1,7 @@
 package curium
 
 import (
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -13,8 +14,8 @@ func NewKeyRingReader(keyringDir string) *KeyRingReader {
 	}
 }
 
-func (krr KeyRingReader) GetAddress(name string) (sdk.AccAddress, error) {
-	kr, err := keyring.New("curium", keyring.BackendTest, krr.keyringDir, nil, nil, nil)
+func (krr KeyRingReader) GetAddress(name string, cdc codec.Codec) (sdk.AccAddress, error) {
+	kr, err := keyring.New("curium", keyring.BackendTest, krr.keyringDir, nil, cdc)
 	if err != nil {
 		return nil, err
 	}

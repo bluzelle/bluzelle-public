@@ -42,9 +42,9 @@ func (EmptyAppOptions) Get(_ string) interface{} { return nil }
 
 func Setup(isCheckTx bool) *App {
 	db := dbm.NewMemDB()
-	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, curiumparams.MakeEncodingConfig(), EmptyAppOptions{}, baseapp.SetChainID("testing"))
+	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, curiumparams.MakeTestEncodingConfig(), EmptyAppOptions{}, baseapp.SetChainID("testing"))
 	if !isCheckTx {
-		genesisState := NewDefaultGenesisState(curiumparams.MakeEncodingConfig().Marshaler)
+		genesisState := NewDefaultGenesisState(curiumparams.MakeTestEncodingConfig().Marshaler)
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 		if err != nil {
 			panic(err)

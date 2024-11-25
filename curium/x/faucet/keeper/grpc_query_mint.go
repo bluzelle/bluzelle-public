@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+
 	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
@@ -15,7 +16,7 @@ func (k Keeper) Mint(goCtx context.Context, req *types.QueryMintRequest) (*types
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	addr, err := k.keyringReader.GetAddress("minter")
+	addr, err := k.keyringReader.GetAddress("minter", k.cdc)
 	if err != nil {
 		return nil, err
 	}
@@ -24,8 +25,7 @@ func (k Keeper) Mint(goCtx context.Context, req *types.QueryMintRequest) (*types
 		Creator: addr.String(),
 		Address: req.Address,
 	}
-
-	k.broadcastMsg(ctx, []sdk.Msg{&msg}, "minter")
+	k.broadcastMsg(ctx, []sdk.Msg{&msg}, "minter", k.cdc)
 
 	return &types.QueryMintResponse{}, nil
 

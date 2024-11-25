@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/bluzelle/bluzelle-public/curium/app/params"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	tenderminttypes "github.com/cometbft/cometbft/types"
 	sdkclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/types"
@@ -26,8 +26,8 @@ func NewKeyRingReader(keyringDir string) *KeyRingReader {
 		keyringDir: keyringDir,
 	}
 }
-func (krr KeyRingReader) GetAddress(name string) (sdk.AccAddress, error) {
-	kr, err := keyring.New("curium", keyring.BackendTest, krr.keyringDir, nil, nil, nil)
+func (krr KeyRingReader) GetAddress(name string, cdc codec.Codec) (sdk.AccAddress, error) {
+	kr, err := keyring.New("curium", keyring.BackendTest, krr.keyringDir, nil, cdc)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (krr KeyRingReader) GetAddress(name string) (sdk.AccAddress, error) {
 
 }
 
-type MsgBroadcaster func(ctx sdk.Context, msgs []types.Msg, from string) chan *MsgBroadcasterResponse
+type MsgBroadcaster func(ctx sdk.Context, msgs []types.Msg, from string, cdc codec.Codec) chan *MsgBroadcasterResponse
 
 type MsgBroadcasterResponse struct {
 	Response *abcitypes.TxResult
@@ -51,8 +51,8 @@ type MsgBroadcasterResponse struct {
 	Error    error
 }
 
-func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBroadcaster {
-	return func(ctx sdk.Context, msgs []types.Msg, from string) chan *MsgBroadcasterResponse {
+func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string, txConfig sdkclient.TxConfig) MsgBroadcaster {
+	return func(ctx sdk.Context, msgs []types.Msg, from string, cdc codec.Codec) chan *MsgBroadcasterResponse {
 		resp := make(chan *MsgBroadcasterResponse)
 
 		go func() {
@@ -65,17 +65,16 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 
 			// Choose your codec: Amino or Protobuf. Here, we use Protobuf, given by the
 			// following function.
-			encCfg := params.MakeEncodingConfig()
 
 			// Create a new TxBuilder.
-			txBuilder := encCfg.TxConfig.NewTxBuilder()
+			txBuilder := txConfig.NewTxBuilder()
 
 			err := txBuilder.SetMsgs(msgs...)
 			if err != nil {
+
 				returnError(err)
 				return
 			}
-
 			gas := uint64(40000000)
 			txBuilder.SetGasLimit(gas)
 
@@ -83,24 +82,28 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 			txBuilder.SetMemo("memo")
 			txBuilder.SetTimeoutHeight(uint64(ctx.BlockHeight() + 20))
 
-			kr, err := keyring.New("curium", keyring.BackendTest, keyringDir, nil, nil, nil)
+			kr, err := keyring.New("curium", keyring.BackendTest, keyringDir, nil, cdc)
+
 			if err != nil {
 				returnError(err)
 				return
 			}
 			keys, err := kr.Key(from)
+
 			if err != nil {
+
 				returnError(err)
 				return
 			}
 
 			addr, _ := keys.GetAddress()
+
 			accnt := accKeeper.GetAccount(ctx, addr)
+
 			if accnt == nil {
 				returnError(sdkerrors.New("curium", 2, "Cannot broadcast message, accnt does not exist"))
 				return
 			}
-
 			privArmor, err := kr.ExportPrivKeyArmor(from, "")
 			if err != nil {
 				returnError(err)
@@ -116,7 +119,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 			sigV2 := signing.SignatureV2{
 				PubKey: pubKey,
 				Data: &signing.SingleSignatureData{
-					SignMode:  encCfg.TxConfig.SignModeHandler().DefaultMode(),
+					SignMode:  txConfig.SignModeHandler().DefaultMode(),
 					Signature: nil,
 				},
 				Sequence: accnt.GetSequence(),
@@ -135,8 +138,9 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 			}
 
 			sigV2, err = tx.SignWithPrivKey(
-				encCfg.TxConfig.SignModeHandler().DefaultMode(), signerData,
-				txBuilder, privKey, encCfg.TxConfig, accnt.GetSequence())
+				txConfig.SignModeHandler().DefaultMode(), signerData,
+				txBuilder, privKey, txConfig, accnt.GetSequence())
+
 			if err != nil {
 				returnError(err)
 				return
@@ -148,7 +152,8 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 				return
 			}
 
-			txBytes, err := encCfg.TxConfig.TxEncoder()(txBuilder.GetTx())
+			txBytes, err := txConfig.TxEncoder()(txBuilder.GetTx())
+
 			if err != nil {
 				returnError(err)
 				return
@@ -163,16 +168,18 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 			}
 
 			res, err := client.BroadcastTxSync(txCtx, txBytes)
+
+			client.Start()
 			if err != nil {
+
 				returnError(err)
 				return
 			}
 
 			_ = res
 
-			client.Start()
-
 			sub, err := client.Subscribe(txCtx, "MsgBroadcaster", tenderminttypes.EventQueryTxFor(txBytes).String())
+
 			if err != nil {
 				returnError(err)
 				return
@@ -185,6 +192,9 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string) MsgBr
 				Response: &a.TxResult,
 				Data:     &a.TxResult.Result.Data,
 			}
+			println("\n\n\n")
+			println(resp)
+			println("\n\n\n")
 			close(resp)
 			client.Stop()
 		}()
