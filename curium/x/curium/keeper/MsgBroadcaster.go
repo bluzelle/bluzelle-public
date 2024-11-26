@@ -43,7 +43,7 @@ func (krr KeyRingReader) GetAddress(name string, cdc codec.Codec) (sdk.AccAddres
 
 }
 
-type MsgBroadcaster func(ctx sdk.Context, msgs []types.Msg, from string, cdc codec.Codec) chan *MsgBroadcasterResponse
+type MsgBroadcaster func(ctx sdk.Context, msgs []types.Msg, from string) chan *MsgBroadcasterResponse
 
 type MsgBroadcasterResponse struct {
 	Response *abcitypes.TxResult
@@ -51,8 +51,8 @@ type MsgBroadcasterResponse struct {
 	Error    error
 }
 
-func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string, txConfig sdkclient.TxConfig) MsgBroadcaster {
-	return func(ctx sdk.Context, msgs []types.Msg, from string, cdc codec.Codec) chan *MsgBroadcasterResponse {
+func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string, txConfig sdkclient.TxConfig, cdc codec.Codec) MsgBroadcaster {
+	return func(ctx sdk.Context, msgs []types.Msg, from string) chan *MsgBroadcasterResponse {
 		resp := make(chan *MsgBroadcasterResponse)
 
 		go func() {
@@ -187,14 +187,11 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string, txCon
 			result := <-sub
 
 			a := result.Data.(tenderminttypes.EventDataTx)
-
 			resp <- &MsgBroadcasterResponse{
 				Response: &a.TxResult,
 				Data:     &a.TxResult.Result.Data,
 			}
-			println("\n\n\n")
-			println(resp)
-			println("\n\n\n")
+
 			close(resp)
 			client.Stop()
 		}()

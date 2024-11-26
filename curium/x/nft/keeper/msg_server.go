@@ -308,7 +308,7 @@ func (m msgServer) UpdateCollectionMutableUri(goCtx context.Context, msg *types.
 
 func (m msgServer) MultiSendNFT(goCtx context.Context, msg *types.MsgMultiSendNFT) (*types.MsgMultiSendNFTResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	
+
 	// validate the MultiSendNFT Msg
 	err := msg.ValidateBasic()
 	if err != nil {
@@ -316,38 +316,38 @@ func (m msgServer) MultiSendNFT(goCtx context.Context, msg *types.MsgMultiSendNF
 	}
 	// checking the valid nft and the valid owner of each nft.
 	for _, output := range msg.MultiSendOutputs {
-		nft, err := m.Keeper.GetNFTById(ctx, output.NftId);
+		nft, err := m.Keeper.GetNFTById(ctx, output.NftId)
 		if err != nil {
-			return nil, err;
+			return nil, err
 		}
 		if nft.Owner != msg.Sender {
-			return nil, types.ErrNotNFTOwner;
+			return nil, types.ErrNotNFTOwner
 		}
 	}
-	
-	err = m.Keeper.MultiSendNFT(ctx, msg);
+
+	err = m.Keeper.MultiSendNFT(ctx, msg)
 	if err != nil {
-		return nil, err;
+		return nil, err
 	}
 
-	return &types.MsgMultiSendNFTResponse{}, nil;
+	return &types.MsgMultiSendNFTResponse{}, nil
 }
 
 func (m msgServer) BurnNFT(goCtx context.Context, msg *types.MsgBurnNFT) (*types.MsgBurnNFTResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	
+
 	// validate the MultiSendNFT Msg
 	err := msg.ValidateBasic()
 	if err != nil {
 		return nil, err
 	}
 
-	err = m.Keeper.BurnNFT(ctx, msg);
+	err = m.Keeper.BurnNFT(ctx, msg)
 	if err != nil {
-		return nil, err;
+		return nil, err
 	}
 
 	return &types.MsgBurnNFTResponse{
 		NftId: msg.NftId,
-	}, nil;
+	}, nil
 }
