@@ -9,9 +9,6 @@ import (
 
 func (k msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintResponse, error) {
 
-	println("\n\n\n")
-	println("test")
-	println("\n\n\n")
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	addr, err := sdk.AccAddressFromBech32(msg.Address)

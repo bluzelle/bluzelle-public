@@ -501,7 +501,7 @@ func NewCuriumApp(
 		app.GetSubspace(faucetmoduletypes.ModuleName),
 		app.BankKeeper,
 		curium.NewKeyRingReader(appOpts.Get(flags.FlagHome).(string)),
-		curiummodulekeeper.NewMsgBroadcaster(&app.AccountKeeper, cast.ToString(appOpts.Get(flags.FlagHome)), txConfig),
+		curiummodulekeeper.NewMsgBroadcaster(&app.AccountKeeper, cast.ToString(appOpts.Get(flags.FlagHome)), txConfig, appCodec),
 	)
 
 	faucetModule := faucetmodule.NewAppModule(appCodec, app.FaucetKeeper, app.AccountKeeper, app.BankKeeper)

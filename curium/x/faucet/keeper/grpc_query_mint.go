@@ -25,7 +25,7 @@ func (k Keeper) Mint(goCtx context.Context, req *types.QueryMintRequest) (*types
 		Creator: addr.String(),
 		Address: req.Address,
 	}
-	k.broadcastMsg(ctx, []sdk.Msg{&msg}, "minter", k.cdc)
+	k.broadcastMsg(ctx, []sdk.Msg{&msg}, "minter")
 
 	return &types.QueryMintResponse{}, nil
 
