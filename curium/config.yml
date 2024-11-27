@@ -15,7 +15,7 @@ accounts:
     hd-path: "m/44'/118'/0'/0/0"
   - name: minter
     coins:
-      - 10000000000ubnt
+      - 10000ubnt
     hd-path: "m/44'/118'/0'/0/0"
 faucet:
   name: null
