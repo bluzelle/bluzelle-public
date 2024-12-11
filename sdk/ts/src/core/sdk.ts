@@ -2,6 +2,7 @@ import {createProtobufRpcClient, QueryClient, SequenceResponse, SigningStargateC
 import {getRegistry} from "./registry";
 import {SigningStargateClientOptions} from "@cosmjs/stargate";
 import {QueryClientImpl as StorageQueryClientImpl} from "../curium/lib/generated/storage/query";
+import {QueryClientImpl as AuthQueryClientImpl} from "../curium/lib/generated/cosmos/auth/v1beta1/query";
 import {QueryClientImpl as BankQueryClientImpl} from "../curium/lib/generated/cosmos/bank/v1beta1/query";
 import {QueryClientImpl as FaucetQueryClientImpl} from '../curium/lib/generated/faucet/query'
 import {BluzelleWallet} from "../wallets/BluzelleWallet";
@@ -20,6 +21,7 @@ import {Tendermint37Client} from "@cosmjs/tendermint-rpc";
 // import {Tendermint34Client} from "@cosmjs/tendermint-rpc";
 
 type QueryClientImpl = {
+  auth: AuthQueryClientImpl;
   storage: StorageQueryClientImpl;
   bank: BankQueryClientImpl;
   faucet: FaucetQueryClientImpl;
@@ -68,6 +70,7 @@ const getRpcClient = (url: string): Promise<QueryClientImpl> =>
     .then(tendermintClient => new QueryClient(tendermintClient))
     .then(createProtobufRpcClient)
     .then(rpcClient => Promise.resolve({
+      auth: new AuthQueryClientImpl(rpcClient),
       storage: new StorageQueryClientImpl(rpcClient),
       bank: new BankQueryClientImpl(rpcClient),
       faucet: new FaucetQueryClientImpl(rpcClient),

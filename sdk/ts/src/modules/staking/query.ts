@@ -31,7 +31,7 @@ import {
 import { BluzelleCoin } from '../../shared/types';
 import { parseCoin, parseDecTypeToNumber, parseNumToLong } from '../../shared/parse';
 import { Bech32Address } from '@keplr-wallet/cosmos';
-import {Bech32} from '@cosmjs/encoding'
+import {toBech32} from '@cosmjs/encoding'
 /************************Bluzelle Type Definitions for staking query*/
 export type BluzelleDelegatorUnbondingDelegationsResponse = {
     unbondingDelegations: BluzelleUnbondingDelegation[],
@@ -612,7 +612,7 @@ const parseUint8ArrayToStr = (val: Uint8Array): string => {
 }
 
 const parseUint8ArrayToAddr = (val: Uint8Array): string => {
-    const bech32Addr = Bech32.encode('bluzellevaloper', val);
+    const bech32Addr = toBech32('bluzellevaloper', val);
     return bech32Addr;
 }
 

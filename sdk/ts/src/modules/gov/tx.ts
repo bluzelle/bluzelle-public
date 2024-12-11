@@ -4,13 +4,17 @@ import {
   MsgVote,
   MsgVoteWeighted,
   MsgDeposit
+} from '../../curium/lib/generated/cosmos/gov/v1/tx';
+import {
+  MsgSubmitProposal as MsgSubmitLegacyProposal
 } from '../../curium/lib/generated/cosmos/gov/v1beta1/tx';
-import { VoteOption, WeightedVoteOption } from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
+import { VoteOption, WeightedVoteOption } from '../../curium/lib/generated/cosmos/gov/v1/gov';
 import { TextProposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { ParamChange, ParameterChangeProposal } from 'cosmjs-types/cosmos/params/v1beta1/params';
 import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import { encodeSoftwareUpgradeProposal } from '../upgrade';
 import { parseStringToLong, scaleTo18 } from '../../shared/parse';
+import { MsgCommunityPoolSpend } from '../../curium/lib/generated/cosmos/distribution/v1beta1/tx';
 
 
 export type BluzelleWeightedVoteOption = {
@@ -38,7 +42,7 @@ export const submitTextProposal = (
     },
     proposer: params.proposer,
     initialDeposit: params.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
-  } as MsgSubmitProposal, options))
+  } as MsgSubmitLegacyProposal, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
 
@@ -68,7 +72,7 @@ export const submitSoftwareUpgradeProposal = (
     },
     proposer: params.proposer,
     initialDeposit: params.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
-  } as MsgSubmitProposal, options))
+  } as MsgSubmitLegacyProposal, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
 
@@ -94,7 +98,7 @@ export const submitParameterChangeProposal = (
     },
     proposer: params.proposer,
     initialDeposit: params.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
-  } as MsgSubmitProposal, options))
+  } as MsgSubmitLegacyProposal, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
 
@@ -107,20 +111,22 @@ export const submitCommunityPoolSpendProposal = (
     amount: {amount: number, denom: 'ubnt' | 'ug4' | 'uelt'}[];
     initialDeposit: {amount: number, denom: 'ubnt'}[]
     proposer: string,
+    authority: string
   },
   options: BroadcastOptions
 ): Promise<BluzelleTxResponse> =>
-  Promise.resolve(sendTx(client, '/cosmos.gov.v1beta1.MsgSubmitProposal', {
-    content: {
-      typeUrl: '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
-      value: CommunityPoolSpendProposal.encode({
-        title: params.title,
-        description: params.description,
+  Promise.resolve(sendTx(client, '/cosmos.gov.v1.MsgSubmitProposal', {
+    messages:[{
+      "typeUrl": '/cosmos.distribution.v1beta1.MsgCommunityPoolSpend',
+      value: MsgCommunityPoolSpend.encode({
+        authority: params.authority,
         recipient: params.recipient,
         amount: params.amount.map(({amount, denom}) => ({amount: amount.toString(), denom}))
       }).finish()
-    },
+    }],
+    title: params.title,
     proposer: params.proposer,
+    summary: "test summarny",
     initialDeposit: params.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
   } as MsgSubmitProposal, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
@@ -135,7 +141,7 @@ export const vote = (
   },
   options: BroadcastOptions
 ): Promise<BluzelleTxResponse> =>
-  Promise.resolve(sendTx(client, '/cosmos.gov.v1beta1.MsgVote', {
+  Promise.resolve(sendTx(client, '/cosmos.gov.v1.MsgVote', {
     proposalId: parseStringToLong(params.proposalId),
     voter: params.voter,
     option: params.option,
@@ -152,7 +158,7 @@ export const voteWithWeights = (
   },
   options: BroadcastOptions
 ): Promise<BluzelleTxResponse> =>
-  Promise.resolve(sendTx(client, '/cosmos.gov.v1beta1.MsgVoteWeighted', {
+  Promise.resolve(sendTx(client, '/cosmos.gov.v1.MsgVoteWeighted', {
     proposalId: parseStringToLong(params.proposalId),
     voter: params.voter,
     options: params.options.map(parseBluzelleWeightedVoteOption),
@@ -174,7 +180,7 @@ export const depositToProposal = (
   },
   options: BroadcastOptions
 ) =>
-  Promise.resolve(sendTx(client, '/cosmos.gov.v1beta1.MsgDeposit', {
+  Promise.resolve(sendTx(client, '/cosmos.gov.v1.MsgDeposit', {
     proposalId: parseStringToLong(params.proposalId),
     depositor: params.depositor,
     amount: params.amount.map(({amount, denom}) => ({amount: amount.toString(), denom})),

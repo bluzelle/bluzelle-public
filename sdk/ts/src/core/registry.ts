@@ -38,6 +38,10 @@ import {
   MsgSubmitProposal,
   MsgVote,
   MsgVoteWeighted
+} from '../curium/lib/generated/cosmos/gov/v1/tx';
+
+import {
+  MsgSubmitProposal as MsgSubmitLegacyProposal
 } from '../curium/lib/generated/cosmos/gov/v1beta1/tx';
 
 export const getRegistry = memoize(() =>
@@ -78,10 +82,11 @@ const registerMessages = (registry: Registry) => {
   registry.register('/nft.MsgUpdateCollectionUri', MsgUpdateCollectionUri)
   registry.register('/nft.MsgUpdateCollectionMutableUri', MsgUpdateCollectionMutableUri)
   registry.register('/cosmos.vesting.v1beta1.MsgCreateVestingAccount', MsgCreateVestingAccount)
-  registry.register('/cosmos.gov.v1beta1.MsgSubmitProposal', MsgSubmitProposal)
-  registry.register('/cosmos.gov.v1beta1.MsgVote', MsgVote)
-  registry.register('/cosmos.gov.v1beta1.MsgVoteWeighted', MsgVoteWeighted)
-  registry.register('/cosmos.gov.v1beta1.MsgDeposit', MsgDeposit)
+  registry.register('/cosmos.gov.v1.MsgSubmitProposal', MsgSubmitProposal)
+  registry.register('/cosmos.gov.v1beta1.MsgSubmitProposal', MsgSubmitLegacyProposal)
+  registry.register('/cosmos.gov.v1.MsgVote', MsgVote)
+  registry.register('/cosmos.gov.v1.MsgVoteWeighted', MsgVoteWeighted)
+  registry.register('/cosmos.gov.v1.MsgDeposit', MsgDeposit)
 
   return registry
 };
