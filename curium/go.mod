@@ -8,8 +8,8 @@ require (
 	github.com/bluzelle/simapp v0.1.0
 	github.com/cometbft/cometbft v0.37.5
 	github.com/cometbft/cometbft-db v0.8.0
-	github.com/cosmos/cosmos-sdk v0.47.12
-	github.com/cosmos/gogoproto v1.4.10
+	github.com/cosmos/cosmos-sdk v0.47.15
+	github.com/cosmos/gogoproto v1.7.0
 	github.com/cosmos/ibc-go/v7 v7.6.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.4
@@ -85,8 +85,8 @@ require (
 	cosmossdk.io/core v0.5.1 // indirect
 	cosmossdk.io/depinject v1.0.0-alpha.4 // indirect
 	cosmossdk.io/errors v1.0.1
-	cosmossdk.io/log v1.3.1 // indirect
-	cosmossdk.io/math v1.3.0 // indirect
+	cosmossdk.io/log v1.4.1 // indirect
+	cosmossdk.io/math v1.4.0 // indirect
 	cosmossdk.io/tools/rosetta v0.2.1 // indirect
 	filippo.io/edwards25519 v1.0.0 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
@@ -177,7 +177,7 @@ require (
 	github.com/gsterjov/go-libsecret v0.0.0-20161001094733-a6f4afe4910c // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-getter v1.7.1 // indirect
+	github.com/hashicorp/go-getter v1.7.5 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-safetemp v1.0.0 // indirect
@@ -302,7 +302,7 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/rs/cors v1.11.0 // indirect
-	github.com/rs/zerolog v1.32.0 // indirect
+	github.com/rs/zerolog v1.33.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/samber/lo v1.39.0 // indirect
