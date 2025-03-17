@@ -28,10 +28,6 @@ export const getPathFromLink = (link: string): string =>
 export const getThirdPartyPathFromLink = (link: string): string =>
     'third_party/proto/' + link.replace(/.*?\/proto\/(.*)/, "$1");
 
-// export const getPathFromOldLink = (link: string): string =>
-//     link.replace(/.*?\/v0.45.11\/(.*)/, "$1");
-export const getThirdPartyPathFromLink = (link: string): string =>
-    'third_party/proto/' + link.replace(/.*?\/proto\/(.*)/, "$1");
 
 // export const getPathFromOldLink = (link: string): string =>
 //     link.replace(/.*?\/v0.45.11\/(.*)/, "$1");
