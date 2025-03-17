@@ -25,6 +25,7 @@ import { getParamValue } from '../params';
 import { fundCommunityPool } from '../distribution';
 import { generateMnemonic } from '../../utils/generateMnemonic';
 import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
+import { getModuleAccountByName } from '../auth/query';
 
 describe.skip('gov module, local docker', () => {
 
@@ -368,6 +369,7 @@ describe.skip('gov module, local docker', () => {
           amount: [{amount: 100_000_000, denom: 'ubnt'}],
           depositor: ctx.auth.address
         }, {maxGas: 200_000, gasPrice: 10})))
+          .then(withCtxAwait("govModuleAddress", ctx => getModuleAccountByName(ctx.bzSdk, "gov")))
         .then(passThroughAwait(ctx => submitCommunityPoolSpendProposal(ctx.bzSdk, {
             title: 'community pool spend',
             description: 'Take funds from community pool',
@@ -380,7 +382,8 @@ describe.skip('gov module, local docker', () => {
             amount: [{
               amount: 100_000_000,
               denom: 'ubnt'
-            }]
+            }],
+            authority: ctx.govModuleAddress?.baseAccount?.address as string
           }, {
             maxGas: 200_000,
             gasPrice: 10
@@ -404,6 +407,7 @@ describe.skip('gov module, local docker', () => {
           amount: [{amount: 500_000_000, denom: 'ubnt'}],
           depositor: ctx.auth.address
         }, {maxGas: 200_000, gasPrice: 10})))
+        .then(withCtxAwait("govModuleAddress", ctx => getModuleAccountByName(ctx.bzSdk, "gov")))
         .then(withCtxAwait("recipient", () => newBluzelleClient({
           url: 'http://localhost:26667',
           wallet: newLocalWallet(generateMnemonic())
@@ -421,7 +425,9 @@ describe.skip('gov module, local docker', () => {
             amount: [{
               amount: 300_000_000,
               denom: 'ubnt'
-            }]
+            }],
+            authority: ctx.govModuleAddress?.baseAccount?.address as string
+
           }, {
             maxGas: 200_000,
             gasPrice: 10
