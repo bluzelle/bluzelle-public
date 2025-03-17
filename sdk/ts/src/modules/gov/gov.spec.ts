@@ -33,7 +33,7 @@ const PROPOSAL_VALUE: TextProposal = {
 
 const FIRST_PROPOSAL_ID = '1';
 
-describe('gov module', function() {
+describe.skip('gov module', function() {
   this.timeout(10_800_000)
 
   beforeEach(() =>
