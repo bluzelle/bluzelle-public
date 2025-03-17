@@ -1,8 +1,8 @@
 package app
 
 import (
+	upgrade "github.com/bluzelle/bluzelle-public/curium/app/upgrades/v10"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
@@ -10,9 +10,14 @@ import (
 func (app *App) setupUpgradeHandlers(
 	configurator module.Configurator,
 ) {
-	app.UpgradeKeeper.SetUpgradeHandler("10.0", func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		return app.mm.RunMigrations(ctx, configurator, fromVM)
-	})
+	app.UpgradeKeeper.SetUpgradeHandler(upgrade.UpgradeName, upgrade.CreateV10UpgradeHandler(app.mm, configurator))
+}
+
+func (app *App) setupUpgradeStoreLoaders() {
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		panic("failed to read upgrade info from disk: " + err.Error())
+	}
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	storeUpgrades = &storetypes.StoreUpgrades{
@@ -20,6 +25,12 @@ func (app *App) setupUpgradeHandlers(
 	}
 
 	if storeUpgrades != nil {
-		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(3333333, storeUpgrades))
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
 	}
+
+}
+
+func (app *App) upgrade(configurator module.Configurator) {
+	app.setupUpgradeHandlers(configurator)
+	app.setupUpgradeStoreLoaders()
 }
