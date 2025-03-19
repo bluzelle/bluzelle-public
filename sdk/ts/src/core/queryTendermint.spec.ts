@@ -4,8 +4,8 @@ import { getStatus, getValidators } from './queryTendermint';
 import { expect } from 'chai';
 import { Swarm } from 'daemon-manager/src';
 
-describe('tendermint queries', () => {
-
+describe('tendermint queries', function () {
+    this.timeout(800_000)
     beforeEach(() =>
         Swarm.stopDaemons({...defaultSwarmConfig})
     );

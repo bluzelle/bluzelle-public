@@ -27,5 +27,5 @@ export const getValidators = (client: BluzelleClient): Promise<ValidatorResponse
     client.tmClient.validators({})
         .then(result => result.validators.map(validator => ({
             address: Buffer.from(validator.address).toString('hex'),
-            votingPower: validator.votingPower as unknown as number
+            votingPower: validator.votingPower.valueOf() as unknown as number
         })))
