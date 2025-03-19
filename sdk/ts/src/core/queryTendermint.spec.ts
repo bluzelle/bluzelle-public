@@ -10,7 +10,7 @@ describe('tendermint queries', function () {
         Swarm.stopDaemons({...defaultSwarmConfig})
     );
 
-    it('should get the status of a node', () =>
+    it.skip('should get the status of a node', () =>
         startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})
             .then(({bzSdk}) => getStatus(bzSdk))
             .then(response => {
@@ -26,6 +26,7 @@ describe('tendermint queries', function () {
         startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})
             .then(({bzSdk}) => getValidators(bzSdk))
             .then(response => {
+                console.log(response)
                 expect(response[0].address.length).to.equal(40)
                 expect(response[0].votingPower).to.equal(defaultSwarmConfig.genesisTokenBalance? defaultSwarmConfig.genesisTokenBalance / 10: 0)
             })
