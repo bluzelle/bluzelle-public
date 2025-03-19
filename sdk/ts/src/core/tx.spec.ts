@@ -15,6 +15,7 @@ import {mint} from "../modules/faucet";
 import {withCtxAwait} from "@scottburch/with-context";
 import {getForkTestSwarmConfig} from "infra-control-test/specs/fork/genesisToLocal.spec";
 import {times} from "lodash";
+import { getTaxInfo } from "../modules/tax";
 
 
 describe('sending transactions', function () {
@@ -95,7 +96,8 @@ describe('sending transactions', function () {
 
     it('should send tokens in uelt and ug4', () =>
         startSwarmWithClient()
-            .then(withCtxAwait('taxCost', () => 10000 * (1/10000)))
+            .then(withCtxAwait("taxInfo", ctx => getTaxInfo(ctx.bzSdk)))
+            .then(withCtxAwait('taxCost', ctx => 10000 * (Number(ctx.taxInfo.transferTaxBp)/10000)))
             .then(withCtxAwait('toAddress', ctx => mint(ctx.bzSdk).then(res => res.address)))
             .then(withCtxAwait('preBalances', ctx => Promise.all([
                 getAccountBalance(ctx.bzSdk, ctx.bzSdk.address, 'uelt'),
