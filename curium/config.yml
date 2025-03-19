@@ -48,7 +48,7 @@ genesis:
     tax:
       gasTaxBp: 100
       taxCollector: bluzelle1dvc2u4l84hyfeem5fmfm9eyjlndpsycwwfhtln
-      transferTaxBp: 2
+      transferTaxBp: 1
 validators:
   - name: vuser
     bonded: 100000000ubnt
