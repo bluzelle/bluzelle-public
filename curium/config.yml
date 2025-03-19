@@ -30,7 +30,7 @@ genesis:
       constant_fee:
         denom: ubnt
     gov:
-      deposit_params:
+      params:
         min_deposit:
           - amount: "1000000"
             denom: ubnt
@@ -48,7 +48,7 @@ genesis:
     tax:
       gasTaxBp: 100
       taxCollector: bluzelle1dvc2u4l84hyfeem5fmfm9eyjlndpsycwwfhtln
-      transferTaxBp: 1
+      transferTaxBp: 2
 validators:
   - name: vuser
     bonded: 100000000ubnt

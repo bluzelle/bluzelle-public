@@ -27,7 +27,8 @@ import { generateMnemonic } from '../../utils/generateMnemonic';
 import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
 import { getModuleAccountByName } from '../auth/query';
 
-describe.skip('gov module, local docker', () => {
+describe('gov module, local docker', function () {
+  this.timeout(10_800_000)
 
   // Set genesis.app_state.gov.voting_params.voting_period to "10s" in daemon-manager/src/config.yml
 
@@ -35,7 +36,7 @@ describe.skip('gov module, local docker', () => {
     Swarm.stopDaemons({ ...defaultSwarmConfig })
   );
 
-  describe('text proposal', () => {
+  describe.skip('text proposal', () => {
 
     it('should be able to submit a text proposal', () =>
       startSwarmWithClient()
@@ -111,7 +112,7 @@ describe.skip('gov module, local docker', () => {
           proposalId: "1",
           depositor: client.auth.address,
           amount: [{
-            amount: 1_000_000,
+            amount: 10_000_000,
             denom: 'ubnt'
           }]
         }, {
@@ -141,7 +142,7 @@ describe.skip('gov module, local docker', () => {
           proposalId: "1",
           depositor: client.auth.address,
           amount: [{
-            amount: 1_000_000,
+            amount: 10_000_000,
             denom: 'ubnt'
           }]
         }, {
@@ -160,7 +161,7 @@ describe.skip('gov module, local docker', () => {
 
   });
 
-  describe('software upgrade proposal', () => {
+  describe.skip('software upgrade proposal', () => {
 
     it('should be able to vote on and pass a software upgrade proposal', () =>
       startSwarmWithClient()
@@ -281,7 +282,7 @@ describe.skip('gov module, local docker', () => {
 
   });
 
-  describe('parameters change proposal', () => {
+  describe.skip('parameters change proposal', () => {
 
     it('should be able to vote on and pass a parameters change proposal', () =>
       startSwarmWithClient()
@@ -361,7 +362,7 @@ describe.skip('gov module, local docker', () => {
 
   });
 
-  describe('community pool spend proposal', () => {
+  describe.skip('community pool spend proposal', () => {
 
     it('should be able to vote on and pass a community pool spend proposal', () =>
       startSwarmWithClient()

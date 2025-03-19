@@ -15,7 +15,8 @@ import {
 } from '../curium/lib/generated/cosmos/staking/v1beta1/tx';
 import {
   MsgFundCommunityPool, MsgSetWithdrawAddress,
-  MsgWithdrawDelegatorReward, MsgWithdrawValidatorCommission
+  MsgWithdrawDelegatorReward, MsgWithdrawValidatorCommission,
+  MsgCommunityPoolSpend
 } from '../curium/lib/generated/cosmos/distribution/v1beta1/tx';
 import {
   MsgBurnNFT,
@@ -66,6 +67,7 @@ const registerMessages = (registry: Registry) => {
   registry.register('/cosmos.distribution.v1beta1.MsgFundCommunityPool', MsgFundCommunityPool)
   registry.register('/cosmos.distribution.v1beta1.MsgSetWithdrawAddress', MsgSetWithdrawAddress)
   registry.register('/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission', MsgWithdrawValidatorCommission)
+  registry.register('/cosmos.distribution.v1beta1.MsgCommunityPoolSpend', MsgCommunityPoolSpend)
   registry.register('/nft.MsgCreateNFT', MsgCreateNFT)
   registry.register('/nft.MsgCreateCollection', MsgCreateCollection)
   registry.register('/nft.MsgTransferNFT', MsgTransferNFT)

@@ -126,9 +126,10 @@ export const submitCommunityPoolSpendProposal = (
     }],
     title: params.title,
     proposer: params.proposer,
-    summary: "test summarny",
+    summary: "test summary",
     initialDeposit: params.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
-  } as MsgSubmitProposal, options))
+    metadata: "test",
+  } as MsgSubmitLegacyProposal, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
 

@@ -147,13 +147,14 @@ describe('gov module', function() {
           url: 'http://localhost:26667',
           wallet: newLocalWallet(generateMnemonic())
         })
-          .then(recipient =>
-            submitCommunityPoolSpendProposal(client.bzSdk, {
+          .then(recipient =>{
+            console.log(client)
+            return submitCommunityPoolSpendProposal(client.bzSdk, {
               title: 'My title',
               description: 'My description',
               recipient: recipient.address,
               amount: [{
-                amount: 100_000_000,
+                amount: 10_000_000,
                 denom: `ubnt`
               }],
               proposer: client.auth.address,
@@ -166,6 +167,8 @@ describe('gov module', function() {
               maxGas: 200_000,
               gasPrice: 10
             })
+          }
+            
           )
           .then(res => expect(res.code).to.equal(0))
       ))
