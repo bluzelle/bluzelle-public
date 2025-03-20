@@ -141,7 +141,7 @@ describe('storage module', function () {
             .then(({resp, bzSdk}) => getTx(bzSdk, resp.transactionHash))
     });
 
-    it.skip('should allow multiaddr to nodes holding content', () => {
+    it('should allow multiaddr to nodes holding content', () => {
         const addr = '/ip4/45.32.211.194/udp/4001/quic-v1/p2p/12D3KooWDpD6gVGLAr7UZGUUgzVfXA6C3wotrBzY9CT8hQFhrKA7/p2p-circuit/p2p/12D3KooWM7UBZn1hS96xXMvE2UthmXTMmXq3w1p4r14MiSZqkaMa'
         return getBlzClient(curiumUrl, mnemonic.getValue())
             .then(bzSdk => (pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR', addresses: ['/ip4/45.32.211.194/udp/4001/quic-v1/p2p/12D3KooWDpD6gVGLAr7UZGUUgzVfXA6C3wotrBzY9CT8hQFhrKA7/p2p-circuit/p2p/12D3KooWM7UBZn1hS96xXMvE2UthmXTMmXq3w1p4r14MiSZqkaMa']}, {
