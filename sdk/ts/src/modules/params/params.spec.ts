@@ -3,7 +3,8 @@ import { Swarm } from 'daemon-manager/src';
 import { defaultSwarmConfig, startSwarmWithClient } from '@bluzelle/testing';
 import { getParamValue } from './query';
 
-describe('params module', () => {
+// params module is deprecated after cosmos-sdk version 0.47.12
+describe.skip('params module', () => {
 
   beforeEach(() =>
     Swarm.stopDaemons({ ...defaultSwarmConfig })
