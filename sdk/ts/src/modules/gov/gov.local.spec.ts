@@ -30,7 +30,7 @@ import { getModuleAccountByName } from '../auth/query';
 describe('gov module, local docker', function () {
   this.timeout(10_800_000)
 
-  // Set genesis.app_state.gov.voting_params.voting_period to "10s" in daemon-manager/src/config.yml
+  // Set genesis.app_state.gov.params.voting_period to "10s" in daemon-manager/src/config.yml
 
   beforeEach(() =>
     Swarm.stopDaemons({ ...defaultSwarmConfig })
@@ -79,7 +79,7 @@ describe('gov module, local docker', function () {
           proposalId: "1",
           depositor: client.auth.address,
           amount: [{
-            amount: 2_000_000,
+            amount: 10_000_000,
             denom: 'ubnt'
           }]
         }, {
