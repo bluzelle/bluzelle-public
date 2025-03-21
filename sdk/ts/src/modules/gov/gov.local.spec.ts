@@ -31,6 +31,7 @@ describe('gov module, local docker', function () {
   this.timeout(10_800_000)
 
   // Set genesis.app_state.gov.params.voting_period to "10s" in daemon-manager/src/config.yml
+  // Set genesis.app_state.gov.params.min_deposit to "10000000" in daemon-manager/src/config.yml
 
   beforeEach(() =>
     Swarm.stopDaemons({ ...defaultSwarmConfig })
