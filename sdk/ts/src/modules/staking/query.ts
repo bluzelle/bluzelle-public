@@ -30,7 +30,7 @@ import {
 } from '../../shared/pagination';
 import { BluzelleCoin } from '../../shared/types';
 import { parseCoin, parseDecTypeToNumber, parseNumToLong } from '../../shared/parse';
-import { Bech32Address } from '@keplr-wallet/cosmos';
+import Long from 'long';
 import {toBech32} from '@cosmjs/encoding'
 /************************Bluzelle Type Definitions for staking query*/
 export type BluzelleDelegatorUnbondingDelegationsResponse = {
@@ -180,6 +180,7 @@ export type BluzelleStakingParams = {
     maxEntries: number;
     historicalEntries: number;
     bondDenom: string;
+    minCommissionRate: string;
 }
 
 /*************************Query interface funtions */
@@ -455,7 +456,8 @@ export const getStakingParams = (
             maxValidators: 0,
             maxEntries: 0,
             historicalEntries: 0,
-            bondDenom: 'ubnt'
+            bondDenom: 'ubnt',
+            minCommissionRate: '0'
         })
 /******************* parse functions ********************/
 const parseQueryDelegatorDelegationsResponse = (res: QueryDelegatorDelegationsResponse): Promise<BluzelleDelegatorDelegationsResponse> =>
@@ -632,5 +634,18 @@ const parseParams = (params: Params): BluzelleStakingParams => ({
     maxValidators: params.maxValidators,
     maxEntries: params.maxEntries,
     historicalEntries: params.historicalEntries,
-    bondDenom: params.bondDenom
+    bondDenom: params.bondDenom,
+    minCommissionRate: params.minCommissionRate
+})
+
+export const parseBluzelleParamsToParams = (blzParams: BluzelleStakingParams): Params => ({
+    unbondingTime: {
+        seconds: Long.fromNumber(blzParams.unbondingTime.seconds),
+        nanos: Number(blzParams.unbondingTime.nanos)
+    },
+    maxValidators: blzParams.maxValidators,
+    maxEntries: blzParams.maxEntries,
+    historicalEntries: blzParams.historicalEntries,
+    bondDenom: blzParams.bondDenom,
+    minCommissionRate: blzParams.minCommissionRate
 })

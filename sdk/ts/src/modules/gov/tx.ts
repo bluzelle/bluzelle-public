@@ -15,6 +15,9 @@ import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1b
 import { encodeSoftwareUpgradeProposal } from '../upgrade';
 import { parseStringToLong, scaleTo18 } from '../../shared/parse';
 import { MsgCommunityPoolSpend } from '../../curium/lib/generated/cosmos/distribution/v1beta1/tx';
+import { MsgUpdateParams } from '../../curium/lib/generated/cosmos/staking/v1beta1/tx';
+import { Duration } from '../../curium/lib/generated/google/protobuf/duration';
+import { Params } from '../../curium/lib/generated/cosmos/staking/v1beta1/staking';
 
 
 export type BluzelleWeightedVoteOption = {
@@ -78,27 +81,30 @@ export const submitSoftwareUpgradeProposal = (
 
 export const submitParameterChangeProposal = (
   client: BluzelleClient,
-  params: {
+  authority: string,
+  proposalParams: {
     title: string,
     description: string,
-    changes: ParamChange[],
     initialDeposit: {amount: number, denom: 'ubnt'}[]
     proposer: string,
   },
+  params: Params,
   options: BroadcastOptions
 ): Promise<BluzelleTxResponse> =>
-  Promise.resolve(sendTx(client, '/cosmos.gov.v1beta1.MsgSubmitProposal', {
-    content: {
-      typeUrl: '/cosmos.params.v1beta1.ParameterChangeProposal',
-      value: ParameterChangeProposal.encode({
-        title: params.title,
-        description: params.description,
-        changes: params.changes,
+  Promise.resolve(sendTx(client, '/cosmos.gov.v1.MsgSubmitProposal', {
+    messages: [{
+      typeUrl: '/cosmos.staking.v1beta1.MsgUpdateParams',
+      value: MsgUpdateParams.encode({
+        authority: authority,
+        params: params
       }).finish()
-    },
-    proposer: params.proposer,
-    initialDeposit: params.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
-  } as MsgSubmitLegacyProposal, options))
+    }],
+    title: proposalParams.title,
+    proposer: proposalParams.proposer,
+    summary: "test summary",
+    initialDeposit: proposalParams.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
+    metadata: "test",
+  } as MsgSubmitProposal, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
 
@@ -129,7 +135,7 @@ export const submitCommunityPoolSpendProposal = (
     summary: "test summary",
     initialDeposit: params.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
     metadata: "test",
-  } as MsgSubmitLegacyProposal, options))
+  } as MsgSubmitProposal, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
 

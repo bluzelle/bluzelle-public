@@ -26,12 +26,13 @@ import { fundCommunityPool } from '../distribution';
 import { generateMnemonic } from '../../utils/generateMnemonic';
 import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
 import { getModuleAccountByName } from '../auth/query';
+import { getStakingParams } from '../staking';
+import { parseBluzelleParamsToParams } from '../staking/query';
 
 describe('gov module, local docker', function () {
   this.timeout(10_800_000)
 
   // Set genesis.app_state.gov.params.voting_period to "10s" in daemon-manager/src/config.yml
-  // Set genesis.app_state.gov.params.min_deposit to "10000000" in daemon-manager/src/config.yml
 
   beforeEach(() =>
     Swarm.stopDaemons({ ...defaultSwarmConfig })
@@ -64,7 +65,7 @@ describe('gov module, local docker', function () {
             description: 'My description',
             proposer: client.auth.address,
             initialDeposit: [{
-              amount: 2_000_000,
+              amount: 500_000,
               denom: 'ubnt'
             }],
           }, {
@@ -80,7 +81,7 @@ describe('gov module, local docker', function () {
           proposalId: "1",
           depositor: client.auth.address,
           amount: [{
-            amount: 10_000_000,
+            amount: 1_000_000,
             denom: 'ubnt'
           }]
         }, {
@@ -113,7 +114,7 @@ describe('gov module, local docker', function () {
           proposalId: "1",
           depositor: client.auth.address,
           amount: [{
-            amount: 10_000_000,
+            amount: 1_000_000,
             denom: 'ubnt'
           }]
         }, {
@@ -143,7 +144,7 @@ describe('gov module, local docker', function () {
           proposalId: "1",
           depositor: client.auth.address,
           amount: [{
-            amount: 10_000_000,
+            amount: 1_000_000,
             denom: 'ubnt'
           }]
         }, {
@@ -283,49 +284,49 @@ describe('gov module, local docker', function () {
 
   });
 
-  describe.skip('parameters change proposal', () => {
+  describe('parameters change proposal', () => {
 
-    it('should be able to vote on and pass a parameters change proposal', () =>
-      startSwarmWithClient()
-        .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, {
-            title: 'change_max_validators',
-            description: 'Increase max validators to 120',
-            proposer: client.auth.address,
-            initialDeposit: [{
-              amount: 2_000_000,
-              denom: 'ubnt'
-            }],
-            changes: [{
-              subspace: 'staking',
-              key: 'MaxValidators',
-              value: '120'
-            }]
-          }, {
-            maxGas: 200_000,
-            gasPrice: 10
-          })
-        ))
-        .then(passThroughAwait(client => vote(client.bzSdk, {
-          proposalId: "1",
-          voter: client.auth.address,
-          option: VoteOption.VOTE_OPTION_YES
-        }, { maxGas: 200_000, gasPrice: 10 })))
-        .then(passThroughAwait(() => delay(10_000)))
-        .then(passThroughAwait(client =>
-          getProposal(client.bzSdk, "1")
-            .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
-        ))
-    );
+    // it.skip('should be able to vote on and pass a parameters change proposal', () =>
+    //   startSwarmWithClient()
+    //     .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, {
+    //         title: 'change_max_validators',
+    //         description: 'Increase max validators to 120',
+    //         proposer: client.auth.address,
+    //         initialDeposit: [{
+    //           amount: 2_000_000,
+    //           denom: 'ubnt'
+    //         }],
+    //         changes: [{
+    //           subspace: 'staking',
+    //           key: 'MaxValidators',
+    //           value: '120'
+    //         }]
+    //       }, {
+    //         maxGas: 200_000,
+    //         gasPrice: 10
+    //       })
+    //     ))
+    //     .then(passThroughAwait(client => vote(client.bzSdk, {
+    //       proposalId: "1",
+    //       voter: client.auth.address,
+    //       option: VoteOption.VOTE_OPTION_YES
+    //     }, { maxGas: 200_000, gasPrice: 10 })))
+    //     .then(passThroughAwait(() => delay(10_000)))
+    //     .then(passThroughAwait(client =>
+    //       getProposal(client.bzSdk, "1")
+    //         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
+    //     ))
+    // );
 
     it('should be able to apply a parameters change proposal and see the parameter change', () =>
         startSwarmWithClient()
-          .then(passThroughAwait(client => getParamValue(client.bzSdk, {
-            subspace: 'staking',
-            key: 'MaxValidators'
-          })
-            .then(res => expect(res.param?.value).to.equal('100'))
+          .then(withCtxAwait("initialParams", client => getStakingParams(client.bzSdk)
+            // .then(res => expect(res.maxValidators).to.equal(100))
           ))
-          .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, {
+          .then(withCtxAwait("govModuleAddress", client => getModuleAccountByName(client.bzSdk, "gov")))
+          .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, 
+            client.govModuleAddress?.baseAccount?.address as string,
+            {
               title: 'change_max_validators',
               description: 'Increase max validators to 120',
               proposer: client.auth.address,
@@ -333,12 +334,9 @@ describe('gov module, local docker', function () {
                 amount: 2_000_000,
                 denom: 'ubnt'
               }],
-              changes: [{
-                subspace: 'staking',
-                key: 'MaxValidators',
-                value: '120'
-              }]
-            }, {
+            },
+            {...parseBluzelleParamsToParams(client.initialParams), maxValidators: 120},
+            {
               maxGas: 200_000,
               gasPrice: 10
             })
@@ -354,11 +352,8 @@ describe('gov module, local docker', function () {
               .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
           ))
           .then(passThroughAwait(() => delay(180_000)))
-          .then(client => getParamValue(client.bzSdk, {
-            subspace: 'staking',
-            key: 'MaxValidators'
-          }))
-          .then(res => expect(res.param?.value).to.equal('120'))
+          .then(client => getStakingParams(client.bzSdk))
+          .then(res => expect(res.maxValidators).to.equal(120))
     );
 
   });
@@ -458,7 +453,7 @@ describe.skip('gov module, local machine', () => {
 
   // Run a local bluzelle instance
   // Set genesis.app_state.gov.deposit_params.max_deposit_period to "5s" in curium/config.yml
-  // Set genesis.app_state.gov.voting_params.voting_period to "10s" in curium/config.yml
+  // Set genesis.app_state.gov.params.voting_period to "10s" in curium/config.yml
 
   const MNEMONIC = "";
   const CURIUM_URL = "http://localhost:26657";
