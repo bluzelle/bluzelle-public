@@ -14,6 +14,7 @@ export {
   getDepositParams,
   getTallyParams,
   getProposal,
+  getProposals,
   getDeposit,
 } from './query';
 

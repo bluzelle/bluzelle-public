@@ -115,6 +115,10 @@ export const getProposals = (
     proposalStatus: ProposalStatus;
     voter: string;
     depositor: string;
+  } = {
+    proposalStatus: 0,
+    voter: "",
+    depositor: ""
   },
   pagination: BluzellePageRequest = defaultPaginationOptions()
 ): Promise<BluzelleProposals> =>
