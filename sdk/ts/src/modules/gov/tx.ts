@@ -15,9 +15,16 @@ import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1b
 import { encodeSoftwareUpgradeProposal } from '../upgrade';
 import { parseStringToLong, scaleTo18 } from '../../shared/parse';
 import { MsgCommunityPoolSpend } from '../../curium/lib/generated/cosmos/distribution/v1beta1/tx';
-import { MsgUpdateParams } from '../../curium/lib/generated/cosmos/staking/v1beta1/tx';
+import { MsgUpdateParams as StakingMsgUpdateParams } from '../../curium/lib/generated/cosmos/staking/v1beta1/tx';
+import { MsgUpdateParams as GovMsgUpdateParams } from '../../curium/lib/generated/cosmos/gov/v1/tx';
+import { MsgUpdateParams as BankMsgUpdateParams } from '../../curium/lib/generated/cosmos/bank/v1beta1/tx';
+import { MsgUpdateParams as CrisisMsgUpdateParams } from '../../curium/lib/generated/cosmos/crisis/v1beta1/tx';
+import { MsgUpdateParams as SlashingMsgUpdateParams } from '../../curium/lib/generated/cosmos/slashing/v1beta1/tx';
+import { MsgUpdateParams as AuthMsgUpdateParams } from '../../curium/lib/generated/cosmos/auth/v1beta1/tx';
+import { MsgUpdateParams as DistributionMsgUpdateParams } from '../../curium/lib/generated/cosmos/distribution/v1beta1/tx';
 import { Duration } from '../../curium/lib/generated/google/protobuf/duration';
 import { Params } from '../../curium/lib/generated/cosmos/staking/v1beta1/staking';
+import { Any } from '../../curium/lib/generated/google/protobuf/any';
 
 
 export type BluzelleWeightedVoteOption = {
@@ -81,24 +88,18 @@ export const submitSoftwareUpgradeProposal = (
 
 export const submitParameterChangeProposal = (
   client: BluzelleClient,
-  authority: string,
   proposalParams: {
     title: string,
     description: string,
     initialDeposit: {amount: number, denom: 'ubnt'}[]
     proposer: string,
   },
-  params: Params,
+  params: any,
+  module: string,
   options: BroadcastOptions
 ): Promise<BluzelleTxResponse> =>
   Promise.resolve(sendTx(client, '/cosmos.gov.v1.MsgSubmitProposal', {
-    messages: [{
-      typeUrl: '/cosmos.staking.v1beta1.MsgUpdateParams',
-      value: MsgUpdateParams.encode({
-        authority: authority,
-        params: params
-      }).finish()
-    }],
+    messages: getMessages(module, params),
     title: proposalParams.title,
     proposer: proposalParams.proposer,
     summary: "test summary",
@@ -193,3 +194,47 @@ export const depositToProposal = (
     amount: params.amount.map(({amount, denom}) => ({amount: amount.toString(), denom})),
   } as MsgDeposit, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
+
+const moduleNamesToParamsMapping = {
+  "staking" : StakingMsgUpdateParams,
+  "gov" : GovMsgUpdateParams,
+  "distribution" : DistributionMsgUpdateParams,
+  "slashing" : SlashingMsgUpdateParams,
+  "auth" : AuthMsgUpdateParams ,
+  "crisis" : CrisisMsgUpdateParams,
+  "bank" : BankMsgUpdateParams,
+} 
+
+const getMessages = (module: string, updateParams: any): Any[] => {
+  let msgValue;
+  switch (module) {
+    case "staking":
+      msgValue = StakingMsgUpdateParams.encode(updateParams).finish()
+      break;
+    case "gov":
+      msgValue = GovMsgUpdateParams.encode(updateParams).finish()
+      break;
+    case "distribution":
+      msgValue = DistributionMsgUpdateParams.encode(updateParams).finish()
+      break;
+    case "slashing":
+      msgValue = SlashingMsgUpdateParams.encode(updateParams).finish()
+      break;
+    case "auth":
+      msgValue = AuthMsgUpdateParams.encode(updateParams).finish()
+      break;
+    case "crisis":
+      msgValue = CrisisMsgUpdateParams.encode(updateParams).finish()
+      break;
+    case "bank":
+      msgValue = BankMsgUpdateParams.encode(updateParams).finish()
+      break;
+    default:
+      msgValue = StakingMsgUpdateParams.encode(updateParams).finish()
+      break;
+  }
+  return [{
+    typeUrl: `/cosmos.${module}.v1beta1.MsgUpdateParams`,
+    value: msgValue
+  } as Any];
+}

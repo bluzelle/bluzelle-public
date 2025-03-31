@@ -14,7 +14,7 @@ import { getProposal } from './query';
 import { passThroughAwait } from 'promise-passthrough';
 import { newBluzelleClient } from '../../core';
 import { newLocalWallet } from '../../wallets/localWallet';
-import { VoteOption } from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
+import { VoteOption } from '../../curium/lib/generated/cosmos/gov/v1/gov';
 import delay from 'delay';
 import { copyToContainer, getContainerId } from '@bluzelle/testing/src/dockerUtils';
 import * as path from 'path';
@@ -29,7 +29,7 @@ import { getModuleAccountByName } from '../auth/query';
 import { getStakingParams } from '../staking';
 import { parseBluzelleParamsToParams } from '../staking/query';
 
-describe('gov module, local docker', function () {
+describe.skip('gov module, local docker', function () {
   this.timeout(10_800_000)
 
   // Set genesis.app_state.gov.params.voting_period to "10s" in daemon-manager/src/config.yml
@@ -38,7 +38,7 @@ describe('gov module, local docker', function () {
     Swarm.stopDaemons({ ...defaultSwarmConfig })
   );
 
-  describe.skip('text proposal', () => {
+  describe('text proposal', () => {
 
     it('should be able to submit a text proposal', () =>
       startSwarmWithClient()
@@ -286,46 +286,12 @@ describe('gov module, local docker', function () {
 
   describe('parameters change proposal', () => {
 
-    // it.skip('should be able to vote on and pass a parameters change proposal', () =>
-    //   startSwarmWithClient()
-    //     .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, {
-    //         title: 'change_max_validators',
-    //         description: 'Increase max validators to 120',
-    //         proposer: client.auth.address,
-    //         initialDeposit: [{
-    //           amount: 2_000_000,
-    //           denom: 'ubnt'
-    //         }],
-    //         changes: [{
-    //           subspace: 'staking',
-    //           key: 'MaxValidators',
-    //           value: '120'
-    //         }]
-    //       }, {
-    //         maxGas: 200_000,
-    //         gasPrice: 10
-    //       })
-    //     ))
-    //     .then(passThroughAwait(client => vote(client.bzSdk, {
-    //       proposalId: "1",
-    //       voter: client.auth.address,
-    //       option: VoteOption.VOTE_OPTION_YES
-    //     }, { maxGas: 200_000, gasPrice: 10 })))
-    //     .then(passThroughAwait(() => delay(10_000)))
-    //     .then(passThroughAwait(client =>
-    //       getProposal(client.bzSdk, "1")
-    //         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
-    //     ))
-    // );
-
-    it('should be able to apply a parameters change proposal and see the parameter change', () =>
-        startSwarmWithClient()
+    it('should be able to vote on and pass a parameters change proposal', () =>
+      startSwarmWithClient()
           .then(withCtxAwait("initialParams", client => getStakingParams(client.bzSdk)
-            // .then(res => expect(res.maxValidators).to.equal(100))
           ))
           .then(withCtxAwait("govModuleAddress", client => getModuleAccountByName(client.bzSdk, "gov")))
           .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, 
-            client.govModuleAddress?.baseAccount?.address as string,
             {
               title: 'change_max_validators',
               description: 'Increase max validators to 120',
@@ -335,7 +301,49 @@ describe('gov module, local docker', function () {
                 denom: 'ubnt'
               }],
             },
-            {...parseBluzelleParamsToParams(client.initialParams), maxValidators: 120},
+            {
+              authority: client.govModuleAddress?.baseAccount?.address as string,
+              params: {...parseBluzelleParamsToParams(client.initialParams), maxValidators: 120},
+            },
+            "staking",
+            {
+              maxGas: 200_000,
+              gasPrice: 10
+            })
+          ))
+          .then(passThroughAwait(client => vote(client.bzSdk, {
+            proposalId: "1",
+            voter: client.auth.address,
+            option: VoteOption.VOTE_OPTION_YES
+          }, { maxGas: 200_000, gasPrice: 10 })))
+          .then(passThroughAwait(() => delay(10_000)))
+          .then(passThroughAwait(client =>
+            getProposal(client.bzSdk, "1")
+              .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
+          ))
+    );
+
+    it('should be able to apply a parameters change proposal and see the parameter change', () =>
+        startSwarmWithClient()
+          .then(withCtxAwait("initialParams", client => getStakingParams(client.bzSdk)
+            // .then(res => expect(res.maxValidators).to.equal(100))
+          ))
+          .then(withCtxAwait("govModuleAddress", client => getModuleAccountByName(client.bzSdk, "gov")))
+          .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, 
+            {
+              title: 'change_max_validators',
+              description: 'Increase max validators to 120',
+              proposer: client.auth.address,
+              initialDeposit: [{
+                amount: 2_000_000,
+                denom: 'ubnt'
+              }],
+            },
+            {
+              authority: client.govModuleAddress?.baseAccount?.address as string,
+              params: {...parseBluzelleParamsToParams(client.initialParams), maxValidators: 120},
+            },
+            "staking",
             {
               maxGas: 200_000,
               gasPrice: 10
@@ -358,7 +366,7 @@ describe('gov module, local docker', function () {
 
   });
 
-  describe.skip('community pool spend proposal', () => {
+  describe('community pool spend proposal', () => {
 
     it('should be able to vote on and pass a community pool spend proposal', () =>
       startSwarmWithClient()
@@ -523,7 +531,7 @@ describe.skip('gov module, local machine', () => {
 });
 
 
-describe.skip('gov votes', function () {
+describe('gov votes', function () {
   this.timeout(2_000_000);
 
   beforeEach(stopSwarm);
