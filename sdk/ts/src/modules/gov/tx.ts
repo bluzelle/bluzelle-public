@@ -175,7 +175,7 @@ export const voteWithWeights = (
 
 const parseBluzelleWeightedVoteOption = (vote: BluzelleWeightedVoteOption) => ({
   ...vote,
-  weight: scaleTo18(vote.weight)
+  weight: vote.weight.toString()
 });
 
 
