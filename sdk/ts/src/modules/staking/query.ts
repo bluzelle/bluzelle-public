@@ -638,7 +638,7 @@ const parseParams = (params: Params): BluzelleStakingParams => ({
     minCommissionRate: params.minCommissionRate
 })
 
-export const parseBluzelleParamsToParams = (blzParams: BluzelleStakingParams): Params => ({
+export const parseBluzelleStakingParamsToParams = (blzParams: BluzelleStakingParams): Params => ({
     unbondingTime: {
         seconds: Long.fromNumber(blzParams.unbondingTime.seconds),
         nanos: Number(blzParams.unbondingTime.nanos)

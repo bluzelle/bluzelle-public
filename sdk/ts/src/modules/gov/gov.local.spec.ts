@@ -27,7 +27,7 @@ import { generateMnemonic } from '../../utils/generateMnemonic';
 import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
 import { getModuleAccountByName } from '../auth/query';
 import { getStakingParams } from '../staking';
-import { parseBluzelleParamsToParams } from '../staking/query';
+import { parseBluzelleStakingParamsToParams } from '../staking/query';
 
 describe.skip('gov module, local docker', function () {
   this.timeout(10_800_000)
@@ -303,7 +303,7 @@ describe.skip('gov module, local docker', function () {
             },
             {
               authority: client.govModuleAddress?.baseAccount?.address as string,
-              params: {...parseBluzelleParamsToParams(client.initialParams), maxValidators: 120},
+              params: {...parseBluzelleStakingParamsToParams(client.initialParams), maxValidators: 120},
             },
             "staking",
             {
@@ -341,7 +341,7 @@ describe.skip('gov module, local docker', function () {
             },
             {
               authority: client.govModuleAddress?.baseAccount?.address as string,
-              params: {...parseBluzelleParamsToParams(client.initialParams), maxValidators: 120},
+              params: {...parseBluzelleStakingParamsToParams(client.initialParams), maxValidators: 120},
             },
             "staking",
             {

@@ -25,6 +25,7 @@ import { ProposalStatus } from '../../curium/lib/generated/cosmos/gov/v1beta1/go
 import { getModuleAccountByName } from '../auth/query';
 import { withCtxAwait } from '@scottburch/with-context';
 import { cli } from 'webpack';
+import { getStakingParams, parseBluzelleStakingParamsToParams } from '../staking/query';
 
 const PROPOSAL_VALUE: TextProposal = {
   title: 'My title',
@@ -111,23 +112,28 @@ describe('gov module', function() {
 
   it('should be able to submit and query a parameters change proposal', () =>
     startSwarmWithClient()
-      .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, {
-        title: 'My title',
-        description: 'My description',
-        changes: [{
-          'subspace': 'staking',
-          'key': 'MaxValidators',
-          'value': '200'
-        }],
-        proposer: client.auth.address,
-        initialDeposit: [{
-          amount: 100,
-          denom: `ubnt`
-        }],
-      }, {
-        maxGas: 200_000,
-        gasPrice: 10
-      })))
+      .then(withCtxAwait("initialParams", client => getStakingParams(client.bzSdk)
+      ))
+      .then(withCtxAwait("govModuleAddress", client => getModuleAccountByName(client.bzSdk, "gov")))
+      .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, 
+        {
+          title: 'change_max_validators',
+          description: 'Increase max validators to 120',
+          proposer: client.auth.address,
+          initialDeposit: [{
+            amount: 2_000_000,
+            denom: 'ubnt'
+          }],
+        },
+        {
+          authority: client.govModuleAddress?.baseAccount?.address as string,
+          params: {...parseBluzelleStakingParamsToParams(client.initialParams), maxValidators: 120},
+        },
+        "staking",
+        {
+          maxGas: 200_000,
+          gasPrice: 10
+        })))
       .then(client => getProposal(client.bzSdk, FIRST_PROPOSAL_ID))
       .then(proposal => expect(TextProposal.decode(proposal.content.value))
         .to
