@@ -31,7 +31,7 @@ import { parseBluzelleStakingParamsToParams } from '../staking/query';
 import {Environment, SwarmTypes, DaemonConfig, SwarmConfig} from "daemon-manager/src/SwarmConfig";
 import {times} from 'lodash';
 
-describe.skip('gov module, local docker', function () {
+describe('gov module, local docker', function () {
   this.timeout(10_800_000)
 
   // Set genesis.app_state.gov.params.voting_period to "10s" in daemon-manager/src/config.yml
