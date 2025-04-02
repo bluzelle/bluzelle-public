@@ -138,7 +138,7 @@ describe('gov module', function() {
           gasPrice: 10
         })))
       .then(client => getProposal(client.bzSdk, FIRST_PROPOSAL_ID))
-      .then(proposal => expect(proposal.status).to.equal(ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD))
+      .then(proposal => expect(proposal.status).to.equal(ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD))
   );
 
   it('should be able to submit and query a community pool spend proposal. This is considered as normal v1 proposal submit test.', () =>
