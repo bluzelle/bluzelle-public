@@ -96,15 +96,17 @@ export const submitParameterChangeProposal = (
   },
   params: any,
   module: string,
+  summary: string,
+  metadata: string,
   options: BroadcastOptions
 ): Promise<BluzelleTxResponse> =>
   Promise.resolve(sendTx(client, '/cosmos.gov.v1.MsgSubmitProposal', {
     messages: getMessages(module, params),
     title: proposalParams.title,
     proposer: proposalParams.proposer,
-    summary: "test summary",
+    summary: summary,
     initialDeposit: proposalParams.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
-    metadata: "test",
+    metadata: metadata,
   } as MsgSubmitProposal, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 

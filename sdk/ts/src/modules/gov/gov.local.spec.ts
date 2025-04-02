@@ -308,6 +308,8 @@ describe('gov module, local docker', function () {
               params: {...parseBluzelleStakingParamsToParams(client.initialParams), maxValidators: 120},
             },
             "staking",
+            "test summary",
+            "test metadata",
             {
               maxGas: 200_000,
               gasPrice: 10
@@ -346,6 +348,8 @@ describe('gov module, local docker', function () {
               params: {...parseBluzelleStakingParamsToParams(client.initialParams), maxValidators: 120},
             },
             "staking",
+            "test summary",
+            "test metadata",
             {
               maxGas: 200_000,
               gasPrice: 10

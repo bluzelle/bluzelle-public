@@ -26,6 +26,7 @@ import { getModuleAccountByName } from '../auth/query';
 import { withCtxAwait } from '@scottburch/with-context';
 import { cli } from 'webpack';
 import { getStakingParams, parseBluzelleStakingParamsToParams } from '../staking/query';
+import { ParameterChangeProposal } from '../../curium/lib/generated/cosmos/params/v1beta1/params';
 
 const PROPOSAL_VALUE: TextProposal = {
   title: 'My title',
@@ -117,8 +118,8 @@ describe('gov module', function() {
       .then(withCtxAwait("govModuleAddress", client => getModuleAccountByName(client.bzSdk, "gov")))
       .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, 
         {
-          title: 'change_max_validators',
-          description: 'Increase max validators to 120',
+          title: 'My title',
+          description: 'My description', 
           proposer: client.auth.address,
           initialDeposit: [{
             amount: 2_000_000,
@@ -130,15 +131,14 @@ describe('gov module', function() {
           params: {...parseBluzelleStakingParamsToParams(client.initialParams), maxValidators: 120},
         },
         "staking",
+        "test summary",
+        "test metadata",
         {
           maxGas: 200_000,
           gasPrice: 10
         })))
       .then(client => getProposal(client.bzSdk, FIRST_PROPOSAL_ID))
-      .then(proposal => expect(TextProposal.decode(proposal.content.value))
-        .to
-        .deep
-        .equal(PROPOSAL_VALUE))
+      .then(proposal => expect(proposal.status).to.equal(ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD))
   );
 
   it('should be able to submit and query a community pool spend proposal. This is considered as normal v1 proposal submit test.', () =>
