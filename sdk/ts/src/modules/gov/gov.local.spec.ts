@@ -579,6 +579,11 @@ describe('gov votes', function () {
 
 });
 
+
+
+
+const getConfigPath = () => path.join(__dirname, 'config.yml');
+
 export const govTestSwarmConfig: SwarmConfig = {
     denom: 'bnt',
     otherTokens: ['500000000000000uelt', '500000000000000ug4'],
@@ -616,6 +621,6 @@ export const govTestSwarmConfig: SwarmConfig = {
             pruningKeepEvery: 10
         },
         useCosmovisor: true,
-        configPath: "config_gov_test.yml"
+        configPath: getConfigPath()
     } as DaemonConfig)),
 }
