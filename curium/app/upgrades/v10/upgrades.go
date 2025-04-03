@@ -1,4 +1,4 @@
-package firstupgrade
+package v10
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -6,11 +6,13 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
-func CreateUpgradeHandler(
+func CreateV10UpgradeHandler(
 	mm *module.Manager,
 	configurator module.Configurator,
 ) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
-		return mm.RunMigrations(ctx, configurator, vm)
+	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		return mm.RunMigrations(ctx, configurator, fromVM)
 	}
 }
+
+const UpgradeName = "v10.0"
