@@ -17,8 +17,8 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
+          git config --global user.name "alvi"
+          git config --global user.email "smartdev0328@github.com"
 
       - name: Rebase no-faucet onto devel
         run: |
