@@ -1,0 +1,32 @@
+name: Auto Rebase
+
+on:
+  push:
+    branches:
+      - devel  # Trigger this workflow on updates to the devel branch
+
+jobs:
+  rebase:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Fetch all history so we can rebase
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+
+      - name: Rebase no-faucet onto devel
+        run: |
+          git checkout no-faucet
+          git rebase devel
+
+      - name: Push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use the GitHub token for authentication
+        run: |
+          git push --force origin no-faucet  # Force push the rebased branch
