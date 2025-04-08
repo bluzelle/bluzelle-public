@@ -680,6 +680,7 @@ func NewCuriumApp(
 
 	app.SetAnteHandler(anteHandler)
 	app.SetEndBlocker(app.EndBlocker)
+	app.upgrade(app.Configurator)
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
