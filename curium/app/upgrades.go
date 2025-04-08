@@ -2,6 +2,7 @@ package app
 
 import (
 	upgrade "github.com/bluzelle/bluzelle-public/curium/app/upgrades/v11"
+	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -17,6 +18,8 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 )
 
 // NOTE: This upgrade defines a reference implementation of what an upgrade
@@ -46,15 +49,20 @@ func (app *App) setupUpgradeHandlers(
 			keyTable = govv1.ParamKeyTable() //nolint:staticcheck
 		case crisistypes.ModuleName:
 			keyTable = crisistypes.ParamKeyTable() //nolint:staticcheck
+		case nfttypes.ModuleName:
+			keyTable = nfttypes.ParamKeyTable() //nolint:staticcheck
+		case ibctransfertypes.ModuleName:
+			keyTable = ibctransfertypes.ParamKeyTable() //nolint:staticcheck
+		case icahosttypes.SubModuleName:
+			keyTable = icahosttypes.ParamKeyTable() //nolint:staticcheck
 		}
 		if !subspace.HasKeyTable() {
 			subspace.WithKeyTable(keyTable)
 		}
-
-		baseAppLegacySS := app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
-
-		app.UpgradeKeeper.SetUpgradeHandler(upgrade.UpgradeName, upgrade.CreateV11UpgradeHandler(app.mm, configurator, baseAppLegacySS, &app.ConsensusParamsKeeper))
 	}
+	baseAppLegacySS := app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
+
+	app.UpgradeKeeper.SetUpgradeHandler(upgrade.UpgradeName, upgrade.CreateV11UpgradeHandler(app.mm, configurator, baseAppLegacySS, &app.ConsensusParamsKeeper))
 }
 
 func (app *App) setupUpgradeStoreLoaders() {
