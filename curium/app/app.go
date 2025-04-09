@@ -51,7 +51,6 @@ import (
 	"github.com/bluzelle/bluzelle-public/curium/docs"
 
 	storetypes "cosmossdk.io/store/types"
-	faucetmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
@@ -552,7 +551,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(minttypes.ModuleName)
 
 	// custom
-	paramsKeeper.Subspace(faucetmoduletypes.ModuleName)
 	paramsKeeper.Subspace(nfttypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibcexported.ModuleName)
