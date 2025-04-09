@@ -19,7 +19,6 @@ import (
 	tmlog "github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -90,9 +89,6 @@ import (
 	curiummodule "github.com/bluzelle/bluzelle-public/curium/x/curium"
 	curiummodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/curium/keeper"
 	curiummoduletypes "github.com/bluzelle/bluzelle-public/curium/x/curium/types"
-	faucetmodule "github.com/bluzelle/bluzelle-public/curium/x/faucet"
-	faucetmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/faucet/keeper"
-	faucetmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	nftmodule "github.com/bluzelle/bluzelle-public/curium/x/nft"
 	nftkeeper "github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
@@ -201,7 +197,6 @@ var (
 		authzmodule.AppModuleBasic{},
 		curiummodule.AppModuleBasic{},
 		storagemodule.AppModuleBasic{},
-		faucetmodule.AppModuleBasic{},
 		taxmodule.AppModuleBasic{},
 		nftmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
@@ -217,7 +212,6 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		nfttypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
-		faucetmoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		taxmoduletypes.ModuleName:      nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
@@ -288,8 +282,6 @@ type App struct {
 
 	StorageKeeper storagemodulekeeper.Keeper
 
-	FaucetKeeper faucetmodulekeeper.Keeper
-
 	TaxKeeper taxmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
@@ -333,7 +325,6 @@ func NewCuriumApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		curiummoduletypes.StoreKey,
 		storagemoduletypes.StoreKey,
-		faucetmoduletypes.StoreKey,
 		taxmoduletypes.StoreKey,
 		nfttypes.StoreKey,
 		authzkeeper.StoreKey, icahosttypes.StoreKey,
@@ -492,18 +483,6 @@ func NewCuriumApp(
 	)
 	storageModule := storagemodule.NewAppModule(appCodec, app.StorageKeeper)
 
-	app.FaucetKeeper = *faucetmodulekeeper.NewKeeper(
-		appCodec,
-		keys[faucetmoduletypes.StoreKey],
-		keys[faucetmoduletypes.MemStoreKey],
-		app.GetSubspace(faucetmoduletypes.ModuleName),
-		app.BankKeeper,
-		curiummodule.NewKeyRingReader(appOpts.Get(flags.FlagHome).(string)),
-		curiummodulekeeper.NewMsgBroadcaster(&app.AccountKeeper, cast.ToString(appOpts.Get(flags.FlagHome)), txConfig, appCodec),
-	)
-
-	faucetModule := faucetmodule.NewAppModule(appCodec, app.FaucetKeeper, app.AccountKeeper, app.BankKeeper)
-
 	app.TaxKeeper = *taxmodulekeeper.NewKeeper(
 		appCodec,
 		keys[taxmoduletypes.StoreKey],
@@ -558,7 +537,6 @@ func NewCuriumApp(
 		transferModule,
 		&curiumModule,
 		storageModule,
-		faucetModule,
 		taxModule,
 		nftModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
@@ -589,7 +567,6 @@ func NewCuriumApp(
 		genutiltypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
-		faucetmoduletypes.ModuleName,
 		crisistypes.ModuleName,
 		taxmoduletypes.ModuleName,
 		storagemoduletypes.ModuleName,
@@ -613,7 +590,6 @@ func NewCuriumApp(
 		genutiltypes.ModuleName,
 		authtypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		faucetmoduletypes.ModuleName,
 		banktypes.ModuleName,
 		capabilitytypes.ModuleName,
 		evidencetypes.ModuleName,
@@ -647,7 +623,6 @@ func NewCuriumApp(
 		nfttypes.ModuleName,
 		curiummoduletypes.ModuleName,
 		storagemoduletypes.ModuleName,
-		faucetmoduletypes.ModuleName,
 		taxmoduletypes.ModuleName,
 
 		paramstypes.ModuleName,
@@ -929,7 +904,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(minttypes.ModuleName)
 
 	// custom
-	paramsKeeper.Subspace(faucetmoduletypes.ModuleName)
 	paramsKeeper.Subspace(nfttypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibcexported.ModuleName)
