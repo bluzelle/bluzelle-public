@@ -27,6 +27,6 @@ jobs:
 
       - name: Push changes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use the GitHub token for authentication
+          GITHUB_TOKEN: ${{ secrets.AUTO_REBASE_TOKEN }}  # Use the GitHub token for authentication
         run: |
           git push --force origin no-faucet  # Force push the rebased branch
