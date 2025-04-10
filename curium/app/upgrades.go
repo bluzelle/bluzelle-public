@@ -1,7 +1,7 @@
 package app
 
 import (
-	upgrade "github.com/bluzelle/bluzelle-public/curium/app/upgrades/v11"
+	donothing "github.com/bluzelle/bluzelle-public/curium/app/upgrades/donothing"
 	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -62,7 +62,7 @@ func (app *App) setupUpgradeHandlers(
 	}
 	baseAppLegacySS := app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
 
-	app.UpgradeKeeper.SetUpgradeHandler(upgrade.UpgradeName, upgrade.CreateV11UpgradeHandler(app.mm, configurator, baseAppLegacySS, &app.ConsensusParamsKeeper))
+	app.UpgradeKeeper.SetUpgradeHandler(donothing.UpgradeName, donothing.CreateDoNothingUpgradeHandler(app.mm, configurator, baseAppLegacySS, &app.ConsensusParamsKeeper))
 }
 
 func (app *App) setupUpgradeStoreLoaders() {
