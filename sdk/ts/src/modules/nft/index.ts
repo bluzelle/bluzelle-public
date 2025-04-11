@@ -15,3 +15,4 @@ export {getNftByOwner} from "./query";
 export {getNftMetadata} from "./query";
 export {getCollectionInfo} from "./query";
 export {getNftInfo} from "./query";
+export {getLastCollectionId} from "./query";
