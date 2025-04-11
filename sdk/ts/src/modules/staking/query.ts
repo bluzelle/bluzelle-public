@@ -30,9 +30,11 @@ import {
 } from '../../shared/pagination';
 import { BluzelleCoin } from '../../shared/types';
 import { parseCoin, parseDecTypeToNumber, parseNumToLong } from '../../shared/parse';
-import Long from 'long';
 import {toBech32} from '@cosmjs/encoding'
-/************************Bluzelle Type Definitions for staking query*/
+
+const Long = require("long");
+
+
 export type BluzelleDelegatorUnbondingDelegationsResponse = {
     unbondingDelegations: BluzelleUnbondingDelegation[],
     pagination: PageResponse,
