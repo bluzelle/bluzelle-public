@@ -15,6 +15,8 @@ export * from './modules/storage';
 export * from './modules/params';
 export * from './modules/gov';
 export * from './modules/upgrade';
+export * from './modules/vesting';
+export * from './modules/auth';
 export {
   BluzelleCoin,
   BluzelleDenom
