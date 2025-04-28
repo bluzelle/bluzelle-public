@@ -11,6 +11,7 @@ export * from './modules/staking';
 export * from './modules/distribution';
 export * from './modules/nft';
 export * from './modules/authz';
+export * from './modules/auth';
 export * from './modules/storage';
 export * from './modules/params';
 export * from './modules/gov';

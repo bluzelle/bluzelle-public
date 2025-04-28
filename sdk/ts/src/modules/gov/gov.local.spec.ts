@@ -290,8 +290,7 @@ describe('gov module, local docker', function () {
 
     it('should be able to vote on and pass a parameters change proposal', () =>
       startSwarmWithClient(govTestSwarmConfig)
-          .then(withCtxAwait("initialParams", client => getStakingParams(client.bzSdk)
-          ))
+          .then(withCtxAwait("initialParams", client => getStakingParams(client.bzSdk)))
           .then(withCtxAwait("govModuleAddress", client => getModuleAccountByName(client.bzSdk, "gov")))
           .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, 
             {
