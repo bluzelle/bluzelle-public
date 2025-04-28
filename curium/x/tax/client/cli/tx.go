@@ -85,7 +85,7 @@ func GetCmdSetTaxCollector() *cobra.Command {
 
 func GetCmdSetTransferTaxBp() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "set-transfer-tx-bp",
+		Use:  "set-transfer-tax-bp",
 		Long: "Set transfer tax basis point",
 		Example: fmt.Sprintf(
 			`$ %s tx tax set-transfer-tax-bp 10`,
