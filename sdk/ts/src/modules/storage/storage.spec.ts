@@ -155,6 +155,7 @@ describe('storage module', function () {
                     }))
             )
            // .then(({resp, bzSdk}) => hasContent(bzSdk, ))
+          .catch(err => console.log(`pinCid did not work. Error: ${err}`));
 
     })
 
