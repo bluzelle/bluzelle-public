@@ -598,7 +598,7 @@ export const govTestSwarmConfig: SwarmConfig = {
     targetBranch: process.env.BRANCH || 'devel',
     environment: Environment.DEVEL,
     swarmType: SwarmTypes.Docker,
-    bluzelleFaucet: true,
+    createMinter: true,
     storageBaseDir: '',
     storageMount: '/home/ubuntu/storage',
     daemons: times(2).map(n => ({

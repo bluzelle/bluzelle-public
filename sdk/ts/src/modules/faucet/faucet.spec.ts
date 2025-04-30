@@ -24,7 +24,7 @@ describe('faucet module', function () {
     });
 
     it('should mint tokens to a given address', () => {
-        return startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})
+        return startSwarmWithClient({...defaultSwarmConfig, createMinter: true})
             .then(({bzSdk}) => mint(bzSdk, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
             .then(response => {
                 expect(response.mnemonic).to.be.empty
@@ -33,7 +33,7 @@ describe('faucet module', function () {
     });
 
     it('should mint tokens with no given address', () => {
-        return startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})
+        return startSwarmWithClient({...defaultSwarmConfig, createMinter: true})
             .then(({bzSdk}) => mint(bzSdk))
             .then(response => {
                 expect(response.mnemonic.split(' ')).to.have.length(24)
@@ -44,7 +44,7 @@ describe('faucet module', function () {
 
     it('should not be able to mint tokens when faucet is off', () => {
         let client: BluzelleClient;
-        return startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: false})
+        return startSwarmWithClient({...defaultSwarmConfig, createMinter: false})
             .then(({bzSdk}) => client = bzSdk)
             .then(() => mint(client, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
             .then(() => expect(true).to.be.false)
@@ -54,7 +54,7 @@ describe('faucet module', function () {
     });
 
     it('should be able to mint tokens to a new account', () =>
-        startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true}, {url: 'http://localhost:26667'})
+        startSwarmWithClient({...defaultSwarmConfig, createMinter: true}, {url: 'http://localhost:26667'})
             .then(info => ({client: info.bzSdk}))
             .then(withCtxAwait('mintResult', ctx => mint(ctx.client)))
             .then(ctx => getAccountBalance(ctx.client, ctx.mintResult.address))
@@ -87,7 +87,7 @@ describe('faucet module', function () {
     );
 
     it('should not mint if bluzelleFaucet is not turned on', () =>
-        startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: false})
+        startSwarmWithClient({...defaultSwarmConfig, createMinter: false})
             .then(info => mint(info.bzSdk))
             .catch(err => expect(err.message.includes('unknown request')).to.be.true)
     );

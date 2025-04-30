@@ -11,7 +11,7 @@ describe('tendermint queries', function () {
     );
 
     it.skip('should get the status of a node', () =>
-        startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})
+        startSwarmWithClient({...defaultSwarmConfig, createMinter: true})
             .then(({bzSdk}) => getStatus(bzSdk))
             .then(response => {
                 expect(response.nodeId.length).to.equal(40)
@@ -23,7 +23,7 @@ describe('tendermint queries', function () {
     );
 
     it('should return the validators on a network', () =>
-        startSwarmWithClient({...defaultSwarmConfig, bluzelleFaucet: true})
+        startSwarmWithClient({...defaultSwarmConfig, createMinter: true})
             .then(({bzSdk}) => getValidators(bzSdk))
             .then(response => {
                 console.log(response)

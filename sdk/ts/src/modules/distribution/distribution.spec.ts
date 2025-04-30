@@ -230,7 +230,7 @@ const swarmConfig = (): SwarmConfig => ({
     targetBranch: process.env.BRANCH || 'devel',
     environment: Environment.DEVEL,
     swarmType: SwarmTypes.Docker,
-    bluzelleFaucet: true,
+    createMinter: true,
     storageBaseDir: '',
     storageMount: '/home/ubuntu/storage',
     filter: 'local-discovery',
