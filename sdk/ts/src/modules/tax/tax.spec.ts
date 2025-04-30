@@ -24,6 +24,7 @@ describe('tax module', function () {
 
         it("setGasTaxBp should set gas tax bp", () =>
             startSwarmWithClient()
+                
                 .then(passThroughAwait(client => setGasTaxBp(client.bzSdk, BP, {maxGas: MAX_GAS, gasPrice: GAS_PRICE, mode: 'sync'})))
                 .then(client => getTaxInfo(client.bzSdk))
                 .then(taxInfo => expect(taxInfo.gasTaxBp).equal(BP))
