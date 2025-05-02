@@ -39,7 +39,7 @@ func NewTxCmd() *cobra.Command {
 
 func GetCmdSetGasTaxBp() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "set-gas-tax-bp",
+		Use:  "set-gas-tax-bp <bp>",
 		Long: "Set gas tax basis point",
 		Example: fmt.Sprintf(
 			`$ %s tx tax set-gas-tax-bp 10`,
@@ -64,7 +64,7 @@ func GetCmdSetGasTaxBp() *cobra.Command {
 
 func GetCmdSetTaxCollector() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "set-tax-collector",
+		Use:  "set-tax-collector <address>",
 		Long: "Set tax collector",
 		Example: fmt.Sprintf(
 			`$ %s tx tax set-tax-collector bluzelle1pcx0ant83addkeaskrm7c9wkamwnj3hh2qc9j7`,
@@ -88,7 +88,7 @@ func GetCmdSetTaxCollector() *cobra.Command {
 
 func GetCmdSetTransferTaxBp() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "set-transfer-tax-bp",
+		Use:  "set-transfer-tax-bp <bp>.",
 		Long: "Set transfer tax basis point",
 		Example: fmt.Sprintf(
 			`$ %s tx tax set-transfer-tax-bp 10`,

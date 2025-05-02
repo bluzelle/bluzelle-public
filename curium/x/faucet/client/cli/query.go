@@ -39,7 +39,8 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 func GetCmdQueryMint() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "mint [addr]",
-		Long:    "faucet mint",
+		Short:   "will mint faucet tokens to the address",
+		Long:    "will mint faucet tokens to the address",
 		Example: fmt.Sprintf(`$ %s faucet mint`, version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
