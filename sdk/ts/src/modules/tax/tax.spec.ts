@@ -110,20 +110,13 @@ describe('tax module', function () {
 
         it("setTaxCollector should not set tax collector", () =>
             startSwarmWithClient()
-                .then(withCtxAwait('mnemonic', () => Promise.resolve(bip39.generateMnemonic(256))))
-                .then(withCtxAwait('new_tax_collector', ctx =>
-                    newBluzelleClient({
-                        url: 'localhost:26667',
-                        wallet: newLocalWallet(ctx.mnemonic)
-                    })
-                ))
-                .then(passThroughAwait(ctx => setTaxCollector(ctx.bzSdk, ctx.new_tax_collector.address, {
+                .then(passThroughAwait(ctx => setTaxCollector(ctx.bzSdk, ctx.bzSdk.address, {
                     maxGas: MAX_GAS,
                     gasPrice: GAS_PRICE,
                     mode: 'sync'
                 })))
                 .then(withCtxAwait("taxInfo", ctx => getTaxInfo(ctx.bzSdk)))
-                .then(ctx => expect(ctx.taxInfo.taxCollector).not.equal(ctx.new_tax_collector.address))
+                .then(ctx => expect(ctx.taxInfo.taxCollector).not.equal(ctx.bzSdk.address))
                 );
 
     });
