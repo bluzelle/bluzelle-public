@@ -11,6 +11,7 @@ import { newLocalWallet } from "../../wallets/localWallet";
 import { mint } from "../faucet";
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import * as bip39 from "bip39";
 
 dotenv.config({ path: path.resolve(__dirname, '../../../../../.env') });
 
@@ -27,19 +28,18 @@ describe('tax module', function () {
     // skipping because we don't want to add admin info to repo right now
     describe('as admin', () => {
 
-        const BP = 7777;
-        const TAX_COLLECTOR = "bluzelle197xx52k9tw08e7h0jqahptwucyv3e6pxex3xfe";
         it("setGasTaxBp should set gas tax bp", () =>
             startSwarmWithClient()
-            .then(passThroughAwait(ctx => mint(ctx.bzSdk, process.env.TAX_ADMIN_ADDRESS)))
-            .then(() =>newBluzelleClient({
-                                    url: 'localhost:26667',
-                                    wallet: newLocalWallet(process.env.TAX_ADMIN_MNEMONIC ? process.env.TAX_ADMIN_MNEMONIC: "" )
-                                }
-            ))
-            .then(passThroughAwait(client => setGasTaxBp(client, BP, {maxGas: MAX_GAS, gasPrice: GAS_PRICE, mode: 'sync'})))
-            .then(client => getTaxInfo(client))
-            .then(taxInfo => expect(Number(taxInfo.gasTaxBp)).equal(BP))
+                .then(passThroughAwait(ctx => mint(ctx.bzSdk, process.env.TAX_ADMIN_ADDRESS)))
+                .then(() =>newBluzelleClient({
+                                        url: 'localhost:26667',
+                                        wallet: newLocalWallet(process.env.TAX_ADMIN_MNEMONIC ? process.env.TAX_ADMIN_MNEMONIC: "" )
+                                    }
+                ))
+                .then(withCtxAwait("bp_before", client => getTaxInfo(client)))
+                .then(passThroughAwait(client => setGasTaxBp(client, Number(client.bp_before.gasTaxBp) + 1, {maxGas: MAX_GAS, gasPrice: GAS_PRICE, mode: 'sync'})))
+                .then(withCtxAwait("bp_after", client => getTaxInfo(client)))
+                .then(client => expect(Number(client.bp_after.gasTaxBp)).equal(Number(client.bp_before.gasTaxBp.add(1))))
         );
 
         it("setTransferTaxBp should set transfer tax bp", () =>
@@ -50,13 +50,14 @@ describe('tax module', function () {
                                         wallet: newLocalWallet(process.env.TAX_ADMIN_MNEMONIC ? process.env.TAX_ADMIN_MNEMONIC: "" )
                                     }
                 ))
-                .then(passThroughAwait(client => setTransferTaxBp(client, BP, {
+                .then(withCtxAwait("bp_before", client => getTaxInfo(client)))
+                .then(passThroughAwait(client => setTransferTaxBp(client, Number(client.bp_before.transferTaxBp) + 1, {
                     maxGas: MAX_GAS,
                     gasPrice: GAS_PRICE,
                     mode: 'sync'
                 })))
-                .then(client => getTaxInfo(client))
-                .then(taxInfo => expect(Number(taxInfo.transferTaxBp)).equal(BP))
+                .then(withCtxAwait("bp_after", client => getTaxInfo(client)))
+                .then(client => expect(Number(client.bp_after.transferTaxBp)).equal(Number(client.bp_before.transferTaxBp.add(1))))
         );
 
         it("setTaxCollector should set tax collector", () =>
@@ -67,50 +68,63 @@ describe('tax module', function () {
                                         wallet: newLocalWallet(process.env.TAX_ADMIN_MNEMONIC ? process.env.TAX_ADMIN_MNEMONIC: "" )
                                     }
                 ))
-                .then(passThroughAwait(client => setTaxCollector(client, TAX_COLLECTOR, {
+                .then(withCtxAwait('mnemonic', () => Promise.resolve(bip39.generateMnemonic(256))))
+                .then(withCtxAwait('new_tax_collector', ctx =>
+                    newBluzelleClient({
+                        url: 'localhost:26667',
+                        wallet: newLocalWallet(ctx.mnemonic)
+                    })
+                ))
+                .then(passThroughAwait(client => setTaxCollector(client, client.new_tax_collector.address, {
                     maxGas: MAX_GAS,
                     gasPrice: GAS_PRICE,
                     mode: 'sync'
                 })))
-                .then(client => getTaxInfo(client))
-                .then(taxInfo => expect(taxInfo.taxCollector).equal(TAX_COLLECTOR))
+                .then(withCtxAwait("taxInfo", client => getTaxInfo(client)))
+                .then(client => expect(client.taxInfo.taxCollector).equal(client.new_tax_collector.address))
         );
 
     });
 
     describe('as non-admin', () => {
 
-        const BP = 1234;
-        const TAX_COLLECTOR = "bluzelle197xx52k9tw08e7h0jqahptwucyv3e123456789";
-
         it("setGasTaxBp should not set gas tax bp", () =>
             startSwarmWithClient()
-                .then(passThroughAwait(client => setGasTaxBp(client.bzSdk, BP, {maxGas: MAX_GAS, gasPrice: GAS_PRICE, mode: 'sync'})))
-                .then(client => getTaxInfo(client.bzSdk))
-                .then(taxInfo => expect(taxInfo.gasTaxBp).not.equal(BP))
+                .then(withCtxAwait("bp_before", ctx => getTaxInfo(ctx.bzSdk)))
+                .then(passThroughAwait(ctx => setGasTaxBp(ctx.bzSdk, Number(ctx.bp_before) + 1, {maxGas: MAX_GAS, gasPrice: GAS_PRICE, mode: 'sync'})))
+                .then(withCtxAwait("bp_after", ctx => getTaxInfo(ctx.bzSdk)))
+                .then(ctx => expect(Number(ctx.bp_after.transferTaxBp)).equal(Number(ctx.bp_before.transferTaxBp)))
         );
 
         it("setTransferTaxBp should not set transfer tax bp", () =>
             startSwarmWithClient()
-                .then(passThroughAwait(client => setTransferTaxBp(client.bzSdk, BP, {
+                .then(withCtxAwait("bp_before", ctx => getTaxInfo(ctx.bzSdk)))
+                .then(passThroughAwait(ctx => setTransferTaxBp(ctx.bzSdk, Number(ctx.bp_before.transferTaxBp) + 1, {
                     maxGas: MAX_GAS,
                     gasPrice: GAS_PRICE,
                     mode: 'sync'
                 })))
-                .then(client => getTaxInfo(client.bzSdk))
-                .then(taxInfo => expect(taxInfo.transferTaxBp).not.equal(BP))
+                .then(withCtxAwait("bp_after", ctx => getTaxInfo(ctx.bzSdk)))
+                .then(ctx => expect(Number(ctx.bp_after.transferTaxBp)).equal(Number(ctx.bp_before.transferTaxBp)))
         );
 
         it("setTaxCollector should not set tax collector", () =>
             startSwarmWithClient()
-                .then(passThroughAwait(client => setTaxCollector(client.bzSdk, TAX_COLLECTOR, {
+                .then(withCtxAwait('mnemonic', () => Promise.resolve(bip39.generateMnemonic(256))))
+                .then(withCtxAwait('new_tax_collector', ctx =>
+                    newBluzelleClient({
+                        url: 'localhost:26667',
+                        wallet: newLocalWallet(ctx.mnemonic)
+                    })
+                ))
+                .then(passThroughAwait(ctx => setTaxCollector(ctx.bzSdk, ctx.new_tax_collector.address, {
                     maxGas: MAX_GAS,
                     gasPrice: GAS_PRICE,
                     mode: 'sync'
                 })))
-                .then(client => getTaxInfo(client.bzSdk))
-                .then(taxInfo => expect(taxInfo.taxCollector).not.equal(TAX_COLLECTOR))
-        );
+                .then(withCtxAwait("taxInfo", ctx => getTaxInfo(ctx.bzSdk)))
+                .then(ctx => expect(ctx.taxInfo.taxCollector).not.equal(ctx.new_tax_collector.address))
+                );
 
     });
 
