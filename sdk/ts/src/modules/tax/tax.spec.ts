@@ -30,12 +30,12 @@ describe('tax module', function () {
 
         it("setGasTaxBp should set gas tax bp", () =>
             startSwarmWithClient()
-                .then(passThroughAwait(ctx => mint(ctx.bzSdk, process.env.TAX_ADMIN_ADDRESS)))
                 .then(() =>newBluzelleClient({
                                         url: 'localhost:26667',
                                         wallet: newLocalWallet(process.env.TAX_ADMIN_MNEMONIC ? process.env.TAX_ADMIN_MNEMONIC: "" )
                                     }
                 ))
+                .then(passThroughAwait(client => mint(client, client.address)))
                 .then(withCtxAwait("bp_before", client => getTaxInfo(client)))
                 .then(passThroughAwait(client => setGasTaxBp(client, Number(client.bp_before.gasTaxBp) + 1, {maxGas: MAX_GAS, gasPrice: GAS_PRICE, mode: 'sync'})))
                 .then(withCtxAwait("bp_after", client => getTaxInfo(client)))
@@ -44,12 +44,12 @@ describe('tax module', function () {
 
         it("setTransferTaxBp should set transfer tax bp", () =>
             startSwarmWithClient()
-                .then(passThroughAwait(ctx => mint(ctx.bzSdk, process.env.TAX_ADMIN_ADDRESS)))
                 .then(() =>newBluzelleClient({
                                         url: 'localhost:26667',
                                         wallet: newLocalWallet(process.env.TAX_ADMIN_MNEMONIC ? process.env.TAX_ADMIN_MNEMONIC: "" )
                                     }
                 ))
+                .then(passThroughAwait(client => mint(client, client.address)))
                 .then(withCtxAwait("bp_before", client => getTaxInfo(client)))
                 .then(passThroughAwait(client => setTransferTaxBp(client, Number(client.bp_before.transferTaxBp) + 1, {
                     maxGas: MAX_GAS,
@@ -62,12 +62,12 @@ describe('tax module', function () {
 
         it("setTaxCollector should set tax collector", () =>
             startSwarmWithClient()
-                .then(passThroughAwait(ctx => mint(ctx.bzSdk, process.env.TAX_ADMIN_ADDRESS)))
                 .then(() =>newBluzelleClient({
                                         url: 'localhost:26667',
                                         wallet: newLocalWallet(process.env.TAX_ADMIN_MNEMONIC ? process.env.TAX_ADMIN_MNEMONIC: "" )
                                     }
                 ))
+                .then(passThroughAwait(ctx => mint(ctx, ctx.address)))
                 .then(withCtxAwait('mnemonic', () => Promise.resolve(bip39.generateMnemonic(256))))
                 .then(withCtxAwait('new_tax_collector', ctx =>
                     newBluzelleClient({
