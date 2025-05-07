@@ -158,7 +158,7 @@ describe('gov module, local docker', function () {
           voter: client.auth.address,
           option: VoteOption.VOTE_OPTION_YES
         }, { maxGas: 200_000, gasPrice: 10 })))
-        .then(passThroughAwait(() => delay(15_000)))
+        .then(passThroughAwait(() => delay(20_000)))
         .then(client => getProposal(client.bzSdk, "1"))
         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
     );
@@ -192,7 +192,7 @@ describe('gov module, local docker', function () {
           voter: client.auth.address,
           option: VoteOption.VOTE_OPTION_YES
         }, { maxGas: 200_000, gasPrice: 10 })))
-        .then(passThroughAwait(() => delay(10_000)))
+        .then(passThroughAwait(() => delay(20_000)))
         .then(client => getProposal(client.bzSdk, "1"))
         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
     );
@@ -228,7 +228,7 @@ describe('gov module, local docker', function () {
           getContainerId('a.validator')
             .then(id => copyToContainer(id, path.join(__dirname, './plans/do_nothing'), '/root/.curium/cosmovisor/upgrades'))
         }))
-        .then(passThroughAwait(() => delay(10_000)))
+        .then(passThroughAwait(() => delay(20_000)))
         .then(passThroughAwait(client =>
           getProposal(client.bzSdk, "1")
             .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
@@ -270,7 +270,7 @@ describe('gov module, local docker', function () {
           getContainerId('a.validator')
             .then(id => copyToContainer(id, path.join(__dirname, './plans/double_supply'), '/root/.curium/cosmovisor/upgrades'))
         }))
-        .then(passThroughAwait(() => delay(10_000)))
+        .then(passThroughAwait(() => delay(20_000)))
         .then(passThroughAwait(client =>
           getProposal(client.bzSdk, "1")
             .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
@@ -319,7 +319,7 @@ describe('gov module, local docker', function () {
             voter: client.auth.address,
             option: VoteOption.VOTE_OPTION_YES
           }, { maxGas: 200_000, gasPrice: 10 })))
-          .then(passThroughAwait(() => delay(10_000)))
+          .then(passThroughAwait(() => delay(20_000)))
           .then(passThroughAwait(client =>
             getProposal(client.bzSdk, "1")
               .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
@@ -359,7 +359,7 @@ describe('gov module, local docker', function () {
             voter: client.auth.address,
             option: VoteOption.VOTE_OPTION_YES
           }, { maxGas: 200_000, gasPrice: 10 })))
-          .then(passThroughAwait(() => delay(10_000)))
+          .then(passThroughAwait(() => delay(20_000)))
           .then(passThroughAwait(client =>
             getProposal(client.bzSdk, "1")
               .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
@@ -404,7 +404,7 @@ describe('gov module, local docker', function () {
           voter: client.auth.address,
           option: VoteOption.VOTE_OPTION_YES
         }, { maxGas: 200_000, gasPrice: 10 })))
-        .then(passThroughAwait(() => delay(10_000)))
+        .then(passThroughAwait(() => delay(20_000)))
         .then(passThroughAwait(client =>
           getProposal(client.bzSdk, "1")
             .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
@@ -448,7 +448,7 @@ describe('gov module, local docker', function () {
           voter: client.auth.address,
           option: VoteOption.VOTE_OPTION_YES
         }, { maxGas: 200_000, gasPrice: 10 })))
-        .then(passThroughAwait(() => delay(10_000)))
+        .then(passThroughAwait(() => delay(20_000)))
         .then(passThroughAwait(client =>
           getProposal(client.bzSdk, "1")
             .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
@@ -494,7 +494,7 @@ describe.skip('gov module, local machine', () => {
         voter: client.address,
         option: VoteOption.VOTE_OPTION_YES
       }, { maxGas: 200_000, gasPrice: 10 })))
-      .then(passThroughAwait(() => delay(10_000)))
+      .then(passThroughAwait(() => delay(20_000)))
       .then(client => getProposal(client, "1"))
       .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
   );
@@ -528,7 +528,7 @@ describe.skip('gov module, local machine', () => {
         voter: client.address,
         option: VoteOption.VOTE_OPTION_YES
       }, { maxGas: 200_000, gasPrice: 10 })))
-      .then(passThroughAwait(() => delay(10_000)))
+      .then(passThroughAwait(() => delay(20_000)))
       .then(client => getProposal(client, "1"))
       .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
   );
@@ -575,7 +575,7 @@ describe('gov votes', function () {
           { option: VoteOption.VOTE_OPTION_ABSTAIN, weight: 0.5 }
         ]
       }, { maxGas: 200_000, gasPrice: 10 })))
-      .then(passThroughAwait(() => delay(15_000)))
+      .then(passThroughAwait(() => delay(20_000)))
       .then(client => getProposal(client.bzSdk, "1"))
       .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
   );
