@@ -1,6 +1,6 @@
 {
   "name": "@bluzelle/sdk",
-  "version": "1.0.22",
+  "version": "1.0.24",
   "main": "lib/index.js",
   "browser": "lib-web/browser.js",
   "license": "MIT",
@@ -11,7 +11,7 @@
     "@cosmjs/proto-signing": "v0.31.3",
     "@cosmjs/stargate": "v0.31.3",
     "@cosmjs/tendermint-rpc": "v0.31.3",
-    "@cosmjs/encoding" : "0.31.3",
+    "@cosmjs/encoding": "0.31.3",
     "@cosmostation/cosmos-client": "^0.0.5",
     "@cosmostation/extension-client": "^0.1.15",
     "@keplr-wallet/cosmos": "^0.12.145",
