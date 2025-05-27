@@ -1,0 +1,6 @@
+{
+  "require": ["tsx/cjs"],
+  "extensions": ["ts"],
+  "spec": "src/**/*.spec.ts",
+  "timeout": 600000
+} 
