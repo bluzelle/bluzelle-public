@@ -3,6 +3,10 @@ import {downloadAllProto} from "../proto-builder/buildProtoDir";
 import {generateAllProto} from "../proto-builder/compileProto";
 import {mkdir} from "fs/promises";
 import {cd, exec} from "@scottburch/exec";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const rootDir = () => path.join(__dirname, '../../..');
 

@@ -12,7 +12,7 @@ import {getAccountBalance} from "../bank";
 import {pinCid} from "./tx";
 import {getTx, withTransaction} from "../../core";
 
-import "../../utils/fetch-polyfill";
+// import "../../utils/fetch-polyfill";
 
 const curiumUrl = 'http://localhost:26667';
 const mnemonic = new BehaviorSubject<string>("");

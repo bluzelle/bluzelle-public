@@ -1,7 +1,8 @@
 import {getAllFiles} from "./buildProtoDir";
 import {exec} from "@scottburch/exec";
+import { EventEmitter } from "events";
 
-require('events').EventEmitter.defaultMaxListeners = 100;
+EventEmitter.defaultMaxListeners = 100;
 
 
 export const generateProto = (protoFilePath: string, toDir: string) =>

@@ -4,7 +4,10 @@
   "main": "lib/index.js",
   "browser": "lib-web/browser.js",
   "license": "MIT",
-  "type": "module",
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
   "dependencies": {
     "@bluzelle/cli": "^1.0.8",
     "@cosmjs/crypto": "v0.31.3",
@@ -24,7 +27,7 @@
     "@types/bip39": "^3.0.0",
     "@types/delay": "^3.1.0",
     "@types/lodash": "^4.14.178",
-    "@types/node": "^18.6.5",
+    "@types/node": "^18.19.54",
     "@types/tiny-secp256k1": "^2.0.1",
     "async-wait-until": "^2.0.12",
     "bech32": "^2.0.0",
@@ -65,16 +68,16 @@
     "ts-node": "^10.9.2",
     "ts-proto": "1.118.0",
     "tsx": "^4.19.4",
-    "typescript": "^4.6.3",
+    "typescript": "^4.9.5",
     "webpack": "^5.70.0",
     "webpack-cli": "^4.9.2",
     "webpack-node-externals": "^3.0.0",
     "zx": "^4.3.0"
   },
   "scripts": {
-    "build": "ts-node scripts/build-sdk.ts",
-    "build-web": "ts-node scripts/build-web-sdk.ts",
-    "build-curium-store": "ts-node scripts/build-curium-store.ts",
-    "run-sdk-tests": "ts-node scripts/run-sdk-tests.ts"
+    "build": "tsx scripts/build-sdk.ts",
+    "build-web": "tsx scripts/build-web-sdk.ts",
+    "build-curium-store": "tsx scripts/build-curium-store.ts",
+    "run-sdk-tests": "tsx scripts/run-sdk-tests.ts"
   }
 }
