@@ -38,10 +38,10 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 
 func GetCmdQueryMint() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "mint [addr]",
-		Short:   "will mint faucet tokens to the address",
-		Long:    "will mint faucet tokens to the address",
-		Example: fmt.Sprintf(`$ %s faucet mint`, version.AppName),
+		Use:     "faucet-token [addr]",
+		Short:   "will send faucet tokens to the address",
+		Long:    "will send faucet tokens to the address",
+		Example: fmt.Sprintf(`$ %s faucet faucet-token bluzelle15c6g2f3yv7j2xksqsg3pa369yst2dw4kk6fptv`, version.AppName),
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
