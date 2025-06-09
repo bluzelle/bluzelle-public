@@ -8,7 +8,7 @@ import {getTaxInfo} from "./query";
 import { withCtxAwait } from "with-context";
 import { newBluzelleClient } from "../../core";
 import { newLocalWallet } from "../../wallets/localWallet";
-import { mint } from "../faucet";
+import { faucetToken } from "../faucet";
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as bip39 from "bip39";
@@ -35,7 +35,7 @@ describe('tax module', function () {
                                         wallet: newLocalWallet(process.env.TAX_ADMIN_MNEMONIC ? process.env.TAX_ADMIN_MNEMONIC: "" )
                                     }
                 ))
-                .then(passThroughAwait(client => mint(client, client.address)))
+                .then(passThroughAwait(client => faucetToken(client, client.address)))
                 .then(withCtxAwait("bp_before", client => getTaxInfo(client)))
                 .then(passThroughAwait(client => setGasTaxBp(client, Number(client.bp_before.gasTaxBp) + 1, {maxGas: MAX_GAS, gasPrice: GAS_PRICE, mode: 'sync'})))
                 .then(withCtxAwait("bp_after", client => getTaxInfo(client)))
@@ -49,7 +49,7 @@ describe('tax module', function () {
                                         wallet: newLocalWallet(process.env.TAX_ADMIN_MNEMONIC ? process.env.TAX_ADMIN_MNEMONIC: "" )
                                     }
                 ))
-                .then(passThroughAwait(client => mint(client, client.address)))
+                .then(passThroughAwait(client => faucetToken(client, client.address)))
                 .then(withCtxAwait("bp_before", client => getTaxInfo(client)))
                 .then(passThroughAwait(client => setTransferTaxBp(client, Number(client.bp_before.transferTaxBp) + 1, {
                     maxGas: MAX_GAS,
@@ -67,7 +67,7 @@ describe('tax module', function () {
                                         wallet: newLocalWallet(process.env.TAX_ADMIN_MNEMONIC ? process.env.TAX_ADMIN_MNEMONIC: "" )
                                     }
                 ))
-                .then(passThroughAwait(ctx => mint(ctx, ctx.address)))
+                .then(passThroughAwait(ctx => faucetToken(ctx, ctx.address)))
                 .then(withCtxAwait('mnemonic', () => Promise.resolve(bip39.generateMnemonic(256))))
                 .then(withCtxAwait('new_tax_collector', ctx =>
                     newBluzelleClient({

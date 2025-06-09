@@ -5,6 +5,7 @@ import {
   createNft,
   delegate,
   executeAuthorization,
+  faucetToken,
   getAccountBalance,
   getCollectionInfo,
   getDelegation,
@@ -12,7 +13,6 @@ import {
   getNftInfo,
   getValidatorsInfo,
   grantAuthorization,
-  mint,
   newBluzelleClient,
   newLocalWallet,
   queryAuthorizations,
@@ -75,7 +75,7 @@ describe('authz module', function () {
             return ctx;
           })
       )
-      .then(ctx => mint(ctx.client, testGrantee))
+      .then(ctx => faucetToken(ctx.client, testGrantee))
   );
 
   it('verifyInvarient msg authorization should be successfully created', () =>

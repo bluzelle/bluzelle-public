@@ -1,5 +1,5 @@
 syntax = "proto3";
-package bluzelle.curium.faucet;
+package faucet;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
@@ -15,9 +15,9 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/bluzelle/curium/faucet/params";
   }
-  // Queries a list of Mint items.
-	rpc Mint(QueryMintRequest) returns (QueryMintResponse) {
-		option (google.api.http).get = "/bluzelle/curium/faucet/mint/{address}";
+  // Queries a list of FaucetToken items.
+	rpc FaucetToken(QueryFaucetTokenRequest) returns (QueryFaucetTokenResponse) {
+		option (google.api.http).get = "/bluzelle/curium/faucet/faucet-token/{address}";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -32,11 +32,11 @@ message QueryParamsResponse {
   Params params = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryMintRequest {
+message QueryFaucetTokenRequest {
   string address = 1;
 }
 
-message QueryMintResponse {
+message QueryFaucetTokenResponse {
   string address = 1;
   string mnemonic = 2;
 }

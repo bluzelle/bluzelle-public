@@ -23,29 +23,29 @@ export function createAddress(mnemonic: string = bip39.generateMnemonic(256), hd
         .join()
 }
 
-export function mint(client: BluzelleClient, address?: string) {
-    return address ? mintToAddress(address) : mintToNewAddress();
+export function faucetToken(client: BluzelleClient, address?: string) {
+    return address ? faucetTokenToAddress(address) : faucetTokenToNewAddress();
 
-    function mintToAddress(address: string) {
-        return client.queryClient.faucet.Mint({address: address})
+    function faucetTokenToAddress(address: string) {
+        return client.queryClient.faucet.FaucetToken({address: address})
             .then(() => waitUntilFunded(client, address))
             .then(() => ({mnemonic: "", address}))
     }
 
-    function mintToNewAddress() {
+    function faucetTokenToNewAddress() {
         return Promise.resolve(createAddress())
-            .then(passThroughAwait(ctx => client.queryClient.faucet.Mint({address: ctx.address})))
+            .then(passThroughAwait(ctx => client.queryClient.faucet.FaucetToken({address: ctx.address})))
             .then(passThroughAwait(ctx => waitUntilFunded(client, ctx.address)))
     }
 }
 
 export function waitUntilFunded(client: BluzelleClient, address: string): Promise<unknown> {
     return getAccountBalance(client, address)
-        .then(waitForMint);
+        .then(waitForFaucet);
 
-    function waitForMint(startBalance: number): Promise<unknown> {
+    function waitForFaucet(startBalance: number): Promise<unknown> {
         return getAccountBalance(client, address)
             .then(passThroughAwait(balance => console.log('waiting for funds...', balance)))
-            .then(balance => balance === startBalance && delay(1000).then(() => waitForMint(startBalance)))
+            .then(balance => balance === startBalance && delay(1000).then(() => waitForFaucet(startBalance)))
     }
 }

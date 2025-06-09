@@ -10,7 +10,7 @@
     <button id="balance">Check balance</button>
     <button id="pin">Pin Cid</button>
     <button id="send">Send Tx</button>
-    <button id="mint">Mint</button>
+    <button id="faucet">Faucet</button>
     <button id="transferNFT">transferNFT</button>
     <div id="message" style="border: 1px solid black; height: 200px"></div>
 
@@ -51,9 +51,9 @@
             .then(JSON.stringify)
             .then(writeMessage)
     })
-    document.querySelector('#mint').addEventListener('click', () => {
-        writeMessage('minting...')
-        bluzelle.mint(client, client.address)
+    document.querySelector('#faucet').addEventListener('click', () => {
+        writeMessage('sending faucet tokens...')
+        bluzelle.faucetToken(client, client.address)
             .then(JSON.stringify)
             .then(writeMessage)
     })

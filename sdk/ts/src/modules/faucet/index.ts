@@ -1,5 +1,5 @@
 export {
     createAddress,
-    mint,
+    faucetToken,
     waitUntilFunded
 } from './tx';

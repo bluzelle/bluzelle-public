@@ -6,7 +6,7 @@ import {expect} from "chai";
 import {newBluzelleClient} from "../../core";
 import {newLocalWallet} from "../../wallets/localWallet";
 import * as bip39 from "bip39";
-import {mint} from "../faucet";
+import {faucetToken} from "../faucet";
 import {stopSwarm} from "@bluzelle/testing/src/swarmUtils";
 import {getOtherTokenDefaults} from "@bluzelle/testing/src/commonUtils";
 import { fundCommunityPool, setWithdrawAddress, withdrawDelegatorReward, withdrawValidatorCommission } from './tx';
@@ -40,7 +40,7 @@ describe('distribution module', function () {
                     wallet: newLocalWallet(ctx.mnemonic)
                 })
             ))
-            .then(passThroughAwait(ctx => mint(ctx.bzSdk, ctx.sentry.address)))
+            .then(passThroughAwait(ctx => faucetToken(ctx.bzSdk, ctx.sentry.address)))
             .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.sentry, ctx.sentry.address, ctx.valoper, 100_000_000, {maxGas: 200_000, gasPrice: 10})))
             .then(passThroughAwait(ctx => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 100_000_000, {maxGas: 200_000, gasPrice: 10})))
@@ -57,7 +57,7 @@ describe('distribution module', function () {
                     wallet: newLocalWallet(ctx.mnemonic)
                 })
             ))
-            .then(passThroughAwait(ctx => mint(ctx.bzSdk, ctx.sentry.address)))
+            .then(passThroughAwait(ctx => faucetToken(ctx.bzSdk, ctx.sentry.address)))
             .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.sentry, ctx.sentry.address, ctx.valoper, 100_000_000, {maxGas: 200_000, gasPrice: 10})))
             .then(passThroughAwait(ctx => send(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 10_000_000_000, {maxGas: 200_000, gasPrice: 10})))

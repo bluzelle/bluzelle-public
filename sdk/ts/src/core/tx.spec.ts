@@ -11,7 +11,7 @@ import {generateMnemonic} from "../utils/generateMnemonic";
 import delay from "delay";
 import {pinCid} from "../modules/storage";
 import {getAccountBalance, send} from "../modules/bank";
-import {mint} from "../modules/faucet";
+import {faucetToken} from "../modules/faucet";
 import {withCtxAwait} from "@scottburch/with-context";
 import {getForkTestSwarmConfig} from "infra-control-test/specs/fork/genesisToLocal.spec";
 import {times} from "lodash";
@@ -41,7 +41,7 @@ describe('sending transactions', function () {
                 wallet: newLocalWallet(generateMnemonic())
             }))
             .then(passThroughAwait(bzSdk =>
-                mint(bzSdk, bzSdk.address)))
+                faucetToken(bzSdk, bzSdk.address)))
             .then(bzSdk =>
                 (send(bzSdk, 'bluzelle10dj35urh78dym3c24yzdmss8mxtcy8hqgqwmrn', 300, {
                     gasPrice: 0.02,
@@ -98,7 +98,7 @@ describe('sending transactions', function () {
         startSwarmWithClient()
             .then(withCtxAwait("taxInfo", ctx => getTaxInfo(ctx.bzSdk)))
             .then(withCtxAwait('taxCost', ctx => 10000 * (Number(ctx.taxInfo.transferTaxBp)/10000)))
-            .then(withCtxAwait('toAddress', ctx => mint(ctx.bzSdk).then(res => res.address)))
+            .then(withCtxAwait('toAddress', ctx => faucetToken(ctx.bzSdk).then(res => res.address)))
             .then(withCtxAwait('preBalances', ctx => Promise.all([
                 getAccountBalance(ctx.bzSdk, ctx.bzSdk.address, 'uelt'),
                 getAccountBalance(ctx.bzSdk, ctx.bzSdk.address, 'ug4'),

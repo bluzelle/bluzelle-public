@@ -1,5 +1,5 @@
 syntax = "proto3";
-package bluzelle.curium.faucet;
+package faucet;
 
 // this line is used by starport scaffolding # proto/tx/import
 
@@ -7,16 +7,16 @@ option go_package = "github.com/bluzelle/bluzelle-public/curium/x/faucet/types";
 
 // Msg defines the Msg service.
 service Msg {
-      rpc Mint(MsgMint) returns (MsgMintResponse);
+      rpc FaucetToken(MsgFaucetToken) returns (MsgFaucetTokenResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
-message MsgMint {
+message MsgFaucetToken {
   string creator = 1;
   string address = 2;
 }
 
-message MsgMintResponse {
+message MsgFaucetTokenResponse {
   string address = 1;
 }
 
