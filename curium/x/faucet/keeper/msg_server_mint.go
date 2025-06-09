@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMintResponse, error) {
+func (k msgServer) FaucetToken(goCtx context.Context, msg *types.MsgFaucetToken) (*types.MsgFaucetTokenResponse, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -42,7 +42,7 @@ func (k msgServer) Mint(goCtx context.Context, msg *types.MsgMint) (*types.MsgMi
 		return nil, err
 	}
 
-	response := types.MsgMintResponse{
+	response := types.MsgFaucetTokenResponse{
 		Address: msg.Address,
 	}
 

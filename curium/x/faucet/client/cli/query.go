@@ -52,7 +52,7 @@ func GetCmdQueryMint() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			res, err := queryClient.Mint(context.Background(), &types.QueryMintRequest{
+			res, err := queryClient.FaucetToken(context.Background(), &types.QueryFaucetTokenRequest{
 				Address: args[0],
 			})
 

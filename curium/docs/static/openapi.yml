@@ -30070,10 +30070,10 @@ paths:
           format: int64
       tags:
         - Query
-  /bluzelle/curium/faucet/mint/{address}:
+  /bluzelle/curium/faucet/faucet-token/{address}:
     get:
-      summary: Queries a list of Mint items.
-      operationId: FaucetMint
+      summary: Queries a list of FaucetToken items.
+      operationId: FaucetFaucetToken
       responses:
         '200':
           description: A successful response.
@@ -63733,7 +63733,7 @@ definitions:
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
     description: Period defines a length of time and amount of coins that will vest.
-  faucet.MsgMintResponse:
+  faucet.MsgFaucetTokenResponse:
     type: object
     properties:
       address:
@@ -63744,7 +63744,7 @@ definitions:
       testnet:
         type: string
     description: Params defines the parameters for the module.
-  faucet.QueryMintResponse:
+  faucet.QueryFaucetTokenResponse:
     type: object
     properties:
       address:

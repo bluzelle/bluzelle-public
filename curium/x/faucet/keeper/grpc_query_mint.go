@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) Mint(goCtx context.Context, req *types.QueryMintRequest) (*types.QueryMintResponse, error) {
+func (k Keeper) FaucetToken(goCtx context.Context, req *types.QueryFaucetTokenRequest) (*types.QueryFaucetTokenResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -21,12 +21,12 @@ func (k Keeper) Mint(goCtx context.Context, req *types.QueryMintRequest) (*types
 		return nil, err
 	}
 
-	msg := types.MsgMint{
+	msg := types.MsgFaucetToken{
 		Creator: addr.String(),
 		Address: req.Address,
 	}
 	k.broadcastMsg(ctx, []sdk.Msg{&msg}, "minter")
 
-	return &types.QueryMintResponse{}, nil
+	return &types.QueryFaucetTokenResponse{}, nil
 
 }

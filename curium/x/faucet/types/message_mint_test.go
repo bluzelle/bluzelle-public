@@ -11,18 +11,18 @@ import (
 func TestMsgMint_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgMint
+		msg  MsgFaucetToken
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgMint{
+			msg: MsgFaucetToken{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgMint{
+			msg: MsgFaucetToken{
 				Creator: sample.AccAddress(),
 			},
 		},
