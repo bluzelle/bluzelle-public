@@ -39,6 +39,7 @@
     "delay": "^5.0.0",
     "dotenv": "^16.4.7",
     "dts-bundle-generator": "^9.5.1",
+    "helia": "^5.4.2",
     "ipfs-http-client": "^60.0.0",
     "lodash": "4.17.21",
     "mocha": "10.7.3",
