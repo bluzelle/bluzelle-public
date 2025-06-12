@@ -20,4 +20,4 @@ export {
 
 export {
   VoteOption
-} from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
+} from '../../curium/lib/generated/cosmos/gov/v1/gov';
