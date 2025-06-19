@@ -8,10 +8,8 @@ import {
 import {
   MsgSubmitProposal as MsgSubmitLegacyProposal
 } from '../../curium/lib/generated/cosmos/gov/v1beta1/tx';
-import { VoteOption, WeightedVoteOption } from '../../curium/lib/generated/cosmos/gov/v1/gov';
+import { VoteOption } from '../../curium/lib/generated/cosmos/gov/v1/gov';
 import { TextProposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { ParamChange, ParameterChangeProposal } from 'cosmjs-types/cosmos/params/v1beta1/params';
-import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import { encodeSoftwareUpgradeProposal } from '../upgrade';
 import { parseStringToLong, scaleTo18 } from '../../shared/parse';
 import { MsgCommunityPoolSpend } from '../../curium/lib/generated/cosmos/distribution/v1beta1/tx';
@@ -22,8 +20,6 @@ import { MsgUpdateParams as CrisisMsgUpdateParams } from '../../curium/lib/gener
 import { MsgUpdateParams as SlashingMsgUpdateParams } from '../../curium/lib/generated/cosmos/slashing/v1beta1/tx';
 import { MsgUpdateParams as AuthMsgUpdateParams } from '../../curium/lib/generated/cosmos/auth/v1beta1/tx';
 import { MsgUpdateParams as DistributionMsgUpdateParams } from '../../curium/lib/generated/cosmos/distribution/v1beta1/tx';
-import { Duration } from '../../curium/lib/generated/google/protobuf/duration';
-import { Params } from '../../curium/lib/generated/cosmos/staking/v1beta1/staking';
 import { Any } from '../../curium/lib/generated/google/protobuf/any';
 
 
