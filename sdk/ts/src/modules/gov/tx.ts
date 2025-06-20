@@ -1,26 +1,26 @@
-import { BluzelleClient, BluzelleTxResponse, BroadcastOptions, sendTx } from '../../core';
+import {BluzelleClient, BluzelleTxResponse, BroadcastOptions, sendTx} from '../../core';
 import {
-  MsgSubmitProposal,
-  MsgVote,
-  MsgVoteWeighted,
-  MsgDeposit
+    MsgDeposit,
+    MsgSubmitProposal,
+    MsgUpdateParams as GovMsgUpdateParams,
+    MsgVote,
+    MsgVoteWeighted
 } from '../../curium/lib/generated/cosmos/gov/v1/tx';
+import {MsgSubmitProposal as MsgSubmitLegacyProposal} from '../../curium/lib/generated/cosmos/gov/v1beta1/tx';
+import {VoteOption} from '../../curium/lib/generated/cosmos/gov/v1/gov';
+import {TextProposal} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import {encodeSoftwareUpgradeProposal} from '../upgrade';
+import {parseStringToLong} from '../../shared/parse';
 import {
-  MsgSubmitProposal as MsgSubmitLegacyProposal
-} from '../../curium/lib/generated/cosmos/gov/v1beta1/tx';
-import { VoteOption } from '../../curium/lib/generated/cosmos/gov/v1/gov';
-import { TextProposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { encodeSoftwareUpgradeProposal } from '../upgrade';
-import { parseStringToLong, scaleTo18 } from '../../shared/parse';
-import { MsgCommunityPoolSpend } from '../../curium/lib/generated/cosmos/distribution/v1beta1/tx';
-import { MsgUpdateParams as StakingMsgUpdateParams } from '../../curium/lib/generated/cosmos/staking/v1beta1/tx';
-import { MsgUpdateParams as GovMsgUpdateParams } from '../../curium/lib/generated/cosmos/gov/v1/tx';
-import { MsgUpdateParams as BankMsgUpdateParams } from '../../curium/lib/generated/cosmos/bank/v1beta1/tx';
-import { MsgUpdateParams as CrisisMsgUpdateParams } from '../../curium/lib/generated/cosmos/crisis/v1beta1/tx';
-import { MsgUpdateParams as SlashingMsgUpdateParams } from '../../curium/lib/generated/cosmos/slashing/v1beta1/tx';
-import { MsgUpdateParams as AuthMsgUpdateParams } from '../../curium/lib/generated/cosmos/auth/v1beta1/tx';
-import { MsgUpdateParams as DistributionMsgUpdateParams } from '../../curium/lib/generated/cosmos/distribution/v1beta1/tx';
-import { Any } from '../../curium/lib/generated/google/protobuf/any';
+    MsgCommunityPoolSpend,
+    MsgUpdateParams as DistributionMsgUpdateParams
+} from '../../curium/lib/generated/cosmos/distribution/v1beta1/tx';
+import {MsgUpdateParams as StakingMsgUpdateParams} from '../../curium/lib/generated/cosmos/staking/v1beta1/tx';
+import {MsgUpdateParams as BankMsgUpdateParams} from '../../curium/lib/generated/cosmos/bank/v1beta1/tx';
+import {MsgUpdateParams as CrisisMsgUpdateParams} from '../../curium/lib/generated/cosmos/crisis/v1beta1/tx';
+import {MsgUpdateParams as SlashingMsgUpdateParams} from '../../curium/lib/generated/cosmos/slashing/v1beta1/tx';
+import {MsgUpdateParams as AuthMsgUpdateParams} from '../../curium/lib/generated/cosmos/auth/v1beta1/tx';
+import {Any} from '../../curium/lib/generated/google/protobuf/any';
 
 
 export type BluzelleWeightedVoteOption = {
