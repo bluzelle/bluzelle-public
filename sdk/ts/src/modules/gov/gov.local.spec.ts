@@ -40,6 +40,10 @@ describe('gov module, local docker', function () {
     Swarm.stopDaemons({ ...govTestSwarmConfig })
   );
 
+  after(() =>
+    Swarm.stopDaemons({ ...govTestSwarmConfig })
+  );
+
   describe('text proposal', () => {
 
     it('should be able to submit a text proposal', () =>

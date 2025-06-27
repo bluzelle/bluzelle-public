@@ -63,6 +63,8 @@ describe('nft module', function () {
       .then(sdk => client = sdk)
   );
 
+  after(stopSwarm);
+
   it('should throw an error when querying an invalid nft', () =>
     getNftInfo(client, '1')
       .then(() => expect(true).to.be.false)

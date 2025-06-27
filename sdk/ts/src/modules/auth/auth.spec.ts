@@ -11,12 +11,15 @@ import {
 } from "./query";
 import { startSwarmWithClient, stopSwarm } from '@bluzelle/testing/src/swarmUtils';
 import { BaseAccount, ModuleAccount } from '../../curium/lib/generated/cosmos/auth/v1beta1/auth';
+import { throwError } from 'rxjs';
 
 
 describe('auth module', function () {
   this.timeout(1600_000);
 
   beforeEach(stopSwarm);
+
+  after(stopSwarm);
 
   it('getAccounts should return all accounts info', () =>
     startSwarmWithClient(defaultSwarmConfig)

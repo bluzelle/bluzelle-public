@@ -25,6 +25,10 @@ describe('tax module', function () {
         Swarm.stopDaemons({...defaultSwarmConfig})
     );
 
+    after(() =>
+        Swarm.stopDaemons({...defaultSwarmConfig})
+    );
+
     // skipping because we don't want to add admin info to repo right now
     describe('as admin', () => {
 

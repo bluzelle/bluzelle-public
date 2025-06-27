@@ -20,6 +20,7 @@ describe('distribution module', function () {
     this.timeout(2_000_000);
 
     beforeEach(stopSwarm);
+    after(stopSwarm);
 
 
     it('should have reward for delegating', () =>
