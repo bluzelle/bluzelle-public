@@ -25,6 +25,10 @@ describe('sending transactions', function () {
         Swarm.stopDaemons({...defaultSwarmConfig})
     );
 
+    after(() =>
+        Swarm.stopDaemons({...defaultSwarmConfig})
+    );
+
     it('should have a withTransaction that can bundle messages', () => {
         return startSwarmWithClient({...defaultSwarmConfig})
             .then(({bzSdk}) => withTransaction(bzSdk, () => {

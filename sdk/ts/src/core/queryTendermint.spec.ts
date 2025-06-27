@@ -10,6 +10,9 @@ describe('tendermint queries', function () {
         Swarm.stopDaemons({...defaultSwarmConfig})
     );
 
+    after(() =>
+        Swarm.stopDaemons({...defaultSwarmConfig})
+    );
     it('should get the status of a node', () =>
         startSwarmWithClient({...defaultSwarmConfig, createMinter: true})
             .then(({bzSdk}) => getStatus(bzSdk))

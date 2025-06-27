@@ -7,6 +7,7 @@ describe('staking module', function () {
   this.timeout(2_000_000);
 
   beforeEach(stopSwarm);
+  after(stopSwarm);
 
   it("should be able to delegate the expected amount", () =>
     startSwarmWithClient({ ...swarmConfig() })

@@ -78,6 +78,8 @@ describe('authz module', function () {
       .then(ctx => faucetToken(ctx.client, testGrantee))
   );
 
+  after(stopSwarm);
+  
   it('verifyInvarient msg authorization should be successfully created', () =>
     grantAuthorization(client, testGranter, testGrantee, {
       grantType: GrantType.GENERIC,
