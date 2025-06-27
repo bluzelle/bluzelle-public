@@ -62,6 +62,7 @@ describe('bank module', function () {
   this.timeout(600_000);
 
   beforeEach(stopSwarm);
+  after(stopSwarm);
 
   it('getAccountBalance should return account balance for the elt and g4 denoms', () =>
     startSwarmWithClient(defaultSwarmConfig)

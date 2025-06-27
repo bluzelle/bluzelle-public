@@ -17,6 +17,8 @@ describe('nft supply overflow', function () {
       .then(sdk => client = sdk)
   );
 
+  after(stopSwarm);
+
   it('should accept supply and maxSupply of Number.MAX_VALUE', () =>
     createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
       maxGas: 100000000,

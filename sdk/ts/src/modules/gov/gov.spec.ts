@@ -42,6 +42,10 @@ describe('gov module', function() {
     Swarm.stopDaemons({ ...defaultSwarmConfig })
   );
 
+  after(() =>
+    Swarm.stopDaemons({ ...defaultSwarmConfig })
+  );
+
   it('should get voting params', () =>
     startSwarmWithClient()
       .then(client => getVotingParams(client.bzSdk))

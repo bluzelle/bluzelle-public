@@ -6,11 +6,12 @@ import {passThroughAwait} from "promise-passthrough";
 import {createCtx, withCtxAwait} from "@scottburch/with-context";
 import {expect} from "chai";
 import delay from "delay";
-import {defaultSwarmConfig} from "@bluzelle/testing";
+import {defaultSwarmConfig, stopIpfsServers} from "@bluzelle/testing";
 import {hasContent} from "./query";
 import {getAccountBalance} from "../bank";
 import {pinCid} from "./tx";
 import {getTx, withTransaction} from "../../core";
+import { stopSwarm } from "@bluzelle/testing/src/swarmUtils";
 
 // import "../../utils/fetch-polyfill";
 
@@ -44,6 +45,11 @@ describe('storage module', function () {
     beforeEach(() =>
         restartIpfsServerAndSwarm(({...defaultSwarmConfig}))
             .then((swarmMnemonic) => mnemonic.next(swarmMnemonic))
+    );
+    
+    after(() =>
+        stopSwarm({...defaultSwarmConfig})
+        .then(stopIpfsServers)
     );
 
     it('hasContent should return true if content is pinned', () =>

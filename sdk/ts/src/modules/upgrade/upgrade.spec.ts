@@ -9,6 +9,11 @@ describe('Upgrade', () => {
     Swarm.stopDaemons({ ...defaultSwarmConfig })
   );
 
+  after(() =>
+    Swarm.stopDaemons({ ...defaultSwarmConfig })
+  );
+
+
   it('should get current plan', () =>
     startSwarmWithClient()
       .then(client => getCurrentPlan(client.bzSdk))

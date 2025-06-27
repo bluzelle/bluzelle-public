@@ -10,6 +10,10 @@ describe.skip('params module', () => {
     Swarm.stopDaemons({ ...defaultSwarmConfig })
   );
 
+  after(() =>
+    Swarm.stopDaemons({ ...defaultSwarmConfig })
+  );
+
   it('should get params value', () =>
     startSwarmWithClient()
       .then(client => getParamValue(client.bzSdk, {

@@ -14,6 +14,11 @@ describe('faucet module', function () {
         Swarm.stopDaemons(({...defaultSwarmConfig}))
     );
 
+    after(() =>
+        Swarm.stopDaemons(({...defaultSwarmConfig}))
+    );
+    
+
     it('should create an address', () => {
         return Promise.resolve(createAddress())
             .then(result => {
