@@ -1,22 +1,22 @@
 import {
-  BluzelleDelegationResponse,
-  BluzelleValidatorsResponse,
-  createCollection,
-  createNft,
-  delegate,
-  executeAuthorization,
-  faucetToken,
-  getAccountBalance,
-  getCollectionInfo,
-  getDelegation,
-  getNftByOwner,
-  getNftInfo,
-  getValidatorsInfo,
-  grantAuthorization,
-  newBluzelleClient,
-  newLocalWallet,
-  queryAuthorizations,
-  revokeAuthorization
+    BluzelleDelegationResponse,
+    BluzelleValidatorsResponse,
+    createCollection,
+    createNft,
+    delegate,
+    executeAuthorization,
+    faucetToken,
+    getAccountBalance,
+    getCollectionInfo,
+    getDelegation,
+    getNftByOwner,
+    getNftInfo,
+    getValidatorsInfo,
+    grantAuthorization,
+    newBluzelleClient,
+    newLocalWallet,
+    queryAuthorizations,
+    revokeAuthorization, send
 } from '../../index';
 import { expect } from 'chai';
 import { BluzelleClient } from '../../core';
@@ -31,6 +31,7 @@ import { Metadata } from '../../curium/lib/generated/nft/nft';
 import { GrantType, msgMapping, MsgType } from './authzTypes';
 import { QueryCollectionResponse } from '../../curium/lib/generated/nft/query';
 import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
+import { isE2E } from '@bluzelle/testing/src/e2eUtils';
 import { defaultSwarmConfig, startSwarmWithClient } from '@bluzelle/testing';
 import * as bip39 from 'bip39';
 import { parseNumToLong } from '../../shared/parse';
@@ -49,7 +50,10 @@ describe('authz module', function () {
 
   beforeEach(() =>
     stopSwarm()
-      .then(() => startSwarmWithClient(({ ...defaultSwarmConfig })))
+      .then(() => startSwarmWithClient({
+        config: defaultSwarmConfig,
+        isE2E: isE2E()
+      }))
       .then(ctx => ({
         client: ctx.bzSdk,
         testGranter: ctx.bzSdk.address
@@ -75,10 +79,11 @@ describe('authz module', function () {
             return ctx;
           })
       )
-      .then(ctx => faucetToken(ctx.client, testGrantee))
+        .then(ctx => send(ctx.client, testGranter, 2000000, {maxGas: 1000000, gasPrice: 0.002, mode: 'sync'}))
+      // .then(ctx => faucetToken(ctx.client, testGrantee))
   );
 
-  after(stopSwarm);
+  // after(stopSwarm);
   
   it('verifyInvarient msg authorization should be successfully created', () =>
     grantAuthorization(client, testGranter, testGrantee, {
@@ -759,6 +764,7 @@ describe('authz module', function () {
         maxGas: 100000000,
         gasPrice: 0.002
       }))
+      .then(passThroughAwait(res => console.log("createNft", res)))
       .then(() => grantAuthorization(client, testGranter, testGrantee, {
         grantType: GrantType.GENERIC,
         msgType: MsgType.PRINT_EDITION,
@@ -767,6 +773,7 @@ describe('authz module', function () {
         maxGas: 100000000,
         gasPrice: 0.002
       }))
+      .then(passThroughAwait(res => console.log("grantAuthorization", res)))
       .then(() => getNftByOwner(eClient, testGranter))
       .then((nftInfo: any) => createCtx('nftInfo', () => {
         const nft = nftInfo.nfts.pop();

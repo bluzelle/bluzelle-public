@@ -1,7 +1,7 @@
-import { startSwarmWithClient } from '@bluzelle/testing';
-import { DaemonConfig, Environment, SwarmConfig, SwarmTypes } from 'daemon-manager/src/SwarmConfig';
-import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
-import { getOtherTokenDefaults } from '@bluzelle/testing/src/commonUtils';
+import {startSwarmWithClient} from '@bluzelle/testing';
+import {DaemonConfig, Environment, SwarmConfig, SwarmTypes} from 'daemon-manager/src/SwarmConfig';
+import {stopSwarm} from '@bluzelle/testing/src/swarmUtils';
+import {getOtherTokenDefaults} from '@bluzelle/testing/src/commonUtils';
 
 describe('staking module', function () {
   this.timeout(2_000_000);
@@ -10,7 +10,10 @@ describe('staking module', function () {
   after(stopSwarm);
 
   it("should be able to delegate the expected amount", () =>
-    startSwarmWithClient({ ...swarmConfig() })
+      startSwarmWithClient({
+        config: {...swarmConfig()},
+        isE2E: false
+      })
   );
 
 

@@ -5,6 +5,8 @@ import { expect } from 'chai';
 import { Creator } from '../../curium/lib/generated/nft/nft';
 import { createCollection, createNft } from './tx';
 import { getNftInfo } from './query';
+import { isE2E } from '@bluzelle/testing/src/e2eUtils';
+import {passThroughAwait} from "promise-passthrough";
 
 describe('nft supply overflow', function () {
   this.timeout(10_800_000)
@@ -12,7 +14,9 @@ describe('nft supply overflow', function () {
   let client: BluzelleClient;
   beforeEach(() =>
     stopSwarm()
-      .then(() => startSwarmWithClient())
+      .then(() => startSwarmWithClient({
+          isE2E: isE2E()
+      }))
       .then(({bzSdk}) => client = bzSdk)
       .then(sdk => client = sdk)
   );
@@ -24,6 +28,7 @@ describe('nft supply overflow', function () {
       maxGas: 100000000,
       gasPrice: 0.002
     })
+        .then(passThroughAwait(res => console.log("createCollection", res)))
       .then(() => createNft(client, {
         collId: 1,
         metadata: defaultMetadataProps('TMPMeta', true, client.address, {
@@ -31,6 +36,7 @@ describe('nft supply overflow', function () {
           maxSupply: 9223372036854776000
         })
       }, {maxGas: 1000000, gasPrice: 0.002}))
+        .then(passThroughAwait(res => console.log("createNft", res)))
       .then(x => getNftInfo(client, '1:1:0'))
       .then(info => {
         expect(info.metadata?.masterEdition?.supply).to.equal(1);

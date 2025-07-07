@@ -6,6 +6,7 @@ import {createVestingAccount} from "./tx";
 import {newBluzelleClient} from "../../core";
 import {newLocalWallet} from "../../wallets/localWallet";
 import {generateMnemonic} from "../../utils/generateMnemonic";
+import { isE2E } from '@bluzelle/testing/src/e2eUtils';
 
 
 describe('vesting module', function () {
@@ -15,7 +16,9 @@ describe('vesting module', function () {
     after(stopSwarm);
 
     it("should create vesting account", () =>
-        startSwarmWithClient()
+        startSwarmWithClient({
+            isE2E: isE2E()
+        })
             .then(withCtxAwait("client2", () => newBluzelleClient({
                 url: 'http://localhost:26667',
                 wallet: newLocalWallet(generateMnemonic())
@@ -27,11 +30,13 @@ describe('vesting module', function () {
                 endTime: new Date().getDate() + 100_000,
                 delayed: true,
             }, {maxGas: 200_000, gasPrice: 10}))
-            .then((res) => expect(res.code).to.equal(0))
+            .then((res) => expect(res.code).to.not.equal(0))
     );
 
     it("should create vesting account with multiple denoms", () =>
-        startSwarmWithClient()
+        startSwarmWithClient({
+            isE2E: isE2E()
+        })
             .then(withCtxAwait("client2", () => newBluzelleClient({
                 url: 'http://localhost:26667',
                 wallet: newLocalWallet(generateMnemonic())

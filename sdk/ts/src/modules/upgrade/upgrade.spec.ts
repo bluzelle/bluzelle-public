@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { defaultSwarmConfig, startSwarmWithClient } from '@bluzelle/testing';
 import { getCurrentPlan, getModuleVersions } from './query';
 import { Swarm } from 'daemon-manager/src';
+import { isE2E } from '@bluzelle/testing/src/e2eUtils';
 
 describe('Upgrade', () => {
 
@@ -15,12 +16,16 @@ describe('Upgrade', () => {
 
 
   it('should get current plan', () =>
-    startSwarmWithClient()
+    startSwarmWithClient({
+      isE2E: isE2E()
+    })
       .then(client => getCurrentPlan(client.bzSdk))
   );
 
   it('should get module version', () =>
-    startSwarmWithClient()
+      startSwarmWithClient({
+        isE2E: isE2E()
+      })
       .then(client => getModuleVersions(client.bzSdk, 'nft'))
       .then(version => expect(version[0].name).to.equal('nft'))
   );

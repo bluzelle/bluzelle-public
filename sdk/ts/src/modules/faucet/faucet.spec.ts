@@ -6,7 +6,7 @@ import { BluzelleClient } from '../../core';
 import { getAccountBalance } from '../bank';
 import { withCtxAwait } from '@scottburch/with-context';
 
-describe('faucet module', function () {
+(process.env.IS_E2E == 'true' ? describe.skip : describe)('faucet module', function () {
 
     this.timeout(1_800_000);
 
@@ -29,7 +29,9 @@ describe('faucet module', function () {
     });
 
     it('should faucet tokens to a given address', () => {
-        return startSwarmWithClient({...defaultSwarmConfig, createMinter: true})
+        return startSwarmWithClient({
+            config: defaultSwarmConfig,
+        })
             .then(({bzSdk}) => faucetToken(bzSdk, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
             .then(response => {
                 expect(response.mnemonic).to.be.empty
@@ -38,7 +40,9 @@ describe('faucet module', function () {
     });
 
     it('should faucet tokens with no given address', () => {
-        return startSwarmWithClient({...defaultSwarmConfig, createMinter: true})
+        return startSwarmWithClient({
+            config: defaultSwarmConfig,
+        })
             .then(({bzSdk}) => faucetToken(bzSdk))
             .then(response => {
                 expect(response.mnemonic.split(' ')).to.have.length(24)
@@ -49,7 +53,9 @@ describe('faucet module', function () {
 
     it('should not be able to faucet tokens when faucet is off', () => {
         let client: BluzelleClient;
-        return startSwarmWithClient({...defaultSwarmConfig, createMinter: false})
+        return startSwarmWithClient({
+            config: defaultSwarmConfig,
+        })
             .then(({bzSdk}) => client = bzSdk)
             .then(() => faucetToken(client, 'bluzelle1qst08g0f6hyr7z6a7xpgye3nv4ngtnxzz457zd'))
             .then(() => expect(true).to.be.false)
@@ -59,7 +65,11 @@ describe('faucet module', function () {
     });
 
     it('should be able to faucet tokens to a new account', () =>
-        startSwarmWithClient({...defaultSwarmConfig, createMinter: true}, {url: 'http://localhost:26667'})
+
+        startSwarmWithClient({
+            config: {...defaultSwarmConfig},
+            clientOptions: {url: 'http://localhost:26667'}
+        })
             .then(info => ({client: info.bzSdk}))
             .then(withCtxAwait('faucetResult', ctx => faucetToken(ctx.client)))
             .then(ctx => getAccountBalance(ctx.client, ctx.faucetResult.address))
@@ -92,7 +102,9 @@ describe('faucet module', function () {
     );
 
     it('should not faucet if bluzelleFaucet is not turned on', () =>
-        startSwarmWithClient({...defaultSwarmConfig, createMinter: false})
+        startSwarmWithClient({
+            config: {...defaultSwarmConfig},
+        })
             .then(info => faucetToken(info.bzSdk))
             .catch(err => expect(err.message.includes('unknown request')).to.be.true)
     );

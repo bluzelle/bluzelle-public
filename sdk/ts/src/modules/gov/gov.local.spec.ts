@@ -47,7 +47,9 @@ describe('gov module, local docker', function () {
   describe('text proposal', () => {
 
     it('should be able to submit a text proposal', () =>
-      startSwarmWithClient(govTestSwarmConfig)
+      startSwarmWithClient({
+          config: govTestSwarmConfig
+      })
         .then(client => submitTextProposal(client.bzSdk, {
             title: 'My title',
             description: 'My description',
@@ -65,7 +67,9 @@ describe('gov module, local docker', function () {
     );
 
     it('should be able to get a text proposal to reach deposit period', () =>
-      startSwarmWithClient(govTestSwarmConfig)
+      startSwarmWithClient({
+          config: {...govTestSwarmConfig}
+      })
         .then(passThroughAwait(client => submitTextProposal(client.bzSdk, {
             title: 'My title',
             description: 'My description',
@@ -98,7 +102,9 @@ describe('gov module, local docker', function () {
     );
 
     it('should be able to get a text proposal to reach voting period', () =>
-      startSwarmWithClient(govTestSwarmConfig)
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
         .then(passThroughAwait(client => submitTextProposal(client.bzSdk, {
             title: 'My title',
             description: 'My description',
@@ -132,7 +138,9 @@ describe('gov module, local docker', function () {
     );
 
     it('should be able to pass a text proposal by voting yes', () =>
-      startSwarmWithClient(govTestSwarmConfig)
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
         .then(passThroughAwait(client => submitTextProposal(client.bzSdk, {
             title: 'My title',
             description: 'My description',
@@ -172,7 +180,9 @@ describe('gov module, local docker', function () {
   describe.skip('software upgrade proposal', () => {
 
     it('should be able to vote on and pass a software upgrade proposal', () =>
-      startSwarmWithClient(govTestSwarmConfig)
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
         .then(passThroughAwait(client => submitSoftwareUpgradeProposal(client.bzSdk, {
             title: 'My title',
             description: 'My description',
@@ -202,7 +212,9 @@ describe('gov module, local docker', function () {
     );
 
     it('should apply a software upgrade proposal and confirm that it has been applied', () =>
-      startSwarmWithClient(govTestSwarmConfig)
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
         .then(passThroughAwait(client => submitSoftwareUpgradeProposal(client.bzSdk, {
             title: 'My title',
             description: 'My description',
@@ -243,7 +255,9 @@ describe('gov module, local docker', function () {
     );
 
     it('should apply a software upgrade proposal to double token supply', () =>
-      startSwarmWithClient(govTestSwarmConfig)
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
         .then(withCtxAwait("supply_before", client => getTotalSupply(client.bzSdk)))
         .then(passThroughAwait(client => submitSoftwareUpgradeProposal(client.bzSdk, {
             title: 'My title',
@@ -293,7 +307,9 @@ describe('gov module, local docker', function () {
   describe('parameters change proposal', () => {
 
     it('should be able to vote on and pass a parameters change proposal', () =>
-      startSwarmWithClient(govTestSwarmConfig)
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
           .then(withCtxAwait("initialParams", client => getStakingParams(client.bzSdk)))
           .then(withCtxAwait("govModuleAddress", client => getModuleAccountByName(client.bzSdk, "gov")))
           .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, 
@@ -331,7 +347,9 @@ describe('gov module, local docker', function () {
     );
 
     it('should be able to apply a parameters change proposal and see the parameter change', () =>
-        startSwarmWithClient(govTestSwarmConfig)
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
           .then(withCtxAwait("initialParams", client => getStakingParams(client.bzSdk)
             // .then(res => expect(res.maxValidators).to.equal(100))
           ))
@@ -378,7 +396,9 @@ describe('gov module, local docker', function () {
   describe('community pool spend proposal', () => {
 
     it('should be able to vote on and pass a community pool spend proposal', () =>
-      startSwarmWithClient(govTestSwarmConfig)
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
         .then(passThroughAwait(ctx => fundCommunityPool(ctx.bzSdk, {
           amount: [{amount: 100_000_000, denom: 'ubnt'}],
           depositor: ctx.auth.address
@@ -416,7 +436,9 @@ describe('gov module, local docker', function () {
     );
 
     it('should be able to receive funds from a community pool spend proposal', () =>
-      startSwarmWithClient(govTestSwarmConfig)
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
         .then(passThroughAwait(ctx => fundCommunityPool(ctx.bzSdk, {
           amount: [{amount: 500_000_000, denom: 'ubnt'}],
           depositor: ctx.auth.address
@@ -546,7 +568,9 @@ describe('gov votes', function () {
   beforeEach(stopSwarm);
 
   it('should be able to vote with weight', () =>
-    startSwarmWithClient(govTestSwarmConfig)
+      startSwarmWithClient({
+          config: {...govTestSwarmConfig}
+      })
       .then(passThroughAwait(client => submitTextProposal(client.bzSdk, {
           title: 'My title',
           description: 'My description',

@@ -29,7 +29,9 @@ describe('staking module', function () {
     after(stopSwarm);
 
     it("should be able to delegate the expected amount", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, { maxGas: 200_000, gasPrice: 10, mode: "sync" })))
             .then(ctx => getDelegation(ctx.bzSdk, ctx.auth.address, ctx.valoper))
@@ -37,14 +39,18 @@ describe('staking module', function () {
     );
 
     it("should return bluzelle tx response on delegate", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, { maxGas: 200_000, gasPrice: 10 }))
             .then(res => expect(res.code).to.equal(0))
     );
 
     it("should be able to undelegate", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, { maxGas: 200_000, gasPrice: 10 })))
             .then(passThroughAwait(ctx => undelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 2_000_000, { maxGas: 200_000, gasPrice: 10 })))
@@ -53,7 +59,9 @@ describe('staking module', function () {
     );
 
     it("should return bluzelle tx response on undelegate", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 5_000_000, { maxGas: 200_000, gasPrice: 10 })))
             .then(ctx => undelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper, 2_000_000, { maxGas: 200_000, gasPrice: 10 }))
@@ -61,7 +69,9 @@ describe('staking module', function () {
     );
 
     it("should be able to redelegate", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(withCtxAwait('valoper2', ctx => ctx.swarm.getValidators()[2].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, { maxGas: 500_000, gasPrice: 10 })))
@@ -73,7 +83,9 @@ describe('staking module', function () {
     );
 
     it("should return bluzelle tx response on redelegate", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(withCtxAwait('valoper2', ctx => ctx.swarm.getValidators()[2].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, { maxGas: 500_000, gasPrice: 10 })))
@@ -82,7 +94,9 @@ describe('staking module', function () {
     );
 
     it('should get all delegations of the delegator with the correct amount', () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(withCtxAwait('valoper2', ctx => ctx.swarm.getValidators()[2].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, { maxGas: 200_000, gasPrice: 10 })))
@@ -94,13 +108,17 @@ describe('staking module', function () {
     );
 
     it('should get validators info', () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(ctx => getValidatorsInfo(ctx.bzSdk))
             .then(res => expect(res.validators.length).to.equal(3))
     );
 
     it("should query unbonding delegations of a delegator", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(withCtxAwait('valoper2', ctx => ctx.swarm.getValidators()[2].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, { maxGas: 200_000, gasPrice: 10 })))
@@ -115,21 +133,27 @@ describe('staking module', function () {
     );
 
     it("should get the validator's info", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(ctx => getValidatorInfo(ctx.bzSdk, ctx.valoper1))
             .then(res => expect(res.validator.description.moniker).to.equal('b.validator'))    
     );
 
     it("should get all delegations of the validator", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(withCtxAwait('result', ctx => getValidatorDelegations(ctx.bzSdk, ctx.valoper1)))
             .then(ctx => expect(ctx.result.delegationResponses[0].delegation.validatorAddress).to.equal(ctx.valoper1))    
     );
 
     it("should get all delegations of the validator", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, { maxGas: 200_000, gasPrice: 10 })))
             .then(passThroughAwait(ctx => undelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 2_000_000, { maxGas: 200_000, gasPrice: 10 })))
@@ -138,7 +162,9 @@ describe('staking module', function () {
     );
 
     it("should get an unbonding delegation between a validator and a delegator", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, { maxGas: 200_000, gasPrice: 10 })))
             .then(passThroughAwait(ctx => undelegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 2_000_000, { maxGas: 200_000, gasPrice: 10 })))
@@ -147,7 +173,9 @@ describe('staking module', function () {
     );
 
     it("should get an redelegation info", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(withCtxAwait('valoper2', ctx => ctx.swarm.getValidators()[2].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, { maxGas: 500_000, gasPrice: 10 })))
@@ -157,7 +185,9 @@ describe('staking module', function () {
     );
 
     it("should get info of validators of the delegator", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('valoper1', ctx => ctx.swarm.getValidators()[1].getValoper()))
             .then(withCtxAwait('valoper2', ctx => ctx.swarm.getValidators()[2].getValoper()))
             .then(passThroughAwait(ctx => delegate(ctx.bzSdk, ctx.auth.address, ctx.valoper1, 5_000_000, { maxGas: 500_000, gasPrice: 10 })))
@@ -167,20 +197,26 @@ describe('staking module', function () {
     );
 
     it("should get historical info of the chain", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('result', ctx => getHistoricalInfo(ctx.bzSdk, 1)))
             .then(ctx => expect(ctx.result.valSet[0].minSelfDelegation).to.equal(1))
     );
 
     it("should get pool info of the chain", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('result', ctx => getPoolInfo(ctx.bzSdk)))
             .then(ctx => expect(ctx.result.notBondedTokens).to.equal(0))
     );
 
 
     it("should get staking params of the chain", () =>
-        startSwarmWithClient({ ...swarmConfig() })
+        startSwarmWithClient({
+            config: {...swarmConfig()}
+        })
             .then(withCtxAwait('result', ctx => getStakingParams(ctx.bzSdk)))
             .then(ctx => expect(ctx.result.bondDenom).to.equal('ubnt'))
     );

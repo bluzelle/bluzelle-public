@@ -16,6 +16,7 @@ import {withCtxAwait} from "@scottburch/with-context";
 import {getForkTestSwarmConfig} from "infra-control-test/specs/fork/genesisToLocal.spec";
 import {times} from "lodash";
 import { getTaxInfo } from "../modules/tax";
+import {isE2E} from "@bluzelle/testing/src/e2eUtils";
 
 
 describe('sending transactions', function () {
@@ -30,7 +31,10 @@ describe('sending transactions', function () {
     );
 
     it('should have a withTransaction that can bundle messages', () => {
-        return startSwarmWithClient({...defaultSwarmConfig})
+        return startSwarmWithClient({
+            config: {...defaultSwarmConfig},
+            isE2E: isE2E()
+        })
             .then(({bzSdk}) => withTransaction(bzSdk, () => {
                 pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {gasPrice: 0.002, maxGas: 200000, mode: 'sync'});
                 pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {gasPrice: 0.002, maxGas: 200000, mode: 'sync'});
@@ -39,7 +43,9 @@ describe('sending transactions', function () {
     });
 
     it('should return a valid transaction for a failing message', () =>
-        startSwarmWithClient()
+            startSwarmWithClient({
+                isE2E: isE2E()
+            })
             .then(() => newBluzelleClient({
                 url: 'http://localhost:26667',
                 wallet: newLocalWallet(generateMnemonic())
@@ -88,7 +94,10 @@ describe('sending transactions', function () {
     });
 
     it('should reject a transaction if the gas price is too low', () =>
-        startSwarmWithClient({...defaultSwarmConfig, minGasPrice: defaultSwarmConfig.minGasPrice * 10})
+        startSwarmWithClient({
+            config: {...defaultSwarmConfig},
+            isE2E: isE2E()
+        })
             .then(({bzSdk}) => pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {gasPrice: defaultSwarmConfig.minGasPrice, maxGas: 200000, mode: 'sync'}))
             .then(x =>
                 {throw x}
@@ -99,7 +108,9 @@ describe('sending transactions', function () {
     );
 
     it('should send tokens in uelt and ug4', () =>
-        startSwarmWithClient()
+        startSwarmWithClient({
+            isE2E: isE2E()
+        })
             .then(withCtxAwait("taxInfo", ctx => getTaxInfo(ctx.bzSdk)))
             .then(withCtxAwait('taxCost', ctx => 10000 * (Number(ctx.taxInfo.transferTaxBp)/10000)))
             .then(withCtxAwait('toAddress', ctx => faucetToken(ctx.bzSdk).then(res => res.address)))

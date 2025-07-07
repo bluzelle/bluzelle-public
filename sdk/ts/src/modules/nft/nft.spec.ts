@@ -28,6 +28,7 @@ import {
   getNftMetadata
 } from './query';
 import { createCtx, withCtxAwait } from 'with-context';
+import { isE2E } from '@bluzelle/testing/src/e2eUtils';
 
 describe('nft module', function () {
 
@@ -54,7 +55,9 @@ describe('nft module', function () {
   let client: BluzelleClient;
   beforeEach(() =>
     stopSwarm()
-      .then(() => startSwarmWithClient())
+      .then(() => startSwarmWithClient({
+          isE2E: isE2E()
+      }))
       .then(({bzSdk}) => client = bzSdk)
       // .then(() => newBluzelleClient({
       //     url: 'http://localhost:26657',

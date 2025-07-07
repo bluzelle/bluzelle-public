@@ -12,6 +12,7 @@ import { faucetToken } from "../faucet";
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as bip39 from "bip39";
+import { isE2E } from '@bluzelle/testing/src/e2eUtils';
 
 dotenv.config({ path: path.resolve(__dirname, '../../../../../.env') });
 
@@ -33,7 +34,9 @@ describe('tax module', function () {
     describe('as admin', () => {
 
         it("setGasTaxBp should set gas tax bp", () =>
-            startSwarmWithClient()
+            startSwarmWithClient({
+                isE2E: isE2E()
+            })
                 .then(() =>newBluzelleClient({
                                         url: 'localhost:26667',
                                         wallet: newLocalWallet(process.env.TAX_ADMIN_MNEMONIC ? process.env.TAX_ADMIN_MNEMONIC: "" )
@@ -47,7 +50,9 @@ describe('tax module', function () {
         );
 
         it("setTransferTaxBp should set transfer tax bp", () =>
-            startSwarmWithClient()
+            startSwarmWithClient({
+                isE2E: isE2E()
+            })
                 .then(() =>newBluzelleClient({
                                         url: 'localhost:26667',
                                         wallet: newLocalWallet(process.env.TAX_ADMIN_MNEMONIC ? process.env.TAX_ADMIN_MNEMONIC: "" )
@@ -65,7 +70,9 @@ describe('tax module', function () {
         );
 
         it("setTaxCollector should set tax collector", () =>
-            startSwarmWithClient()
+            startSwarmWithClient({
+                isE2E: isE2E()
+            })
                 .then(() =>newBluzelleClient({
                                         url: 'localhost:26667',
                                         wallet: newLocalWallet(process.env.TAX_ADMIN_MNEMONIC ? process.env.TAX_ADMIN_MNEMONIC: "" )
@@ -93,7 +100,9 @@ describe('tax module', function () {
     describe('as non-admin', () => {
 
         it("setGasTaxBp should not set gas tax bp", () =>
-            startSwarmWithClient()
+            startSwarmWithClient({
+                isE2E: isE2E()
+            })
                 .then(withCtxAwait("bp_before", ctx => getTaxInfo(ctx.bzSdk)))
                 .then(passThroughAwait(ctx => setGasTaxBp(ctx.bzSdk, Number(ctx.bp_before) + 1, {maxGas: MAX_GAS, gasPrice: GAS_PRICE, mode: 'sync'})))
                 .then(withCtxAwait("bp_after", ctx => getTaxInfo(ctx.bzSdk)))
@@ -101,7 +110,9 @@ describe('tax module', function () {
         );
 
         it("setTransferTaxBp should not set transfer tax bp", () =>
-            startSwarmWithClient()
+            startSwarmWithClient({
+                isE2E: isE2E()
+            })
                 .then(withCtxAwait("bp_before", ctx => getTaxInfo(ctx.bzSdk)))
                 .then(passThroughAwait(ctx => setTransferTaxBp(ctx.bzSdk, Number(ctx.bp_before.transferTaxBp) + 1, {
                     maxGas: MAX_GAS,
@@ -113,7 +124,9 @@ describe('tax module', function () {
         );
 
         it("setTaxCollector should not set tax collector", () =>
-            startSwarmWithClient()
+                startSwarmWithClient({
+                    isE2E: isE2E()
+                })
                 .then(passThroughAwait(ctx => setTaxCollector(ctx.bzSdk, ctx.bzSdk.address, {
                     maxGas: MAX_GAS,
                     gasPrice: GAS_PRICE,

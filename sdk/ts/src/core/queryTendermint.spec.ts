@@ -3,6 +3,7 @@ import { defaultSwarmConfig } from '@bluzelle/testing/src/defaultConfigs';
 import { getStatus, getValidators } from './queryTendermint';
 import { expect } from 'chai';
 import { Swarm } from 'daemon-manager/src';
+import {isE2E} from '@bluzelle/testing/src/e2eUtils'
 
 describe('tendermint queries', function () {
     this.timeout(800_000)
@@ -14,7 +15,10 @@ describe('tendermint queries', function () {
         Swarm.stopDaemons({...defaultSwarmConfig})
     );
     it('should get the status of a node', () =>
-        startSwarmWithClient({...defaultSwarmConfig, createMinter: true})
+        startSwarmWithClient({
+            config: {...defaultSwarmConfig},
+            isE2E: isE2E()
+        })
             .then(({bzSdk}) => getStatus(bzSdk))
             .then(response => {
                 expect(response.nodeId.length).to.equal(40)
@@ -26,7 +30,10 @@ describe('tendermint queries', function () {
     );
 
     it('should return the validators on a network', () =>
-        startSwarmWithClient({...defaultSwarmConfig, createMinter: true})
+        startSwarmWithClient({
+            config: {...defaultSwarmConfig},
+            isE2E: isE2E()
+        })
             .then(({bzSdk}) => getValidators(bzSdk))
             .then(response => {
                 console.log(response)

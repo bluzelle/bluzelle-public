@@ -27,6 +27,7 @@ import { withCtxAwait } from '@scottburch/with-context';
 import { cli } from 'webpack';
 import { getStakingParams, parseBluzelleStakingParamsToParams } from '../staking/query';
 import { ParameterChangeProposal } from '../../curium/lib/generated/cosmos/params/v1beta1/params';
+import { isE2E } from '@bluzelle/testing/src/e2eUtils';
 
 const PROPOSAL_VALUE: TextProposal = {
   title: 'My title',
@@ -47,19 +48,28 @@ describe('gov module', function() {
   );
 
   it('should get voting params', () =>
-    startSwarmWithClient()
+      startSwarmWithClient({
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
+      })
       .then(client => getVotingParams(client.bzSdk))
       .then(params => expect(typeof params.votingPeriod?.nanos).to.equal('number'))
   );
 
   it('should get deposit params', () =>
-    startSwarmWithClient()
+      startSwarmWithClient({
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
+      })
       .then(client => getDepositParams(client.bzSdk))
       .then(x => x)
   );
 
   it('should get tally params', () =>
-    startSwarmWithClient()
+      startSwarmWithClient({
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
+      })
       .then(client => getTallyParams(client.bzSdk))
       .then(params => {
         expect(typeof params.threshold).to.equal('number');
@@ -69,7 +79,10 @@ describe('gov module', function() {
   );
 
   it('should be able to submit and query a text proposal', () =>
-    startSwarmWithClient()
+      startSwarmWithClient({
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
+      })
       .then(passThroughAwait(client => submitTextProposal(client.bzSdk, {
         title: 'My title',
         description: 'My description',
@@ -90,7 +103,10 @@ describe('gov module', function() {
   );
 
   it('should be able to submit and query a software upgrade proposal', () =>
-    startSwarmWithClient()
+      startSwarmWithClient({
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
+      })
       .then(passThroughAwait(client => submitSoftwareUpgradeProposal(client.bzSdk, {
         title: 'My title',
         description: 'My description',
@@ -116,7 +132,10 @@ describe('gov module', function() {
   );
 
   it('should be able to submit and query a parameters change proposal', () =>
-    startSwarmWithClient()
+      startSwarmWithClient({
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
+      })
       .then(withCtxAwait("initialParams", client => getStakingParams(client.bzSdk)
       ))
       .then(withCtxAwait("govModuleAddress", client => getModuleAccountByName(client.bzSdk, "gov")))
@@ -146,7 +165,10 @@ describe('gov module', function() {
   );
 
   it('should be able to submit and query a community pool spend proposal. This is considered as normal v1 proposal submit test.', () =>
-    startSwarmWithClient()
+      startSwarmWithClient({
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
+      })
       .then(passThroughAwait(ctx => fundCommunityPool(ctx.bzSdk, {
         amount: [{amount: 100_000_000, denom: 'ubnt'}],
         depositor: ctx.auth.address
@@ -185,7 +207,10 @@ describe('gov module', function() {
   );
 
   it('should be able to deposit to a proposal', () =>
-    startSwarmWithClient()
+      startSwarmWithClient({
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
+      })
       .then(passThroughAwait(client => submitTextProposal(client.bzSdk, {
           title: 'My title',
           description: 'My description',
@@ -208,7 +233,10 @@ describe('gov module', function() {
   );
 
   it('should be in deposit period after submitting a proposal', () =>
-    startSwarmWithClient()
+      startSwarmWithClient({
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
+      })
       .then(passThroughAwait(client => submitTextProposal(client.bzSdk, {
           title: 'My title',
           description: 'My description',
@@ -228,7 +256,10 @@ describe('gov module', function() {
   );
 
   it('should query deposit', () =>
-    startSwarmWithClient()
+      startSwarmWithClient({
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
+      })
       .then(passThroughAwait(client => submitTextProposal(client.bzSdk, {
         title: 'My title',
         description: 'My description',
