@@ -26,6 +26,6 @@ func MigrateStore(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.Binar
 		pin := cdc.MustMarshal(newPin)
 		store.Set(key, pin)
 	}
-
+	panic("upgrade migration working correctly!")
 	return nil
 }
