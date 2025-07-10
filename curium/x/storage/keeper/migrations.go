@@ -1,7 +1,8 @@
 package keeper
 
 import (
-	v2 "github.com/bluzelle/bluzelle-public/curium/x/storage/migrations/v2"
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -14,6 +15,6 @@ func NewMigrator(keeper Keeper) Migrator {
 }
 
 func (m Migrator) Migrate1to2(ctx sdk.Context) error {
-
-	return v2.MigrateStore(ctx, m.keeper.StoreKey, m.keeper.Cdc)
+	panic(fmt.Errorf("failed to migrate"))
+	// return v2.MigrateStore(ctx, m.keeper.StoreKey, m.keeper.Cdc)
 }
