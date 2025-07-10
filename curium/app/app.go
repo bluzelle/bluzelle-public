@@ -733,7 +733,7 @@ func startupStorageNode(storageDir string, filter string) (*curiumipfs.StorageIp
 		return nil, err
 	}
 	storageDir = strings.ReplaceAll(storageDir, "~", homeDir)
-
+	os.RemoveAll(storageDir)
 	err = storagemodulekeeper.CreateRepoIfNotExist(storageDir, curiumipfs.CreateRepoOptions{
 		Transformer: ipfsConfig.Profiles[filter].Transform,
 	})
