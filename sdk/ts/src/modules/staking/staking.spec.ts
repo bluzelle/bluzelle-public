@@ -5,7 +5,7 @@ import { passThroughAwait } from 'promise-passthrough';
 import { expect } from 'chai';
 import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
 import { getOtherTokenDefaults } from '@bluzelle/testing/src/commonUtils';
-import { delegate, redelegate, undelegate } from './tx';
+import {delegate, editValidator, redelegate, undelegate} from './tx';
 import {
     getDelegation,
     getDelegatorDelegations,
@@ -21,6 +21,8 @@ import {
     getValidatorUnbondingDelegations,
     getValidatorsInfo
 } from './query';
+import {newBluzelleClient} from "../../core";
+import {newLocalWallet} from "../../wallets/localWallet";
 
 describe('staking module', function () {
     this.timeout(2_000_000);
@@ -219,6 +221,36 @@ describe('staking module', function () {
         })
             .then(withCtxAwait('result', ctx => getStakingParams(ctx.bzSdk)))
             .then(ctx => expect(ctx.result.bondDenom).to.equal('ubnt'))
+    );
+
+    it("should edit validator", () =>
+        startSwarmWithClient()
+            .then(withCtxAwait("validatorAddress", ctx => ctx.swarm.getValidators()[0].getValoper()))
+            .then(withCtxAwait('infoBefore', ctx => getValidatorInfo(ctx.bzSdk, ctx.validatorAddress)))
+            .then(passThroughAwait(ctx => console.log(`retrieved validator info before edit: ${JSON.stringify(ctx.infoBefore.validator)}`)))
+            .then(passThroughAwait(ctx =>
+                editValidator({
+                    client: ctx.bzSdk,
+                    validatorAddress: ctx.validatorAddress,
+                    minSelfDelegation: ctx.infoBefore.validator.minSelfDelegation,
+                    commissionRate: ctx.infoBefore.validator.commission.commissionRates.rate,
+                    description: {
+                        moniker: ctx.infoBefore.validator.description.moniker,
+                        identity: "",
+                        website: ctx.infoBefore.validator.description.website,
+                        securityContact: ctx.infoBefore.validator.description.securityContact,
+                        details: ctx.infoBefore.validator.description.details
+                    },
+                    options: {
+                        maxGas: 200_000,
+                        gasPrice: 10
+                    }
+                })
+                    .then(passThroughAwait(res => console.log(`edit validator res: ${res}`)))
+            ))
+            .then(withCtxAwait('infoAfter', ctx => getValidatorInfo(ctx.bzSdk, ctx.validatorAddress)))
+            .then(passThroughAwait(ctx => console.log(`retrieved validator info: ${ctx.infoBefore}`)))
+            .then(ctx => expect(ctx.infoAfter.validator.description.moniker).to.equal(ctx.infoBefore.validator.description.moniker))
     );
 
 });

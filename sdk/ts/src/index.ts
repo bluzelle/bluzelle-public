@@ -43,3 +43,4 @@ export {
   StakeAuthorization
 } from './curium/lib/generated/cosmos/staking/v1beta1/authz';
 
+export {Creator, Metadata} from "./curium/lib/generated/nft/nft";

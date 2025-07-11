@@ -44,18 +44,25 @@ export const redelegate = (
     } as MsgBeginRedelegate, options))
         .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
-export const editValidator = (
+export const editValidator = (params: {
     client: BluzelleClient,
     validatorAddress: string,
-    commissionRate: string,
-    minSelfDelegation: string,
+    commissionRate: number,
+    minSelfDelegation: number,
+    description: {
+        moniker: string;
+        identity: string;
+        website: string;
+        securityContact: string;
+        details: string;
+    },
     options: BroadcastOptions,
-    description?: string,
-): Promise<BluzelleTxResponse> =>
-    Promise.resolve(sendTx(client, '/cosmos.staking.v1beta1.MsgEditValidator', {
-        description,
-        validatorAddress,
-        commissionRate,
-        minSelfDelegation
-    } as MsgEditValidator, options))
+}): Promise<BluzelleTxResponse> =>
+    Promise.resolve(sendTx(params.client, '/cosmos.staking.v1beta1.MsgEditValidator', {
+        description: params.description,
+        validatorAddress: params.validatorAddress,
+        // commissionRate: params.commissionRate.toFixed(18),
+        commissionRate: Math.floor(params.commissionRate).toString(),
+        minSelfDelegation: Math.floor(params.minSelfDelegation).toString()
+    } as MsgEditValidator, params.options))
         .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);

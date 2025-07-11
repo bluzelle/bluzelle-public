@@ -206,7 +206,30 @@ export const getValidatorsInfo = (
 
 export const getValidatorInfo = (client: BluzelleClient, validatorAddr: string): Promise<BluzelleValidatorResponse> =>
     client.queryClient.staking.Validator({ validatorAddr })
-        .then((res) => ({ validator: res.validator ? parseValidator(res.validator) : null } as BluzelleValidatorResponse));
+        .then((res) => ({
+            validator: res.validator ? parseValidator(res.validator) : defaultBluzelleValidator()
+        }));
+
+const defaultBluzelleValidator = () => ({
+    operatorAddress: "",
+    description: {
+        moniker: '',
+        details: '',
+        website: '',
+        securityContact: '',
+    },
+    commission: {
+        commissionRates: {
+            rate: 0,
+            maxRate: 0,
+            maxChangeRate: 0,
+        },
+        updateTime: new Date(0)
+    },
+    minSelfDelegation: 0,
+    delegatorShares: 0,
+    jailed: false
+})
 
 export const getValidatorDelegations = (
     client: BluzelleClient,
