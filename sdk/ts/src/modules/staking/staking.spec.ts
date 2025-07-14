@@ -27,6 +27,8 @@ import {newLocalWallet} from "../../wallets/localWallet";
 describe('staking module', function () {
     this.timeout(2_000_000);
 
+    before(() => process.env.IS_E2E && this.skip());
+
     beforeEach(stopSwarm);
     after(stopSwarm);
 

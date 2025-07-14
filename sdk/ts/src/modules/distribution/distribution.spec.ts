@@ -19,6 +19,8 @@ import {delegate} from "../staking";
 describe('distribution module', function () {
     this.timeout(2_000_000);
 
+    before(() => process.env.IS_E2E && this.skip());
+
     beforeEach(stopSwarm);
     after(stopSwarm);
 
