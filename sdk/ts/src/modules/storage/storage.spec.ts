@@ -12,80 +12,43 @@ import {getAccountBalance} from "../bank";
 import {pinCid} from "./tx";
 import {getTx, withTransaction} from "../../core";
 import { stopSwarm } from "@bluzelle/testing/src/swarmUtils";
-import { createHelia } from 'helia'
-import { unixfs } from '@helia/unixfs'
-// import { createLibp2p } from 'libp2p'
-// import { webSockets } from '@libp2p/websockets'
-// import { bootstrap } from '@libp2p/bootstrap'
-// import { kadDHT } from '@libp2p/kad-dht'
-// import { noise } from '@chainsafe/libp2p-noise'
-// import { mplex } from '@libp2p/mplex'
 
-// import "../../utils/fetch-polyfill";
+import axios from 'axios'
+import FormData from 'form-data'
+import fs from 'fs'
+import path from 'path'
 
 const curiumUrl = 'http://localhost:26667';
 const mnemonic = new BehaviorSubject<string>("");
 
-async function createHeliaClient() {
-    const { createHelia } = await eval('import("helia")');
-    const { unixfs } = await eval('import("@helia/unixfs")');
-    const { createLibp2p } = await eval('import("libp2p")');
-    const { webSockets } = await eval('import("@libp2p/websockets")');
-    const { bootstrap } = await eval('import("@libp2p/bootstrap")');
-    const { kadDHT } = await eval('import("@libp2p/kad-dht")');
-    const { noise } = await eval('import("@chainsafe/libp2p-noise")');
-    const { mplex } = await eval('import("@libp2p/mplex")');
-    const { identify } = await eval('import("@libp2p/identify")')
-    const { ping } = await eval('import("@libp2p/ping")')
-    const { tcp } = await eval('import("@libp2p/tcp")');
-    const libp2p = await createLibp2p({
-        transports: [
-            webSockets(),
-              tcp(),           // ✅ For IPFS bootstrap nodes over TCP
-        ],
-        streamMuxers: [mplex()],
-        connectionEncrypters: [noise()],
-        peerDiscovery: [
-            bootstrap({
-            list: [
-                 '/ip4/147.75.83.83/tcp/4001/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN',
-                    '/ip4/147.75.109.187/tcp/4001/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa'
-                // "/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN",
-                // "/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa",
-                // "/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb",
-                // "/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt",
-                // "/ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ",
-                // "/ip4/104.131.131.82/udp/4001/quic-v1/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
-            ]
-            })
-        ],
-    services: {
-        identify: identify(),         // ✅ <-- REQUIRED FOR kad-dht
-        dht: kadDHT() as any  ,        // ✅ your DHT (already cast safely)
-        ping: ping(),
-    }
-    });
+const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI2OGZkNzMyZS0wMGU4LTRhOTUtOWUzNi0yZGU4NzEzZWUyOWMiLCJlbWFpbCI6ImFsdml3b3JsZHdpdGhtYWlsQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiIyYWZiOWQ2Nzg3MGMwMTcxNGJkZSIsInNjb3BlZEtleVNlY3JldCI6ImI5YmRlNDRkZjM0NzVmNDMzN2QxYzllODQ3NTZkYTU0YjRjMGQ3ODk1M2U3OTMxZWMzOTc4N2UxMjI0MDEzMjYiLCJleHAiOjE3ODQwMzU3NDZ9.Zghc4QAcgtvRHIk7QQVpW67erqTeE6WZJ1oUnxenhwA' // 🔐 Replace with your actual JWT token
 
-    console.log(libp2p.getPeers().map(p => p.toString()))
-    const helia = await createHelia({libp2p});
-    console.log("-----------helia--------", helia)
-    await delay(5000); // wait 5 seconds
-    console.log('Connected peers:', libp2p.getPeers());
-    const fs = unixfs(helia);
-    return {
-        add: async (content: Uint8Array) => {
-            const cid = await fs.addBytes(content);
-            return { path: cid.toString() };
-        },
-        helia,
-        fs
-    };
+async function uploadToPinata(filePath: string): Promise<string> {
+  const form = new FormData()
+  form.append('file', fs.createReadStream(filePath))
+
+  const fileName = path.basename(filePath)
+
+  try {
+    const response = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', form, {
+      maxBodyLength: Infinity,
+      headers: {
+        ...form.getHeaders(),
+        Authorization: `Bearer ${PINATA_JWT}`,
+      },
+    })
+
+    const cid = response.data.IpfsHash
+    console.log(`✅ Uploaded ${fileName}`)
+    console.log(`📦 CID: ${cid}`)
+    console.log(`🔗 View at: https://ipfs.io/ipfs/${cid}`)
+    return cid
+  } catch (error: any) {
+    console.error('❌ Upload failed:', error.response?.data || error.message)
+    throw error
+  }
 }
 
-async function loadCID() {
-    const { CID } = await eval('import("multiformats/cid")');
-    return CID;
-}
 
 describe('storage module', function () {
     this.timeout(600_000);
@@ -102,8 +65,7 @@ describe('storage module', function () {
 
     it('hasContent should return true if content is pinned', () =>
         
-            Promise.resolve(generateContent(0.01))
-            .then((content) => createHeliaClient().then((heliaClient) => heliaClient.add(content)))
+            Promise.resolve(uploadToPinata('./err.txt'))
             .then((addResults) => console.log(addResults))
             .catch(e => console.log(e))
     );
