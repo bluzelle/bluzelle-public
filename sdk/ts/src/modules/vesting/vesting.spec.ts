@@ -7,6 +7,7 @@ import {newBluzelleClient} from "../../core";
 import {newLocalWallet} from "../../wallets/localWallet";
 import {generateMnemonic} from "../../utils/generateMnemonic";
 import { isE2E } from '@bluzelle/testing/src/e2eUtils';
+import {passThroughAwait} from "promise-passthrough";
 
 
 describe('vesting module', function () {
@@ -51,6 +52,7 @@ describe('vesting module', function () {
                 endTime: new Date().getDate() + 100_000,
                 delayed: false,
             }, {maxGas: 200_000, gasPrice: 10}))
+            .then(passThroughAwait(res => console.log(`res: ${JSON.stringify(res)}`)))
             .then((res) => expect(res.code).to.equal(0))
     );
 
