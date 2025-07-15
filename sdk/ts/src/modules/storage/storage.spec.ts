@@ -12,43 +12,21 @@ import {getAccountBalance} from "../bank";
 import {pinCid} from "./tx";
 import {getTx, withTransaction} from "../../core";
 import { stopSwarm } from "@bluzelle/testing/src/swarmUtils";
-
-import axios from 'axios'
-import FormData from 'form-data'
-import fs from 'fs'
-import path from 'path'
+import {create} from "ipfs-http-client"
 
 const curiumUrl = 'http://localhost:26667';
 const mnemonic = new BehaviorSubject<string>("");
 
-const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI2OGZkNzMyZS0wMGU4LTRhOTUtOWUzNi0yZGU4NzEzZWUyOWMiLCJlbWFpbCI6ImFsdml3b3JsZHdpdGhtYWlsQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiIyYWZiOWQ2Nzg3MGMwMTcxNGJkZSIsInNjb3BlZEtleVNlY3JldCI6ImI5YmRlNDRkZjM0NzVmNDMzN2QxYzllODQ3NTZkYTU0YjRjMGQ3ODk1M2U3OTMxZWMzOTc4N2UxMjI0MDEzMjYiLCJleHAiOjE3ODQwMzU3NDZ9.Zghc4QAcgtvRHIk7QQVpW67erqTeE6WZJ1oUnxenhwA' // 🔐 Replace with your actual JWT token
 
-async function uploadToPinata(filePath: string): Promise<string> {
-  const form = new FormData()
-  form.append('file', fs.createReadStream(filePath))
+const ipfs = create({
+  url: 'http://172.26.13.123:5001'  // Your Go IPFS node's endpoint
+})
 
-  const fileName = path.basename(filePath)
-
-  try {
-    const response = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', form, {
-      maxBodyLength: Infinity,
-      headers: {
-        ...form.getHeaders(),
-        Authorization: `Bearer ${PINATA_JWT}`,
-      },
-    })
-
-    const cid = response.data.IpfsHash
-    console.log(`✅ Uploaded ${fileName}`)
-    console.log(`📦 CID: ${cid}`)
-    console.log(`🔗 View at: https://ipfs.io/ipfs/${cid}`)
-    return cid
-  } catch (error: any) {
-    console.error('❌ Upload failed:', error.response?.data || error.message)
-    throw error
-  }
+async function uploadToIPFS() {
+  const content = 'Hello IPFS from Node 22!'
+  const { cid } = await ipfs.add(content)
+  console.log('✅ CID:', cid.toString())
 }
-
 
 describe('storage module', function () {
     this.timeout(600_000);
@@ -65,7 +43,7 @@ describe('storage module', function () {
 
     it('hasContent should return true if content is pinned', () =>
         
-            Promise.resolve(uploadToPinata('./err.txt'))
+            Promise.resolve(uploadToIPFS())
             .then((addResults) => console.log(addResults))
             .catch(e => console.log(e))
     );

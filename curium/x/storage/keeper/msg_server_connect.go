@@ -2,11 +2,12 @@ package keeper
 
 import (
 	"context"
+	"log"
+	"sync"
+
 	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multiaddr"
-	"log"
-	"sync"
 )
 
 func AttemptConnections(ctx context.Context, node *curiumipfs.StorageIpfsNode, peers []string) error {

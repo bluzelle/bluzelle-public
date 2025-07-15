@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"fmt"
+	chainlog "log"
 
 	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
 
@@ -72,10 +73,11 @@ func (k Keeper) PinFile(ctx sdk.Context, msg *types.MsgPin) {
 	if len(msg.Addrs) != 0 {
 		err := AttemptConnections(k.storageNode.Context, k.storageNode, msg.Addrs)
 		if err != nil {
+			chainlog.Printf("failed connect to peers: %s", err)
 			return
 		}
 	}
-
+	chainlog.Printf("IPFS Node peers: ", k.storageNode.IpfsNode.Peerstore.Peers().String())
 	DoPinFile(
 		k.storageNode.AddPin,
 		msg,
