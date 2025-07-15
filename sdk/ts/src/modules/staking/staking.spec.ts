@@ -1,10 +1,10 @@
-import { startSwarmWithClient } from '@bluzelle/testing';
-import { withCtxAwait } from '@scottburch/with-context';
-import { DaemonConfig, Environment, SwarmConfig, SwarmTypes } from 'daemon-manager/src/SwarmConfig';
-import { passThroughAwait } from 'promise-passthrough';
-import { expect } from 'chai';
-import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
-import { getOtherTokenDefaults } from '@bluzelle/testing/src/commonUtils';
+import {startSwarmWithClient} from '@bluzelle/testing';
+import {withCtxAwait} from '@scottburch/with-context';
+import {DaemonConfig, Environment, SwarmConfig, SwarmTypes} from 'daemon-manager/src/SwarmConfig';
+import {passThroughAwait} from 'promise-passthrough';
+import {expect} from 'chai';
+import {stopSwarm} from '@bluzelle/testing/src/swarmUtils';
+import {getOtherTokenDefaults} from '@bluzelle/testing/src/commonUtils';
 import {delegate, editValidator, redelegate, undelegate} from './tx';
 import {
     getDelegation,
@@ -18,11 +18,9 @@ import {
     getUnbondingDelegation,
     getValidatorDelegations,
     getValidatorInfo,
-    getValidatorUnbondingDelegations,
-    getValidatorsInfo
+    getValidatorsInfo,
+    getValidatorUnbondingDelegations
 } from './query';
-import {newBluzelleClient} from "../../core";
-import {newLocalWallet} from "../../wallets/localWallet";
 
 describe('staking module', function () {
     this.timeout(2_000_000);

@@ -1,40 +1,30 @@
-import { expect } from 'chai';
-import { defaultSwarmConfig, startSwarmWithClient } from '@bluzelle/testing';
-import { Swarm } from 'daemon-manager/src';
+import {expect} from 'chai';
+import {defaultSwarmConfig, startSwarmWithClient} from '@bluzelle/testing';
+import {Swarm} from 'daemon-manager/src';
 import {
-  depositToProposal,
-  submitCommunityPoolSpendProposal,
-  submitParameterChangeProposal,
-  submitSoftwareUpgradeProposal,
-  submitTextProposal
+    depositToProposal,
+    submitCommunityPoolSpendProposal,
+    submitParameterChangeProposal,
+    submitSoftwareUpgradeProposal,
+    submitTextProposal
 } from './tx';
-import {
-  getDeposit,
-  getDepositParams,
-  getProposal,
-  getTallyParams,
-  getVotingParams
-} from './query';
-import { TextProposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { passThroughAwait } from 'promise-passthrough';
-import { newBluzelleClient } from '../../core';
-import { newLocalWallet } from '../../wallets/localWallet';
-import { generateMnemonic } from '../../utils/generateMnemonic';
-import { fundCommunityPool } from '../distribution';
-import { ProposalStatus } from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
-import { getModuleAccountByName } from '../auth/query';
-import { withCtxAwait } from '@scottburch/with-context';
-import { cli } from 'webpack';
-import { getStakingParams, parseBluzelleStakingParamsToParams } from '../staking/query';
-import { ParameterChangeProposal } from '../../curium/lib/generated/cosmos/params/v1beta1/params';
-import { isE2E } from '@bluzelle/testing/src/e2eUtils';
+import {getDeposit, getDepositParams, getProposal, getProposals, getTallyParams, getVotingParams} from './query';
+import {TextProposal} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import {passThroughAwait} from 'promise-passthrough';
+import {newBluzelleClient} from '../../core';
+import {newLocalWallet} from '../../wallets/localWallet';
+import {generateMnemonic} from '../../utils/generateMnemonic';
+import {fundCommunityPool} from '../distribution';
+import {ProposalStatus} from '../../curium/lib/generated/cosmos/gov/v1beta1/gov';
+import {getModuleAccountByName} from '../auth/query';
+import {withCtxAwait} from '@scottburch/with-context';
+import {getStakingParams, parseBluzelleStakingParamsToParams} from '../staking/query';
+import {isE2E} from '@bluzelle/testing/src/e2eUtils';
 
 const PROPOSAL_VALUE: TextProposal = {
   title: 'My title',
   description: 'My description',
 };
-
-const FIRST_PROPOSAL_ID = '1';
 
 describe('gov module', function() {
   this.timeout(10_800_000)
@@ -95,7 +85,11 @@ describe('gov module', function() {
         maxGas: 200_000,
         gasPrice: 10
       })))
-      .then(client => getProposal(client.bzSdk, FIRST_PROPOSAL_ID))
+      .then(client =>
+          getProposals(client.bzSdk)
+              .then(res => (res.proposals.length).toString())
+              .then(proposalId => getProposal(client.bzSdk, proposalId))
+      )
       .then(proposal => expect(TextProposal.decode(proposal.content.value))
         .to
         .deep
@@ -124,7 +118,11 @@ describe('gov module', function() {
         maxGas: 200_000,
         gasPrice: 10
       })))
-      .then(client => getProposal(client.bzSdk, FIRST_PROPOSAL_ID))
+      .then(client =>
+          getProposals(client.bzSdk)
+              .then(res => (res.proposals.length).toString())
+              .then(proposalId => getProposal(client.bzSdk, proposalId))
+      )
       .then(proposal => expect(TextProposal.decode(proposal.content.value))
         .to
         .deep
@@ -145,7 +143,7 @@ describe('gov module', function() {
           description: 'My description', 
           proposer: client.auth.address,
           initialDeposit: [{
-            amount: 2_000_000,
+            amount: 2_000_000_000,
             denom: 'ubnt'
           }],
         },
@@ -160,7 +158,11 @@ describe('gov module', function() {
           maxGas: 200_000,
           gasPrice: 10
         })))
-      .then(client => getProposal(client.bzSdk, FIRST_PROPOSAL_ID))
+      .then(client =>
+          getProposals(client.bzSdk)
+              .then(res => (res.proposals.length).toString())
+              .then(proposalId => getProposal(client.bzSdk, proposalId))
+      )
       .then(proposal => expect(proposal.status).to.equal(ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD))
   );
 
@@ -224,11 +226,15 @@ describe('gov module', function() {
           gasPrice: 10
         })
       ))
-      .then(client => depositToProposal(client.bzSdk, {
-        proposalId: FIRST_PROPOSAL_ID,
-        depositor: client.auth.address,
-        amount: [{amount: 500_000_000_000, denom: 'ubnt'}],
-      }, { maxGas: 200_000, gasPrice: 10 }))
+      .then(client =>
+          getProposals(client.bzSdk)
+              .then(res => (res.proposals.length).toString())
+              .then(id => depositToProposal(client.bzSdk, {
+                  proposalId: id,
+                  depositor: client.auth.address,
+                  amount: [{amount: 1_000_000_000, denom: 'ubnt'}],
+              }, { maxGas: 200_000, gasPrice: 10 }))
+      )
       .then(res => expect(res.code).to.equal(0))
   );
 
@@ -251,7 +257,11 @@ describe('gov module', function() {
         })
           .then(x => x)
       ))
-      .then(client => getProposal(client.bzSdk, FIRST_PROPOSAL_ID))
+      .then(client =>
+          getProposals(client.bzSdk)
+              .then(res => (res.proposals.length).toString())
+              .then(proposalId => getProposal(client.bzSdk, proposalId))
+      )
       .then(proposal => expect(proposal.status).to.equal(ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD))
   );
 
@@ -272,10 +282,14 @@ describe('gov module', function() {
         maxGas: 200_000,
         gasPrice: 10
       })))
-      .then(client => getDeposit(client.bzSdk, {
-        proposalId: FIRST_PROPOSAL_ID,
-        depositor: client.auth.address,
-      }))
+      .then(client =>
+          getProposals(client.bzSdk)
+              .then(res => (res.proposals.length).toString())
+              .then(id => getDeposit(client.bzSdk, {
+                  proposalId: id,
+                  depositor: client.auth.address,
+              }))
+      )
       .then(deposit => expect(deposit.amount)
         .to
         .deep

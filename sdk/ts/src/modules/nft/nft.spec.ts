@@ -144,7 +144,7 @@ describe('nft module', function () {
     createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
       maxGas: 100000000,
       gasPrice: 0.002
-    })
+  })
       .then(() => createNft(client, {
         collId: 1,
         metadata: defaultMetadataProps('TMPMeta', true, client.address)
@@ -412,7 +412,7 @@ describe('nft module', function () {
       }, {maxGas: 1000000, gasPrice: 0.002}))
       .then(() => multiSendNft(client, testMultiSendNFTParams, {maxGas: 1000000, gasPrice: 0.002}))
       .then((multiSendNftResponse) => createCtx("multiSendResult", () => multiSendNftResponse))
-      .then(withCtxAwait('singleSendResult', () => transferNft(client, '1:6:0', 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 
+      .then(withCtxAwait('singleSendResult', () => transferNft(client, '1:6:0', 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
         {maxGas: 1000000, gasPrice: 0.002})))
       .then((ctx) => {
         expect((ctx.multiSendResult as unknown as { gasUsed: number }).gasUsed)
