@@ -28,7 +28,7 @@ describe('auth module', function () {
         })
             .then(client => getAccounts(client.bzSdk)
             )
-            .then(result => expect(result.accounts[0]).to.have.property('typeURLLLL'))
+            .then(result => expect(result.accounts[0]).to.have.property('typeURL'))
     );
 
 
