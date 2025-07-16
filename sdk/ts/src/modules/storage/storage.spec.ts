@@ -12,9 +12,6 @@ import { startSwarmWithClient, stopSwarm } from "@bluzelle/testing/src/swarmUtil
 import axios from 'axios'
 import FormData from 'form-data'
 
-const curiumUrl = 'http://localhost:26667';
-const mnemonic = new BehaviorSubject<string>("");
-
 async function loadCID() {
     const { CID } = await eval('import("multiformats/cid")');
     return CID;
