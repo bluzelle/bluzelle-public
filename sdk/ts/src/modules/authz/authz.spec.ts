@@ -79,11 +79,11 @@ describe('authz module', function () {
             return ctx;
           })
       )
-        .then(ctx => send(ctx.client, testGranter, 2000000, {maxGas: 1000000, gasPrice: 0.002, mode: 'sync'}))
+        .then(ctx => send(ctx.client, testGrantee, 2000000, {maxGas: 1000000, gasPrice: 0.002, mode: 'sync'}))
       // .then(ctx => faucetToken(ctx.client, testGrantee))
   );
 
-  // after(stopSwarm);
+  after(stopSwarm);
   
   it('verifyInvarient msg authorization should be successfully created', () =>
     grantAuthorization(client, testGranter, testGrantee, {
