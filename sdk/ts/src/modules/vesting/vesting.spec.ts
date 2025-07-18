@@ -35,9 +35,7 @@ describe('vesting module', function () {
     );
 
     it("should create vesting account with multiple denoms", () =>
-        startSwarmWithClient({
-            isE2E: isE2E()
-        })
+        startSwarmWithClient()
             .then(withCtxAwait("client2", () => newBluzelleClient({
                 url: 'http://localhost:26667',
                 wallet: newLocalWallet(generateMnemonic())
