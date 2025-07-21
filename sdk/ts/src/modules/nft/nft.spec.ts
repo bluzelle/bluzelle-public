@@ -1,11 +1,9 @@
 import { startSwarmWithClient } from '@bluzelle/testing';
 import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
-import { BluzelleClient, newBluzelleClient } from '../../core';
+import { BluzelleClient } from '../../core';
 import { expect } from 'chai';
 import { Creator, MultiSendNFTOutput } from '../../curium/lib/generated/nft/nft';
 import { createAddress } from '../faucet';
-import { newLocalWallet } from '../../wallets/localWallet';
-import { generateMnemonic } from '../../utils/generateMnemonic';
 import { passThroughAwait } from 'promise-passthrough';
 import {
   burnNFT,
@@ -29,6 +27,12 @@ import {
 } from './query';
 import { createCtx, withCtxAwait } from 'with-context';
 import { isE2E } from '@bluzelle/testing/src/e2eUtils';
+import {decodeFns} from '../../utils/responseDecode'
+
+
+function getMsgResponse(res:any): Uint8Array {
+  return res.msgResponses[0].value
+}
 
 describe('nft module', function () {
 
@@ -39,14 +43,8 @@ describe('nft module', function () {
     'bluzelle14gren5katxznytnhqjl6zt3u0asg2erqgngjzk',
     'bluzelle1kq7tqye24lr6muyvdgjwk3vv90ad90z2mrsgcm',
   ];
-  const nfts = [
-    '1:1:0',
-    '1:2:0',
-    '1:3:0',
-    '1:4:0',
-    '1:5:0',
-  ]
-  const testMultiSendNFTParams: MultiSendNFTOutput[] = testAddresses.map((addr: string, idx: number) => ({
+  const nfts: string[] = []
+  const testMultiSendNFTParams = (nfts: string[]): MultiSendNFTOutput[] => testAddresses.map((addr: string, idx: number) => ({
     receiver: addr,
     nftId: nfts[idx]
   } as MultiSendNFTOutput));
@@ -59,10 +57,6 @@ describe('nft module', function () {
           isE2E: isE2E()
       }))
       .then(({bzSdk}) => client = bzSdk)
-      // .then(() => newBluzelleClient({
-      //     url: 'http://localhost:26657',
-      //     wallet: newLocalWallet("hurry involve cruel hope crush pear nothing trend strong spin twin garment special fine still scrub satisfy vote also height goose catalog illness media")
-      // }))
       .then(sdk => client = sdk)
   );
 
@@ -74,13 +68,16 @@ describe('nft module', function () {
       .catch(err => expect(err.message).to.contain('invalid nft id'))
   );
 
-  it('should create a collection and last collection id should be 1', () =>
-    createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
-      maxGas: 100000000,
-      gasPrice: 0.002
-    })
-      .then(()=> getLastCollectionId(client))
-      .then((info) =>expect(info.id).to.equal(1) )
+  it('should create a collection and last collection id should be oldID + 1', () =>
+    getLastCollectionId(client)
+      .then(result => createCtx("oldInfo", () => result))
+      .then(passThroughAwait(() =>
+        createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
+          maxGas: 100000000,
+          gasPrice: 0.002
+      })))
+      .then(withCtxAwait("updatedInfo", ()=> getLastCollectionId(client)))
+      .then((ctx) =>expect(ctx.oldInfo.id).to.be.equal(ctx.updatedInfo.id -1 ) )
   );
 
   it('should create an empty collection', () =>
@@ -97,9 +94,9 @@ describe('nft module', function () {
       maxGas: 100000000,
       gasPrice: 0.002
     })
-      .then(() => getCollectionInfo(client, 1))
+      .then(() => getLastCollectionId(client))
+      .then((result) => getCollectionInfo(client, result.id))
       .then(resp => {
-        expect(resp.collection?.id).to.equal(1);
         expect(resp.collection?.uri).to.deep.equal('http://temp.com');
         expect(resp.collection?.name).to.deep.equal('Temp');
         expect(resp.collection?.symbol).to.deep.equal("TMP");
@@ -111,32 +108,31 @@ describe('nft module', function () {
       maxGas: 100000000,
       gasPrice: 0.002
     })
-      .then(() => createNft(client, {
-        collId: 1,
+      .then(() => getLastCollectionId(client))
+      .then((result) => createNft(client, {
+        collId: result.id,
         metadata: defaultMetadataProps('TMPMeta', true, client.address)
       }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(x => getNftInfo(client, '1:1:0'))
+      .then((result) => decodeFns['createNFT'](getMsgResponse(result)))
+      .then(result => getNftInfo(client, (result as unknown as {id: string}).id))
       .then(info => {
         expect(info.nft?.owner).to.deep.equal(client.address);
-        expect(info.nft?.collId).to.equal(1);
-        expect(info.nft?.metadataId).to.equal(1);
         expect(info.metadata?.name).to.deep.equal('TMPMeta');
         expect(info.metadata?.uri).to.deep.equal('https://tmp.com');
         expect(info.metadata?.creators[0].address).to.deep.equal(client.address);
       })
   );
 
-  it.skip('should create an nft without metadata', () =>
+  it('should create an nft without metadata', () =>
     createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
       maxGas: 100000000,
       gasPrice: 0.002
     })
       .then(() => createNft(client, {collId: 1}, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(x => getNftInfo(client, '1:1:0'))
+      .then((result) => decodeFns['createNFT'](getMsgResponse(result)) as unknown as {metadataId: Long.Long, id: string })
+      .then(res => getNftInfo(client, res.id))
       .then(info => {
         expect(info.nft?.owner).to.deep.equal(client.address);
-        expect(info.nft?.collId).to.equal(1);
-        expect(info.nft?.metadataId).to.equal(1);
       })
   )
 
@@ -144,20 +140,23 @@ describe('nft module', function () {
     createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
       maxGas: 100000000,
       gasPrice: 0.002
-  })
-      .then(() => createNft(client, {
-        collId: 1,
+    })
+      .then(() => getLastCollectionId(client))
+      .then((result) => createNft(client, {
+        collId: result.id,
         metadata: defaultMetadataProps('TMPMeta', true, client.address)
       }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => updateMetadata(client, {
+      .then((result) => decodeFns['createNFT'](getMsgResponse(result)))
+      .then((result) =>createCtx("createdNFTInfo", ()=> result as unknown as {metadataId: Long.Long, id: string }))
+      .then(passThroughAwait((ctx) => updateMetadata(client, {
         name: 'TMP2',
         uri: 'http://temp2.com',
         creators: [defaultCreators(client.address)],
         sellerFeeBasisPoints: 80,
         sender: client.address,
-        metadataId: 1
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => getNftInfo(client, '1:1:0'))
+        metadataId: Number(ctx.createdNFTInfo.metadataId),
+      }, {maxGas: 1000000, gasPrice: 0.002})))
+      .then((ctx) => getNftInfo(client, ctx.createdNFTInfo.id))
       .then(nftInfo => {
         expect(nftInfo.metadata?.uri).to.equal('http://temp2.com');
         expect(nftInfo.metadata?.name).to.equal('TMP2');
@@ -170,12 +169,15 @@ describe('nft module', function () {
         maxGas: 100000000,
         gasPrice: 0.002
       })
-        .then(() => createNft(client, {
-          collId: 1,
+        .then(() => getLastCollectionId(client))
+        .then((res) => createNft(client, {
+          collId: res.id,
           metadata: defaultMetadataProps('TMPMeta', true, client.address)
         }, {maxGas: 1000000, gasPrice: 0.002}))
-        .then(() => updateMetadataAuthority(client, 1, newAuthority, {maxGas: 1000000, gasPrice: 0.002}))
-        .then(() => getNftMetadata(client, 1))
+        .then((result) => decodeFns['createNFT'](getMsgResponse(result)))
+        .then((result) =>createCtx("createdNFTInfo", ()=> result as unknown as {metadataId: Long.Long, id: string }))
+        .then(passThroughAwait((ctx) => updateMetadataAuthority(client, Number(ctx.createdNFTInfo.metadataId), newAuthority, {maxGas: 1000000, gasPrice: 0.002})))
+        .then((ctx) => getNftMetadata(client, Number(ctx.createdNFTInfo.metadataId)))
         .then(resp => {
           expect(resp.metadata?.metadataAuthority).to.deep.equal(newAuthority)
         })
@@ -188,12 +190,15 @@ describe('nft module', function () {
         maxGas: 100000000,
         gasPrice: 0.002
       })
-        .then(() => createNft(client, {
-          collId: 1,
+      .then(() => getLastCollectionId(client))
+        .then((res) => createNft(client, {
+          collId: res.id,
           metadata: defaultMetadataProps('TMPMeta', true, client.address)
         }, {maxGas: 1000000, gasPrice: 0.002}))
-        .then(() => updateMintAuthority(client, 1, newAuthority, {maxGas: 1000000, gasPrice: 0.002}))
-        .then(() => getNftMetadata(client, 1))
+        .then((result) => decodeFns['createNFT'](getMsgResponse(result)))
+        .then((result) =>createCtx("createdNFTInfo", ()=> result as unknown as {metadataId: Long.Long, id: string }))
+        .then(passThroughAwait((ctx) => updateMintAuthority(client, Number(ctx.createdNFTInfo.metadataId), newAuthority, {maxGas: 1000000, gasPrice: 0.002})))
+        .then((ctx) => getNftMetadata(client, Number(ctx.createdNFTInfo.metadataId)))
         .then(resp => {
           expect(resp.metadata?.mintAuthority).to.deep.equal(newAuthority)
         })
@@ -205,12 +210,15 @@ describe('nft module', function () {
       maxGas: 100000000,
       gasPrice: 0.002
     })
-      .then(() => createNft(client, {
-        collId: 1,
+      .then((res) => decodeFns['createCollection']((res as any).msgResponses[0].value))
+      .then((res) =>createCtx("collInfo", ()=> res as unknown as {id: Long}))
+      .then(withCtxAwait("createNFTRes", (ctx) => createNft(client, {
+        collId: Number(ctx.collInfo.id),
         metadata: defaultMetadataProps('TMPMeta', true, client.address)
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => printNftEdition(client, 1, 1, client.address, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(x => getCollectionInfo(client, 1))
+      }, {maxGas: 1000000, gasPrice: 0.002})))
+      .then(withCtxAwait("createdNFTInfo", (ctx) => Promise.resolve(decodeFns['createNFT'](getMsgResponse(ctx.createNFTRes))) ))
+      .then(passThroughAwait((ctx) => printNftEdition(client, Number((ctx.createdNFTInfo as unknown as {metadataId: Long.Long}).metadataId), Number(ctx.collInfo.id), client.address, {maxGas: 1000000, gasPrice: 0.002})))
+      .then(ctx => getCollectionInfo(client, Number(ctx.collInfo.id)))
       .then(info => {
         expect(info.nfts).to.have.length(2);
         expect(info.nfts[1].seq).to.equal(1)
@@ -218,28 +226,27 @@ describe('nft module', function () {
   );
 
   it('should transfer an nft from one user to another', () => {
+    let newUser = createAddress().address;
     return createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address}, {
       maxGas: 100000000,
       gasPrice: 0.002
     })
-      .then(() => createNft(client, {
-        collId: 1,
+      .then(() => getLastCollectionId(client))
+      .then((res) => createNft(client, {
+        collId: res.id,
         metadata: defaultMetadataProps('TMPMeta', true, client.address)
       }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => newBluzelleClient({
-        url: 'http://localhost:26667',
-        wallet: newLocalWallet(generateMnemonic())
-      }))
-      .then(passThroughAwait(otherSdk => transferNft(client, '1:1:0', otherSdk.address, {
+      .then((result) => decodeFns['createNFT'](getMsgResponse(result)))
+      .then((result) =>createCtx("createdNFTInfo", ()=> result as unknown as {metadataId: Long.Long, id: string }))
+      .then(passThroughAwait((ctx) => transferNft(client, ctx.createdNFTInfo.id, newUser, {
         maxGas: 1000000,
         gasPrice: 0.002
       })))
-      .then(otherSdk =>
-        getNftInfo(client, '1:1:0')
-          .then(info => ({info, address: otherSdk.address}))
+      .then((ctx) =>
+        getNftInfo(client, ctx.createdNFTInfo.id)
       )
-      .then(({info, address}) => {
-        expect(info.nft?.owner).to.deep.equal(address);
+      .then((info) => {
+        expect(info.nft?.owner).to.deep.equal(newUser);
         expect(info.metadata?.creators[0].address).to.deep.equal(client.address);
       })
 
@@ -250,21 +257,22 @@ describe('nft module', function () {
       maxGas: 100000000,
       gasPrice: 0.002
     })
-      .then(() => createNft(client, {
-        collId: 1,
+      .then(() => getLastCollectionId(client))
+      .then(passThroughAwait((res) => createNft(client, {
+        collId: res.id,
         metadata: defaultMetadataProps('NFT1', true, client.address)
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => createNft(client, {
-        collId: 1,
+      }, {maxGas: 1000000, gasPrice: 0.002})))
+      .then((res) => createNft(client, {
+        collId: res.id,
         metadata: defaultMetadataProps('NFT2', true, client.address)
       }, {maxGas: 1000000, gasPrice: 0.002}))
       .then(() => getNftByOwner(client, client.address))
       .then(resp => {
-          expect(resp.nfts).to.have.length(2);
-          expect(resp.nfts[0].owner).to.deep.equal(client.address);
-          expect(resp.nfts[1].owner).to.deep.equal(client.address);
-          expect(resp.metadata[0].name).to.deep.equal('NFT1');
-          expect(resp.metadata[1].name).to.deep.equal('NFT2');
+          expect(resp.nfts.length).to.greaterThan(1);
+          expect(resp.nfts[resp.nfts.length-2].owner).to.deep.equal(client.address);
+          expect(resp.nfts[resp.nfts.length-1].owner).to.deep.equal(client.address);
+          expect(resp.metadata[resp.nfts.length-2].name).to.deep.equal('NFT1');
+          expect(resp.metadata[resp.nfts.length-1].name).to.deep.equal('NFT2');
         }
       )
   });
@@ -274,8 +282,10 @@ describe('nft module', function () {
       maxGas: 100000000,
       gasPrice: 0.002
     })
-      .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps('NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(x => getNftMetadata(client, 1))
+      .then(() => getLastCollectionId(client))
+      .then((res) => createNft(client, {collId: res.id, metadata: defaultMetadataProps('NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+      .then((result) => decodeFns['createNFT'](getMsgResponse(result)) as unknown as {metadataId: Long.Long, id: string })
+      .then((res) => getNftMetadata(client, Number(res.metadataId)))
       .then(info => {
         expect(info.metadata?.mutableUri).to.deep.equal(defaultMetadataProps('NFT1', true, client.address).mutableUri)
       })
@@ -286,17 +296,19 @@ describe('nft module', function () {
       maxGas: 100000000,
       gasPrice: 0.002
     })
-      .then(() => createNft(client, {collId: 1, metadata: defaultMetadataProps('NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => updateMetadata(client, {
+      .then(() => getLastCollectionId(client))
+      .then((res) => createNft(client, {collId: res.id, metadata: defaultMetadataProps('NFT1', true, client.address)}, {maxGas: 1000000, gasPrice: 0.002}))
+      .then((res) => decodeFns['createNFT'](getMsgResponse(res)) as unknown as {metadataId: Long.Long, id: string })
+      .then(passThroughAwait((res) => updateMetadata(client, {
         name: 'NFT2',
         uri: 'http://temp2.com',
         mutableUri: 'http://updatedStarloopDatabase.com',
         creators: [defaultCreators(client.address)],
         sellerFeeBasisPoints: 80,
         sender: client.address,
-        metadataId: 1
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => getNftInfo(client, '1:1:0'))
+        metadataId: Number(res.metadataId)
+      }, {maxGas: 1000000, gasPrice: 0.002})))
+      .then((res) => getNftInfo(client, res.id))
       .then(nftInfo => {
         expect(nftInfo.metadata?.mutableUri).to.deep.equal('http://updatedStarloopDatabase.com');
       })
@@ -308,11 +320,12 @@ describe('nft module', function () {
       maxGas: 100000000,
       gasPrice: 0.002
     })
-      .then(() => updateCollectionUri(client, 1, 'http://updatedTemp.com', {
+      .then(() => getLastCollectionId(client))
+      .then(passThroughAwait((res) => updateCollectionUri(client, res.id, 'http://updatedTemp.com', {
         maxGas: 100000000,
         gasPrice: 0.002
-      }))
-      .then(() => getCollectionInfo(client, 1))
+      })))
+      .then((res) => getCollectionInfo(client, res.id))
       .then(resp => {
         expect(resp.collection?.uri).to.deep.equal('http://updatedTemp.com')
       })
@@ -323,11 +336,12 @@ describe('nft module', function () {
       maxGas: 100000000,
       gasPrice: 0.002
     })
-      .then(() => updateCollectionMutableUri(client, 1, 'http://updatedTemp.com', {
+      .then(() => getLastCollectionId(client))
+      .then(passThroughAwait((res) => updateCollectionMutableUri(client, res.id, 'http://updatedTemp.com', {
         maxGas: 100000000,
         gasPrice: 0.002
-      }))
-      .then(() => getCollectionInfo(client, 1))
+      })))
+      .then((res) => getCollectionInfo(client, res.id))
       .then(resp => {
         expect(resp.collection?.mutableUri).to.deep.equal('http://updatedTemp.com')
       })
@@ -338,13 +352,12 @@ describe('nft module', function () {
       maxGas: 100000000,
       gasPrice: 0.002
     })
-      .then(() => updateCollectionMutableUri(client, 1, 'http://updatedTemp.com', {
+      .then(() => getLastCollectionId(client))
+      .then((res) => updateCollectionMutableUri(client, res.id, 'http://updatedTemp.com', {
         maxGas: 100000000,
         gasPrice: 0.002
       }))
-      .then(() => expect(true).to.be.false)
-      .catch(err => {})
-
+      .then(res => expect((res as any).rawLog).to.contains('failed'))
   )
 
   it('should send multiple nfts into several accounts', () =>
@@ -352,67 +365,111 @@ describe('nft module', function () {
       maxGas: 100000000,
       gasPrice: 0.002
     })
-      .then(() => createNft(client, {
-        collId: 1,
-        metadata: defaultMetadataProps('TMPMeta', true, client.address)
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => createNft(client, {
-        collId: 1,
-        metadata: defaultMetadataProps('TMPMeta', true, client.address)
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => createNft(client, {
-        collId: 1,
-        metadata: defaultMetadataProps('TMPMeta', true, client.address)
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => createNft(client, {
-        collId: 1,
-        metadata: defaultMetadataProps('TMPMeta', true, client.address)
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => createNft(client, {
-        collId: 1,
-        metadata: defaultMetadataProps('TMPMeta', true, client.address)
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => multiSendNft(client, testMultiSendNFTParams, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => getNftByOwner(client, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj'))
+      .then(() => getLastCollectionId(client))
+      .then(passThroughAwait((res) => 
+        createNft(client, {
+          collId: res.id,
+          metadata: defaultMetadataProps('TMPMeta', true, client.address)
+        }, {maxGas: 1000000, gasPrice: 0.002})
+        .then((nftRes) => decodeFns['createNFT'](getMsgResponse(nftRes)) as unknown as {metadataId: Long.Long, id: string })
+        .then((nftRes) => nfts.push(nftRes.id))
+      ))
+      .then(passThroughAwait((res) => 
+        createNft(client, {
+          collId: res.id,
+          metadata: defaultMetadataProps('TMPMeta', true, client.address)
+        }, {maxGas: 1000000, gasPrice: 0.002})
+        .then((nftRes) => decodeFns['createNFT'](getMsgResponse(nftRes)) as unknown as {metadataId: Long.Long, id: string })
+        .then((nftRes) => nfts.push(nftRes.id))
+      ))
+      .then(passThroughAwait((res) => 
+        createNft(client, {
+          collId: res.id,
+          metadata: defaultMetadataProps('TMPMeta', true, client.address)
+        }, {maxGas: 1000000, gasPrice: 0.002})
+        .then((nftRes) => decodeFns['createNFT'](getMsgResponse(nftRes)) as unknown as {metadataId: Long.Long, id: string })
+        .then((nftRes) => nfts.push(nftRes.id))
+      ))
+      .then(passThroughAwait((res) => 
+        createNft(client, {
+          collId: res.id,
+          metadata: defaultMetadataProps('TMPMeta', true, client.address)
+        }, {maxGas: 1000000, gasPrice: 0.002})
+        .then((nftRes) => decodeFns['createNFT'](getMsgResponse(nftRes)) as unknown as {metadataId: Long.Long, id: string })
+        .then((nftRes) => nfts.push(nftRes.id))
+      ))
+      .then((res) => 
+        createNft(client, {
+          collId: res.id,
+          metadata: defaultMetadataProps('TMPMeta', true, client.address)
+        }, {maxGas: 1000000, gasPrice: 0.002})
+        .then((nftRes) => decodeFns['createNFT'](getMsgResponse(nftRes)) as unknown as {metadataId: Long.Long, id: string })
+        .then((nftRes) => nfts.push(nftRes.id))
+      )
+      .then(() => multiSendNft(client, testMultiSendNFTParams(nfts), {maxGas: 1000000, gasPrice: 0.002}))
+      .then(() => getNftInfo(client, nfts[0]))
       .then(resp => {
-        expect(resp.nfts[0].collId).to.be.equal(1);
-        expect(resp.nfts[0].metadataId).to.be.equal(1);
-        expect(resp.nfts[0].seq).to.be.equal(0);
+        expect(resp.nft?.owner).to.equal(testAddresses[0])
       })
   )
 
   it('multiSendNft should use less gas than several individual gas.', () =>
-    createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
+      createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
       maxGas: 100000000,
       gasPrice: 0.002
     })
-      .then(() => createNft(client, {
-        collId: 1,
-        metadata: defaultMetadataProps('TMPMeta', true, client.address)
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => createNft(client, {
-        collId: 1,
-        metadata: defaultMetadataProps('TMPMeta', true, client.address)
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => createNft(client, {
-        collId: 1,
-        metadata: defaultMetadataProps('TMPMeta', true, client.address)
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => createNft(client, {
-        collId: 1,
-        metadata: defaultMetadataProps('TMPMeta', true, client.address)
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => createNft(client, {
-        collId: 1,
-        metadata: defaultMetadataProps('TMPMeta', true, client.address)
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => createNft(client, {
-        collId: 1,
-        metadata: defaultMetadataProps('TMPMeta', true, client.address)
-      }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => multiSendNft(client, testMultiSendNFTParams, {maxGas: 1000000, gasPrice: 0.002}))
+      .then(() => getLastCollectionId(client))
+      .then(passThroughAwait((res) => 
+        createNft(client, {
+          collId: res.id,
+          metadata: defaultMetadataProps('TMPMeta', true, client.address)
+        }, {maxGas: 1000000, gasPrice: 0.002})
+        .then((nftRes) => decodeFns['createNFT'](getMsgResponse(nftRes)) as unknown as {metadataId: Long.Long, id: string })
+        .then((nftRes) => nfts.push(nftRes.id))
+      ))
+      .then(passThroughAwait((res) => 
+        createNft(client, {
+          collId: res.id,
+          metadata: defaultMetadataProps('TMPMeta', true, client.address)
+        }, {maxGas: 1000000, gasPrice: 0.002})
+        .then((nftRes) => decodeFns['createNFT'](getMsgResponse(nftRes)) as unknown as {metadataId: Long.Long, id: string })
+        .then((nftRes) => nfts.push(nftRes.id))
+      ))
+      .then(passThroughAwait((res) => 
+        createNft(client, {
+          collId: res.id,
+          metadata: defaultMetadataProps('TMPMeta', true, client.address)
+        }, {maxGas: 1000000, gasPrice: 0.002})
+        .then((nftRes) => decodeFns['createNFT'](getMsgResponse(nftRes)) as unknown as {metadataId: Long.Long, id: string })
+        .then((nftRes) => nfts.push(nftRes.id))
+      ))
+      .then(passThroughAwait((res) => 
+        createNft(client, {
+          collId: res.id,
+          metadata: defaultMetadataProps('TMPMeta', true, client.address)
+        }, {maxGas: 1000000, gasPrice: 0.002})
+        .then((nftRes) => decodeFns['createNFT'](getMsgResponse(nftRes)) as unknown as {metadataId: Long.Long, id: string })
+        .then((nftRes) => nfts.push(nftRes.id))
+      ))
+      .then(passThroughAwait((res) => 
+        createNft(client, {
+          collId: res.id,
+          metadata: defaultMetadataProps('TMPMeta', true, client.address)
+        }, {maxGas: 1000000, gasPrice: 0.002})
+        .then((nftRes) => decodeFns['createNFT'](getMsgResponse(nftRes)) as unknown as {metadataId: Long.Long, id: string })
+        .then((nftRes) => nfts.push(nftRes.id))
+      ))
+      .then((res) => 
+        createNft(client, {
+          collId: res.id,
+          metadata: defaultMetadataProps('TMPMeta', true, client.address)
+        }, {maxGas: 1000000, gasPrice: 0.002})
+        .then((nftRes) => decodeFns['createNFT'](getMsgResponse(nftRes)) as unknown as {metadataId: Long.Long, id: string })
+        .then((nftRes) => nfts.push(nftRes.id))
+      )
+      .then(() => multiSendNft(client, testMultiSendNFTParams(nfts), {maxGas: 1000000, gasPrice: 0.002}))
       .then((multiSendNftResponse) => createCtx("multiSendResult", () => multiSendNftResponse))
-      .then(withCtxAwait('singleSendResult', () => transferNft(client, '1:6:0', 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
+      .then(withCtxAwait('singleSendResult', () => transferNft(client, nfts[5], 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', 
         {maxGas: 1000000, gasPrice: 0.002})))
       .then((ctx) => {
         expect((ctx.multiSendResult as unknown as { gasUsed: number }).gasUsed)
@@ -427,19 +484,21 @@ describe('nft module', function () {
       maxGas: 100000000,
       gasPrice: 0.002
     })
-      .then(() => createNft(client, {
-        collId: 1,
+      .then(() => getLastCollectionId(client))
+      .then((res) => createNft(client, {
+        collId: res.id,
         metadata: defaultMetadataProps('TMPMeta', true, client.address)
       }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => burnNFT(client, '1:1:0', {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => getNftInfo(client, '1:1:0'))
+      .then((nftRes) => decodeFns['createNFT'](getMsgResponse(nftRes)) as unknown as {metadataId: Long.Long, id: string })
+      .then(passThroughAwait((nftRes) => burnNFT(client, nftRes.id, {maxGas: 1000000, gasPrice: 0.002})))
+      .then((nftRes) => getNftInfo(client, nftRes.id))
       .then(resp => {
         console.log(resp);
         expect(resp.nft?.owner).to.equal('bluzelle1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxmrapv')
       })
   )
 
-  it('should burn the nft', () =>
+  it('should fail to burn the nft', () =>
     createCollection(client, {sender: client.address, symbol: 'TMP', name: 'Temp', uri: 'http://temp.com', isMutable: true, updateAuthority: client.address},  {
       maxGas: 100000000,
       gasPrice: 0.002
@@ -448,8 +507,9 @@ describe('nft module', function () {
         collId: 1,
         metadata: defaultMetadataProps('TMPMeta', true, client.address)
       }, {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => transferNft(client, '1:1:0', 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', {maxGas: 1000000, gasPrice: 0.002}))
-      .then(() => burnNFT(client, '1:1:0', {maxGas: 1000000, gasPrice: 0.002}))
+      .then((nftRes) => decodeFns['createNFT'](getMsgResponse(nftRes)) as unknown as {metadataId: Long.Long, id: string })
+      .then(passThroughAwait((nftRes) => transferNft(client, nftRes.id, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj', {maxGas: 1000000, gasPrice: 0.002})))
+      .then((nftRes) => burnNFT(client, nftRes.id, {maxGas: 1000000, gasPrice: 0.002}))
       .then(resp => {
         expect((resp as unknown as { rawLog: string })?.rawLog).to.contains('not the owner of nft');
       })

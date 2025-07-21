@@ -11,6 +11,7 @@ import {getTx} from "../../core";
 import { startSwarmWithClient, stopSwarm } from "@bluzelle/testing/src/swarmUtils";
 import axios from 'axios'
 import FormData from 'form-data'
+import { isE2E } from "@bluzelle/testing/src/e2eUtils";
 
 async function loadCID() {
     const { CID } = await eval('import("multiformats/cid")');
@@ -18,7 +19,7 @@ async function loadCID() {
 }
 
 
-async function uploadToIpfs(contentObj) {
+async function uploadToIpfs(contentObj: any) {
   const form = new FormData()
   
   // Example 1: Upload a file
@@ -50,7 +51,8 @@ describe('storage module', function () {
 
     it('hasContent should return true if content is pinned', () =>
         startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
         })
         .then(withCtxAwait('addResult', ()=> uploadToIpfs(generateContent(0.01))))
         .then(passThroughAwait(()=> delay(20_000)))
@@ -68,7 +70,8 @@ describe('storage module', function () {
 
     it('hasContent should return false if content is NOT pinned', () =>
         startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
         })
         .then(withCtxAwait('addResult', ()=> uploadToIpfs(generateContent(0.01))))
         .then(passThroughAwait(()=> delay(20_000)))
@@ -81,7 +84,8 @@ describe('storage module', function () {
 
     it('should query for v1 cids', () =>
         startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
         })
         .then(passThroughAwait(ctx =>
                 pinCid(ctx.bzSdk, {cid: 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi'}, {
@@ -98,7 +102,9 @@ describe('storage module', function () {
 
     it('should query for the same cid with either v0 or v1', () =>
         startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
+
         })
         .then(passThroughAwait(ctx =>
                 pinCid(ctx.bzSdk, {cid: 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi'}, {
@@ -115,7 +121,9 @@ describe('storage module', function () {
 
     it('should query for the same cid with either v0 or v1 other direction', () =>
         startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
+
         })
         .then(passThroughAwait(ctx =>
                 pinCid(ctx.bzSdk, {cid: 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi'}, {
@@ -134,7 +142,9 @@ describe('storage module', function () {
 
     it('should query a transaction by hash', () => {
       return startSwarmWithClient({
-                config: defaultSwarmConfig
+                config: defaultSwarmConfig,
+                isE2E: isE2E()
+
               })
               .then(ctx =>
                       (pinCid(ctx.bzSdk, {cid: 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi'}, {
