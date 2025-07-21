@@ -19,7 +19,7 @@ async function loadCID() {
 describe('storage module', function () {
     this.timeout(600_000);
 
-    after(() =>
+    afterEach(() =>
         stopSwarm({...defaultSwarmConfig})
     );
 
