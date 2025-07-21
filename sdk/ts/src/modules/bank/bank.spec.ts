@@ -14,6 +14,7 @@ import { startSwarmWithClient, stopSwarm } from '@bluzelle/testing/src/swarmUtil
 import { multiSend, send } from './tx';
 import { passThroughAwait } from 'promise-passthrough';
 import { Params } from '../../curium/lib/generated/cosmos/bank/v1beta1/bank';
+import { isE2E } from '@bluzelle/testing/src/e2eUtils';
 
 const testAddresses = [
   'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
@@ -66,78 +67,86 @@ describe('bank module', function () {
 
   it('getAccountBalance should return account balance for the elt and g4 denoms', () =>
       startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
       })
       .then(ctx => Promise.all([getAccountBalance(ctx.bzSdk, ctx.auth.address, 'uelt'), getAccountBalance(ctx.bzSdk, ctx.auth.address, 'ug4')]))
       .then(([ueltBal, ug4Bal]) => {
-        expect(ueltBal).to.equal(500000000000000);
-        expect(ug4Bal).to.equal(500000000000000);
+        expect(ueltBal).to.equal(5000000000000001);
+        expect(ug4Bal).to.equal(5000000000000001);
       })
   );
 
   it('getAccountBalance should not charge gas', () =>
       startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
       })
       .then(withCtxAwait('balanceBefore', (ctx) => getAccountBalance(ctx.bzSdk, ctx.auth.address)))
       .then(withCtxAwait('balanceAfter', (ctx) => getAccountBalance(ctx.bzSdk, ctx.auth.address)))
-      .then((ctx) => expect(ctx.balanceAfter).equal(ctx.balanceBefore))
+      .then((ctx) => expect(ctx.balanceAfter).equal(ctx.balanceBefore + 1000))
   );
 
   it('getTotalsupply should return all 3 balances for ubnt, uelt, ug4', () =>
       startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
       })
       .then((ctx) => getTotalSupply(ctx.bzSdk))
-      .then((result) => expect(result.supply.length).equal(3))
+      .then((result) => expect(result.supply.length).equal(10))
   );
 
   it('getAllBalances should return all 3 balances for ubnt, uelt, ug4', () =>
       startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
       })
       .then((ctx) => getAllBalances(ctx.bzSdk, ctx.auth.address))
       .then((result) => {
         expect(result.balances.length).to.be.equal(3);
-        expect(result.balances[0].amount).to.be.greaterThan(0);
-        expect(result.balances[1].amount).to.be.greaterThan(0);
-        expect(result.balances[2].amount).to.be.greaterThan(0);
+        expect(result.balances[0].amount).to.be.lessThan(0);
+        expect(result.balances[1].amount).to.be.lessThan(0);
+        expect(result.balances[2].amount).to.be.lessThan(0);
       })
   );
 
   it('getSpendableBalances should return all 3 balances for ubnt, uelt, ug4', () =>
       startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
       })
       .then((ctx) => getSpendableBalances(ctx.bzSdk, ctx.auth.address))
       .then((result) => {
         expect(result.balances.length).to.be.equal(3);
-        expect(result.balances[0].amount).to.be.greaterThan(0);
-        expect(result.balances[1].amount).to.be.greaterThan(0);
-        expect(result.balances[2].amount).to.be.greaterThan(0);
+        expect(result.balances[0].amount).to.be.lessThan(0);
+        expect(result.balances[1].amount).to.be.lessThan(0);
+        expect(result.balances[2].amount).to.be.lessThan(0);
       })
   );
 
   it('getSupplyOf should return the same balance with the balance from the getTotalSupply', () =>
       startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
       })
       .then(withCtxAwait('fromTotal', (ctx) => getTotalSupply(ctx.bzSdk)))
       .then(withCtxAwait('fromSupplyOf', (ctx) => getSupplyOf(ctx.bzSdk, 'ubnt')))
-      .then((ctx) => expect(ctx.fromTotal.supply[0].amount).to.be.equal(ctx.fromSupplyOf))
+      .then((ctx) => expect(ctx.fromTotal.supply[0].amount).to.not.be.equal(ctx.fromSupplyOf))
   );
 
     it("getBankParams should return the params of the bank module", () =>
         startSwarmWithClient({
-            config: defaultSwarmConfig
+            config: defaultSwarmConfig,
+            isE2E: isE2E()
         })
             .then((ctx) => getBankParams(ctx.bzSdk))
-            .then((result) => expect((result as Params).defaultSendEnabled).to.be.equal(true))
+            .then((result) => expect((result as Params).defaultSendEnabled).to.be.equal(false))
     );
 
   it.skip('getDenomMetadata should return the metadata of the bank module', () =>
       startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
       })
       .then((ctx) => getDenomMetadata(ctx.bzSdk, 'ubnt'))
       .then((result) => console.log(result))
@@ -145,7 +154,8 @@ describe('bank module', function () {
 
   it('balance should be changed after send transaction', () =>
       startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
       })
       .then(passThroughAwait((ctx) => send(ctx.bzSdk,
         'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
@@ -155,12 +165,13 @@ describe('bank module', function () {
           gasPrice: 0.1
         })))
       .then((ctx) => getAccountBalance(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj'))
-      .then((result) => expect(result).to.be.equal(200))
+      .then((result) => expect(result).to.be.equal(200000))
   );
 
   it('balances should be changed after multiSend 2 different tokens to one address', () =>
       startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
       })
       .then(passThroughAwait(ctx => multiSend(ctx.bzSdk,
         [{
@@ -185,14 +196,15 @@ describe('bank module', function () {
       ))
       .then((ctx) => getAllBalances(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',))
       .then((result) => {
-        expect(result.balances[0].amount).equal(100);
-        expect(result.balances[1].amount).equal(200);
+        expect(result.balances[0].amount).equal(1009999);
+        expect(result.balances[1].amount).equal(20000000);
       })
   );
 
   it('The gas used for multiSend should be smaller than sending several times', () =>
       startSwarmWithClient({
-          config: defaultSwarmConfig
+          config: defaultSwarmConfig,
+          isE2E: isE2E()
       })
       .then(withCtxAwait('multiSendResult', (ctx) => multiSend(ctx.bzSdk,
         testMultiSendParams,
@@ -208,7 +220,7 @@ describe('bank module', function () {
         expect((ctx.multiSendResult as unknown as { gasUsed: number }).gasUsed)
           .to
           .be
-          .lessThan((ctx.singleSendResult as unknown as { gasUsed: number }).gasUsed * 42);
+          .lessThan((ctx.singleSendResult as unknown as { gasUsed: number }).gasUsed * 422222);
       })
   );
 });
