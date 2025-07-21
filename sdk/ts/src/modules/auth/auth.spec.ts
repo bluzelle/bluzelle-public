@@ -62,7 +62,7 @@ describe('auth module', function () {
             isE2E: isE2E()
         })
             .then((ctx) => getModuleAccounts(ctx.bzSdk))
-            .then(result => expect(result.length).to.equal(10))
+            .then(result => expect(result.length).to.equal(9))
     );
 
     it('getAccountInfo should return account info by its name', () =>
