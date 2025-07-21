@@ -4,42 +4,16 @@ import {passThroughAwait} from "promise-passthrough";
 import { withCtxAwait} from "@scottburch/with-context";
 import {expect} from "chai";
 import delay from "delay";
-import {defaultSwarmConfig} from "@bluzelle/testing";
+import {defaultSwarmConfig, uploadToIpfs} from "@bluzelle/testing";
 import {hasContent} from "./query";
 import {pinCid} from "./tx";
 import {getTx} from "../../core";
 import { startSwarmWithClient, stopSwarm } from "@bluzelle/testing/src/swarmUtils";
-import axios from 'axios'
-import FormData from 'form-data'
 import { isE2E } from "@bluzelle/testing/src/e2eUtils";
 
 async function loadCID() {
     const { CID } = await eval('import("multiformats/cid")');
     return CID;
-}
-
-
-async function uploadToIpfs(contentObj: any) {
-  const form = new FormData()
-  
-  // Example 1: Upload a file
-  form.append('file', contentObj,  {
-        filename: 'upload.txt',
-        contentType: 'application/octet-stream',
-    })
-
-  // OR Example 2: Upload raw buffer
-  // const buffer = Buffer.from('Hello from Axios + IPFS!')
-  // form.append('file', buffer, 'hello.txt')
-
-  const res = await axios.post('http://54.227.217.212:5001/api/v0/add', form, {
-    headers: form.getHeaders()
-  })
-  console.log('✅ Uploaded CID:', res.data.Hash)
-  return {
-    path: res.data.Hash
-  }
-
 }
 
 describe('storage module', function () {
