@@ -6,9 +6,11 @@ import { BluzelleClient } from '../../core';
 import { getAccountBalance } from '../bank';
 import { withCtxAwait } from '@scottburch/with-context';
 
-(process.env.IS_E2E == 'true' ? describe.skip : describe)('faucet module', function () {
+describe('faucet module', function () {
 
     this.timeout(1_800_000);
+
+    before(() => process.env.IS_E2E && this.skip());
 
     beforeEach(() =>
         Swarm.stopDaemons(({...defaultSwarmConfig}))
