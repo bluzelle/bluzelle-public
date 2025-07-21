@@ -72,8 +72,8 @@ describe('bank module', function () {
       })
       .then(ctx => Promise.all([getAccountBalance(ctx.bzSdk, ctx.auth.address, 'uelt'), getAccountBalance(ctx.bzSdk, ctx.auth.address, 'ug4')]))
       .then(([ueltBal, ug4Bal]) => {
-        expect(ueltBal).to.equal(5000000000000001);
-        expect(ug4Bal).to.equal(5000000000000001);
+        expect(ueltBal).to.equal(500000000000000);
+        expect(ug4Bal).to.equal(500000000000000);
       })
   );
 
@@ -84,7 +84,7 @@ describe('bank module', function () {
       })
       .then(withCtxAwait('balanceBefore', (ctx) => getAccountBalance(ctx.bzSdk, ctx.auth.address)))
       .then(withCtxAwait('balanceAfter', (ctx) => getAccountBalance(ctx.bzSdk, ctx.auth.address)))
-      .then((ctx) => expect(ctx.balanceAfter).equal(ctx.balanceBefore + 1000))
+      .then((ctx) => expect(ctx.balanceAfter).equal(ctx.balanceBefore))
   );
 
   it('getTotalsupply should return all 3 balances for ubnt, uelt, ug4', () =>
@@ -93,7 +93,7 @@ describe('bank module', function () {
           isE2E: isE2E()
       })
       .then((ctx) => getTotalSupply(ctx.bzSdk))
-      .then((result) => expect(result.supply.length).equal(10))
+      .then((result) => expect(result.supply.length).equal(3))
   );
 
   it('getAllBalances should return all 3 balances for ubnt, uelt, ug4', () =>
@@ -104,9 +104,9 @@ describe('bank module', function () {
       .then((ctx) => getAllBalances(ctx.bzSdk, ctx.auth.address))
       .then((result) => {
         expect(result.balances.length).to.be.equal(3);
-        expect(result.balances[0].amount).to.be.lessThan(0);
-        expect(result.balances[1].amount).to.be.lessThan(0);
-        expect(result.balances[2].amount).to.be.lessThan(0);
+        expect(result.balances[0].amount).to.be.greaterThan(0);
+        expect(result.balances[1].amount).to.be.greaterThan(0);
+        expect(result.balances[2].amount).to.be.greaterThan(0);
       })
   );
 
@@ -118,9 +118,9 @@ describe('bank module', function () {
       .then((ctx) => getSpendableBalances(ctx.bzSdk, ctx.auth.address))
       .then((result) => {
         expect(result.balances.length).to.be.equal(3);
-        expect(result.balances[0].amount).to.be.lessThan(0);
-        expect(result.balances[1].amount).to.be.lessThan(0);
-        expect(result.balances[2].amount).to.be.lessThan(0);
+        expect(result.balances[0].amount).to.be.greaterThan(0);
+        expect(result.balances[1].amount).to.be.greaterThan(0);
+        expect(result.balances[2].amount).to.be.greaterThan(0);
       })
   );
 
@@ -131,7 +131,7 @@ describe('bank module', function () {
       })
       .then(withCtxAwait('fromTotal', (ctx) => getTotalSupply(ctx.bzSdk)))
       .then(withCtxAwait('fromSupplyOf', (ctx) => getSupplyOf(ctx.bzSdk, 'ubnt')))
-      .then((ctx) => expect(ctx.fromTotal.supply[0].amount).to.not.be.equal(ctx.fromSupplyOf))
+      .then((ctx) => expect(ctx.fromTotal.supply[0].amount).to.be.equal(ctx.fromSupplyOf))
   );
 
     it("getBankParams should return the params of the bank module", () =>
@@ -140,7 +140,7 @@ describe('bank module', function () {
             isE2E: isE2E()
         })
             .then((ctx) => getBankParams(ctx.bzSdk))
-            .then((result) => expect((result as Params).defaultSendEnabled).to.be.equal(false))
+            .then((result) => expect((result as Params).defaultSendEnabled).to.be.equal(true))
     );
 
   it.skip('getDenomMetadata should return the metadata of the bank module', () =>
@@ -165,7 +165,7 @@ describe('bank module', function () {
           gasPrice: 0.1
         })))
       .then((ctx) => getAccountBalance(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj'))
-      .then((result) => expect(result).to.be.equal(200000))
+      .then((result) => expect(result).to.be.equal(200))
   );
 
   it('balances should be changed after multiSend 2 different tokens to one address', () =>
@@ -196,8 +196,8 @@ describe('bank module', function () {
       ))
       .then((ctx) => getAllBalances(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',))
       .then((result) => {
-        expect(result.balances[0].amount).equal(1009999);
-        expect(result.balances[1].amount).equal(20000000);
+        expect(result.balances[0].amount).equal(100);
+        expect(result.balances[1].amount).equal(200);
       })
   );
 
@@ -220,7 +220,7 @@ describe('bank module', function () {
         expect((ctx.multiSendResult as unknown as { gasUsed: number }).gasUsed)
           .to
           .be
-          .lessThan((ctx.singleSendResult as unknown as { gasUsed: number }).gasUsed * 422222);
+          .lessThan((ctx.singleSendResult as unknown as { gasUsed: number }).gasUsed * 42);
       })
   );
 });
