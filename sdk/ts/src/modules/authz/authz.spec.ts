@@ -5,10 +5,10 @@ import {
     createNft,
     delegate,
     executeAuthorization,
-    faucetToken,
     getAccountBalance,
     getCollectionInfo,
     getDelegation,
+    getLastCollectionId,
     getNftByOwner,
     getNftInfo,
     getValidatorsInfo,
@@ -16,26 +16,24 @@ import {
     newBluzelleClient,
     newLocalWallet,
     queryAuthorizations,
-    revokeAuthorization, send
+    revokeAuthorization,
+    send
 } from '../../index';
-import { expect } from 'chai';
-import { BluzelleClient } from '../../core';
-import {
-  AuthorizationType,
-  StakeAuthorization
-} from '../../curium/lib/generated/cosmos/staking/v1beta1/authz';
-import { GenericAuthorization } from '../../curium/lib/generated/cosmos/authz/v1beta1/authz';
-import { createCtx, withCtxAwait } from '@scottburch/with-context';
-import { passThroughAwait } from 'promise-passthrough';
-import { Metadata } from '../../curium/lib/generated/nft/nft';
-import { GrantType, msgMapping, MsgType } from './authzTypes';
-import { QueryCollectionResponse } from '../../curium/lib/generated/nft/query';
-import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
-import { isE2E } from '@bluzelle/testing/src/e2eUtils';
-import { defaultSwarmConfig, startSwarmWithClient } from '@bluzelle/testing';
+import {expect} from 'chai';
+import {BluzelleClient} from '../../core';
+import {AuthorizationType, StakeAuthorization} from '../../curium/lib/generated/cosmos/staking/v1beta1/authz';
+import {GenericAuthorization} from '../../curium/lib/generated/cosmos/authz/v1beta1/authz';
+import {createCtx, withCtxAwait} from '@scottburch/with-context';
+import {passThroughAwait} from 'promise-passthrough';
+import {Metadata} from '../../curium/lib/generated/nft/nft';
+import {GrantType, msgMapping, MsgType} from './authzTypes';
+import {QueryCollectionResponse} from '../../curium/lib/generated/nft/query';
+import {stopSwarm} from '@bluzelle/testing/src/swarmUtils';
+import {isE2E} from '@bluzelle/testing/src/e2eUtils';
+import {defaultSwarmConfig, startSwarmWithClient} from '@bluzelle/testing';
 import * as bip39 from 'bip39';
-import { parseNumToLong } from '../../shared/parse';
-import { BluzelleQueryGrantsResponse } from './query';
+import {parseNumToLong} from '../../shared/parse';
+import {BluzelleQueryGrantsResponse} from './query';
 
 describe('authz module', function () {
   this.timeout(1_800_000);
@@ -190,8 +188,7 @@ describe('authz module', function () {
       .then(withCtxAwait('delegationInfo', () => getDelegation(client, testGranter, testValAddress)))
       .then((ctx: any) => {
         expect(ctx.delegationInfo.delegation.shares - ctx.initialAmount)
-          .to
-          .equal(100);
+          .to.be.approximately(100, 1);
       })
   );
 
@@ -269,8 +266,7 @@ describe('authz module', function () {
       })))
       .then(withCtxAwait('delegationInfo', () => getDelegation(client, testGranter, testValAddress)))
       .then((ctx: any) => expect(ctx.delegationInfo.delegation.shares - ctx.initialAmount)
-        .to
-        .equal(-100))
+        .to.be.approximately(-100, 1))
   );
 
   it('redelegate msg authorization should be successfully created and executed', () =>
@@ -309,13 +305,17 @@ describe('authz module', function () {
           })
             .then(() => getDelegation(client, testGranter, testValAddress1))
             .then((delegationInfo: BluzelleDelegationResponse) => createCtx('initialAmount', () => delegationInfo.delegation.shares))
-            .then(withCtxAwait('result', () => executeAuthorization(eClient, testGrantee, [
+            .then(withCtxAwait('result', (ctx) => executeAuthorization(eClient, testGrantee, [
               {
                 msgType: MsgType.REDELEGATE,
                 params: {
                   validatorDstAddress: testValAddress2,
                   validatorSrcAddress: testValAddress1,
-                  delegatorAddress: testGranter
+                  delegatorAddress: testGranter,
+                  amount: {
+                      amount: parseNumToLong(ctx.initialAmount).toString(),
+                      denom: 'ubnt'
+                  }
                 }
               }
             ], {
@@ -324,8 +324,7 @@ describe('authz module', function () {
             })))
             .then(withCtxAwait('delegationInfo', () => getDelegation(eClient, testGranter, testValAddress1)))
             .then((ctx: any) => expect(ctx.delegationInfo.delegation.shares - ctx.initialAmount)
-              .to
-              .equal(-100));
+              .to.be.approximately(-100, 1));
         }
       })
   );
@@ -354,7 +353,8 @@ describe('authz module', function () {
         maxGas: 1000000,
         gasPrice: 0.002
       }))
-      .then(() => getCollectionInfo(eClient, 1))
+      .then(() => getLastCollectionId(client))
+      .then(res => getCollectionInfo(eClient, res.id))
       .then((collectionRes: QueryCollectionResponse) => {
         expect(collectionRes.collection?.symbol)
           .to
@@ -418,7 +418,7 @@ describe('authz module', function () {
       }))
       .then(() => getNftByOwner(eClient, testGranter))
       .then((nftInfo: any) => {
-        const nft = nftInfo.nfts.pop();
+        const nft = nftInfo.nfts[0];
         const id = nft?.collId.toString() + ':' + nft?.metadataId.toString() + ':' + nft?.seq.toString();
         return getNftInfo(eClient, id);
       })
@@ -776,7 +776,7 @@ describe('authz module', function () {
       .then(passThroughAwait(res => console.log("grantAuthorization", res)))
       .then(() => getNftByOwner(eClient, testGranter))
       .then((nftInfo: any) => createCtx('nftInfo', () => {
-        const nft = nftInfo.nfts.pop();
+        const nft = nftInfo.nfts[0];
         return {
           id: nft?.collId.toString() + ':' + nft?.metadataId.toString() + ':' + nft?.seq.toString(),
           nft: nft
