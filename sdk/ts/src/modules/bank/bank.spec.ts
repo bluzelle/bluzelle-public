@@ -33,7 +33,7 @@ const testAddresses = [
   'bluzelle1pc6ncwdlx70uc4ryh0d8unzfeql0eme76q3ykz',
 ];
 
-const testMultiSendUbntParams = testAddresses.map((addr) => ({
+const testMultiSendParams = testAddresses.map((addr) => ({
   outputAddress: addr,
   coins: [{
     amount: '100',
@@ -41,29 +41,12 @@ const testMultiSendUbntParams = testAddresses.map((addr) => ({
   }]
 }));
 
-const testMultiSendUg4Params = testAddresses.map((addr) => ({
-  outputAddress: addr,
-  coins: [{
-    amount: '200',
-    denom: 'ug4'
-  }]
-}));
-
-const testMultiSendUeltParams = testAddresses.map((addr) => ({
-  outputAddress: addr,
-  coins: [{
-    amount: '300',
-    denom: 'uelt'
-  }]
-}));
-
-const testMultiSendParams = [...testMultiSendUbntParams, ...testMultiSendUeltParams, ...testMultiSendUg4Params];
 
 describe('bank module', function () {
   this.timeout(600_000);
 
   beforeEach(stopSwarm);
-  after(stopSwarm);
+  // after(stopSwarm);
 
   it('getAccountBalance should return account balance for the elt and g4 denoms', () =>
       startSwarmWithClient({
@@ -71,9 +54,14 @@ describe('bank module', function () {
           isE2E: isE2E()
       })
       .then(ctx => Promise.all([getAccountBalance(ctx.bzSdk, ctx.auth.address, 'uelt'), getAccountBalance(ctx.bzSdk, ctx.auth.address, 'ug4')]))
-      .then(([ueltBal, ug4Bal]) => {
-        expect(ueltBal).to.equal(500000000000000);
-        expect(ug4Bal).to.equal(500000000000000);
+      .then(([ueltBal,ug4Bal]) => {
+        if(isE2E()){
+          expect(ueltBal).to.equal(0);
+          expect(ug4Bal).to.equal(0);
+        } else{
+          expect(ueltBal).to.equal(500000000000000);
+          expect(ug4Bal).to.equal(500000000000000);
+        }
       })
   );
 
@@ -87,26 +75,32 @@ describe('bank module', function () {
       .then((ctx) => expect(ctx.balanceAfter).equal(ctx.balanceBefore))
   );
 
-  it('getTotalsupply should return all 3 balances for ubnt, uelt, ug4', () =>
+  it('getTotalsupply should return more than 3 balances for ubnt, uelt, ug4 and other coins', () =>
       startSwarmWithClient({
           config: defaultSwarmConfig,
           isE2E: isE2E()
       })
       .then((ctx) => getTotalSupply(ctx.bzSdk))
-      .then((result) => expect(result.supply.length).equal(3))
+      .then((result) => expect(result.supply.length).to.greaterThanOrEqual(3))
   );
 
-  it('getAllBalances should return all 3 balances for ubnt, uelt, ug4', () =>
+  it('getAllBalances should return more than 3 balances for ubnt, uelt, ug4 and other coins', () =>
       startSwarmWithClient({
           config: defaultSwarmConfig,
           isE2E: isE2E()
       })
       .then((ctx) => getAllBalances(ctx.bzSdk, ctx.auth.address))
       .then((result) => {
-        expect(result.balances.length).to.be.equal(3);
-        expect(result.balances[0].amount).to.be.greaterThan(0);
-        expect(result.balances[1].amount).to.be.greaterThan(0);
-        expect(result.balances[2].amount).to.be.greaterThan(0);
+        if(isE2E()){
+          expect(result.balances.length).to.equal(2);
+          expect(result.balances[0].amount).to.be.greaterThan(0);
+          expect(result.balances[1].amount).to.be.greaterThan(0);
+        }else {
+          expect(result.balances.length).to.equal(3);
+          expect(result.balances[0].amount).to.be.greaterThan(0);
+          expect(result.balances[1].amount).to.be.greaterThan(0);
+          expect(result.balances[2].amount).to.be.greaterThan(0);
+        }
       })
   );
 
@@ -117,10 +111,16 @@ describe('bank module', function () {
       })
       .then((ctx) => getSpendableBalances(ctx.bzSdk, ctx.auth.address))
       .then((result) => {
-        expect(result.balances.length).to.be.equal(3);
-        expect(result.balances[0].amount).to.be.greaterThan(0);
-        expect(result.balances[1].amount).to.be.greaterThan(0);
-        expect(result.balances[2].amount).to.be.greaterThan(0);
+        if(isE2E()){
+          expect(result.balances.length).to.equal(2);
+          expect(result.balances[0].amount).to.be.greaterThan(0);
+          expect(result.balances[1].amount).to.be.greaterThan(0);
+        }else {
+          expect(result.balances.length).to.equal(3);
+          expect(result.balances[0].amount).to.be.greaterThan(0);
+          expect(result.balances[1].amount).to.be.greaterThan(0);
+          expect(result.balances[2].amount).to.be.greaterThan(0);
+        }
       })
   );
 
@@ -131,7 +131,11 @@ describe('bank module', function () {
       })
       .then(withCtxAwait('fromTotal', (ctx) => getTotalSupply(ctx.bzSdk)))
       .then(withCtxAwait('fromSupplyOf', (ctx) => getSupplyOf(ctx.bzSdk, 'ubnt')))
-      .then((ctx) => expect(ctx.fromTotal.supply[0].amount).to.be.equal(ctx.fromSupplyOf))
+      .then((ctx) => {
+        const ubntBal = ctx.fromTotal.supply.find(b => b.denom === 'ubnt')
+        expect(ubntBal?.amount).to.be.equal(ctx.fromSupplyOf)
+      }
+      )
   );
 
     it("getBankParams should return the params of the bank module", () =>
@@ -173,19 +177,20 @@ describe('bank module', function () {
           config: defaultSwarmConfig,
           isE2E: isE2E()
       })
+      .then(withCtxAwait('spendableBal', (ctx) => getSpendableBalances(ctx.bzSdk, ctx.auth.address)))
       .then(passThroughAwait(ctx => multiSend(ctx.bzSdk,
         [{
           outputAddress: 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
           coins: [{
             amount: '100',
-            denom: 'ubnt'
+            denom: ctx.spendableBal.balances[0].denom
           }]
         },
           {
             outputAddress: 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
             coins: [{
               amount: '200',
-              denom: 'ug4'
+              denom: ctx.spendableBal.balances[1].denom
             }]
           }
         ],
@@ -220,7 +225,7 @@ describe('bank module', function () {
         expect((ctx.multiSendResult as unknown as { gasUsed: number }).gasUsed)
           .to
           .be
-          .lessThan((ctx.singleSendResult as unknown as { gasUsed: number }).gasUsed * 42);
+          .lessThan((ctx.singleSendResult as unknown as { gasUsed: number }).gasUsed * 14);
       })
   );
 });

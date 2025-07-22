@@ -35,7 +35,7 @@ export type ParseFn = ((params: object) => unknown)
 
 
 export const parseCoin = (coin: Coin): BluzelleCoin => ({
-  denom: ['ubnt', 'ug4', 'uelt'].includes(coin.denom) ? coin.denom as BluzelleDenom : 'ubnt',
+  denom: coin.denom,
   amount: Number(coin.amount)
 });
 
