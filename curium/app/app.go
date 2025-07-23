@@ -13,7 +13,6 @@ import (
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	curiumparams "github.com/bluzelle/bluzelle-public/curium/app/params"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
-	"github.com/bluzelle/bluzelle-public/curium/x/curium"
 	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
 	ipfsConfig "github.com/bluzelle/ipfs-kubo/config"
 	dbm "github.com/cometbft/cometbft-db"
@@ -94,7 +93,6 @@ import (
 	faucetmodule "github.com/bluzelle/bluzelle-public/curium/x/faucet"
 	faucetmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/faucet/keeper"
 	faucetmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
-	"github.com/bluzelle/bluzelle-public/curium/x/nft"
 	nftmodule "github.com/bluzelle/bluzelle-public/curium/x/nft"
 	nftkeeper "github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
@@ -205,7 +203,7 @@ var (
 		storagemodule.AppModuleBasic{},
 		faucetmodule.AppModuleBasic{},
 		taxmodule.AppModuleBasic{},
-		nft.AppModuleBasic{},
+		nftmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -483,7 +481,7 @@ func NewCuriumApp(
 	storageDir := appOpts.Get("storage-dir").(string)
 	filter := appOpts.Get("filter").(string)
 	fmt.Println(filter)
-	storageNode, err := startupStorageNode(storageDir, filter)
+	storageNode, _ := startupStorageNode(storageDir, filter)
 
 	app.StorageKeeper = *storagemodulekeeper.NewKeeper(
 		appCodec,
@@ -500,7 +498,7 @@ func NewCuriumApp(
 		keys[faucetmoduletypes.MemStoreKey],
 		app.GetSubspace(faucetmoduletypes.ModuleName),
 		app.BankKeeper,
-		curium.NewKeyRingReader(appOpts.Get(flags.FlagHome).(string)),
+		curiummodule.NewKeyRingReader(appOpts.Get(flags.FlagHome).(string)),
 		curiummodulekeeper.NewMsgBroadcaster(&app.AccountKeeper, cast.ToString(appOpts.Get(flags.FlagHome)), txConfig, appCodec),
 	)
 
@@ -553,7 +551,7 @@ func NewCuriumApp(
 		upgrade.NewAppModule(app.UpgradeKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
-		nft.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
+		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
@@ -759,6 +757,7 @@ func startupStorageNode(storageDir string, filter string) (*curiumipfs.StorageIp
 		return nil, err
 	}
 	storageDir = strings.ReplaceAll(storageDir, "~", homeDir)
+	os.RemoveAll(storageDir)
 
 	err = storagemodulekeeper.CreateRepoIfNotExist(storageDir, curiumipfs.CreateRepoOptions{
 		Transformer: ipfsConfig.Profiles[filter].Transform,

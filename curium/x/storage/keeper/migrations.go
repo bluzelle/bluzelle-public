@@ -1,6 +1,9 @@
 package keeper
 
 import (
+	"os"
+	"strings"
+
 	v2 "github.com/bluzelle/bluzelle-public/curium/x/storage/migrations/v2"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -14,6 +17,11 @@ func NewMigrator(keeper Keeper) Migrator {
 }
 
 func (m Migrator) Migrate1to2(ctx sdk.Context) error {
-
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	storageDir := strings.ReplaceAll(m.keeper.storageDir, "~", homeDir)
+	os.RemoveAll(storageDir)
 	return v2.MigrateStore(ctx, m.keeper.StoreKey, m.keeper.Cdc)
 }

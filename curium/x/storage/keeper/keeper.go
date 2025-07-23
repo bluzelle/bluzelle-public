@@ -77,7 +77,7 @@ func (k Keeper) PinFile(ctx sdk.Context, msg *types.MsgPin) {
 			return
 		}
 	}
-	chainlog.Printf("IPFS Node peers: ", k.storageNode.IpfsNode.Peerstore.Peers().String())
+	chainlog.Printf("IPFS Node peers: %s", k.storageNode.IpfsNode.Peerstore.Peers().String())
 	DoPinFile(
 		k.storageNode.AddPin,
 		msg,
