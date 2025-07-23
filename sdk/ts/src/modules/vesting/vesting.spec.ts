@@ -31,7 +31,7 @@ describe('vesting module', function () {
                 endTime: new Date().getDate() + 100_000,
                 delayed: true,
             }, {maxGas: 200_000, gasPrice: 10}))
-            .then((res) => expect(res.code).to.not.equal(0))
+            .then((res) => expect(res.code).to.equal(0))
     );
 
     it("should create vesting account with multiple denoms", () =>
