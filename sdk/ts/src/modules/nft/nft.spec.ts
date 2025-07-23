@@ -30,7 +30,7 @@ import { isE2E } from '@bluzelle/testing/src/e2eUtils';
 import {decodeFns} from '../../utils/responseDecode'
 
 
-function getMsgResponse(res:any): Uint8Array {
+export function getMsgResponse(res:any): Uint8Array {
   return res.msgResponses[0].value
 }
 

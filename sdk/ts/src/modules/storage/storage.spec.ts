@@ -45,7 +45,7 @@ describe('storage module', function () {
     it('hasContent should return false if content is NOT pinned', () =>
         startSwarmWithClient({
           config: defaultSwarmConfig,
-          isE2E: isE2E()
+          // isE2E: isE2E()
         })
         .then(withCtxAwait('addResult', ()=> uploadToIpfs(generateContent(0.01))))
         .then(passThroughAwait(()=> delay(20_000)))
@@ -132,6 +132,7 @@ describe('storage module', function () {
                       }))
               )
             .then(({resp, bzSdk}) => getTx(bzSdk, resp.transactionHash))
+            .then((res) => expect(res.tx?.body?.messages[0].typeUrl).to.equals('/storage.MsgPin'))
     });
 
 });
