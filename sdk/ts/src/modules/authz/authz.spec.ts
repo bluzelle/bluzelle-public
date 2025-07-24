@@ -354,7 +354,7 @@ describe('authz module', function () {
         gasPrice: 0.002
       }))
       .then(() => getLastCollectionId(client))
-      .then(res => getCollectionInfo(eClient, res.id))
+      .then((result: {id: number}) => getCollectionInfo(client, result.id))
       .then((collectionRes: QueryCollectionResponse) => {
         expect(collectionRes.collection?.symbol)
           .to
