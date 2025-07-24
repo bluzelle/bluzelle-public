@@ -31,8 +31,7 @@ describe('tendermint queries', function () {
 
     it('should return the validators on a network', () =>
         startSwarmWithClient({
-            config: {...defaultSwarmConfig},
-            isE2E: isE2E()
+            config: {...defaultSwarmConfig}
         })
             .then(({bzSdk}) => getValidators(bzSdk))
             .then(response => {
