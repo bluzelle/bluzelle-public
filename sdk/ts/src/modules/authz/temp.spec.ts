@@ -3,7 +3,7 @@ import {DaemonConfig, Environment, SwarmConfig, SwarmTypes} from 'daemon-manager
 import {stopSwarm} from '@bluzelle/testing/src/swarmUtils';
 import {getOtherTokenDefaults} from '@bluzelle/testing/src/commonUtils';
 
-describe('staking module', function () {
+describe('temp module', function () {
   this.timeout(2_000_000);
 
   beforeEach(stopSwarm);
