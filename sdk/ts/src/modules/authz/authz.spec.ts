@@ -31,7 +31,7 @@ import {QueryCollectionResponse} from '../../curium/lib/generated/nft/query';
 import {stopSwarm} from '@bluzelle/testing/src/swarmUtils';
 import {isE2E} from '@bluzelle/testing/src/e2eUtils';
 import {defaultSwarmConfig, startSwarmWithClient} from '@bluzelle/testing';
-import bip39 from 'bip39';
+import * as bip39 from 'bip39';
 import {parseNumToLong} from '../../shared/parse';
 import {BluzelleQueryGrantsResponse} from './query';
 

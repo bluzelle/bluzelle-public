@@ -1,9 +1,9 @@
 import {BluzelleClient} from "../../core";
 import {passThroughAwait} from "promise-passthrough";
-import bip39 from 'bip39';
+import * as bip39 from 'bip39';
 import {Some} from "monet";
 import BIP32Factory, {BIP32Interface} from 'bip32';
-import ecc from 'tiny-secp256k1';
+import * as ecc from 'tiny-secp256k1';
 import {bech32} from "bech32"
 import delay from "delay";
 import {getAccountBalance} from "../bank";

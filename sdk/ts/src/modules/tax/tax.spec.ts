@@ -9,9 +9,9 @@ import {withCtxAwait} from "with-context";
 import {newBluzelleClient} from "../../core";
 import {newLocalWallet} from "../../wallets/localWallet";
 import {faucetToken} from "../faucet";
-import dotenv from 'dotenv';
-import path from 'path';
-import bip39 from "bip39";
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+import * as bip39 from "bip39";
 import {isE2E} from '@bluzelle/testing/src/e2eUtils';
 
 dotenv.config({path: path.resolve(__dirname, '../../../../../.env')});

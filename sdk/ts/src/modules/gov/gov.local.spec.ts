@@ -17,7 +17,7 @@ import { newLocalWallet } from '../../wallets/localWallet';
 import { VoteOption } from '../../curium/lib/generated/cosmos/gov/v1/gov';
 import delay from 'delay';
 import { copyToContainer, getContainerId } from '@bluzelle/testing/src/dockerUtils';
-import path from 'path';
+import * as path from 'path';
 import { getAppliedPlan } from '../upgrade/query';
 import { withCtxAwait } from '@scottburch/with-context';
 import { getAccountBalance, getTotalSupply } from '../bank/query';

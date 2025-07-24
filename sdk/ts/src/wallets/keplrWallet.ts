@@ -5,7 +5,7 @@ import {BluzelleWallet} from "./BluzelleWallet";
 import {Window} from '@keplr-wallet/types';
 import {AccountData, DirectSignResponse, OfflineDirectSigner} from "@cosmjs/proto-signing/build/signer";
 import {newLocalWallet} from "./localWallet";
-import bip39 from 'bip39';
+import * as bip39 from 'bip39';
 import { SignDoc } from "@cosmjs/proto-signing/node_modules/cosmjs-types/cosmos/tx/v1beta1/tx";
 
 // interface SignDoc {
