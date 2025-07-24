@@ -45,7 +45,7 @@ describe('storage module', function () {
     it('hasContent should return false if content is NOT pinned', () =>
         startSwarmWithClient({
           config: defaultSwarmConfig,
-          // isE2E: isE2E()
+          isE2E: isE2E()
         })
         .then(withCtxAwait('addResult', ()=> uploadToIpfs(generateContent(0.01))))
         .then(passThroughAwait(()=> delay(20_000)))
