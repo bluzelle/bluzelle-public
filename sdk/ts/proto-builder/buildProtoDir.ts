@@ -2,7 +2,7 @@ import {mkdir, writeFile, cp} from "fs/promises";
 import fetch from 'node-fetch'
 import {getCosmosProtoDependencies, getGoogleDependencies, getThirdPartyDependencies} from "./getProto";
 import {readdirSync, statSync} from "fs";
-import * as path from 'path'
+import path from 'path'
 
 
 const rootDir = () => path.join(__dirname, '../../..');

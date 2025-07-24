@@ -5,7 +5,7 @@ import {passThroughAwait} from "promise-passthrough";
 import {expect} from "chai";
 import {newBluzelleClient} from "../../core";
 import {newLocalWallet} from "../../wallets/localWallet";
-import * as bip39 from "bip39";
+import bip39 from "bip39";
 import {faucetToken} from "../faucet";
 import {stopSwarm} from "@bluzelle/testing/src/swarmUtils";
 import {getOtherTokenDefaults} from "@bluzelle/testing/src/commonUtils";

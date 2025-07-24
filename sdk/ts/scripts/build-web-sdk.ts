@@ -1,7 +1,7 @@
 import {doBuildCuriumStore} from "./build-curium-store";
 import {rm} from "fs/promises";
 import {exec, cd} from "@scottburch/exec";
-import * as path from 'path'
+import path from 'path'
 
 doBuildCuriumStore()
     .then(() => cd(path.join(__dirname, '..')))

@@ -1,4 +1,4 @@
-import * as path from "path";
+import path from "path";
 import {downloadAllProto} from "../proto-builder/buildProtoDir";
 import {generateAllProto} from "../proto-builder/compileProto";
 import {mkdir} from "fs/promises";

@@ -1,4 +1,4 @@
-import * as  path from "path";
+import  path from "path";
 import {passThroughAwait} from "promise-passthrough";
 import {cd, exec} from '@scottburch/exec'
 

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { deepParseLong, parseDecTypeToNumber, scaleTo18 } from './parse';
-import * as Long from 'long';
+import Long from 'long';
 
 describe('parse', function () {
     this.timeout(600_000);

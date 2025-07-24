@@ -1,4 +1,4 @@
-import * as bip39 from "bip39";
+import bip39 from "bip39";
 import {Some} from "monet";
 
 

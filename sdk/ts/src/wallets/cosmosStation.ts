@@ -5,7 +5,7 @@ import {getStatus, newBluzelleClient, SigningBluzelleClient} from "../core";
 import {passThrough, passThroughAwait} from "promise-passthrough";
 import {Window as KeplrWindow} from "@keplr-wallet/types"
 import {newLocalWallet} from "./localWallet";
-import * as bip39 from "bip39";
+import bip39 from "bip39";
 import {Cosmos} from "@cosmostation/extension-client"
 import {addChain, requestAccount} from "@cosmostation/extension-client/cosmos";
 import {getExtensionOfflineSigner, connectWallet} from "@cosmostation/cosmos-client";

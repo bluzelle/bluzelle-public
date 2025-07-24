@@ -1,6 +1,6 @@
 import {doBuildCuriumStore} from "./build-curium-store";
 import {rm} from "fs/promises";
-import * as path from "path";
+import path from "path";
 import {exec, cd} from "@scottburch/exec";
 import { fileURLToPath } from 'url';
 
