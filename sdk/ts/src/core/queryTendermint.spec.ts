@@ -23,7 +23,7 @@ describe('tendermint queries', function () {
             .then(response => {
                 expect(response.nodeId.length).to.equal(40)
                 expect(response.caughtUp).to.be.true
-                expect(response.chainId).to.equal('my-chain')
+                expect(response.chainId).to.equal('bluzelle-9')
                 expect(response.blockHeight).to.be.greaterThan(0)
                 expect(response.moniker).to.equal('a.client.sentry')
             })
