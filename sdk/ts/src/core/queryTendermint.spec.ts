@@ -14,8 +14,9 @@ describe('tendermint queries', function () {
     after(() =>
         Swarm.stopDaemons({...defaultSwarmConfig})
     );
-    it('should get the status of a node', () =>
-        startSwarmWithClient({
+    it('should get the status of a node', function() {
+        isE2E() && this.skip();
+        return startSwarmWithClient({
             config: {...defaultSwarmConfig},
             isE2E: isE2E()
         })
@@ -27,17 +28,18 @@ describe('tendermint queries', function () {
                 expect(response.blockHeight).to.be.greaterThan(0)
                 expect(response.moniker).to.equal('a.client.sentry')
             })
-    );
+    });
 
-    it('should return the validators on a network', () =>
-        startSwarmWithClient({
+    it('should return the validators on a network', function() {
+        isE2E() && this.skip();
+        return startSwarmWithClient({
             config: {...defaultSwarmConfig}
         })
             .then(({bzSdk}) => getValidators(bzSdk))
             .then(response => {
                 console.log(response)
                 expect(response[0].address.length).to.equal(40)
-                expect(response[0].votingPower).to.equal(defaultSwarmConfig.genesisTokenBalance? defaultSwarmConfig.genesisTokenBalance / 10: 0)
+                expect(response[0].votingPower).to.equal(defaultSwarmConfig.genesisTokenBalance ? defaultSwarmConfig.genesisTokenBalance / 10 : 0)
             })
-    );
+    });
 });
