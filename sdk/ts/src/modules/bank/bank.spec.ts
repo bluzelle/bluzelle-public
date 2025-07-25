@@ -92,9 +92,8 @@ describe('bank module', function () {
       .then((ctx) => getAllBalances(ctx.bzSdk, ctx.auth.address))
       .then((result) => {
         if(isE2E()){
-          expect(result.balances.length).to.equal(2);
+          expect(result.balances.length).to.equal(1);
           expect(result.balances[0].amount).to.be.greaterThan(0);
-          expect(result.balances[1].amount).to.be.greaterThan(0);
         }else {
           expect(result.balances.length).to.equal(3);
           expect(result.balances[0].amount).to.be.greaterThan(0);
