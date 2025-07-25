@@ -20,7 +20,7 @@ describe('faucet module', function () {
 
     it('should be able to faucet tokens to a new account', function() {
         isE2E() && this.skip();
-        startSwarmWithClient({
+        return startSwarmWithClient({
             config: {...defaultSwarmConfig},
             clientOptions: {url: 'http://localhost:26667'}
         })
@@ -33,7 +33,7 @@ describe('faucet module', function () {
 
     it('should be able to faucet tokens to a new given', function() {
         isE2E() && this.skip();
-        startSwarmWithClient()
+        return startSwarmWithClient()
             .then(info => ({client: info.bzSdk}))
             .then(withCtxAwait('faucetResult', ctx => faucetToken(ctx.client, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj')))
             .then(ctx => getAccountBalance(ctx.client, ctx.faucetResult.address))

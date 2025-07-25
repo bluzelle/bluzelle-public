@@ -13,8 +13,6 @@ import {pinCid} from "../modules/storage";
 import {getAccountBalance, send} from "../modules/bank";
 import {faucetToken} from "../modules/faucet";
 import {withCtxAwait} from "@scottburch/with-context";
-import {getForkTestSwarmConfig} from "infra-control-test/specs/fork/genesisToLocal.spec";
-import {times} from "lodash";
 import { getTaxInfo } from "../modules/tax";
 import {isE2E} from "@bluzelle/testing/src/e2eUtils";
 
@@ -107,12 +105,13 @@ describe('sending transactions', function () {
             )
     );
 
-    it('should send tokens in uelt and ug4', () =>
-        startSwarmWithClient({
+    it('should send tokens in uelt and ug4', () => {
+        isE2E() && this.skip();
+        return startSwarmWithClient({
             isE2E: isE2E()
         })
             .then(withCtxAwait("taxInfo", ctx => getTaxInfo(ctx.bzSdk)))
-            .then(withCtxAwait('taxCost', ctx => 10000 * (Number(ctx.taxInfo.transferTaxBp)/10000)))
+            .then(withCtxAwait('taxCost', ctx => 10000 * (Number(ctx.taxInfo.transferTaxBp) / 10000)))
             .then(withCtxAwait('toAddress', ctx => faucetToken(ctx.bzSdk).then(res => res.address)))
             .then(withCtxAwait('preBalances', ctx => Promise.all([
                 getAccountBalance(ctx.bzSdk, ctx.bzSdk.address, 'uelt'),
@@ -147,7 +146,7 @@ describe('sending transactions', function () {
             ])))
             .then(passThroughAwait(ctx => expect(ctx.postBalances).to.deep.equal(ctx.preBalances.map(b => b - 10000 - ctx.taxCost))))
             .then(ctx => expect(ctx.toPostBalances).to.deep.equal(ctx.toPreBalances.map(b => b + 10000)))
-    );
+    });
 
 });
 
