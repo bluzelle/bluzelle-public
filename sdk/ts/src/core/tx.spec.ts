@@ -105,7 +105,7 @@ describe('sending transactions', function () {
             )
     );
 
-    it('should send tokens in uelt and ug4', () => {
+    it('should send tokens in uelt and ug4', function() {
         isE2E() && this.skip();
         return startSwarmWithClient({
             isE2E: isE2E()
