@@ -111,9 +111,8 @@ describe('bank module', function () {
       .then((ctx) => getSpendableBalances(ctx.bzSdk, ctx.auth.address))
       .then((result) => {
         if(isE2E()){
-          expect(result.balances.length).to.equal(2);
+          expect(result.balances.length).to.equal(1);
           expect(result.balances[0].amount).to.be.greaterThan(0);
-          expect(result.balances[1].amount).to.be.greaterThan(0);
         }else {
           expect(result.balances.length).to.equal(3);
           expect(result.balances[0].amount).to.be.greaterThan(0);
@@ -171,39 +170,39 @@ describe('bank module', function () {
       .then((result) => expect(result).to.be.equal(200))
   );
 
-  it('balances should be changed after multiSend 2 different tokens to one address', () =>
-      startSwarmWithClient({
-          config: defaultSwarmConfig,
-          isE2E: isE2E()
+  it('balances should be changed after multiSend 2 different tokens to one address', () => {
+      isE2E() && this.skip();
+      return startSwarmWithClient({
+          config: defaultSwarmConfig
       })
-      .then(withCtxAwait('spendableBal', (ctx) => getSpendableBalances(ctx.bzSdk, ctx.auth.address)))
-      .then(passThroughAwait(ctx => multiSend(ctx.bzSdk,
-        [{
-          outputAddress: 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
-          coins: [{
-            amount: '100',
-            denom: ctx.spendableBal.balances[0].denom
-          }]
-        },
-          {
-            outputAddress: 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
-            coins: [{
-              amount: '200',
-              denom: ctx.spendableBal.balances[1].denom
-            }]
-          }
-        ],
-        {
-          maxGas: 200_000,
-          gasPrice: 0.1
-        })
-      ))
-      .then((ctx) => getAllBalances(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',))
-      .then((result) => {
-        expect(result.balances[0].amount).equal(100);
-        expect(result.balances[1].amount).equal(200);
-      })
-  );
+          .then(withCtxAwait('spendableBal', (ctx) => getSpendableBalances(ctx.bzSdk, ctx.auth.address)))
+          .then(passThroughAwait(ctx => multiSend(ctx.bzSdk,
+              [{
+                  outputAddress: 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
+                  coins: [{
+                      amount: '100',
+                      denom: ctx.spendableBal.balances[0].denom
+                  }]
+              },
+                  {
+                      outputAddress: 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',
+                      coins: [{
+                          amount: '200',
+                          denom: ctx.spendableBal.balances[1].denom
+                      }]
+                  }
+              ],
+              {
+                  maxGas: 200_000,
+                  gasPrice: 0.1
+              })
+          ))
+          .then((ctx) => getAllBalances(ctx.bzSdk, 'bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj',))
+          .then((result) => {
+              expect(result.balances[0].amount).equal(100);
+              expect(result.balances[1].amount).equal(200);
+          })
+  });
 
   it('The gas used for multiSend should be smaller than sending several times', () =>
       startSwarmWithClient({

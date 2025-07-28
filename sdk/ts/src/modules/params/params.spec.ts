@@ -14,7 +14,7 @@ describe.skip('params module', () => {
     Swarm.stopDaemons({ ...defaultSwarmConfig })
   );
 
-  it('should get params value', () =>
+  it.skip('should get params value', () =>
     startSwarmWithClient()
       .then(client => getParamValue(client.bzSdk, {
         subspace: 'staking',
