@@ -106,7 +106,7 @@ describe('gov module', function() {
         description: 'My description',
         plan: {
           name: 'My plan',
-          height: 20,
+          height: 20000,
           info: 'some information',
         },
         proposer: client.auth.address,
