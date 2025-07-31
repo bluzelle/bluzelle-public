@@ -170,7 +170,7 @@ describe('bank module', function () {
       .then((result) => expect(result).to.be.equal(200))
   );
 
-  it('balances should be changed after multiSend 2 different tokens to one address', () => {
+    it('balances should be changed after multiSend 2 different tokens to one address', function () {
       isE2E() && this.skip();
       return startSwarmWithClient({
           config: defaultSwarmConfig
