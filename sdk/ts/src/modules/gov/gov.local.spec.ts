@@ -170,6 +170,7 @@ describe('gov module, local docker', function () {
           voter: client.auth.address,
           option: VoteOption.VOTE_OPTION_YES
         }, { maxGas: 200_000, gasPrice: 10 })))
+        .then(passThroughAwait(() => console.log("waiting for 20 seconds")))
         .then(passThroughAwait(() => delay(20_000)))
         .then(client => getProposal(client.bzSdk, "1"))
         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))

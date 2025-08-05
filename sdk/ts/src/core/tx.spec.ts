@@ -87,6 +87,7 @@ describe('sending transactions', function () {
              }))
             .then(() => getTx(client, hash))
             .catch(passThroughAwait(err => expect(err.message).to.include('not found')))
+            .then(passThroughAwait(() => console.log("waiting for 6 seconds")))
             .then(passThroughAwait(() => delay(6_000)))
             .then(() => getTx(client, hash))
     });
