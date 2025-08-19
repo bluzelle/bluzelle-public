@@ -52,7 +52,7 @@ validators:
       api:
         enable: true
       minimum-gas-prices: 0ubnt
-      storage-dir: ~/.curium/storage
+      storage-dir: ~/.curium
       filter: server
     config:
       consensus:
