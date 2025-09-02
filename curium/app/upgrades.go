@@ -3,7 +3,6 @@ package app
 import (
 	upgrade "github.com/bluzelle/bluzelle-public/curium/app/upgrades/v12"
 	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -60,9 +59,8 @@ func (app *App) setupUpgradeHandlers(
 			subspace.WithKeyTable(keyTable)
 		}
 	}
-	baseAppLegacySS := app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
 
-	app.UpgradeKeeper.SetUpgradeHandler(upgrade.UpgradeName, upgrade.CreateV12UpgradeHandler(app.mm, configurator, baseAppLegacySS, &app.ConsensusParamsKeeper))
+	app.UpgradeKeeper.SetUpgradeHandler(upgrade.UpgradeName, upgrade.CreateV12UpgradeHandler(app.mm, configurator))
 }
 
 func (app *App) setupUpgradeStoreLoaders() {
