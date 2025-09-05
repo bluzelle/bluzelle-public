@@ -60,7 +60,8 @@ export interface BroadcastOptions {
     gasPrice: number,
     maxGas: number,
     mode?: 'async' | 'sync',
-    memo?: string
+    memo?: string,
+    feeGranter?: string
 }
 
 const queueMessage = (msg: EncodeObject, options: BroadcastOptions) =>
@@ -86,10 +87,12 @@ const broadcastTx = <T>(client: BluzelleClient, msgs: EncodeObject[], options: B
         client.address,
         msgs,
         {
-            gas: options.maxGas.toFixed(0), amount: [{
+            gas: options.maxGas.toFixed(0), 
+            amount: [{
                 denom: 'ubnt',
                 amount: (options.gasPrice * options.maxGas).toFixed(0)
-            }]
+            }],
+            granter: options.feeGranter
         },
         options.memo)
         .then(response => ({
@@ -102,10 +105,12 @@ const broadcastTxAsync = <T>(client: BluzelleClient, msgs: EncodeObject[], optio
         client.address,
         msgs,
         {
-            gas: options.maxGas.toFixed(0), amount: [{
+            gas: options.maxGas.toFixed(0), 
+            amount: [{
                 denom: 'ubnt',
                 amount: (options.gasPrice * options.maxGas).toFixed(0)
-            }]
+            }],
+            granter: options.feeGranter
         },
         options.memo || ""
     )

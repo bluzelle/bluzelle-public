@@ -21,7 +21,7 @@ export const sumBluzelleCoins = (coins: BluzelleCoin[]): BluzelleCoin =>
   });
 
 export const parseLongCoin = (coin: Coin): BluzelleCoin => ({
-  denom: ['ubnt', 'ug4', 'uelt'].includes(coin.denom) ? coin.denom as BluzelleDenom : 'ubnt',
+  denom: coin.denom,
   amount: parseDecTypeToNumber(coin.amount)
 });
 
@@ -59,4 +59,4 @@ export const deepParseLong = (obj: object, paths: string[]): object => {
 };
 
 
-export const scaleTo18 = (num: number) => (num * 1e18).toString();
+export const scaleTo18 = (num: number) => (BigInt(Math.floor(num)) * BigInt(1e18)).toString();

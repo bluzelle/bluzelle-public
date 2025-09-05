@@ -41,6 +41,15 @@ import {
   MsgVote,
   MsgVoteWeighted
 } from '../curium/lib/generated/cosmos/gov/v1/tx';
+import {
+  MsgGrantAllowance,
+  MsgRevokeAllowance,
+} from '../curium/lib/generated/cosmos/feegrant/v1beta1/tx';
+import {
+  BasicAllowance,
+  PeriodicAllowance,
+  AllowedMsgAllowance
+} from '../curium/lib/generated/cosmos/feegrant/v1beta1/feegrant';
 
 import {
   MsgSubmitProposal as MsgSubmitLegacyProposal
@@ -90,7 +99,11 @@ const registerMessages = (registry: Registry) => {
   registry.register('/cosmos.gov.v1.MsgExecLegacyContent', MsgExecLegacyContent)
   registry.register('/cosmos.gov.v1.MsgVote', MsgVote)
   registry.register('/cosmos.gov.v1.MsgVoteWeighted', MsgVoteWeighted)
-  registry.register('/cosmos.gov.v1.MsgDeposit', MsgDeposit)
+  registry.register('/cosmos.feegrant.v1beta1.MsgGrantAllowance', MsgGrantAllowance)
+  registry.register('/cosmos.feegrant.v1beta1.MsgRevokeAllowance', MsgRevokeAllowance)
+  registry.register('/cosmos.feegrant.v1beta1.BasicAllowance', BasicAllowance)
+  registry.register('/cosmos.feegrant.v1beta1.PeriodicAllowance', PeriodicAllowance)
+  registry.register('/cosmos.feegrant.v1beta1.AllowedMsgAllowance', AllowedMsgAllowance)
 
   return registry
 };
