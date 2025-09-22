@@ -5,9 +5,9 @@ import (
 
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
+	"github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
 	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
-	"github.com/bluzelle/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -20,13 +20,12 @@ import (
 func TestGasMeterKeeper(t *testing.T) {
 	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
 	govAuthAddrStr := govAuthAddr.String()
-	app := simapp.Setup(t, false)
-	accountKeeper := app.AccountKeeper
+	app, _, accountKeeper := simapp.CreateTestApp()
 	bankKeeper := bankkeeper.NewBaseKeeper(
 		app.AppCodec(),
 		app.GetKey(banktypes.StoreKey),
 		accountKeeper,
-		simapp.BlockedAddresses(),
+		app.ModuleAccountAddrs(),
 		govAuthAddrStr,
 	)
 	_, _, addr := testdata.KeyTestPubAddr()

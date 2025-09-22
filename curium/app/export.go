@@ -12,7 +12,6 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 )
@@ -80,22 +79,22 @@ func WriteUnjailedValidators(ctx sdk.Context, keeper stakingkeeper.Keeper) (vals
 	return
 }
 
-func ExportStakingGenesis(ctx sdk.Context, keeper stakingkeeper.Keeper) *stakingtypes.GenesisState {
-	var unbondingDelegations []stakingtypes.UnbondingDelegation
+func ExportStakingGenesis(ctx sdk.Context, keeper stakingkeeper.Keeper) *types.GenesisState {
+	var unbondingDelegations []types.UnbondingDelegation
 
-	keeper.IterateUnbondingDelegations(ctx, func(_ int64, ubd stakingtypes.UnbondingDelegation) (stop bool) {
+	keeper.IterateUnbondingDelegations(ctx, func(_ int64, ubd types.UnbondingDelegation) (stop bool) {
 		unbondingDelegations = append(unbondingDelegations, ubd)
 		return false
 	})
 
-	var redelegations []stakingtypes.Redelegation
+	var redelegations []types.Redelegation
 
-	keeper.IterateRedelegations(ctx, func(_ int64, red stakingtypes.Redelegation) (stop bool) {
+	keeper.IterateRedelegations(ctx, func(_ int64, red types.Redelegation) (stop bool) {
 		redelegations = append(redelegations, red)
 		return false
 	})
 
-	var lastValidatorPowers []stakingtypes.LastValidatorPower
+	var lastValidatorPowers []types.LastValidatorPower
 	lastPower := sdk.NewInt(0)
 	keeper.IterateLastValidatorPowers(ctx, func(addr sdk.ValAddress, power int64) (stop bool) {
 		v, _ := keeper.GetValidator(ctx, addr)
@@ -103,11 +102,11 @@ func ExportStakingGenesis(ctx sdk.Context, keeper stakingkeeper.Keeper) *staking
 			return false
 		}
 		lastPower = lastPower.Add(sdk.NewIntFromUint64(uint64(power)))
-		lastValidatorPowers = append(lastValidatorPowers, stakingtypes.LastValidatorPower{Address: addr.String(), Power: power})
+		lastValidatorPowers = append(lastValidatorPowers, types.LastValidatorPower{Address: addr.String(), Power: power})
 		return false
 	})
 	keeper.SetLastTotalPower(ctx, lastPower)
-	return &stakingtypes.GenesisState{
+	return &types.GenesisState{
 		Params:               keeper.GetParams(ctx),
 		LastTotalPower:       keeper.GetLastTotalPower(ctx),
 		LastValidatorPowers:  lastValidatorPowers,
@@ -147,7 +146,7 @@ func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []str
 	/* Handle fee distribution state. */
 
 	// withdraw all validator commission
-	app.StakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
+	app.StakingKeeper.IterateValidators(ctx, func(_ int64, val types.ValidatorI) (stop bool) {
 		// only attempt to withdraw commission if it is non-zero. This is required to support
 		// use cases where you have validators who have been jailed since the start of the chain
 		// and therefore never earned commissions. These could be validators that died extremely
@@ -183,7 +182,7 @@ func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []str
 	ctx = ctx.WithBlockHeight(0)
 
 	// reinitialize all validators
-	app.StakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
+	app.StakingKeeper.IterateValidators(ctx, func(_ int64, val types.ValidatorI) (stop bool) {
 		// donate any unwithdrawn outstanding reward fraction tokens to the community pool
 		scraps := app.DistrKeeper.GetValidatorOutstandingRewardsCoins(ctx, val.GetOperator())
 		feePool := app.DistrKeeper.GetFeePool(ctx)
@@ -206,7 +205,7 @@ func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []str
 	/* Handle staking state. */
 
 	// iterate through redelegations, reset creation height
-	app.StakingKeeper.IterateRedelegations(ctx, func(_ int64, red stakingtypes.Redelegation) (stop bool) {
+	app.StakingKeeper.IterateRedelegations(ctx, func(_ int64, red types.Redelegation) (stop bool) {
 		for i := range red.Entries {
 			red.Entries[i].CreationHeight = 0
 		}
@@ -215,7 +214,7 @@ func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []str
 	})
 
 	// iterate through unbonding delegations, reset creation height
-	app.StakingKeeper.IterateUnbondingDelegations(ctx, func(_ int64, ubd stakingtypes.UnbondingDelegation) (stop bool) {
+	app.StakingKeeper.IterateUnbondingDelegations(ctx, func(_ int64, ubd types.UnbondingDelegation) (stop bool) {
 		for i := range ubd.Entries {
 			ubd.Entries[i].CreationHeight = 0
 		}
@@ -225,12 +224,12 @@ func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []str
 
 	// Iterate through validators by power descending, reset bond heights, and
 	// update bond intra-tx counters.
-	store := ctx.KVStore(app.keys[stakingtypes.StoreKey])
-	iter := sdk.KVStoreReversePrefixIterator(store, stakingtypes.ValidatorsKey)
+	store := ctx.KVStore(app.keys[types.StoreKey])
+	iter := sdk.KVStoreReversePrefixIterator(store, types.ValidatorsKey)
 	counter := int16(0)
 
 	for ; iter.Valid(); iter.Next() {
-		addr := sdk.ValAddress(stakingtypes.AddressFromValidatorsKey(iter.Key()))
+		addr := sdk.ValAddress(types.AddressFromValidatorsKey(iter.Key()))
 		validator, found := app.StakingKeeper.GetValidator(ctx, addr)
 		if !found {
 			panic("expected validator, not found")

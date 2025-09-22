@@ -1,10 +1,10 @@
 package v11 // migrations.go
 
 import (
+	storetypes "cosmossdk.io/store/types"
 	v1 "github.com/bluzelle/bluzelle-public/curium/x/storage/migrations/v1/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/storage/types"
 	"github.com/cosmos/cosmos-sdk/codec"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

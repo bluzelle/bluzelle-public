@@ -5,6 +5,8 @@ import (
 
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 
+	"cosmossdk.io/store"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/curium/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/curium/types"
 	tmdb "github.com/cometbft/cometbft-db"
@@ -12,8 +14,6 @@ import (
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/store"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )

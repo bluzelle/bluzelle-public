@@ -3,22 +3,21 @@ package keeper
 import (
 	"testing"
 
+	"cosmossdk.io/store"
+	storetypes "cosmossdk.io/store/types"
+	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
 	"github.com/bluzelle/bluzelle-public/curium/x/tax"
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/types"
-	"github.com/bluzelle/simapp"
 	tmdb "github.com/cometbft/cometbft-db"
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/store"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankKeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/stretchr/testify/require"
@@ -46,8 +45,8 @@ func TaxKeeper(t *testing.T) (*keeper.Keeper, sdk.Context) {
 		"TaxParams",
 	)
 
-	app := simapp.Setup(t, false)
-	bankKeeper := app.BankKeeper.(bankkeeper.BaseKeeper)
+	app, _, _ := testutil.CreateTestApp()
+	bankKeeper := app.BankKeeper.(bankKeeper.BaseKeeper)
 
 	maccPerms := map[string][]string{}
 	//accKey := app.GetKey(authtypes.StoreKey)
@@ -94,8 +93,8 @@ func GetKeepers(t *testing.T) (*keeper.Keeper, bankKeeper.Keeper, acctypes.Accou
 		"TaxParams",
 	)
 
-	app := simapp.Setup(t, false)
-	bankKeeper := app.BankKeeper.(bankkeeper.BaseKeeper)
+	app, _, _ := testutil.CreateTestApp()
+	bankKeeper := app.BankKeeper.(bankKeeper.BaseKeeper)
 	maccPerms := map[string][]string{}
 	//accKey := app.GetKey(authtypes.StoreKey)
 	accountKeeper := acctypes.NewAccountKeeper(cdc, storeKey, authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(), govAuthAddrStr)
@@ -123,7 +122,7 @@ func GetKeepers(t *testing.T) (*keeper.Keeper, bankKeeper.Keeper, acctypes.Accou
 	return k, bankKeeper, accountKeeper, ctx
 }
 
-func SetupTaxKeepersAndCtx(t *testing.T) (*keeper.Keeper, bankkeeper.Keeper, acctypes.AccountKeeper, sdk.Context) {
+func SetupTaxKeepersAndCtx(t *testing.T) (*keeper.Keeper, bankKeeper.Keeper, acctypes.AccountKeeper, sdk.Context) {
 	genesisState := types.GenesisState{
 		GasTaxBp:      10,
 		TransferTaxBp: 15,

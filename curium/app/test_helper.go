@@ -36,13 +36,14 @@ var DefaultConsensusParams = &tmproto.ConsensusParams{
 	},
 }
 
-type EmptyAppOptions struct{}
+type TestAppOptions struct {
+}
 
-func (EmptyAppOptions) Get(_ string) interface{} { return nil }
+func (TestAppOptions) Get(_ string) interface{} { return "test" }
 
 func Setup(isCheckTx bool) *App {
 	db := dbm.NewMemDB()
-	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, curiumparams.MakeTestEncodingConfig(), EmptyAppOptions{}, baseapp.SetChainID("testing"))
+	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, curiumparams.MakeEncodingConfig(ModuleBasics), TestAppOptions{}, baseapp.SetChainID("testing"))
 	if !isCheckTx {
 		genesisState := NewDefaultGenesisState(curiumparams.MakeTestEncodingConfig().Marshaler)
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")

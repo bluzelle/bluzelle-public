@@ -5,10 +5,9 @@ import (
 
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
+	"github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
 	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
-	"github.com/bluzelle/simapp"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -21,17 +20,15 @@ import (
 func TestChargingGasMeter(t *testing.T) {
 	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
 	govAuthAddrStr := govAuthAddr.String()
-	app := simapp.Setup(t, false)
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+	app, ctx, accountKeeper := simapp.CreateTestApp()
 	_, _, addr := testdata.KeyTestPubAddr()
-	accountKeeper := app.AccountKeeper
 	acc := accountKeeper.NewAccountWithAddress(ctx, addr)
 	accountKeeper.SetAccount(ctx, acc)
 	bankKeeper := bankkeeper.NewBaseKeeper(
 		app.AppCodec(),
 		app.GetKey(banktypes.StoreKey),
 		accountKeeper,
-		simapp.BlockedAddresses(),
+		app.ModuleAccountAddrs(),
 		govAuthAddrStr)
 	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdk.NewInt(2)))
 
@@ -104,29 +101,29 @@ func TestChargingGasMeter(t *testing.T) {
 		require.Equal(t, decCoins, gasMeter.GetGasPrice())
 	})
 
-	//t.Run("Charge() should not return err or panic if gasmeter and ctx is valid", func(t *testing.T) {
-	//
-	//	taxKeeper, bankKeeper, accountKeeper, ctx := keeper.GetKeepers(t)
-	//	//addr, _ := sdk.AccAddressFromBech32("toAddr")
-	//	_, _, addr := testdata.KeyTestPubAddr()
-	//	acc := accountKeeper.NewAccountWithAddress(ctx, addr)
-	//	acc.SetAccountNumber(uint64(0))
-	//	accountKeeper.SetAccount(ctx, acc)
-	//	//getAcc := accountKeeper.GetAccount(ctx, addr)
-	//	//require.Equal(t, acc, getAcc)
-	//
-	//	genesisState := taxmoduletypes.GenesisState{
-	//		GasTaxBp:      10,
-	//		TransferTaxBp: 15,
-	//		TaxCollector:  taxmoduletypes.TaxCollector,
-	//	}
-	//	tax.InitGenesis(ctx, *taxKeeper, genesisState)
-	//
-	//	taxKeeper.SetTaxInfo(ctx, genesisState)
-	//
-	//	gasMeter := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, *taxKeeper, 100, addr, decCoins)
-	//	err := gasMeter.Charge(ctx)
-	//	require.Nil(t, err)
-	//})
+	// t.Run("Charge() should not return err or panic if gasmeter and ctx is valid", func(t *testing.T) {
+
+	// 	app, ctx, accountKeeper := simapp.CreateTestApp()
+	// 	//addr, _ := sdk.AccAddressFromBech32("toAddr")
+	// 	_, _, addr := testdata.KeyTestPubAddr()
+	// 	acc := accountKeeper.NewAccountWithAddress(ctx, addr)
+	// 	acc.SetAccountNumber(uint64(0))
+	// 	accountKeeper.SetAccount(ctx, acc)
+	// 	//getAcc := accountKeeper.GetAccount(ctx, addr)
+	// 	//require.Equal(t, acc, getAcc)
+
+	// 	genesisState := taxmoduletypes.GenesisState{
+	// 		GasTaxBp:      10,
+	// 		TransferTaxBp: 15,
+	// 		TaxCollector:  "bluzelle1dvc2u4l84hyfeem5fmfm9eyjlndpsycwwfhtln",
+	// 	}
+	// 	tax.InitGenesis(ctx, app.TaxKeeper, genesisState)
+
+	// 	taxKeeper.SetTaxInfoKeep(ctx, &genesisState)
+
+	// 	gasMeter := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, app.TaxKeeper, 100, addr, decCoins)
+	// 	err := gasMeter.Charge(ctx)
+	// 	require.Nil(t, err)
+	// })
 
 }

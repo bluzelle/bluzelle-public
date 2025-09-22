@@ -1,0 +1,136 @@
+{
+  "Identity": {
+    "PeerID": "QmNVy4FSEUo9HheirK4RvficbetCoHqAtBUBK98RNWH9CU",
+    "PrivKey": "CAASqAkwggSkAgEAAoIBAQCwLRS3vYzB5iOS/QwFPX7cmVF4zNmMVmNtaJPEM5jTn8dHHTkxt8Ntb1Miw/YQ9JxZwke7jojRXeeMasukViuMPuYpZqQQSxhEeYAVcx7cCIEEgbhnGXl3RBCNJt/zfvBn7crjH5JB8Cc0oj2j3sEnqm7ovwDr/M2MagxoDTSfNLbA8ddiiTZKFsO363BBMz1RViy1NN5K/sE0y/cEj0KMAODLsgTT3SEnTatJW8ktVRK4dbRY8lLWgDOjzjTkwGN+ml3B35Q6Z0JF/KbgWicL3QGjrGJgXrPj8rp/84XPi6bvBaitMC9AaE8KcUE+XPknyKH+BSnRX5g+N8o9jXZDAgMBAAECggEANrv6yM8KER+4A628c1BUvqKfjkFOgWxBfbdU2UsSewUT+4MXxtuJytEgaheptkDY5oYWlS3GUg2zp4tycz8WTn8oMMqjxDAgfP2mjoNynffCZa0LpnRiqWwrHD9sqpDQjelx9DhVz0iWVaLmNag6KGGqDYNx/N9Q2QQFkLoxlBhfguKEA4a6vAzm93nWMRuDLb9LcwZnYz/Z04w5Zf3/k4pW09QIa5W6FmcylyfCxKDMYbebcmTM90qLrh/mFueSZWk6SLbjbasYhbAYxGBIJ7R5pr4WJ/+wXn+pu+2yYvcIAum0TCDmCrPW4ZNVRZsMkbqMFLnfb4q3Myo2FFknGQKBgQDZrepW4DvETi3O+t8f8FqmZNOLWKapc1FxCSGQhHnLDmhpnQvu+et90S/NkKOLM+wdoRslQ913IQwIp3iKF8Cqr0UsIg/An4fOzmUZ2SuEszY+ygsVNeLWQyfpyxMLlAIVp++QUhB7lo/Q8UdH1gRo7r7ODELEKJDeAYShBTGUZQKBgQDPMMBtgrVFMGHFMerJGxmWsbzkMiX+6I9DOlZ2ncOL0IDcfmn7p2X7C13DMB8g3Nyt/yaXqDvBN1onlSCxt+sMS5JnP8OakQv1D3RD4nfdlAA5/Vp6ioGYLBN/Rqfx7qxLaO/B2v1GTtsgJa8cvRjNnq1xiBiSIAX6C//NpL+RhwKBgQCYiePuTyHytSoqoehbdE3BzmPjgRMBKXtHr7Nil0LVxVnrsI6dP2sDduR9s763HIJ4XN4t5fm6smDBa8HvWye7NClP/Op2/BPqGv4D+Agj7IW1yFWt3l3/8X11usW01loDnPQmeSttv5s2Ou3NbC8Y7TyuHS9oUFj8CapMP9x3dQKBgHl78WiEunruKnWwliUC8dcNMl9vFB5KCC54F1iHmq/xOo2Oxd/bwI0ZlgmrvqTLO83+DIfiCd958C/DXh82YuibqyVFGxEXOTagsCBZusS+Uf+ukQ3HBsPOHESFjlXqBzZUOjilidpexFcuIWYtbkyqXLJ0BUww4LBDtuLCVd0jAoGBANTStogbfEqtgIkwC9Yx0YbXStAlP841w/oPSGZpn39pXDAuIvwk+yu51E7O7CjI4bKgxclrfu3/T+YnjQxLzyfKkTuc6cgrf5UR2EZRZTCcVcQ7a83BgpmSIFxVzqLzUkIs5SlWxQ59U6YTte9sG4CQsiw3LgqXx/BMLT5gAFtS"
+  },
+  "Datastore": {
+    "StorageMax": "10GB",
+    "StorageGCWatermark": 90,
+    "GCPeriod": "1h",
+    "Spec": {
+      "mounts": [
+        {
+          "child": {
+            "path": "blocks",
+            "shardFunc": "/repo/flatfs/shard/v1/next-to-last/2",
+            "sync": true,
+            "type": "flatfs"
+          },
+          "mountpoint": "/blocks",
+          "prefix": "flatfs.datastore",
+          "type": "measure"
+        },
+        {
+          "child": {
+            "compression": "none",
+            "path": "datastore",
+            "type": "levelds"
+          },
+          "mountpoint": "/",
+          "prefix": "leveldb.datastore",
+          "type": "measure"
+        }
+      ],
+      "type": "mount"
+    },
+    "HashOnRead": false,
+    "BloomFilterSize": 0
+  },
+  "Addresses": {
+    "Swarm": [
+      "/ip4/127.0.0.1/tcp/0"
+    ],
+    "Announce": [],
+    "AppendAnnounce": [],
+    "NoAnnounce": [],
+    "API": "/ip4/127.0.0.1/tcp/0",
+    "Gateway": "/ip4/127.0.0.1/tcp/0"
+  },
+  "Mounts": {
+    "IPFS": "/ipfs",
+    "IPNS": "/ipns",
+    "FuseAllowOther": false
+  },
+  "Discovery": {
+    "MDNS": {
+      "Enabled": false
+    }
+  },
+  "Routing": {
+    "LoopbackAddressesOnLanDHT": true,
+    "Routers": null,
+    "Methods": null
+  },
+  "Ipns": {
+    "RepublishPeriod": "",
+    "RecordLifetime": "",
+    "ResolveCacheSize": 128
+  },
+  "Bootstrap": [],
+  "Gateway": {
+    "HTTPHeaders": {},
+    "RootRedirect": "",
+    "NoFetch": false,
+    "NoDNSLink": false,
+    "DeserializedResponses": null,
+    "DisableHTMLErrors": null,
+    "PublicGateways": null,
+    "ExposeRoutingAPI": null
+  },
+  "API": {
+    "HTTPHeaders": {
+      "Access-Control-Allow-Origin": [
+        "*"
+      ]
+    }
+  },
+  "Swarm": {
+    "AddrFilters": null,
+    "DisableBandwidthMetrics": false,
+    "DisableNatPortMap": true,
+    "RelayClient": {},
+    "RelayService": {},
+    "Transports": {
+      "Network": {},
+      "Security": {},
+      "Multiplexers": {}
+    },
+    "ConnMgr": {},
+    "ResourceMgr": {}
+  },
+  "AutoNAT": {},
+  "Pubsub": {
+    "Router": "",
+    "DisableSigning": false
+  },
+  "Peering": {
+    "Peers": null
+  },
+  "DNS": {
+    "Resolvers": {}
+  },
+  "Migration": {
+    "DownloadSources": [],
+    "Keep": ""
+  },
+  "Provider": {
+    "Strategy": ""
+  },
+  "Reprovider": {},
+  "Experimental": {
+    "FilestoreEnabled": false,
+    "UrlstoreEnabled": false,
+    "Libp2pStreamMounting": false,
+    "P2pHttpProxy": false,
+    "StrategicProviding": false,
+    "OptimisticProvide": false,
+    "OptimisticProvideJobsPoolSize": 0
+  },
+  "Plugins": {
+    "Plugins": null
+  },
+  "Pinning": {
+    "RemoteServices": {}
+  },
+  "Internal": {}
+}

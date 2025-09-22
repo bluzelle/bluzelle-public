@@ -10,7 +10,6 @@ import (
 	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
 
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
-	"github.com/bluzelle/simapp"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
@@ -43,14 +42,14 @@ type KeeperTestSuite struct {
 	BankKeeper    *bankkeeper.BaseKeeper
 	AccountKeeper *acctypes.AccountKeeper
 	ctx           sdk.Context
-	app           *simapp.SimApp
+	app           *app.App
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
 	config := sdk.GetConfig()
 	config.SetCoinType(appTypes.CoinType)
 	config.SetBech32PrefixForAccount("bluzelle", "bluzellepub")
-	suite.app, _, _ = testutil.CreateTestApp(suite.T(), false)
+	suite.app, _, _ = testutil.CreateTestApp()
 	suite.legacyAmino = curiumcmd.MakeEncodingConfig(app.ModuleBasics).Amino
 	suite.NFTKeeper, suite.BankKeeper, suite.AccountKeeper, suite.ctx = testkeeper.NftKeeper(suite.T())
 

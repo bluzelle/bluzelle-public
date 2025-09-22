@@ -3,17 +3,15 @@ package ante_test
 import (
 	"testing"
 
+	storetypes "cosmossdk.io/store/types"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
-	testutilante "github.com/bluzelle/bluzelle-public/curium/testutil/ante"
 	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
 	"github.com/bluzelle/bluzelle-public/curium/testutil/tx"
 	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
-	"github.com/bluzelle/simapp"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkante "github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -36,14 +34,14 @@ func TestNewSetupContextDecorator(t *testing.T) {
 	gasMeterKeeper := gasmeter.NewGasMeterKeeper()
 
 	t.Run("NewSetUpContextDecorator should return a SetUpContextDecorator", func(t *testing.T) {
-		app, ctx, accountKeeper := testutil.CreateTestApp(t, false)
+		app, ctx, accountKeeper := testutil.CreateTestApp()
 		acc := accountKeeper.NewAccountWithAddress(ctx, addr)
 		accountKeeper.SetAccount(ctx, acc)
 		bankKeeper := bankkeeper.NewBaseKeeper(
 			app.AppCodec(),
 			app.GetKey(banktypes.StoreKey),
 			accountKeeper,
-			simapp.BlockedAddresses(),
+			app.ModuleAccountAddrs(),
 			govAuthAddrStr)
 		storeKey := sdk.NewKVStoreKey(taxmoduletypes.StoreKey)
 		memStoreKey := storetypes.NewMemoryStoreKey(taxmoduletypes.MemStoreKey)
@@ -67,14 +65,14 @@ func TestNewSetupContextDecorator(t *testing.T) {
 	t.Run("SetGasMeter()", func(t *testing.T) {
 
 		t.Run("should returns a new context with a gas meter with 0 consumed gas if block height is 0", func(t *testing.T) {
-			app, ctx, accountKeeper := testutil.CreateTestApp(t, false)
+			app, ctx, accountKeeper := testutil.CreateTestApp()
 			acc := accountKeeper.NewAccountWithAddress(ctx, addr)
 			accountKeeper.SetAccount(ctx, acc)
 			bankKeeper := bankkeeper.NewBaseKeeper(
 				app.AppCodec(),
 				app.GetKey(banktypes.StoreKey),
 				accountKeeper,
-				simapp.BlockedAddresses(),
+				app.ModuleAccountAddrs(),
 				govAuthAddrStr)
 			gasMeterCtx, _ := ante.SetGasMeter(ante.SetGasMeterOptions{
 				Simulate:         true,
@@ -91,7 +89,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 		})
 
 		t.Run("should returns a new context with a charging gas meter", func(t *testing.T) {
-			app, ctx, accountKeeper := testutil.CreateTestApp(t, false)
+			app, ctx, accountKeeper := testutil.CreateTestApp()
 			ctx = ctx.WithBlockHeight(ctx.BlockHeight() + 1)
 			acc := accountKeeper.NewAccountWithAddress(ctx, addr)
 			accountKeeper.SetAccount(ctx, acc)
@@ -99,7 +97,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				app.AppCodec(),
 				app.GetKey(banktypes.StoreKey),
 				accountKeeper,
-				simapp.BlockedAddresses(),
+				app.ModuleAccountAddrs(),
 				govAuthAddrStr)
 
 			taxKeeper := *taxmodulekeeper.NewKeeper(
@@ -131,7 +129,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 		})
 
 		t.Run("should return error message if gas price is too low", func(t *testing.T) {
-			app, ctx, accountKeeper := testutil.CreateTestApp(t, false)
+			app, ctx, accountKeeper := testutil.CreateTestApp()
 			ctx = ctx.WithBlockHeight(ctx.BlockHeight() + 1)
 			acc := accountKeeper.NewAccountWithAddress(ctx, addr)
 			accountKeeper.SetAccount(ctx, acc)
@@ -139,7 +137,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				app.AppCodec(),
 				app.GetKey(banktypes.StoreKey),
 				accountKeeper,
-				simapp.BlockedAddresses(),
+				app.ModuleAccountAddrs(),
 				govAuthAddrStr)
 
 			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(global.Denom, 19))
@@ -165,14 +163,14 @@ func TestNewSetupContextDecorator(t *testing.T) {
 	t.Run("SetUpContextDecorator AnteHandle", func(t *testing.T) {
 
 		t.Run("should return context with a gas meter", func(t *testing.T) {
-			app, ctx, accountKeeper := testutil.CreateTestApp(t, false)
+			app, ctx, accountKeeper := testutil.CreateTestApp()
 			acc := accountKeeper.NewAccountWithAddress(ctx, addr)
 			accountKeeper.SetAccount(ctx, acc)
 			bankKeeper := bankkeeper.NewBaseKeeper(
 				app.AppCodec(),
 				app.GetKey(banktypes.StoreKey),
 				accountKeeper,
-				simapp.BlockedAddresses(),
+				app.ModuleAccountAddrs(),
 				govAuthAddrStr)
 			storeKey := sdk.NewKVStoreKey(taxmoduletypes.StoreKey)
 			memStoreKey := storetypes.NewMemoryStoreKey(taxmoduletypes.MemStoreKey)
@@ -196,7 +194,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 			txBuilder.SetFeePayer(addr)
 			newTx := txBuilder.GetTx()
 			gasTx := sdkante.GasTx(newTx)
-			nextAnteHandler, _ := ante.NewAnteHandler(*testutilante.NewAnteHandlerOptions(t))
+			nextAnteHandler, _ := ante.NewAnteHandler(*NewAnteHandlerOptions(t))
 
 			newCtx, _ := setUpContextDecorator.AnteHandle(ctx, gasTx, true, nextAnteHandler)
 

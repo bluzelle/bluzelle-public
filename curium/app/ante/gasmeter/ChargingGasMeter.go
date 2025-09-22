@@ -53,7 +53,7 @@ func (g *ChargingGasMeter) GasConsumedToLimit() sdk.Gas {
 func (g *ChargingGasMeter) ConsumeGas(amount sdk.Gas, descriptor string) {
 	var overflow bool
 	// TODO: Should we set the consumed field after overflow checking?
-	g.consumed, overflow = addUint64Overflow(g.consumed, amount)
+	g.consumed, overflow = AddUint64Overflow(g.consumed, amount)
 	if overflow && g.limit != 0 {
 		panic(sdk.ErrorGasOverflow{Descriptor: descriptor})
 	}
@@ -70,9 +70,9 @@ func (g *ChargingGasMeter) GasRemaining() sdk.Gas {
 	return g.limit - g.consumed
 }
 
-// addUint64Overflow performs the addition operation on two uint64 integers and
+// AddUint64Overflow performs the addition operation on two uint64 integers and
 // returns a boolean on whether or not the result overflows.
-func addUint64Overflow(a, b uint64) (uint64, bool) {
+func AddUint64Overflow(a, b uint64) (uint64, bool) {
 	if math.MaxUint64-a < b {
 		return 0, true
 	}
@@ -99,8 +99,8 @@ func (g *ChargingGasMeter) Charge(ctx sdk.Context) error {
 	acc := g.accountKeeper.GetAccount(ctx, g.PayerAccount)
 	addr := acc.GetAddress()
 
-	gasFee := calculateGasFee(g)
-	feeErr := deductFees(ctx, g.bankKeeper, addr, gasFee)
+	gasFee := CalculateGasFee(g)
+	feeErr := DeductFees(ctx, g.bankKeeper, addr, gasFee)
 	if feeErr != nil {
 		return feeErr
 	}
@@ -117,7 +117,7 @@ func (g *ChargingGasMeter) GetGasPrice() sdk.DecCoins {
 	return g.gasPrice
 }
 
-func deductFees(ctx sdk.Context, bankKeeper bankkeeper.Keeper, addr sdk.AccAddress, fees sdk.Coins) error {
+func DeductFees(ctx sdk.Context, bankKeeper bankkeeper.Keeper, addr sdk.AccAddress, fees sdk.Coins) error {
 
 	if !fees.IsValid() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fees)
@@ -131,7 +131,7 @@ func deductFees(ctx sdk.Context, bankKeeper bankkeeper.Keeper, addr sdk.AccAddre
 	return nil
 }
 
-func calculateGasFee(gm *ChargingGasMeter) sdk.Coins {
+func CalculateGasFee(gm *ChargingGasMeter) sdk.Coins {
 
 	gasPrice := gm.gasPrice
 
