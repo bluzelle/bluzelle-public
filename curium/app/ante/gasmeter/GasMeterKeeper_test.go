@@ -25,7 +25,7 @@ func TestGasMeterKeeper(t *testing.T) {
 		app.AppCodec(),
 		app.GetKey(banktypes.StoreKey),
 		accountKeeper,
-		app.ModuleAccountAddrs(),
+		app.BlockedAddresses(),
 		govAuthAddrStr,
 	)
 	_, _, addr := testdata.KeyTestPubAddr()

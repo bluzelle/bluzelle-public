@@ -23,7 +23,7 @@ func (app *App) ExportAppStateAndValidators(
 ) (servertypes.ExportedApp, error) {
 
 	// as if they could withdraw from the start of the next block
-	ctx := app.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
+	ctx := app.NewContextLegacy(true, tmproto.Header{Height: app.LastBlockHeight()})
 
 	// We export at last height + 1, because that's the height at which
 	// Tendermint will start InitChain.
@@ -32,7 +32,7 @@ func (app *App) ExportAppStateAndValidators(
 		height = 0
 		app.prepForZeroHeightGenesis(ctx, jailAllowedAddrs)
 	}
-	genState := app.mm.ExportGenesisForModules(ctx, app.appCodec, modulesToExport)
+	genState, err := app.mm.ExportGenesisForModules(ctx, app.appCodec, modulesToExport)
 
 	genState["staking"] = app.appCodec.MustMarshalJSON(ExportStakingGenesis(ctx, *app.StakingKeeper))
 	appState, err := json.MarshalIndent(genState, "", "  ")

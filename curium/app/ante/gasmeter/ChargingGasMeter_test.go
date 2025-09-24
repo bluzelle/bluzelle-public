@@ -28,7 +28,7 @@ func TestChargingGasMeter(t *testing.T) {
 		app.AppCodec(),
 		app.GetKey(banktypes.StoreKey),
 		accountKeeper,
-		app.ModuleAccountAddrs(),
+		app.BlockedAddresses(),
 		govAuthAddrStr)
 	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdk.NewInt(2)))
 

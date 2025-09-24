@@ -2,13 +2,13 @@ package types
 
 import (
 	"cosmossdk.io/store/types"
+	txsigning "cosmossdk.io/x/tx/signing"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 )
@@ -32,7 +32,7 @@ type AnteHandlerOptions struct {
 	BankKeeper      bankkeeper.BaseKeeper
 	FeegrantKeeper  ante.FeegrantKeeper
 	TaxKeeper       taxmodulekeeper.Keeper
-	SignModeHandler authsigning.SignModeHandler
+	SignModeHandler *txsigning.HandlerMap
 	SigGasConsumer  func(meter types.GasMeter, sig signing.SignatureV2, params auth.Params) error
 	GasMeterKeeper  *gasmeter.Keeper
 }

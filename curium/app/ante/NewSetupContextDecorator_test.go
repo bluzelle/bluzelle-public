@@ -41,7 +41,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 			app.AppCodec(),
 			app.GetKey(banktypes.StoreKey),
 			accountKeeper,
-			app.ModuleAccountAddrs(),
+			app.BlockedAddresses(),
 			govAuthAddrStr)
 		storeKey := sdk.NewKVStoreKey(taxmoduletypes.StoreKey)
 		memStoreKey := storetypes.NewMemoryStoreKey(taxmoduletypes.MemStoreKey)
@@ -72,7 +72,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				app.AppCodec(),
 				app.GetKey(banktypes.StoreKey),
 				accountKeeper,
-				app.ModuleAccountAddrs(),
+				app.BlockedAddresses(),
 				govAuthAddrStr)
 			gasMeterCtx, _ := ante.SetGasMeter(ante.SetGasMeterOptions{
 				Simulate:         true,
@@ -97,7 +97,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				app.AppCodec(),
 				app.GetKey(banktypes.StoreKey),
 				accountKeeper,
-				app.ModuleAccountAddrs(),
+				app.BlockedAddresses(),
 				govAuthAddrStr)
 
 			taxKeeper := *taxmodulekeeper.NewKeeper(
@@ -137,7 +137,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				app.AppCodec(),
 				app.GetKey(banktypes.StoreKey),
 				accountKeeper,
-				app.ModuleAccountAddrs(),
+				app.BlockedAddresses(),
 				govAuthAddrStr)
 
 			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(global.Denom, 19))
@@ -170,7 +170,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				app.AppCodec(),
 				app.GetKey(banktypes.StoreKey),
 				accountKeeper,
-				app.ModuleAccountAddrs(),
+				app.BlockedAddresses(),
 				govAuthAddrStr)
 			storeKey := sdk.NewKVStoreKey(taxmoduletypes.StoreKey)
 			memStoreKey := storetypes.NewMemoryStoreKey(taxmoduletypes.MemStoreKey)

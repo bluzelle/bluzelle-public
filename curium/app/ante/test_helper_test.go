@@ -42,7 +42,7 @@ func NewAnteHandlerOptions(t *testing.T) *appTypes.AnteHandlerOptions {
 		appCodec, keys[authtypes.StoreKey], authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(), govAuthAddrStr,
 	)
 	bankKeeper := bankkeeper.NewBaseKeeper(
-		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.ModuleAccountAddrs(), govAuthAddrStr,
+		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.BlockedAddresses(), govAuthAddrStr,
 	)
 	app.BankKeeper = bankKeeper
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)

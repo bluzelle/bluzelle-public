@@ -5,7 +5,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogoproto/grpc"
 )
 
@@ -24,7 +23,4 @@ type ServerApplication interface {
 
 	// RegisterTendermintService registers the gRPC Query service for tendermint queries.
 	RegisterTendermintService(client.Context)
-
-	// CommitMultiStore Returns the multistore instance
-	CommitMultiStore() sdk.CommitMultiStore
 }
