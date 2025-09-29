@@ -2,6 +2,8 @@ package keeper
 
 import (
 	"context"
+
+	"cosmossdk.io/errors"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/types"
@@ -10,7 +12,7 @@ import (
 
 func (k msgServer) SetTransferTaxBp(goCtx context.Context, msg *types.MsgSetTransferTaxBp) (*types.MsgSetTransferTaxBpResponse, error) {
 	if !isAdmin(msg.Creator) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "permission denied")
+		return nil, errors.Wrap(sdkerrors.ErrInvalidAddress, "permission denied")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)

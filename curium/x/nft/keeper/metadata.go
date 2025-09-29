@@ -1,9 +1,10 @@
 package keeper
 
 import (
+	sdkerrors "cosmossdk.io/errors"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (k Keeper) GetLastMetadataId(ctx sdk.Context) uint64 {
@@ -41,7 +42,7 @@ func (k Keeper) SetMetadata(ctx sdk.Context, metadata types.Metadata) {
 
 func (k Keeper) GetAllMetadata(ctx sdk.Context) []types.Metadata {
 	store := ctx.KVStore(k.storeKey)
-	it := sdk.KVStorePrefixIterator(store, types.PrefixMetadata)
+	it := storetypes.KVStorePrefixIterator(store, types.PrefixMetadata)
 	defer it.Close()
 
 	allMetadata := []types.Metadata{}

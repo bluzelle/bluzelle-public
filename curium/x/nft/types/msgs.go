@@ -1,8 +1,9 @@
 package types
 
 import (
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const (
@@ -19,8 +20,8 @@ const (
 	TypeMsgUpdateCollectionAuthority  = "update_collection_authority"
 	TypeMsgUpdateCollectionUri        = "update_collection_uri"
 	TypeMsgUpdateCollectionMutableUri = "update_collection_mutable_uri"
-	TypeMsgMultiSendNFT 							= "multi_send_nft"
-	TypeMsgBurnNFT 										= "burn_nft"
+	TypeMsgMultiSendNFT               = "multi_send_nft"
+	TypeMsgBurnNFT                    = "burn_nft"
 )
 
 var _ sdk.Msg = &MsgCreateNFT{}
@@ -63,7 +64,7 @@ func (msg MsgCreateNFT) Type() string { return TypeMsgCreateNFT }
 func (msg MsgCreateNFT) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	if msg.Metadata.SellerFeeBasisPoints > 100 {
@@ -109,12 +110,12 @@ func (msg MsgPrintEdition) Type() string { return TypeMsgPrintEdition }
 func (msg MsgPrintEdition) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	_, err = sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	return nil
@@ -155,7 +156,7 @@ func (msg MsgTransferNFT) Type() string { return TypeMsgTransferNFT }
 func (msg MsgTransferNFT) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	if !IsValidNftId(msg.Id) {
@@ -199,7 +200,7 @@ func (msg MsgSignMetadata) Type() string { return TypeMsgSignMetadata }
 func (msg MsgSignMetadata) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	return nil
@@ -251,7 +252,7 @@ func (msg MsgUpdateMetadata) Type() string { return TypeMsgUpdateMetadata }
 func (msg MsgUpdateMetadata) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	if msg.SellerFeeBasisPoints > 100 {
@@ -296,7 +297,7 @@ func (msg MsgUpdateMetadataAuthority) Type() string { return TypeMsgUpdateMetada
 func (msg MsgUpdateMetadataAuthority) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	return nil
@@ -337,7 +338,7 @@ func (msg MsgUpdateMintAuthority) Type() string { return TypeMsgUpdateMintAuthor
 func (msg MsgUpdateMintAuthority) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	return nil
@@ -382,7 +383,7 @@ func (msg MsgCreateCollection) Type() string { return TypeMsgCreateCollection }
 func (msg MsgCreateCollection) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	return nil
@@ -423,7 +424,7 @@ func (msg MsgUpdateCollectionAuthority) Type() string { return TypeMsgUpdateColl
 func (msg MsgUpdateCollectionAuthority) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	return nil
@@ -464,7 +465,7 @@ func (msg MsgUpdateCollectionUri) Type() string { return TypeMsgUpdateCollection
 func (msg MsgUpdateCollectionUri) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	return nil
@@ -505,7 +506,7 @@ func (msg MsgUpdateCollectionMutableUri) Type() string { return TypeMsgUpdateCol
 func (msg MsgUpdateCollectionMutableUri) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 
 	return nil
@@ -529,13 +530,11 @@ func (msg MsgUpdateCollectionMutableUri) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{sender}
 }
 
-
-
 var _ sdk.Msg = &MsgMultiSendNFT{}
 
 func NewMsgMultiSendNFT(sender sdk.AccAddress, multiSendOutputs []*MultiSendNFTOutput) *MsgMultiSendNFT {
 	return &MsgMultiSendNFT{
-		Sender:       sender.String(),
+		Sender:           sender.String(),
 		MultiSendOutputs: multiSendOutputs,
 	}
 }
@@ -547,12 +546,12 @@ func (msg MsgMultiSendNFT) Type() string { return TypeMsgMultiSendNFT }
 func (msg MsgMultiSendNFT) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	for _, output := range msg.MultiSendOutputs {
 		_, err := sdk.AccAddressFromBech32(output.Receiver)
 		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+			return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 		}
 	}
 	return nil
@@ -576,15 +575,12 @@ func (msg MsgMultiSendNFT) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{sender}
 }
 
-
-
-
 var _ sdk.Msg = &MsgBurnNFT{}
 
 func NewMsgBurnNFT(sender sdk.AccAddress, nft_id string) *MsgBurnNFT {
 	return &MsgBurnNFT{
-		Sender:       sender.String(),
-		NftId: nft_id,
+		Sender: sender.String(),
+		NftId:  nft_id,
 	}
 }
 
@@ -595,7 +591,7 @@ func (msg MsgBurnNFT) Type() string { return TypeMsgBurnNFT }
 func (msg MsgBurnNFT) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return sdkerrors.Wrapf(errors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
 }

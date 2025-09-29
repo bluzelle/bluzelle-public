@@ -7,7 +7,6 @@ import (
 	taxsimulation "github.com/bluzelle/bluzelle-public/curium/x/tax/simulation"
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
@@ -61,14 +60,14 @@ func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.LegacyParamChange 
 }
 
 // RegisterStoreDecoder registers a decoder
-func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
+func (am AppModule) RegisterStoreDecoder() {}
 
 // WeightedOperations returns the all the gov module operations with their respective weights.
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
 
 	var weightMsgSetGasTaxBp int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSetGasTaxBp, &weightMsgSetGasTaxBp, nil,
+	simState.AppParams.GetOrGenerate(opWeightMsgSetGasTaxBp, &weightMsgSetGasTaxBp, nil,
 		func(_ *rand.Rand) {
 			weightMsgSetGasTaxBp = defaultWeightMsgSetGasTaxBp
 		},
@@ -79,7 +78,7 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	))
 
 	var weightMsgSetTransferTaxBp int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSetTransferTaxBp, &weightMsgSetTransferTaxBp, nil,
+	simState.AppParams.GetOrGenerate(opWeightMsgSetTransferTaxBp, &weightMsgSetTransferTaxBp, nil,
 		func(_ *rand.Rand) {
 			weightMsgSetTransferTaxBp = defaultWeightMsgSetTransferTaxBp
 		},
@@ -90,7 +89,7 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	))
 
 	var weightMsgSetTaxCollector int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSetTaxCollector, &weightMsgSetTaxCollector, nil,
+	simState.AppParams.GetOrGenerate(opWeightMsgSetTaxCollector, &weightMsgSetTaxCollector, nil,
 		func(_ *rand.Rand) {
 			weightMsgSetTaxCollector = defaultWeightMsgSetTaxCollector
 		},

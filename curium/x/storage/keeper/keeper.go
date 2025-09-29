@@ -7,9 +7,9 @@ import (
 
 	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
 
+	log "cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/storage/types"
-	log "github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -60,7 +60,7 @@ func StartStorageNode(repoPath string) (*curiumipfs.StorageIpfsNode, error) {
 	return node, nil
 }
 
-func DoPinFile(addPinFn func(cid string) error, msg *types.MsgPin, store sdk.KVStore, cdc codec.BinaryCodec) {
+func DoPinFile(addPinFn func(cid string) error, msg *types.MsgPin, store storetypes.KVStore, cdc codec.BinaryCodec) {
 	go (func() {
 		addPinFn(msg.Cid)
 	})()

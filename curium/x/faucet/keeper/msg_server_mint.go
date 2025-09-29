@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 
+	"cosmossdk.io/math"
 	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -15,9 +16,9 @@ func (k msgServer) FaucetToken(goCtx context.Context, msg *types.MsgFaucetToken)
 	if err != nil {
 		return nil, err
 	}
-	coins := sdk.NewCoins(sdk.NewCoin("ubnt", sdk.NewInt(2000*100000)))
-	eltCoins := sdk.NewCoins(sdk.NewCoin("uelt", sdk.NewInt(2000*100000)))
-	g4coins := sdk.NewCoins(sdk.NewCoin("ug4", sdk.NewInt(2000*100000)))
+	coins := sdk.NewCoins(sdk.NewCoin("ubnt", math.NewInt(2000*100000)))
+	eltCoins := sdk.NewCoins(sdk.NewCoin("uelt", math.NewInt(2000*100000)))
+	g4coins := sdk.NewCoins(sdk.NewCoin("ug4", math.NewInt(2000*100000)))
 
 	err = k.bankKeeper.MintCoins(ctx, "faucet", coins)
 	err = k.bankKeeper.MintCoins(ctx, "faucet", eltCoins)

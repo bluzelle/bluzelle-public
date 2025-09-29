@@ -3,9 +3,10 @@ package keeper
 import (
 	"strconv"
 
+	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
+	storetypes "cosmossdk.io/store/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 )
 
@@ -13,7 +14,7 @@ func (k Keeper) GetNFTsByOwner(ctx sdk.Context, owner sdk.AccAddress) []types.NF
 	store := ctx.KVStore(k.storeKey)
 
 	nfts := []types.NFT{}
-	it := sdk.KVStorePrefixIterator(store, append(types.PrefixNFTByOwner, owner...))
+	it := storetypes.KVStorePrefixIterator(store, append(types.PrefixNFTByOwner, owner...))
 	defer it.Close()
 
 	for ; it.Valid(); it.Next() {
@@ -32,7 +33,7 @@ func (k Keeper) GetCollectionNfts(ctx sdk.Context, collectionId uint64) []types.
 	store := ctx.KVStore(k.storeKey)
 
 	nfts := []types.NFT{}
-	it := sdk.KVStorePrefixIterator(store, append(types.PrefixNFT, sdk.Uint64ToBigEndian(collectionId)...))
+	it := storetypes.KVStorePrefixIterator(store, append(types.PrefixNFT, sdk.Uint64ToBigEndian(collectionId)...))
 	defer it.Close()
 
 	for ; it.Valid(); it.Next() {
@@ -91,7 +92,7 @@ func (k Keeper) DeleteNFT(ctx sdk.Context, nft types.NFT) {
 
 func (k Keeper) GetAllNFTs(ctx sdk.Context) []types.NFT {
 	store := ctx.KVStore(k.storeKey)
-	it := sdk.KVStorePrefixIterator(store, types.PrefixNFT)
+	it := storetypes.KVStorePrefixIterator(store, types.PrefixNFT)
 	defer it.Close()
 
 	allNFTs := []types.NFT{}
@@ -269,9 +270,9 @@ func (k Keeper) TransferNFT(ctx sdk.Context, msg *types.MsgTransferNFT) error {
 func (k Keeper) MultiSendNFT(ctx sdk.Context, msg *types.MsgMultiSendNFT) error {
 	// checking the valid nft and the valid owner of each nft.
 	for _, output := range msg.MultiSendOutputs {
-		nft, err := k.GetNFTById(ctx, output.NftId);
+		nft, err := k.GetNFTById(ctx, output.NftId)
 		if err != nil {
-			return err;
+			return err
 		}
 		nft.Owner = output.Receiver
 		k.SetNFT(ctx, nft)
@@ -285,17 +286,17 @@ func (k Keeper) MultiSendNFT(ctx sdk.Context, msg *types.MsgMultiSendNFT) error 
 	return nil
 }
 
-func (k Keeper) BurnNFT( ctx sdk.Context, msg *types.MsgBurnNFT) error {
+func (k Keeper) BurnNFT(ctx sdk.Context, msg *types.MsgBurnNFT) error {
 	nft, err := k.GetNFTById(ctx, msg.NftId)
-	
+
 	if err != nil {
 		return err
 	}
 
 	if nft.Owner != msg.Sender {
-		return types.ErrNotNFTOwner;
+		return types.ErrNotNFTOwner
 	}
-	
+
 	nft.Owner = "bluzelle1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxmrapv"
 	k.SetNFT(ctx, nft)
 	ctx.EventManager().EmitTypedEvent(&types.EventNFTTransfer{

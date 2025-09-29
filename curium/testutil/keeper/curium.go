@@ -19,7 +19,7 @@ import (
 )
 
 func CuriumKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
-	storeKey := sdk.NewKVStoreKey(types.StoreKey)
+	storeKey := storetyp.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
 	db := tmdb.NewMemDB()

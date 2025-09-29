@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	tenderminttypes "github.com/cometbft/cometbft/types"
 	sdkclient "github.com/cosmos/cosmos-sdk/client"
@@ -13,7 +15,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
@@ -78,7 +79,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string, txCon
 			gas := uint64(40000000)
 			txBuilder.SetGasLimit(gas)
 
-			txBuilder.SetFeeAmount(types.NewCoins(types.NewCoin("ubnt", types.NewInt(10000000))))
+			txBuilder.SetFeeAmount(types.NewCoins(types.NewCoin("ubnt", sdkmath.NewInt(10000000))))
 			txBuilder.SetMemo("memo")
 			txBuilder.SetTimeoutHeight(uint64(ctx.BlockHeight() + 20))
 
@@ -119,7 +120,7 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string, txCon
 			sigV2 := signing.SignatureV2{
 				PubKey: pubKey,
 				Data: &signing.SingleSignatureData{
-					SignMode:  txConfig.SignModeHandler().DefaultMode(),
+					SignMode:  signing.SignMode(txConfig.SignModeHandler().DefaultMode()),
 					Signature: nil,
 				},
 				Sequence: accnt.GetSequence(),
@@ -138,7 +139,9 @@ func NewMsgBroadcaster(accKeeper *keeper.AccountKeeper, keyringDir string, txCon
 			}
 
 			sigV2, err = tx.SignWithPrivKey(
-				txConfig.SignModeHandler().DefaultMode(), signerData,
+				ctx,
+				signing.SignMode(txConfig.SignModeHandler().DefaultMode()),
+				signerData,
 				txBuilder, privKey, txConfig, accnt.GetSequence())
 
 			if err != nil {

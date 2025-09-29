@@ -2,6 +2,8 @@ package ante
 
 import (
 	"fmt"
+
+	errors "cosmossdk.io/errors"
 	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -37,7 +39,7 @@ func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, nex
 
 		feeTx, ok := tx.(FeeTx)
 		if !ok {
-			return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
+			return ctx, errors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
 		}
 
 		if err := handleTx(ctx, td, feeTx); err != nil {

@@ -4,11 +4,13 @@ import (
 	"math"
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
 	"github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
 	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -27,12 +29,13 @@ func TestChargingGasMeterWhiteBox(t *testing.T) {
 	accountKeeper.SetAccount(ctx, acc)
 	bankKeeper := bankkeeper.NewBaseKeeper(
 		app.AppCodec(),
-		app.GetKey(banktypes.StoreKey),
+		runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 		accountKeeper,
 		app.BlockedAddresses(),
 		govAuthAddrStr,
+		nil,
 	)
-	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdk.NewInt(2)))
+	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdkmath.NewInt(2)))
 
 	taxKeeper := *taxmodulekeeper.NewKeeper(
 		app.AppCodec(),
@@ -61,11 +64,11 @@ func TestChargingGasMeterWhiteBox(t *testing.T) {
 	t.Run("CalculateGasFee() should return correct gas fee", func(t *testing.T) {
 		gasMeter := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, taxKeeper, 100, addr, decCoins)
 
-		expectedGasFee1 := sdk.NewCoins(sdk.NewCoin(global.Denom, sdk.NewInt(0)))
+		expectedGasFee1 := sdk.NewCoins(sdk.NewCoin(global.Denom, sdkmath.NewInt(0)))
 		require.Equal(t, expectedGasFee1, gasmeter.CalculateGasFee(gasMeter))
 
 		gasMeter.ConsumeGas(10, "Consume 10 gas when gas price is 2 ubnt")
-		expectedGasFee2 := sdk.NewCoins(sdk.NewCoin(global.Denom, sdk.NewInt(20)))
+		expectedGasFee2 := sdk.NewCoins(sdk.NewCoin(global.Denom, sdkmath.NewInt(20)))
 		require.Equal(t, expectedGasFee2, gasmeter.CalculateGasFee(gasMeter))
 	})
 
@@ -77,15 +80,15 @@ func TestChargingGasMeterWhiteBox(t *testing.T) {
 			err1 := gasmeter.DeductFees(ctx, bankKeeper, addr, fees)
 			require.Nil(t, err1)
 
-			fees.Add(sdk.NewCoin(global.Denom, sdk.NewInt(1)))
+			fees.Add(sdk.NewCoin(global.Denom, sdkmath.NewInt(1)))
 
 			err2 := gasmeter.DeductFees(ctx, bankKeeper, addr, fees)
 			require.Nil(t, err2)
 		})
 
 		t.Run("should make no deduction when address has balance of 0", func(t *testing.T) {
-			fees := sdk.NewCoins().Add(sdk.NewCoin(global.Denom, sdk.NewInt(10)))
-			expectedBalance := sdk.NewCoin(global.Denom, sdk.NewInt(0))
+			fees := sdk.NewCoins().Add(sdk.NewCoin(global.Denom, sdkmath.NewInt(10)))
+			expectedBalance := sdk.NewCoin(global.Denom, sdkmath.NewInt(0))
 
 			balanceBefore := bankKeeper.BaseViewKeeper.GetBalance(ctx, addr, global.Denom)
 			require.Equal(t, expectedBalance, balanceBefore)

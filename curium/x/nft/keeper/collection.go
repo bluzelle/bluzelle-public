@@ -1,9 +1,10 @@
 package keeper
 
 import (
+	sdkerrors "cosmossdk.io/errors"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (k Keeper) GetLastCollectionId(ctx sdk.Context) uint64 {
@@ -43,7 +44,7 @@ func (k Keeper) GetAllCollections(ctx sdk.Context) []types.Collection {
 	store := ctx.KVStore(k.storeKey)
 
 	collections := []types.Collection{}
-	it := sdk.KVStorePrefixIterator(store, types.PrefixCollection)
+	it := storetypes.KVStorePrefixIterator(store, types.PrefixCollection)
 	defer it.Close()
 
 	for ; it.Valid(); it.Next() {

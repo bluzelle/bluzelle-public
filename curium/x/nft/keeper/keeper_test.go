@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"testing"
 
+	"cosmossdk.io/math"
 	"github.com/bluzelle/bluzelle-public/curium/app"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
 	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
@@ -27,12 +28,12 @@ const (
 var (
 	owner    = sdk.AccAddress(tmhash.SumTruncated([]byte("tokenTest")))
 	uri      = "ipfs://"
-	initAmt  = sdk.NewInt(100000000)
+	initAmt  = math.NewInt(100000000)
 	initCoin = sdk.Coins{sdk.NewCoin(sdk.DefaultBondDenom, initAmt)}
 	symbol   = "btc"
 	name     = "Bitcoin Network"
 
-	maxSupply = sdk.NewInt(200000000)
+	maxSupply = math.NewInt(200000000)
 )
 
 type KeeperTestSuite struct {
@@ -58,7 +59,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	moduleAcc := suite.AccountKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
 	suite.Require().NotNil(moduleAcc, "NFT module account should exist")
 
-	suite.NFTKeeper.SetParamSet(suite.ctx, types.NewParams(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(1_000_000_000))))
+	suite.NFTKeeper.SetParamSet(suite.ctx, types.NewParams(sdk.NewCoin(sdk.DefaultBondDenom, math.NewInt(1_000_000_000))))
 
 	err := suite.BankKeeper.MintCoins(suite.ctx, types.ModuleName, initCoin)
 	suite.NoError(err)

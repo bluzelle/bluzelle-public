@@ -2,21 +2,15 @@ package app
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
+	"cosmossdk.io/log"
 	curiumparams "github.com/bluzelle/bluzelle-public/curium/app/params"
-	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
-	"github.com/cometbft/cometbft/libs/cli"
-	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/testutil"
-	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
-	bankcli "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
 )
 
 var DefaultConsensusParams = &tmproto.ConsensusParams{
@@ -52,7 +46,7 @@ func Setup(isCheckTx bool) *App {
 		}
 
 		app.InitChain(
-			abci.RequestInitChain{
+			&abci.RequestInitChain{
 				Validators:      []abci.ValidatorUpdate{},
 				ConsensusParams: DefaultConsensusParams,
 				AppStateBytes:   stateBytes,
@@ -61,15 +55,4 @@ func Setup(isCheckTx bool) *App {
 	}
 
 	return app
-}
-
-func QueryBalanceExec(clientCtx client.Context, address string, denom string, extraArgs ...string) (testutil.BufferWriter, error) {
-	args := []string{
-		address,
-		fmt.Sprintf("--%s=%s", bankcli.FlagDenom, denom),
-		fmt.Sprintf("--%s=json", cli.OutputFlag),
-	}
-	args = append(args, extraArgs...)
-
-	return clitestutil.ExecTestCLICmd(clientCtx, bankcli.GetBalancesCmd(), args)
 }

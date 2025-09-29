@@ -4,18 +4,24 @@ import (
 	"fmt"
 	"math"
 
+	sdkerrors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
 	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 )
 
+var (
+	ErrInsufficientFee   = sdkerrors.Register("gasmeter", 1, "insufficient fee")
+	ErrInsufficientFunds = sdkerrors.Register("gasmeter", 2, "insufficient funds")
+)
+
 type ChargingGasMeter struct {
-	limit         sdk.Gas
-	consumed      sdk.Gas
+	limit         uint64
+	consumed      uint64
 	PayerAccount  sdk.AccAddress
 	gasPrice      sdk.DecCoins
 	bankKeeper    bankkeeper.Keeper
@@ -23,7 +29,7 @@ type ChargingGasMeter struct {
 	taxKeeper     taxmodulekeeper.Keeper
 }
 
-func NewChargingGasMeter(bankKeeper bankkeeper.Keeper, accountKeeper acctypes.AccountKeeper, taxKeeper taxmodulekeeper.Keeper, limit sdk.Gas, payerAccount sdk.AccAddress, gasPrice sdk.DecCoins) *ChargingGasMeter {
+func NewChargingGasMeter(bankKeeper bankkeeper.Keeper, accountKeeper acctypes.AccountKeeper, taxKeeper taxmodulekeeper.Keeper, limit uint64, payerAccount sdk.AccAddress, gasPrice sdk.DecCoins) *ChargingGasMeter {
 	return &ChargingGasMeter{
 		limit:         limit,
 		consumed:      0,
@@ -35,35 +41,35 @@ func NewChargingGasMeter(bankKeeper bankkeeper.Keeper, accountKeeper acctypes.Ac
 	}
 }
 
-func (g *ChargingGasMeter) GasConsumed() sdk.Gas {
+func (g *ChargingGasMeter) GasConsumed() uint64 {
 	return g.consumed
 }
 
-func (g *ChargingGasMeter) Limit() sdk.Gas {
+func (g *ChargingGasMeter) Limit() uint64 {
 	return g.limit
 }
 
-func (g *ChargingGasMeter) GasConsumedToLimit() sdk.Gas {
+func (g *ChargingGasMeter) GasConsumedToLimit() uint64 {
 	if g.IsPastLimit() {
 		return g.limit
 	}
 	return g.consumed
 }
 
-func (g *ChargingGasMeter) ConsumeGas(amount sdk.Gas, descriptor string) {
+func (g *ChargingGasMeter) ConsumeGas(amount uint64, descriptor string) {
 	var overflow bool
 	// TODO: Should we set the consumed field after overflow checking?
 	g.consumed, overflow = AddUint64Overflow(g.consumed, amount)
 	if overflow && g.limit != 0 {
-		panic(sdk.ErrorGasOverflow{Descriptor: descriptor})
+		panic("error gas overflow!")
 	}
 
 	if g.consumed > g.limit && g.limit != 0 {
-		panic(sdk.ErrorOutOfGas{Descriptor: descriptor})
+		panic("error gas limit exceed.")
 	}
 }
 
-func (g *ChargingGasMeter) GasRemaining() sdk.Gas {
+func (g *ChargingGasMeter) GasRemaining() uint64 {
 	if g.IsPastLimit() {
 		return 0
 	}
@@ -80,7 +86,7 @@ func AddUint64Overflow(a, b uint64) (uint64, bool) {
 	return a + b, false
 }
 
-func (g *ChargingGasMeter) RefundGas(_ sdk.Gas, _ string) {
+func (g *ChargingGasMeter) RefundGas(_ uint64, _ string) {
 }
 
 func (g *ChargingGasMeter) IsPastLimit() bool {
@@ -120,12 +126,12 @@ func (g *ChargingGasMeter) GetGasPrice() sdk.DecCoins {
 func DeductFees(ctx sdk.Context, bankKeeper bankkeeper.Keeper, addr sdk.AccAddress, fees sdk.Coins) error {
 
 	if !fees.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fees)
+		return sdkerrors.Wrapf(ErrInsufficientFee, "invalid fee amount: %s", fees)
 	}
 
 	err := bankKeeper.SendCoinsFromAccountToModule(ctx, addr, types.FeeCollectorName, fees)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+		return sdkerrors.Wrapf(ErrInsufficientFunds, err.Error())
 	}
 
 	return nil
@@ -140,5 +146,5 @@ func CalculateGasFee(gm *ChargingGasMeter) sdk.Coins {
 	gasConsumed := gm.GasConsumed()
 
 	gasFee := gasPriceAmount.MulInt64(int64(gasConsumed)).RoundInt64()
-	return sdk.NewCoins(sdk.NewCoin(global.Denom, sdk.NewInt(gasFee)))
+	return sdk.NewCoins(sdk.NewCoin(global.Denom, sdkmath.NewInt(gasFee)))
 }

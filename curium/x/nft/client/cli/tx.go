@@ -12,8 +12,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/version"
 
+	sdkerrors "cosmossdk.io/errors"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // NewTxCmd returns the transaction commands for the nft module.
@@ -553,7 +554,6 @@ func GetCmdUpdateCollectionMutableUri() *cobra.Command {
 	return cmd
 }
 
-
 func GetCmdMultiSendNFT() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "multi-send-nft",
@@ -570,33 +570,33 @@ func GetCmdMultiSendNFT() *cobra.Command {
 				return err
 			}
 
-			nftIdsParam, err := cmd.Flags().GetString(FlagNftIds);
+			nftIdsParam, err := cmd.Flags().GetString(FlagNftIds)
 			if err != nil {
 				return err
 			}
 
-			nftIds := strings.Split(nftIdsParam, ",");
+			nftIds := strings.Split(nftIdsParam, ",")
 
 			receiversParam, err := cmd.Flags().GetString(FlagReceivers)
 			if err != nil {
 				return err
 			}
 
-			receivers := strings.Split(receiversParam, ",");
+			receivers := strings.Split(receiversParam, ",")
 
-			var multiSendOutput []*types.MultiSendNFTOutput;
+			var multiSendOutput []*types.MultiSendNFTOutput
 
 			if len(nftIds) != len(receivers) {
-				return sdkerrors.Wrapf(sdkerrors.ErrIO, "No match of receivers and nfts %s", err)
+				return sdkerrors.Wrapf(errors.ErrIO, "No match of receivers and nfts %s", err)
 			}
 
 			for idx := range nftIds {
 				multiSendOutput = append(multiSendOutput, &types.MultiSendNFTOutput{
 					Receiver: receivers[idx],
-					NftId: nftIds[idx],
+					NftId:    nftIds[idx],
 				})
 			}
-							
+
 			msg := types.NewMsgMultiSendNFT(clientCtx.GetFromAddress(), multiSendOutput)
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -612,7 +612,6 @@ func GetCmdMultiSendNFT() *cobra.Command {
 
 	return cmd
 }
-
 
 func GetCmdBurnNFT() *cobra.Command {
 	cmd := &cobra.Command{
@@ -709,4 +708,3 @@ func collectNftData(cmd *cobra.Command) (types.Metadata, error) {
 		Creators:             creators,
 	}, nil
 }
-

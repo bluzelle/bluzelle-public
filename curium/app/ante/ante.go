@@ -1,6 +1,8 @@
 package ante
 
 import (
+	errors "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -10,7 +12,7 @@ import (
 
 func NewAnteHandler(options appTypes.AnteHandlerOptions) (sdk.AnteHandler, error) {
 	if options.SignModeHandler == nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
+		return nil, errors.Wrap(sdkerrors.ErrTxDecode, "sign mode handler is required for ante builder")
 	}
 
 	var sigGasConsumer = options.SigGasConsumer
@@ -18,7 +20,7 @@ func NewAnteHandler(options appTypes.AnteHandlerOptions) (sdk.AnteHandler, error
 		sigGasConsumer = ante.DefaultSigVerificationGasConsumer
 	}
 
-	minGasPriceCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdk.NewInt(1)))
+	minGasPriceCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdkmath.NewInt(1)))
 
 	anteDecorators := []sdk.AnteDecorator{
 		NewSetUpContextDecorator(options.GasMeterKeeper, options.BankKeeper, options.AccountKeeper, options.TaxKeeper, minGasPriceCoins), // outermost AnteDecorator. SetUpContext must be called first

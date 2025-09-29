@@ -5,7 +5,7 @@ import (
 
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 
-	"github.com/cometbft/cometbft/libs/log"
+	"cosmossdk.io/log"
 
 	storetypes "cosmossdk.io/store/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/curium/types"

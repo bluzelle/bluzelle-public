@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/bluzelle/bluzelle-public/curium/testutil/sample"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -20,7 +20,7 @@ func TestMsgPin_ValidateBasic(t *testing.T) {
 				Creator: "invalid_address",
 				Cid:     "cid",
 			},
-			err: sdkerrors.ErrInvalidAddress,
+			err: errors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
 			msg: MsgPin{

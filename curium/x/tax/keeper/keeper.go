@@ -3,17 +3,18 @@ package keeper
 import (
 	"fmt"
 
+	sdkerrors "cosmossdk.io/errors"
 	taxTypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	bankKeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	paramTypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
+	log "cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
-	log "github.com/cometbft/cometbft/libs/log"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 type Keeper struct {
@@ -47,7 +48,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", taxTypes.ModuleName))
 }
 
-func (k Keeper) GetKVStore(ctx sdk.Context) sdk.KVStore {
+func (k Keeper) GetKVStore(ctx sdk.Context) storetypes.KVStore {
 	return ctx.KVStore(k.storeKey)
 }
 
@@ -90,7 +91,7 @@ func (k Keeper) calculateGasTax(ctx sdk.Context, gasFee sdk.Coins) sdk.Coins {
 func (k Keeper) ChargeTransferTax(ctx sdk.Context, taxPayer sdk.AccAddress, msg sdk.Msg) error {
 	taxPayerAcc := k.AccountKeeper.GetAccount(ctx, taxPayer)
 	if taxPayerAcc == nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrUnknownAddress, "fee payer address: %s does not exist", taxPayer)
+		return sdkerrors.Wrapf(errors.ErrUnknownAddress, "fee payer address: %s does not exist", taxPayer)
 	}
 	transferTaxes, err := k.CalculateTransferTax(ctx, taxPayer, msg)
 	if err != nil {
@@ -144,12 +145,12 @@ func (k Keeper) chargeTax(ctx sdk.Context, taxPayer sdk.AccAddress, taxes sdk.Co
 
 		err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, taxPayer, taxTypes.ModuleName, taxes)
 		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+			return sdkerrors.Wrapf(errors.ErrInsufficientFunds, err.Error())
 		}
 
 		err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx, taxTypes.ModuleName, taxCollector, taxes)
 		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+			return sdkerrors.Wrapf(errors.ErrInsufficientFunds, err.Error())
 		}
 	}
 

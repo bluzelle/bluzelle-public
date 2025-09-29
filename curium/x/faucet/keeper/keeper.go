@@ -6,7 +6,7 @@ import (
 	"github.com/bluzelle/bluzelle-public/curium/x/curium"
 	"github.com/bluzelle/bluzelle-public/curium/x/curium/keeper"
 
-	"github.com/cometbft/cometbft/libs/log"
+	"cosmossdk.io/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 
 	storetypes "cosmossdk.io/store/types"

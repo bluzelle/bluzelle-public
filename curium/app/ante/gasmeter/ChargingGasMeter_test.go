@@ -3,11 +3,13 @@ package gasmeter_test
 import (
 	"testing"
 
+	"cosmossdk.io/math"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
 	"github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
 	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -26,11 +28,13 @@ func TestChargingGasMeter(t *testing.T) {
 	accountKeeper.SetAccount(ctx, acc)
 	bankKeeper := bankkeeper.NewBaseKeeper(
 		app.AppCodec(),
-		app.GetKey(banktypes.StoreKey),
+		runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 		accountKeeper,
 		app.BlockedAddresses(),
-		govAuthAddrStr)
-	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdk.NewInt(2)))
+		govAuthAddrStr,
+		nil,
+	)
+	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, math.NewInt(2)))
 
 	taxKeeper := *taxmodulekeeper.NewKeeper(
 		app.AppCodec(),

@@ -7,7 +7,6 @@ import (
 	faucetsimulation "github.com/bluzelle/bluzelle-public/curium/x/faucet/simulation"
 	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
@@ -59,14 +58,14 @@ func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.LegacyParamChange 
 }
 
 // RegisterStoreDecoder registers a decoder
-func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
+func (am AppModule) RegisterStoreDecoder() {}
 
 // WeightedOperations returns the all the gov module operations with their respective weights.
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
 
 	var weightMsgMint int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgMint, &weightMsgMint, nil,
+	simState.AppParams.GetOrGenerate(opWeightMsgMint, &weightMsgMint, nil,
 		func(_ *rand.Rand) {
 			weightMsgMint = defaultWeightMsgMint
 		},

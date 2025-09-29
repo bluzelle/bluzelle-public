@@ -3,6 +3,7 @@ package ante_test
 import (
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
@@ -12,6 +13,7 @@ import (
 	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkante "github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -30,7 +32,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 	txBuilder.SetGasLimit(20)
 
 	_, _, addr := testdata.KeyTestPubAddr()
-	minGasPriceCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdk.NewInt(1)))
+	minGasPriceCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdkmath.NewInt(1)))
 	gasMeterKeeper := gasmeter.NewGasMeterKeeper()
 
 	t.Run("NewSetUpContextDecorator should return a SetUpContextDecorator", func(t *testing.T) {
@@ -39,11 +41,13 @@ func TestNewSetupContextDecorator(t *testing.T) {
 		accountKeeper.SetAccount(ctx, acc)
 		bankKeeper := bankkeeper.NewBaseKeeper(
 			app.AppCodec(),
-			app.GetKey(banktypes.StoreKey),
+			runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 			accountKeeper,
 			app.BlockedAddresses(),
-			govAuthAddrStr)
-		storeKey := sdk.NewKVStoreKey(taxmoduletypes.StoreKey)
+			govAuthAddrStr,
+			nil,
+		)
+		storeKey := storetypes.NewKVStoreKey(taxmoduletypes.StoreKey)
 		memStoreKey := storetypes.NewMemoryStoreKey(taxmoduletypes.MemStoreKey)
 		paramsSubspace := typesparams.NewSubspace(
 			app.AppCodec(),
@@ -70,10 +74,12 @@ func TestNewSetupContextDecorator(t *testing.T) {
 			accountKeeper.SetAccount(ctx, acc)
 			bankKeeper := bankkeeper.NewBaseKeeper(
 				app.AppCodec(),
-				app.GetKey(banktypes.StoreKey),
+				runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 				accountKeeper,
 				app.BlockedAddresses(),
-				govAuthAddrStr)
+				govAuthAddrStr,
+				nil,
+			)
 			gasMeterCtx, _ := ante.SetGasMeter(ante.SetGasMeterOptions{
 				Simulate:         true,
 				Ctx:              ctx,
@@ -84,7 +90,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				AccountKeeper:    accountKeeper,
 				MinGasPriceCoins: minGasPriceCoins,
 			})
-			require.Equal(t, sdk.NewInfiniteGasMeter(), gasMeterCtx.GasMeter())
+			require.Equal(t, storetypes.NewInfiniteGasMeter(), gasMeterCtx.GasMeter())
 			require.Equal(t, uint64(0), gasMeterCtx.GasMeter().GasConsumed())
 		})
 
@@ -95,10 +101,12 @@ func TestNewSetupContextDecorator(t *testing.T) {
 			accountKeeper.SetAccount(ctx, acc)
 			bankKeeper := bankkeeper.NewBaseKeeper(
 				app.AppCodec(),
-				app.GetKey(banktypes.StoreKey),
+				runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 				accountKeeper,
 				app.BlockedAddresses(),
-				govAuthAddrStr)
+				govAuthAddrStr,
+				nil,
+			)
 
 			taxKeeper := *taxmodulekeeper.NewKeeper(
 				app.AppCodec(),
@@ -124,7 +132,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				MinGasPriceCoins: minGasPriceCoins,
 			})
 			expectedChargingGasMeter := gasmeter.NewChargingGasMeter(bankKeeper, accountKeeper, taxKeeper, testdata.NewTestGasLimit(), addr, minGasPriceCoins)
-			expectedGasMeter := sdk.GasMeter(expectedChargingGasMeter)
+			expectedGasMeter := storetypes.GasMeter(expectedChargingGasMeter)
 			require.EqualValues(t, expectedGasMeter.String(), gasMeterCtx.GasMeter().String())
 		})
 
@@ -135,10 +143,12 @@ func TestNewSetupContextDecorator(t *testing.T) {
 			accountKeeper.SetAccount(ctx, acc)
 			bankKeeper := bankkeeper.NewBaseKeeper(
 				app.AppCodec(),
-				app.GetKey(banktypes.StoreKey),
+				runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 				accountKeeper,
 				app.BlockedAddresses(),
-				govAuthAddrStr)
+				govAuthAddrStr,
+				nil,
+			)
 
 			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(global.Denom, 19))
 			txBuilder.SetFeeAmount(feeAmount)
@@ -168,11 +178,13 @@ func TestNewSetupContextDecorator(t *testing.T) {
 			accountKeeper.SetAccount(ctx, acc)
 			bankKeeper := bankkeeper.NewBaseKeeper(
 				app.AppCodec(),
-				app.GetKey(banktypes.StoreKey),
+				runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 				accountKeeper,
 				app.BlockedAddresses(),
-				govAuthAddrStr)
-			storeKey := sdk.NewKVStoreKey(taxmoduletypes.StoreKey)
+				govAuthAddrStr,
+				nil,
+			)
+			storeKey := storetypes.NewKVStoreKey(taxmoduletypes.StoreKey)
 			memStoreKey := storetypes.NewMemoryStoreKey(taxmoduletypes.MemStoreKey)
 			paramsSubspace := typesparams.NewSubspace(
 				app.AppCodec(),

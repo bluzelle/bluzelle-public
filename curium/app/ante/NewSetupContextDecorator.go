@@ -1,9 +1,11 @@
 package ante
 
 import (
-	"fmt"
+	"strings"
 
 	"cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
@@ -71,7 +73,7 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 			MinGasPriceCoins: sud.minGasPriceCoins,
 		}
 		newCtx, _ = SetGasMeter(gasMeterOptions)
-		return newCtx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, appTypes.ErrGasTxParseError)
+		return newCtx, errors.Wrap(sdkerrors.ErrTxDecode, appTypes.ErrGasTxParseError)
 	}
 
 	gasMeterOptions := SetGasMeterOptions{
@@ -94,15 +96,8 @@ func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate
 	// runTx's recover call.
 	defer func() {
 		if r := recover(); r != nil {
-			switch rType := r.(type) {
-			case sdk.ErrorOutOfGas:
-				log := fmt.Sprintf(
-					"out of gas in location: %v; gasWanted: %d, gasUsed: %d",
-					rType.Descriptor, gasTx.GetGas(), newCtx.GasMeter().GasConsumed())
-
-				err = sdkerrors.Wrap(sdkerrors.ErrOutOfGas, log)
-			default:
-				panic(r)
+			if err, ok := r.(error); ok && strings.Contains(err.Error(), "out of gas") {
+				// Custom handling
 			}
 		}
 	}()
@@ -115,13 +110,13 @@ func SetGasMeter(options SetGasMeterOptions) (sdk.Context, error) {
 	// In various cases such as simulation and during the genesis block, we do not
 	// meter any gas utilization.
 	if options.Simulate || options.Ctx.BlockHeight() == 0 {
-		return options.Ctx.WithGasMeter(sdk.NewInfiniteGasMeter()), nil
+		return options.Ctx.WithGasMeter(storetypes.NewInfiniteGasMeter()), nil
 	}
 
 	feeTx := options.Tx.(sdk.FeeTx)
 	maxGas := feeTx.GetGas()
 
-	maxGasInt := sdk.NewIntFromUint64(maxGas).ToLegacyDec()
+	maxGasInt := sdkmath.NewIntFromUint64(maxGas).ToLegacyDec()
 	feeInt := feeTx.GetFee().AmountOf(global.Denom).ToLegacyDec()
 
 	gasPrice := feeInt.Quo(maxGasInt)

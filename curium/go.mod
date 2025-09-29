@@ -7,6 +7,7 @@ require (
 	cosmossdk.io/store v1.1.1
 	cosmossdk.io/x/evidence v0.1.1
 	cosmossdk.io/x/feegrant v0.1.1
+	cosmossdk.io/x/tx v0.13.7
 	cosmossdk.io/x/upgrade v0.1.4
 	github.com/bluzelle/ipfs-kubo v0.28.1
 	github.com/bufbuild/buf v1.15.1
@@ -43,7 +44,6 @@ require (
 	cloud.google.com/go/auth v0.6.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	cosmossdk.io/collections v0.4.0 // indirect
-	cosmossdk.io/x/tx v0.13.7 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
 	github.com/CosmWasm/wasmd v0.51.0 // indirect
 	github.com/CosmWasm/wasmvm/v2 v2.0.0 // indirect
@@ -140,7 +140,7 @@ require (
 	cosmossdk.io/depinject v1.1.0 // indirect
 	cosmossdk.io/errors v1.0.1
 	cosmossdk.io/log v1.4.1
-	cosmossdk.io/math v1.4.0 // indirect
+	cosmossdk.io/math v1.4.0
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
 	github.com/99designs/keyring v1.2.2 // indirect
