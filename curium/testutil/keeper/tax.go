@@ -3,6 +3,7 @@ package keeper
 import (
 	"testing"
 
+	"cosmossdk.io/log"
 	"cosmossdk.io/store"
 	storetypes "cosmossdk.io/store/types"
 	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
@@ -10,7 +11,6 @@ import (
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	tmdb "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -26,7 +26,7 @@ import (
 func TaxKeeper(t *testing.T) (*keeper.Keeper, sdk.Context) {
 	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
 	govAuthAddrStr := govAuthAddr.String()
-	storeKey := sdk.NewKVStoreKey(types.StoreKey)
+	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
 	db := tmdb.NewMemDB()
@@ -72,7 +72,7 @@ func GetKeepers(t *testing.T) (*keeper.Keeper, bankKeeper.Keeper, acctypes.Accou
 	//storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
 	govAuthAddrStr := govAuthAddr.String()
-	storeKey := sdk.NewKVStoreKey(authtypes.StoreKey)
+	storeKey := storetypes.NewKVStoreKey(authtypes.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
 	db := tmdb.NewMemDB()

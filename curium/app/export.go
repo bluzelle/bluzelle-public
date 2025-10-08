@@ -12,7 +12,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	"github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
@@ -36,7 +35,7 @@ func (app *App) ExportAppStateAndValidators(
 		height = 0
 		app.prepForZeroHeightGenesis(ctx, jailAllowedAddrs)
 	}
-	genState, err := app.mm.ExportGenesisForModules(ctx, app.appCodec, modulesToExport)
+	genState, _ := app.mm.ExportGenesisForModules(ctx, app.appCodec, modulesToExport)
 
 	genState["staking"] = app.appCodec.MustMarshalJSON(ExportStakingGenesis(ctx, *app.StakingKeeper))
 	appState, err := json.MarshalIndent(genState, "", "  ")
@@ -57,7 +56,7 @@ func (app *App) ExportAppStateAndValidators(
 }
 
 func WriteUnjailedValidators(ctx sdk.Context, keeper stakingkeeper.Keeper) (vals []tmtypes.GenesisValidator, err error) {
-	keeper.IterateLastValidators(ctx, func(_ int64, validator types.ValidatorI) (stop bool) {
+	keeper.IterateLastValidators(ctx, func(_ int64, validator stakingtypes.ValidatorI) (stop bool) {
 
 		if validator.IsJailed() {
 			return false
@@ -83,22 +82,22 @@ func WriteUnjailedValidators(ctx sdk.Context, keeper stakingkeeper.Keeper) (vals
 	return
 }
 
-func ExportStakingGenesis(ctx sdk.Context, keeper stakingkeeper.Keeper) *types.GenesisState {
-	var unbondingDelegations []types.UnbondingDelegation
+func ExportStakingGenesis(ctx sdk.Context, keeper stakingkeeper.Keeper) *stakingtypes.GenesisState {
+	var unbondingDelegations []stakingtypes.UnbondingDelegation
 
-	keeper.IterateUnbondingDelegations(ctx, func(_ int64, ubd types.UnbondingDelegation) (stop bool) {
+	keeper.IterateUnbondingDelegations(ctx, func(_ int64, ubd stakingtypes.UnbondingDelegation) (stop bool) {
 		unbondingDelegations = append(unbondingDelegations, ubd)
 		return false
 	})
 
-	var redelegations []types.Redelegation
+	var redelegations []stakingtypes.Redelegation
 
-	keeper.IterateRedelegations(ctx, func(_ int64, red types.Redelegation) (stop bool) {
+	keeper.IterateRedelegations(ctx, func(_ int64, red stakingtypes.Redelegation) (stop bool) {
 		redelegations = append(redelegations, red)
 		return false
 	})
 
-	var lastValidatorPowers []types.LastValidatorPower
+	var lastValidatorPowers []stakingtypes.LastValidatorPower
 	lastPower := math.NewInt(0)
 	keeper.IterateLastValidatorPowers(ctx, func(addr sdk.ValAddress, power int64) (stop bool) {
 		v, _ := keeper.GetValidator(ctx, addr)
@@ -106,7 +105,7 @@ func ExportStakingGenesis(ctx sdk.Context, keeper stakingkeeper.Keeper) *types.G
 			return false
 		}
 		lastPower = lastPower.Add(math.NewIntFromUint64(uint64(power)))
-		lastValidatorPowers = append(lastValidatorPowers, types.LastValidatorPower{Address: addr.String(), Power: power})
+		lastValidatorPowers = append(lastValidatorPowers, stakingtypes.LastValidatorPower{Address: addr.String(), Power: power})
 		return false
 	})
 	keeper.SetLastTotalPower(ctx, lastPower)
@@ -114,7 +113,7 @@ func ExportStakingGenesis(ctx sdk.Context, keeper stakingkeeper.Keeper) *types.G
 	lastTotalPower, _ := keeper.GetLastTotalPower(ctx)
 	validators, _ := keeper.GetAllValidators(ctx)
 	delegations, _ := keeper.GetAllDelegations(ctx)
-	return &types.GenesisState{
+	return &stakingtypes.GenesisState{
 		Params:               params,
 		LastTotalPower:       lastTotalPower,
 		LastValidatorPowers:  lastValidatorPowers,

@@ -23,11 +23,12 @@ func TestGasMeterKeeper(t *testing.T) {
 	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
 	govAuthAddrStr := govAuthAddr.String()
 	app, _, accountKeeper := simapp.CreateTestApp()
+	moduleAccountAddresses := app.ModuleAccountAddrs()
 	bankKeeper := bankkeeper.NewBaseKeeper(
 		app.AppCodec(),
 		runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 		accountKeeper,
-		app.BlockedAddresses(),
+		app.BlockedAddresses(moduleAccountAddresses),
 		govAuthAddrStr,
 		nil,
 	)

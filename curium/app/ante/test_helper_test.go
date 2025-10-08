@@ -49,11 +49,13 @@ func NewAnteHandlerOptions(t *testing.T) *appTypes.AnteHandlerOptions {
 		appCodec, runtime.NewKVStoreService(keys[authtypes.StoreKey]),
 		authtypes.ProtoBaseAccount, maccPerms, ac, bech32Prefix, govAuthAddrStr,
 	)
+	moduleAccountAddresses := app.ModuleAccountAddrs()
+
 	bankKeeper := bankkeeper.NewBaseKeeper(
 		app.AppCodec(),
 		runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 		app.AccountKeeper,
-		app.BlockedAddresses(),
+		app.BlockedAddresses(moduleAccountAddresses),
 		govAuthAddrStr,
 		nil,
 	)

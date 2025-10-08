@@ -23,6 +23,7 @@ func TestChargingGasMeter(t *testing.T) {
 	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
 	govAuthAddrStr := govAuthAddr.String()
 	app, ctx, accountKeeper := simapp.CreateTestApp()
+	moduleAccountAddresses := app.ModuleAccountAddrs()
 	_, _, addr := testdata.KeyTestPubAddr()
 	acc := accountKeeper.NewAccountWithAddress(ctx, addr)
 	accountKeeper.SetAccount(ctx, acc)
@@ -30,7 +31,7 @@ func TestChargingGasMeter(t *testing.T) {
 		app.AppCodec(),
 		runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 		accountKeeper,
-		app.BlockedAddresses(),
+		app.BlockedAddresses(moduleAccountAddresses),
 		govAuthAddrStr,
 		nil,
 	)

@@ -6,7 +6,6 @@ import (
 	"cosmossdk.io/math"
 	"github.com/bluzelle/bluzelle-public/curium/app"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
-	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
 	testkeeper "github.com/bluzelle/bluzelle-public/curium/testutil/keeper"
 	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
 
@@ -51,7 +50,8 @@ func (suite *KeeperTestSuite) SetupTest() {
 	config.SetCoinType(appTypes.CoinType)
 	config.SetBech32PrefixForAccount("bluzelle", "bluzellepub")
 	suite.app, _, _ = testutil.CreateTestApp()
-	suite.legacyAmino = curiumcmd.MakeEncodingConfig(app.ModuleBasics).Amino
+
+	suite.legacyAmino = codec.NewLegacyAmino()
 	suite.NFTKeeper, suite.BankKeeper, suite.AccountKeeper, suite.ctx = testkeeper.NftKeeper(suite.T())
 
 	suite.T().Log("AccountKeeper set up")

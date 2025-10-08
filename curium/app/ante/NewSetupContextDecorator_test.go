@@ -37,13 +37,14 @@ func TestNewSetupContextDecorator(t *testing.T) {
 
 	t.Run("NewSetUpContextDecorator should return a SetUpContextDecorator", func(t *testing.T) {
 		app, ctx, accountKeeper := testutil.CreateTestApp()
+		moduleAccountAddresses := app.ModuleAccountAddrs()
 		acc := accountKeeper.NewAccountWithAddress(ctx, addr)
 		accountKeeper.SetAccount(ctx, acc)
 		bankKeeper := bankkeeper.NewBaseKeeper(
 			app.AppCodec(),
 			runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 			accountKeeper,
-			app.BlockedAddresses(),
+			app.BlockedAddresses(moduleAccountAddresses),
 			govAuthAddrStr,
 			nil,
 		)
@@ -71,12 +72,13 @@ func TestNewSetupContextDecorator(t *testing.T) {
 		t.Run("should returns a new context with a gas meter with 0 consumed gas if block height is 0", func(t *testing.T) {
 			app, ctx, accountKeeper := testutil.CreateTestApp()
 			acc := accountKeeper.NewAccountWithAddress(ctx, addr)
+			moduleAccountAddresses := app.ModuleAccountAddrs()
 			accountKeeper.SetAccount(ctx, acc)
 			bankKeeper := bankkeeper.NewBaseKeeper(
 				app.AppCodec(),
 				runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 				accountKeeper,
-				app.BlockedAddresses(),
+				app.BlockedAddresses(moduleAccountAddresses),
 				govAuthAddrStr,
 				nil,
 			)
@@ -96,6 +98,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 
 		t.Run("should returns a new context with a charging gas meter", func(t *testing.T) {
 			app, ctx, accountKeeper := testutil.CreateTestApp()
+			moduleAccountAddresses := app.ModuleAccountAddrs()
 			ctx = ctx.WithBlockHeight(ctx.BlockHeight() + 1)
 			acc := accountKeeper.NewAccountWithAddress(ctx, addr)
 			accountKeeper.SetAccount(ctx, acc)
@@ -103,7 +106,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				app.AppCodec(),
 				runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 				accountKeeper,
-				app.BlockedAddresses(),
+				app.BlockedAddresses(moduleAccountAddresses),
 				govAuthAddrStr,
 				nil,
 			)
@@ -138,6 +141,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 
 		t.Run("should return error message if gas price is too low", func(t *testing.T) {
 			app, ctx, accountKeeper := testutil.CreateTestApp()
+			moduleAccountAddresses := app.ModuleAccountAddrs()
 			ctx = ctx.WithBlockHeight(ctx.BlockHeight() + 1)
 			acc := accountKeeper.NewAccountWithAddress(ctx, addr)
 			accountKeeper.SetAccount(ctx, acc)
@@ -145,7 +149,7 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				app.AppCodec(),
 				runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 				accountKeeper,
-				app.BlockedAddresses(),
+				app.BlockedAddresses(moduleAccountAddresses),
 				govAuthAddrStr,
 				nil,
 			)
@@ -174,13 +178,14 @@ func TestNewSetupContextDecorator(t *testing.T) {
 
 		t.Run("should return context with a gas meter", func(t *testing.T) {
 			app, ctx, accountKeeper := testutil.CreateTestApp()
+			moduleAccountAddresses := app.ModuleAccountAddrs()
 			acc := accountKeeper.NewAccountWithAddress(ctx, addr)
 			accountKeeper.SetAccount(ctx, acc)
 			bankKeeper := bankkeeper.NewBaseKeeper(
 				app.AppCodec(),
 				runtime.NewKVStoreService(app.GetKey(banktypes.StoreKey)),
 				accountKeeper,
-				app.BlockedAddresses(),
+				app.BlockedAddresses(moduleAccountAddresses),
 				govAuthAddrStr,
 				nil,
 			)

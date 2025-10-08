@@ -4,16 +4,19 @@ import (
 	"github.com/gogo/protobuf/proto"
 
 	sdkerrors "cosmossdk.io/errors"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/tx"
+	protov2 "google.golang.org/protobuf/proto"
 )
 
 // wrapper is a wrapper around the tx.Tx proto.Message which retain the raw
@@ -28,8 +31,6 @@ type wrapper struct {
 	// authInfoBz represents the protobuf encoding of TxBody. This should be encoding
 	// from the client using TxRaw if the tx was decoded from the wire
 	authInfoBz []byte
-
-	txBodyHasUnknownNonCriticals bool
 }
 
 var (
@@ -60,6 +61,10 @@ func NewBuilder() *wrapper {
 
 func (w *wrapper) GetMsgs() []sdk.Msg {
 	return w.tx.GetMsgs()
+}
+
+func (w *wrapper) GetMsgsV2() ([]protov2.Message, error) {
+	return []protov2.Message{}, nil // this is a hack for tests
 }
 
 func (w *wrapper) ValidateBasic() error {
@@ -101,47 +106,47 @@ func (w *wrapper) AddAuxSignerData(data tx.AuxSignerData) error {
 	}
 
 	if w.tx.Body.Memo != "" && w.tx.Body.Memo != body.Memo {
-		return sdkerrors.ErrInvalidRequest.Wrapf("TxBuilder has memo %s, got %s in AuxSignerData", w.tx.Body.Memo, body.Memo)
+		return errors.ErrInvalidRequest.Wrapf("TxBuilder has memo %s, got %s in AuxSignerData", w.tx.Body.Memo, body.Memo)
 	}
 	if w.tx.Body.TimeoutHeight != 0 && w.tx.Body.TimeoutHeight != body.TimeoutHeight {
-		return sdkerrors.ErrInvalidRequest.Wrapf("TxBuilder has timeout height %d, got %d in AuxSignerData", w.tx.Body.TimeoutHeight, body.TimeoutHeight)
+		return errors.ErrInvalidRequest.Wrapf("TxBuilder has timeout height %d, got %d in AuxSignerData", w.tx.Body.TimeoutHeight, body.TimeoutHeight)
 	}
 	if len(w.tx.Body.ExtensionOptions) != 0 {
 		if len(w.tx.Body.ExtensionOptions) != len(body.ExtensionOptions) {
-			return sdkerrors.ErrInvalidRequest.Wrapf("TxBuilder has %d extension options, got %d in AuxSignerData", len(w.tx.Body.ExtensionOptions), len(body.ExtensionOptions))
+			return errors.ErrInvalidRequest.Wrapf("TxBuilder has %d extension options, got %d in AuxSignerData", len(w.tx.Body.ExtensionOptions), len(body.ExtensionOptions))
 		}
 		for i, o := range w.tx.Body.ExtensionOptions {
 			if !o.Equal(body.ExtensionOptions[i]) {
-				return sdkerrors.ErrInvalidRequest.Wrapf("TxBuilder has extension option %+v at index %d, got %+v in AuxSignerData", o, i, body.ExtensionOptions[i])
+				return errors.ErrInvalidRequest.Wrapf("TxBuilder has extension option %+v at index %d, got %+v in AuxSignerData", o, i, body.ExtensionOptions[i])
 			}
 		}
 	}
 	if len(w.tx.Body.NonCriticalExtensionOptions) != 0 {
 		if len(w.tx.Body.NonCriticalExtensionOptions) != len(body.NonCriticalExtensionOptions) {
-			return sdkerrors.ErrInvalidRequest.Wrapf("TxBuilder has %d non-critical extension options, got %d in AuxSignerData", len(w.tx.Body.NonCriticalExtensionOptions), len(body.NonCriticalExtensionOptions))
+			return errors.ErrInvalidRequest.Wrapf("TxBuilder has %d non-critical extension options, got %d in AuxSignerData", len(w.tx.Body.NonCriticalExtensionOptions), len(body.NonCriticalExtensionOptions))
 		}
 		for i, o := range w.tx.Body.NonCriticalExtensionOptions {
 			if !o.Equal(body.NonCriticalExtensionOptions[i]) {
-				return sdkerrors.ErrInvalidRequest.Wrapf("TxBuilder has non-critical extension option %+v at index %d, got %+v in AuxSignerData", o, i, body.NonCriticalExtensionOptions[i])
+				return errors.ErrInvalidRequest.Wrapf("TxBuilder has non-critical extension option %+v at index %d, got %+v in AuxSignerData", o, i, body.NonCriticalExtensionOptions[i])
 			}
 		}
 	}
 	if len(w.tx.Body.Messages) != 0 {
 		if len(w.tx.Body.Messages) != len(body.Messages) {
-			return sdkerrors.ErrInvalidRequest.Wrapf("TxBuilder has %d Msgs, got %d in AuxSignerData", len(w.tx.Body.Messages), len(body.Messages))
+			return errors.ErrInvalidRequest.Wrapf("TxBuilder has %d Msgs, got %d in AuxSignerData", len(w.tx.Body.Messages), len(body.Messages))
 		}
 		for i, o := range w.tx.Body.Messages {
 			if !o.Equal(body.Messages[i]) {
-				return sdkerrors.ErrInvalidRequest.Wrapf("TxBuilder has Msg %+v at index %d, got %+v in AuxSignerData", o, i, body.Messages[i])
+				return errors.ErrInvalidRequest.Wrapf("TxBuilder has Msg %+v at index %d, got %+v in AuxSignerData", o, i, body.Messages[i])
 			}
 		}
 	}
 	if w.tx.AuthInfo.Tip != nil && data.SignDoc.Tip != nil {
-		if !w.tx.AuthInfo.Tip.Amount.IsEqual(data.SignDoc.Tip.Amount) {
-			return sdkerrors.ErrInvalidRequest.Wrapf("TxBuilder has tip %+v, got %+v in AuxSignerData", w.tx.AuthInfo.Tip.Amount, data.SignDoc.Tip.Amount)
+		if !w.tx.AuthInfo.Tip.Amount.Equal(data.SignDoc.Tip.Amount) {
+			return errors.ErrInvalidRequest.Wrapf("TxBuilder has tip %+v, got %+v in AuxSignerData", w.tx.AuthInfo.Tip.Amount, data.SignDoc.Tip.Amount)
 		}
 		if w.tx.AuthInfo.Tip.Tipper != data.SignDoc.Tip.Tipper {
-			return sdkerrors.ErrInvalidRequest.Wrapf("TxBuilder has tipper %s, got %s in AuxSignerData", w.tx.AuthInfo.Tip.Tipper, data.SignDoc.Tip.Tipper)
+			return errors.ErrInvalidRequest.Wrapf("TxBuilder has tipper %s, got %s in AuxSignerData", w.tx.AuthInfo.Tip.Tipper, data.SignDoc.Tip.Tipper)
 		}
 	}
 
@@ -158,13 +163,14 @@ func (w *wrapper) AddAuxSignerData(data tx.AuxSignerData) error {
 
 	// Get the aux signer's index in GetSigners.
 	signerIndex := -1
-	for i, signer := range w.GetSigners() {
-		if signer.String() == data.Address {
+	signers, _ := w.GetSigners()
+	for i, signer := range signers {
+		if string(signer) == data.Address {
 			signerIndex = i
 		}
 	}
 	if signerIndex < 0 {
-		return sdkerrors.ErrLogic.Wrapf("address %s is not a signer", data.Address)
+		return errors.ErrLogic.Wrapf("address %s is not a signer", data.Address)
 	}
 
 	w.setSignerInfoAtIndex(signerIndex, &tx.SignerInfo{
@@ -179,7 +185,9 @@ func (w *wrapper) AddAuxSignerData(data tx.AuxSignerData) error {
 
 func (w *wrapper) setSignerInfoAtIndex(index int, info *tx.SignerInfo) {
 	if w.tx.AuthInfo.SignerInfos == nil {
-		w.tx.AuthInfo.SignerInfos = make([]*tx.SignerInfo, len(w.GetSigners()))
+		signers, _ := w.GetSigners()
+
+		w.tx.AuthInfo.SignerInfos = make([]*tx.SignerInfo, len(signers))
 	}
 
 	w.tx.AuthInfo.SignerInfos[index] = info
@@ -189,7 +197,9 @@ func (w *wrapper) setSignerInfoAtIndex(index int, info *tx.SignerInfo) {
 
 func (w *wrapper) setSignatureAtIndex(index int, sig []byte) {
 	if w.tx.Signatures == nil {
-		w.tx.Signatures = make([][]byte, len(w.GetSigners()))
+		signers, _ := w.GetSigners()
+
+		w.tx.Signatures = make([][]byte, len(signers))
 	}
 
 	w.tx.Signatures[index] = sig
@@ -218,8 +228,9 @@ func (w *wrapper) getAuthInfoBytes() []byte {
 	return w.authInfoBz
 }
 
-func (w *wrapper) GetSigners() []sdk.AccAddress {
-	return w.tx.GetSigners()
+func (w *wrapper) GetSigners() ([][]byte, error) {
+	signers, _, _ := w.tx.GetSigners(w.cdc)
+	return signers, nil
 }
 
 func (w *wrapper) GetPubKeys() ([]cryptotypes.PubKey, error) {
@@ -238,7 +249,7 @@ func (w *wrapper) GetPubKeys() ([]cryptotypes.PubKey, error) {
 		if ok {
 			pks[i] = pk
 		} else {
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrLogic, "Expecting PubKey, got: %T", pkAny)
+			return nil, sdkerrors.Wrapf(errors.ErrLogic, "Expecting PubKey, got: %T", pkAny)
 		}
 	}
 
@@ -253,7 +264,7 @@ func (w *wrapper) GetFee() sdk.Coins {
 	return w.tx.AuthInfo.Fee.Amount
 }
 
-func (w *wrapper) FeePayer() sdk.AccAddress {
+func (w *wrapper) FeePayer() []byte {
 	feePayer := w.tx.AuthInfo.Fee.Payer
 	if feePayer != "" {
 		payerAddr, err := sdk.AccAddressFromBech32(feePayer)
@@ -263,10 +274,12 @@ func (w *wrapper) FeePayer() sdk.AccAddress {
 		return payerAddr
 	}
 	// use first signer as default if no payer specified
-	return w.GetSigners()[0]
+	signers, _ := w.GetSigners()
+
+	return signers[0]
 }
 
-func (w *wrapper) FeeGranter() sdk.AccAddress {
+func (w *wrapper) FeeGranter() []byte {
 	feePayer := w.tx.AuthInfo.Fee.Granter
 	if feePayer != "" {
 		granterAddr, err := sdk.AccAddressFromBech32(feePayer)

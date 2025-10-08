@@ -3,12 +3,12 @@ package keeper
 import (
 	"testing"
 
+	"cosmossdk.io/log"
 	"cosmossdk.io/store"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/storage/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/storage/types"
 	tmdb "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -17,7 +17,7 @@ import (
 )
 
 func StorageKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
-	storeKey := sdk.NewKVStoreKey(types.StoreKey)
+	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
 	db := tmdb.NewMemDB()

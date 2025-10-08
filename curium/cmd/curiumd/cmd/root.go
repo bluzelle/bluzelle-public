@@ -2,25 +2,35 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
+	"cosmossdk.io/client/v2/autocli"
+
+	"cosmossdk.io/log"
 	"cosmossdk.io/store"
+	"cosmossdk.io/store/snapshots"
+	snapshottypes "cosmossdk.io/store/snapshots/types"
+	storetypes "cosmossdk.io/store/types"
+	confixcmd "cosmossdk.io/tools/confix/cmd"
 	"github.com/bluzelle/bluzelle-public/curium/app"
-	"github.com/bluzelle/bluzelle-public/curium/app/params"
-	dbm "github.com/cometbft/cometbft-db"
 	tmcfg "github.com/cometbft/cometbft/config"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
-	"github.com/cometbft/cometbft/libs/log"
 	tmtypes "github.com/cometbft/cometbft/types"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
-	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/keys"
+	"github.com/cosmos/cosmos-sdk/client/pruning"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
+	"github.com/cosmos/cosmos-sdk/client/snapshot"
+	"github.com/cosmos/cosmos-sdk/codec"
+	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -28,51 +38,17 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
-	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 type (
-	// AppBuilder is a method that allows to build an app
-	// AppBuilder func(
-	// 	logger log.Logger,
-	// 	db dbm.DB,
-	// 	traceStore io.Writer,
-	// 	loadLatest bool,
-	// 	skipUpgradeHeights map[int64]bool,
-	// 	homePath string,
-	// 	invCheckPeriod uint,
-	// 	encodingConfig EncodingConfig,
-	// 	appOpts servertypes.AppOptions,
-	// 	baseAppOptions ...func(*baseapp.BaseApp),
-	// ) App
-
-	// // App represents a Cosmos SDK application that can be run as a server and with an exportable state
-	// App interface {
-	// 	servertypes.Application
-	// 	ExportableApp
-	// }
-
-	// // ExportableApp represents an app with an exportable state
-	// ExportableApp interface {
-	// 	ExportAppStateAndValidators(
-	// 		forZeroHeight bool,
-	// 		jailAllowedAddrs []string,
-	// 		modulesToExport []string,
-	// 	) (servertypes.ExportedApp, error)
-	// 	LoadHeight(height int64) error
-	// }
-
 	// appCreator is an app creator
-	appCreator struct {
-		encodingConfig params.EncodingConfig
-	}
+	appCreator struct{}
 )
 
 // Option configures root command option.
@@ -111,31 +87,41 @@ func CustomizeStartCmd(h func(startCmd *cobra.Command)) Option {
 }
 
 // NewRootCmd creates a new root command for a Cosmos SDK application
-func NewRootCmd(
-	appName,
-	accountAddressPrefix,
-	defaultNodeHome,
-	defaultChainID string,
-	moduleBasics module.BasicManager,
-	options ...Option,
-) (*cobra.Command, params.EncodingConfig) {
-	rootOptions := newRootOptions(options...)
-
+func NewRootCmd() *cobra.Command {
+	initAppOptions := viper.New()
+	tempDir := tempDir()
+	initAppOptions.Set(flags.FlagHome, tempDir)
+	tempApplication := app.New(
+		log.NewNopLogger(),
+		dbm.NewMemDB(),
+		nil,
+		true,
+		map[int64]bool{},
+		tempDir,
+		false,
+		initAppOptions,
+	)
+	defer func() {
+		if err := tempApplication.Close(); err != nil {
+			panic(err)
+		}
+		if tempDir != app.DefaultNodeHome {
+			os.RemoveAll(tempDir)
+		}
+	}()
 	// Set config for prefixes
-	encodingConfig := MakeEncodingConfig(moduleBasics)
 	initClientCtx := client.Context{}.
-		WithCodec(encodingConfig.Marshaler).
-		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
-		WithTxConfig(encodingConfig.TxConfig).
-		WithLegacyAmino(encodingConfig.Amino).
+		WithCodec(tempApplication.AppCodec()).
+		WithInterfaceRegistry(tempApplication.InterfaceRegistry()).
+		WithLegacyAmino(tempApplication.LegacyAmino()).
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.FlagBroadcastMode).
-		WithHomeDir(defaultNodeHome).
+		WithHomeDir(app.DefaultNodeHome).
 		WithViper("")
 
 	rootCmd := &cobra.Command{
-		Use:   appName + "d",
+		Use:   "curiumd",
 		Short: "Stargate CosmosHub App",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			initClientCtx, err := client.ReadPersistentCommandFlags(initClientCtx, cmd.Flags())
@@ -157,81 +143,73 @@ func NewRootCmd(
 		},
 	}
 
-	initRootCmd(
-		rootCmd,
-		encodingConfig,
-		defaultNodeHome,
-		moduleBasics,
-		rootOptions,
-	)
-	overwriteFlagDefaults(rootCmd, map[string]string{
-		flags.FlagChainID:        defaultChainID,
-		flags.FlagKeyringBackend: "test",
-	})
+	initRootCmd(rootCmd, tempApplication.ModuleBasics, tempApplication.AppCodec(), tempApplication.InterfaceRegistry(), tempApplication.GetTxConfig())
 
-	return rootCmd, encodingConfig
+	autoCliOpts := enrichAutoCliOpts(tempApplication.AutoCliOpts(), initClientCtx)
+	if err := autoCliOpts.EnhanceRootCommand(rootCmd); err != nil {
+		panic(err)
+	}
+
+	// overwriteFlagDefaults(rootCmd, map[string]string{
+	// 	flags.FlagChainID:        defaultChainID,
+	// 	flags.FlagKeyringBackend: "test",
+	// })
+
+	return rootCmd
 }
 
 func initRootCmd(
 	rootCmd *cobra.Command,
-	encodingConfig params.EncodingConfig,
-	defaultNodeHome string,
-	moduleBasics module.BasicManager,
-	options rootOptions,
+	basicManager module.BasicManager,
+	cdc codec.Codec,
+	interfaceRegistry codectypes.InterfaceRegistry,
+	txConfig client.TxConfig,
 ) {
-	gentxModule := app.ModuleBasics[genutiltypes.ModuleName].(genutil.AppModuleBasic)
-	rootCmd.AddCommand(
-		genutilcli.InitCmd(moduleBasics, defaultNodeHome),
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, defaultNodeHome, gentxModule.GenTxValidator),
-		genutilcli.MigrateGenesisCmd(),
-		genutilcli.GenTxCmd(
-			moduleBasics,
-			encodingConfig.TxConfig,
-			banktypes.GenesisBalancesIterator{},
-			defaultNodeHome,
-		),
-		genutilcli.ValidateGenesisCmd(moduleBasics),
-		AddGenesisAccountCmd(defaultNodeHome),
-		tmcli.NewCompletionCmd(rootCmd, true),
-		debug.Cmd(),
-		config.Cmd(),
-	)
+	cfg := sdk.GetConfig()
+	cfg.Seal()
 
-	a := appCreator{
-		encodingConfig,
-	}
+	ac := appCreator{}
+	rootCmd.AddCommand(
+		genutilcli.InitCmd(basicManager, app.DefaultNodeHome),
+		tmcli.NewCompletionCmd(rootCmd, true),
+		// addDebugCommands(debug.Cmd()),
+		// addDebugCommands(debug.Cmd()),
+		confixcmd.ConfigCommand(),
+		pruning.Cmd(ac.newApp, app.DefaultNodeHome),
+		snapshot.Cmd(ac.newApp),
+	)
 
 	// add server commands
 	server.AddCommands(
 		rootCmd,
-		defaultNodeHome,
-		a.newApp,
-		a.appExport,
+		app.DefaultNodeHome,
+		ac.newApp,
+		ac.appExport,
 		func(cmd *cobra.Command) {
 			addModuleInitFlags(cmd)
-
-			if options.startCmdCustomizer != nil {
-				options.startCmdCustomizer(cmd)
-			}
+			// if options.startCmdCustomizer != nil {
+			// 	options.startCmdCustomizer(cmd)
+			// }
 		},
 	)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
-		rpc.StatusCommand(),
-		queryCommand(moduleBasics),
-		txCommand(moduleBasics),
-		keys.Commands(defaultNodeHome),
+		server.StatusCommand(),
+		genesisCommand(txConfig, basicManager),
+		queryCommand(),
+		txCommand(basicManager),
+		keys.Commands(),
 	)
 
 	// add user given sub commands.
-	for _, cmd := range options.addSubCmds {
-		rootCmd.AddCommand(cmd)
-	}
+	// for _, cmd := range options.addSubCmds {
+	// 	rootCmd.AddCommand(cmd)
+	// }
 }
 
 // queryCommand returns the sub-command to send queries to the app
-func queryCommand(moduleBasics module.BasicManager) *cobra.Command {
+func queryCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "query",
 		Aliases:                    []string{"q"},
@@ -242,14 +220,14 @@ func queryCommand(moduleBasics module.BasicManager) *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		authcmd.GetAccountCmd(),
 		rpc.ValidatorCommand(),
-		rpc.BlockCommand(),
+		server.QueryBlocksCmd(),
+		server.QueryBlockCmd(),
+		server.QueryBlockResultsCmd(),
 		authcmd.QueryTxsByEventsCmd(),
 		authcmd.QueryTxCmd(),
 	)
 
-	moduleBasics.AddQueryCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 
 	return cmd
@@ -269,6 +247,7 @@ func txCommand(moduleBasics module.BasicManager) *cobra.Command {
 		authcmd.GetSignCommand(),
 		authcmd.GetSignBatchCommand(),
 		authcmd.GetMultiSignCommand(),
+		authcmd.GetMultiSignBatchCmd(),
 		authcmd.GetValidateSignaturesCommand(),
 		flags.LineBreak,
 		authcmd.GetBroadcastCommand(),
@@ -309,7 +288,7 @@ func (a appCreator) newApp(
 	traceStore io.Writer,
 	appOpts servertypes.AppOptions,
 ) servertypes.Application {
-	var cache sdk.MultiStorePersistentCache
+	var cache storetypes.MultiStorePersistentCache
 
 	if cast.ToBool(appOpts.Get(server.FlagInterBlockCache)) {
 		cache = store.NewCommitKVStoreCacheManager()
@@ -337,6 +316,35 @@ func (a appCreator) newApp(
 		chainID = appGenesis.ChainID
 	}
 
+	snapshotDir := filepath.Join(homeDir, "data", "snapshots")
+	snapshotDB, err := dbm.NewDB("metadata", server.GetAppDBBackend(appOpts), snapshotDir)
+	if err != nil {
+		panic(err)
+	}
+	snapshotStore, err := snapshots.NewStore(snapshotDB, snapshotDir)
+	if err != nil {
+		panic(err)
+	}
+
+	// BaseApp Opts
+	snapshotOptions := snapshottypes.NewSnapshotOptions(
+		cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotInterval)),
+		cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent)),
+	)
+
+	baseappOptions := []func(*baseapp.BaseApp){
+		baseapp.SetChainID(chainID),
+		baseapp.SetPruning(pruningOpts),
+		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
+		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
+		baseapp.SetHaltTime(cast.ToUint64(appOpts.Get(server.FlagHaltTime))),
+		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
+		baseapp.SetInterBlockCache(cache),
+		baseapp.SetTrace(cast.ToBool(appOpts.Get(server.FlagTrace))),
+		baseapp.SetIndexEvents(cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents))),
+		baseapp.SetSnapshot(snapshotStore, snapshotOptions),
+		baseapp.SetIAVLCacheSize(cast.ToInt(appOpts.Get(server.FlagIAVLCacheSize))),
+	}
 	return app.New(
 		logger,
 		db,
@@ -344,18 +352,9 @@ func (a appCreator) newApp(
 		true,
 		skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
-		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		a.encodingConfig,
+		true,
 		appOpts,
-		baseapp.SetChainID(chainID),
-		baseapp.SetPruning(pruningOpts),
-		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
-		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
-		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
-		baseapp.SetHaltTime(cast.ToUint64(appOpts.Get(server.FlagHaltTime))),
-		baseapp.SetInterBlockCache(cache),
-		baseapp.SetTrace(cast.ToBool(appOpts.Get(server.FlagTrace))),
-		baseapp.SetIndexEvents(cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents))),
+		baseappOptions...,
 	)
 }
 
@@ -376,15 +375,26 @@ func (a appCreator) appExport(
 		return servertypes.ExportedApp{}, errors.New("application home not set")
 	}
 
+	viperAppOpts, ok := appOpts.(*viper.Viper)
+
+	if !ok {
+		return servertypes.ExportedApp{}, errors.New("appOpts is not viper.Viper")
+	}
+	viperAppOpts.Set(server.FlagInvCheckPeriod, 1)
+	appOpts = viperAppOpts
+
+	var loadLatest bool
+	if height == -1 {
+		loadLatest = true
+	}
 	curiumApp = app.New(
 		logger,
 		db,
 		traceStore,
-		height == -1, // -1: no height provided
+		loadLatest, // -1: no height provided
 		map[int64]bool{},
 		homePath,
-		uint(1),
-		a.encodingConfig,
+		true,
 		appOpts,
 	)
 
@@ -451,4 +461,34 @@ query_gas_limit = 300000
 lru_size = 0`
 
 	return customAppTemplate, customAppConfig
+}
+
+// genesisCommand builds genesis-related `simd genesis` command. Users may provide application specific commands as a parameter
+func genesisCommand(txConfig client.TxConfig, basicManager module.BasicManager, cmds ...*cobra.Command) *cobra.Command {
+	cmd := genutilcli.GenesisCoreCommand(txConfig, basicManager, app.DefaultNodeHome)
+
+	for _, subCmd := range cmds {
+		cmd.AddCommand(subCmd)
+	}
+	return cmd
+}
+
+var tempDir = func() string {
+	dir, err := os.MkdirTemp("", ".curium")
+	if err != nil {
+		panic(fmt.Sprintf("failed creating temp directory: %s", err.Error()))
+	}
+	defer os.RemoveAll(dir)
+
+	return dir
+}
+
+func enrichAutoCliOpts(autoCliOpts autocli.AppOptions, clientCtx client.Context) autocli.AppOptions {
+	autoCliOpts.AddressCodec = addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix())
+	autoCliOpts.ValidatorAddressCodec = addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix())
+	autoCliOpts.ConsensusAddressCodec = addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix())
+
+	autoCliOpts.ClientCtx = clientCtx
+
+	return autoCliOpts
 }

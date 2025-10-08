@@ -24,13 +24,7 @@ func main() {
 	config.SetCoinType(appTypes.CoinType)
 	config.SetBech32PrefixForAccount("bluzelle", "bluzellepub")
 
-	rootCmd, _ := curiumcmd.NewRootCmd(
-		appTypes.Name,
-		appTypes.AccountAddressPrefix,
-		app.DefaultNodeHome,
-		appTypes.Name,
-		app.ModuleBasics,
-	)
+	rootCmd := curiumcmd.NewRootCmd()
 
 	if err := svrcmd.Execute(rootCmd, "curiumd", app.DefaultNodeHome); err != nil {
 

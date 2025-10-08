@@ -1,12 +1,9 @@
 package app
 
 import (
-	"encoding/json"
 	"time"
 
 	"cosmossdk.io/log"
-	curiumparams "github.com/bluzelle/bluzelle-public/curium/app/params"
-	abci "github.com/cometbft/cometbft/abci/types"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 	dbm "github.com/cosmos/cosmos-db"
@@ -37,22 +34,22 @@ func (TestAppOptions) Get(_ string) interface{} { return "test" }
 
 func Setup(isCheckTx bool) *App {
 	db := dbm.NewMemDB()
-	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, curiumparams.MakeEncodingConfig(ModuleBasics), TestAppOptions{}, baseapp.SetChainID("testing"))
-	if !isCheckTx {
-		genesisState := NewDefaultGenesisState(curiumparams.MakeTestEncodingConfig().Marshaler)
-		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
-		if err != nil {
-			panic(err)
-		}
+	app := NewCuriumApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, true, TestAppOptions{}, baseapp.SetChainID("testing"))
+	// if !isCheckTx {
+	// 	genesisState := NewDefaultGenesisState(curiumparams.MakeTestEncodingConfig().Marshaler)
+	// 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
 
-		app.InitChain(
-			&abci.RequestInitChain{
-				Validators:      []abci.ValidatorUpdate{},
-				ConsensusParams: DefaultConsensusParams,
-				AppStateBytes:   stateBytes,
-			},
-		)
-	}
+	// 	app.InitChain(
+	// 		&abci.RequestInitChain{
+	// 			Validators:      []abci.ValidatorUpdate{},
+	// 			ConsensusParams: DefaultConsensusParams,
+	// 			AppStateBytes:   stateBytes,
+	// 		},
+	// 	)
+	// }
 
 	return app
 }

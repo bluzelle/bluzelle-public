@@ -5,12 +5,12 @@ import (
 
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 
+	"cosmossdk.io/log"
 	"cosmossdk.io/store"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/curium/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/curium/types"
 	tmdb "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -19,11 +19,11 @@ import (
 )
 
 func CuriumKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
-	storeKey := storetyp.NewKVStoreKey(types.StoreKey)
+	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
 	db := tmdb.NewMemDB()
-	stateStore := store.NewCommitMultiStore(db)
+	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), nil)
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
 	stateStore.MountStoreWithDB(memStoreKey, storetypes.StoreTypeMemory, nil)
 	require.NoError(t, stateStore.LoadLatestVersion())

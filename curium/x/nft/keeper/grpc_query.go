@@ -52,9 +52,6 @@ func (k Keeper) NFTsByOwner(c context.Context, req *types.QueryNFTsByOwnerReques
 	}
 
 	nfts := k.GetNFTsByOwner(ctx, owner)
-	if err != nil {
-		return nil, err
-	}
 
 	metadata := []types.Metadata{}
 	for _, nft := range nfts {

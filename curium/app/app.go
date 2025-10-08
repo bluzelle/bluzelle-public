@@ -2,31 +2,28 @@ package app
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
+	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
+
+	"cosmossdk.io/client/v2/autocli"
+	"cosmossdk.io/core/appmodule"
 	tmlog "cosmossdk.io/log"
-	"cosmossdk.io/x/evidence"
-	evidencekeeper "cosmossdk.io/x/evidence/keeper"
-	evidencetypes "cosmossdk.io/x/evidence/types"
-	"cosmossdk.io/x/feegrant"
-	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
-	feegrantmodule "cosmossdk.io/x/feegrant/module"
+	"cosmossdk.io/x/tx/signing"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	appAnte "github.com/bluzelle/bluzelle-public/curium/app/ante"
-	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
-	curiumparams "github.com/bluzelle/bluzelle-public/curium/app/params"
+	appkeepers "github.com/bluzelle/bluzelle-public/curium/app/keepers"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
-	curiumipfs "github.com/bluzelle/bluzelle-public/curium/x/storage-ipfs/ipfs"
-	ipfsConfig "github.com/bluzelle/ipfs-kubo/config"
+	abci "github.com/cometbft/cometbft/abci/types"
+	tmos "github.com/cometbft/cometbft/libs/os"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
@@ -36,50 +33,17 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
-	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
-	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
-	"github.com/cosmos/cosmos-sdk/x/authz"
-	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
-	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
-	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	"github.com/cosmos/cosmos-sdk/x/genutil"
-	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
-	"github.com/cosmos/cosmos-sdk/x/gov"
-	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
-	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	"github.com/cosmos/cosmos-sdk/x/mint"
-	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/ibc-go/modules/capability"
-	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
-	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-
-	"cosmossdk.io/x/upgrade"
-	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
-	upgradetypes "cosmossdk.io/x/upgrade/types"
-	abci "github.com/cometbft/cometbft/abci/types"
-	tmos "github.com/cometbft/cometbft/libs/os"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
-	"github.com/cosmos/cosmos-sdk/x/staking"
-	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/cosmos/gogoproto/proto"
 	"github.com/spf13/cast"
 
 	"github.com/bluzelle/bluzelle-public/curium/app/openapiconsole"
@@ -87,32 +51,15 @@ import (
 	"github.com/bluzelle/bluzelle-public/curium/docs"
 
 	storetypes "cosmossdk.io/store/types"
-	curiummodule "github.com/bluzelle/bluzelle-public/curium/x/curium"
-	curiummodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/curium/keeper"
-	curiummoduletypes "github.com/bluzelle/bluzelle-public/curium/x/curium/types"
-	faucetmodule "github.com/bluzelle/bluzelle-public/curium/x/faucet"
-	faucetmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/faucet/keeper"
 	faucetmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
-	nftmodule "github.com/bluzelle/bluzelle-public/curium/x/nft"
-	nftkeeper "github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
-	storagemodule "github.com/bluzelle/bluzelle-public/curium/x/storage"
-	storagemodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/storage/keeper"
-	storagemoduletypes "github.com/bluzelle/bluzelle-public/curium/x/storage/types"
-	taxmodule "github.com/bluzelle/bluzelle-public/curium/x/tax"
-	taxmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
-	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 
-	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-
-	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
 	tmservice "github.com/cosmos/cosmos-sdk/client/grpc/cmtservice"
 	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
@@ -121,9 +68,7 @@ import (
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	runtimeservices "github.com/cosmos/cosmos-sdk/runtime/services"
-	"github.com/cosmos/cosmos-sdk/x/consensus"
 	consensusparamkeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
-	consensusparamtypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 
 	// ica "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts"
 	// icacontrollerkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/keeper"
@@ -132,21 +77,16 @@ import (
 	// icahostkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/keeper"
 	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
 	// icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
-	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/v8/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/v8/modules/core/02-client"
-	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
-	ibcporttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
-	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
-	solomachine "github.com/cosmos/ibc-go/v8/modules/light-clients/06-solomachine"
-	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 
-	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/keeper"
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+
+	"github.com/cosmos/cosmos-sdk/server"
+	sigtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
+	txmodule "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8"
+	// providertypes "github.com/cosmos/interchain-security/v7/x/ccv/provider/types"
 )
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
@@ -174,52 +114,38 @@ var (
 	// ModuleBasics defines the module BasicManager is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
 	// and genesis verification.
-	ModuleBasics = module.NewBasicManager(
-		auth.AppModuleBasic{},
-		genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
-		bank.AppModuleBasic{},
-		capability.AppModuleBasic{},
-		staking.AppModuleBasic{},
-		mint.AppModuleBasic{},
-		distr.AppModuleBasic{},
-		gov.NewAppModuleBasic([]govclient.ProposalHandler{
-			paramsclient.ProposalHandler,
-		}),
-		params.AppModuleBasic{},
-		crisis.AppModuleBasic{},
-		slashing.AppModuleBasic{},
-		feegrantmodule.AppModuleBasic{},
-		ibc.AppModuleBasic{},
-		ibctm.AppModuleBasic{},
-		solomachine.AppModuleBasic{},
-		upgrade.AppModuleBasic{},
-		evidence.AppModuleBasic{},
-		transfer.AppModuleBasic{},
-		vesting.AppModuleBasic{},
-		consensus.AppModuleBasic{},
-		authzmodule.AppModuleBasic{},
-		curiummodule.AppModuleBasic{},
-		storagemodule.AppModuleBasic{},
-		faucetmodule.AppModuleBasic{},
-		taxmodule.AppModuleBasic{},
-		nftmodule.AppModuleBasic{},
-		// this line is used by starport scaffolding # stargate/app/moduleBasic
-	)
+	// ModuleBasics = module.NewBasicManager(
+	// 	auth.AppModuleBasic{},
+	// 	genutil.AppModuleBasic{},
+	// 	bank.AppModuleBasic{},
+	// 	capability.AppModuleBasic{},
+	// 	mint.AppModuleBasic{},
+	// 	gov.AppModuleBasic{},
+	// 	params.AppModuleBasic{},
+	// 	crisis.AppModuleBasic{},
+	// 	slashing.AppModuleBasic{},
+	// 	distr.AppModuleBasic{},
+	// 	staking.AppModuleBasic{},
+	// 	feegrantmodule.AppModuleBasic{},
+	// 	ibc.AppModuleBasic{},
+	// 	ibctm.AppModuleBasic{},
+	// 	solomachine.AppModuleBasic{},
+	// 	upgrade.AppModuleBasic{},
+	// 	evidence.AppModuleBasic{},
+	// 	transfer.AppModuleBasic{},
+	// 	vesting.AppModuleBasic{},
+	// 	consensus.AppModuleBasic{},
+	// 	authzmodule.AppModuleBasic{},
+	// 	curiummodule.AppModuleBasic{},
+	// 	storagemodule.AppModuleBasic{},
+	// 	faucetmodule.AppModuleBasic{},
+	// 	taxmodule.AppModuleBasic{},
+	// 	nftmodule.AppModuleBasic{},
+	// 	// this line is used by starport scaffolding # stargate/app/moduleBasic
+	// )
 
 	// module account permissions
-	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		distrtypes.ModuleName:          nil,
-		minttypes.ModuleName:           {authtypes.Minter},
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		nfttypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
-		faucetmoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
-		taxmoduletypes.ModuleName:      nil,
-		// this line is used by starport scaffolding # stargate/app/maccPerms
-	}
+
 )
 
 // var (
@@ -246,60 +172,24 @@ func init() {
 // capabilities aren't needed for testing.
 type App struct {
 	*baseapp.BaseApp
-
-	cdc               *codec.LegacyAmino
+	legacyAmino       *codec.LegacyAmino
 	appCodec          codec.Codec
 	interfaceRegistry types.InterfaceRegistry
 	txConfig          client.TxConfig
-	legacyAmino       *codec.LegacyAmino
-	homePath          string
 
 	//keepers
-	AccountKeeper    authkeeper.AccountKeeper
-	BankKeeper       bankkeeper.Keeper
-	CapabilityKeeper *capabilitykeeper.Keeper
-	StakingKeeper    *stakingkeeper.Keeper
-	SlashingKeeper   slashingkeeper.Keeper
-	MintKeeper       mintkeeper.Keeper
-	DistrKeeper      distrkeeper.Keeper
-	GovKeeper        govkeeper.Keeper
-	CrisisKeeper     *crisiskeeper.Keeper
-	UpgradeKeeper    *upgradekeeper.Keeper
-	ParamsKeeper     paramskeeper.Keeper
-	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	EvidenceKeeper   evidencekeeper.Keeper
-	TransferKeeper   ibctransferkeeper.Keeper
-	FeeGrantKeeper   feegrantkeeper.Keeper
-	GasMeterKeeper   *gasmeter.Keeper
-	AuthzKeeper      authzkeeper.Keeper
-	// make scoped keepers public for test purposes
-	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
-
-	PacketForwardKeeper *packetforwardkeeper.Keeper
-
-	CuriumKeeper curiummodulekeeper.Keeper
-
-	NFTKeeper nftkeeper.Keeper
-
-	StorageKeeper storagemodulekeeper.Keeper
-
-	FaucetKeeper faucetmodulekeeper.Keeper
-
-	TaxKeeper taxmodulekeeper.Keeper
+	appkeepers.AppKeepers
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	HooksICS4Wrapper      ibchooks.ICS4Middleware
 	// the module manager
-	BasicModuleManager *module.Manager
-	mm                 *module.Manager
+	mm *module.Manager
 
 	// simulation manager
 	sm *module.SimulationManager
 
+	ModuleBasics module.BasicManager
 	configurator module.Configurator
-
-	keys map[string]*storetypes.KVStoreKey
 }
 
 func NewCuriumApp(
@@ -309,292 +199,64 @@ func NewCuriumApp(
 	loadLatest bool,
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
-	invCheckPeriod uint,
-	encodingConfig curiumparams.EncodingConfig,
+	ipfsOn bool,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
-	appCodec := encodingConfig.Marshaler
-	cdc := encodingConfig.Amino
-	interfaceRegistry := encodingConfig.InterfaceRegistry
-	txConfig := encodingConfig.TxConfig
+	invCheckPeriod := cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod))
+	legacyAmino := codec.NewLegacyAmino()
+	interfaceRegistry, err := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
+		ProtoFiles: proto.HybridResolver,
+		SigningOptions: signing.Options{
+			AddressCodec: address.Bech32Codec{
+				Bech32Prefix: sdk.GetConfig().GetBech32AccountAddrPrefix(),
+			},
+			ValidatorAddressCodec: address.Bech32Codec{
+				Bech32Prefix: sdk.GetConfig().GetBech32ValidatorAddrPrefix(),
+			},
+		},
+	})
 
-	bApp := baseapp.NewBaseApp(appTypes.Name, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
+	if err != nil {
+		panic(err)
+	}
+	appCodec := codec.NewProtoCodec(interfaceRegistry)
+	txConfig := authtx.NewTxConfig(appCodec, authtx.DefaultSignModes)
+
+	bApp := baseapp.NewBaseApp(appTypes.Name, logger, db, txConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 	bApp.SetTxEncoder(txConfig.TxEncoder())
 
-	keys := storetypes.NewKVStoreKeys(
-		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
-		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
-		govtypes.StoreKey, paramstypes.StoreKey, ibcexported.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
-		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		curiummoduletypes.StoreKey,
-		storagemoduletypes.StoreKey,
-		faucetmoduletypes.StoreKey,
-		taxmoduletypes.StoreKey,
-		nfttypes.StoreKey,
-		authzkeeper.StoreKey, icahosttypes.StoreKey,
-		crisistypes.StoreKey,
-		consensusparamtypes.StoreKey,
-		// this line is used by starport scaffolding # stargate/app/storeKey
-	)
-
-	tkeys := storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)
-	memKeys := storetypes.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
-
 	app := &App{
 		BaseApp:           bApp,
-		cdc:               cdc,
+		legacyAmino:       legacyAmino,
 		appCodec:          appCodec,
 		interfaceRegistry: interfaceRegistry,
 		txConfig:          txConfig,
-		keys:              keys,
 	}
 
-	app.ParamsKeeper = initParamsKeeper(appCodec, encodingConfig.Amino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
-
-	// Authority for gov proposals, using the x/gov module account address
-	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
-	govAuthAddrStr := govAuthAddr.String()
-
-	bech32Prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
-	ac := authcodec.NewBech32Codec(bech32Prefix)
-	// set the BaseApp's parameter store
-	app.ConsensusParamsKeeper = consensusparamkeeper.NewKeeper(
+	moduleAccountAddresses := app.ModuleAccountAddrs()
+	app.AppKeepers = appkeepers.NewAppKeeper(
 		appCodec,
-		runtime.NewKVStoreService(keys[consensusparamtypes.StoreKey]),
-		govAuthAddrStr,
-		runtime.EventService{},
-	)
-	bApp.SetParamStore(&app.ConsensusParamsKeeper.ParamsStore)
-
-	// add capability keeper and ScopeToModule for ibc module
-	app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
-
-	// grant capabilities for the ibc and ibc-transfer modules
-	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibcexported.ModuleName)
-	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
-	// this line is used by starport scaffolding # stargate/app/scopedKeeper
-
-	// add keepers
-	app.AccountKeeper = authkeeper.NewAccountKeeper(
-		appCodec,
-		runtime.NewKVStoreService(keys[authtypes.StoreKey]),
-		authtypes.ProtoBaseAccount,
+		bApp,
+		legacyAmino,
 		maccPerms,
-		ac,
-		bech32Prefix,
-		govAuthAddrStr,
-	)
-	app.BankKeeper = bankkeeper.NewBaseKeeper(
-		appCodec,
-		runtime.NewKVStoreService(keys[banktypes.StoreKey]),
-		app.AccountKeeper,
-		BlockedAddresses(),
-		govAuthAddrStr,
-		bApp.Logger(),
-	)
-	app.StakingKeeper = stakingkeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(keys[stakingtypes.StoreKey]),
-		app.AccountKeeper,
-		app.BankKeeper,
-		govAuthAddrStr,
-		authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix()),
-		authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
-	)
-
-	app.MintKeeper = mintkeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(keys[minttypes.StoreKey]),
-		app.StakingKeeper,
-		app.AccountKeeper,
-		app.BankKeeper,
-		authtypes.FeeCollectorName,
-		govAuthAddrStr,
-	)
-	app.DistrKeeper = distrkeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(keys[distrtypes.StoreKey]),
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.StakingKeeper,
-		authtypes.FeeCollectorName,
-		govAuthAddrStr,
-	)
-	app.SlashingKeeper = slashingkeeper.NewKeeper(
-		appCodec,
-		cdc,
-		runtime.NewKVStoreService(keys[slashingtypes.StoreKey]),
-		app.StakingKeeper,
-		govAuthAddrStr,
-	)
-
-	app.CrisisKeeper = crisiskeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(keys[crisistypes.StoreKey]),
+		moduleAccountAddresses,
+		app.BlockedAddresses(moduleAccountAddresses),
+		skipUpgradeHeights,
+		homePath,
 		invCheckPeriod,
-		app.BankKeeper,
-		authtypes.FeeCollectorName,
-		govAuthAddrStr,
-		ac,
+		txConfig,
+		ipfsOn,
+		logger,
+		appOpts,
 	)
 
-	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec,
-		runtime.NewKVStoreService(keys[feegrant.StoreKey]), app.AccountKeeper)
-	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, runtime.NewKVStoreService(keys[upgradetypes.StoreKey]), appCodec, homePath, app.BaseApp, govAuthAddrStr)
-	//app.UpgradeKeeper.SetUpgradeHandler("Upgrade 1", firstupgrade.CreateUpgradeHandler(app.mm, app.Configurator))
-
-	// register the staking hooks
-	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
-	app.StakingKeeper.SetHooks(
-		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
-	)
-
-	// ... other modules keepers
-
-	// Create IBC Keeper
-	app.IBCKeeper = ibckeeper.NewKeeper(
-		appCodec,
-		keys[ibcexported.StoreKey],
-		app.GetSubspace(ibcexported.ModuleName),
-		app.StakingKeeper,
-		app.UpgradeKeeper,
-		scopedIBCKeeper,
-		govAuthAddrStr,
-	)
-
-	//create authz Keeper
-	app.AuthzKeeper = authzkeeper.NewKeeper(
-		runtime.NewKVStoreService(keys[authzkeeper.StoreKey]),
-		appCodec,
-		bApp.MsgServiceRouter(),
-		app.AccountKeeper,
-	)
-
-	app.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
-		app.IBCKeeper.ChannelKeeper,
-		nil,
-	)
-	app.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
-		appCodec,
-		keys[packetforwardtypes.StoreKey],
-		app.TransferKeeper, // Will be zero-value here. Reference is set later on with SetTransferKeeper.
-		app.IBCKeeper.ChannelKeeper,
-		app.BankKeeper,
-		app.HooksICS4Wrapper,
-		govAuthAddrStr,
-	)
-	// Create Transfer Keepers
-	app.TransferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec,
-		keys[ibctransfertypes.StoreKey],
-		app.GetSubspace(ibctransfertypes.ModuleName),
-		// The ICS4Wrapper is replaced by the PacketForwardKeeper instead of the channel so that sending can be overridden by the middleware
-		app.PacketForwardKeeper,
-		app.IBCKeeper.ChannelKeeper,
-		app.IBCKeeper.PortKeeper,
-		app.AccountKeeper,
-		app.BankKeeper,
-		scopedTransferKeeper,
-		govAuthAddrStr,
-	)
-	transferModule := transfer.NewAppModule(app.TransferKeeper)
-	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
-
-	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
-	evidenceKeeper := evidencekeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(keys[evidencetypes.StoreKey]),
-		app.StakingKeeper,
-		app.SlashingKeeper,
-		ac,
-		runtime.ProvideCometInfoService(),
-	)
-	// If evidence needs to be handled for the app, set routes in router here and seal
-	app.EvidenceKeeper = *evidenceKeeper
-
-	govConfig := govtypes.DefaultConfig()
-	govKeeper := govkeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(keys[govtypes.StoreKey]),
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.StakingKeeper,
-		app.DistrKeeper,
-		bApp.MsgServiceRouter(),
-		govConfig,
-		govAuthAddrStr,
-	)
-	// register the proposal types
-	govRouter := govv1beta1.NewRouter()
-	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
-		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
-		AddRoute(ibcexported.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
-	govKeeper.SetLegacyRouter(govRouter)
-	app.GovKeeper = *govKeeper.SetHooks(
-		govtypes.NewMultiGovHooks(),
-	)
-
-	app.GasMeterKeeper = gasmeter.NewGasMeterKeeper()
-
-	app.CuriumKeeper = *curiummodulekeeper.NewKeeper(
-		appCodec,
-		keys[curiummoduletypes.StoreKey],
-		keys[curiummoduletypes.MemStoreKey],
-		app.GasMeterKeeper,
-	)
-	curiumModule := curiummodule.NewAppModule(appCodec, &app.CuriumKeeper)
-
-	storageDir := appOpts.Get("storage-dir").(string)
-	filter := appOpts.Get("filter").(string)
-	fmt.Println(filter)
-	storageNode, _ := startupStorageNode(storageDir, filter)
-
-	app.StorageKeeper = *storagemodulekeeper.NewKeeper(
-		appCodec,
-		keys[storagemoduletypes.StoreKey],
-		keys[storagemoduletypes.MemStoreKey],
-		appOpts.Get("storage-dir").(string),
-		storageNode,
-	)
-	storageModule := storagemodule.NewAppModule(appCodec, app.StorageKeeper)
-
-	app.FaucetKeeper = *faucetmodulekeeper.NewKeeper(
-		appCodec,
-		keys[faucetmoduletypes.StoreKey],
-		keys[faucetmoduletypes.MemStoreKey],
-		app.GetSubspace(faucetmoduletypes.ModuleName),
-		app.BankKeeper,
-		curiummodule.NewKeyRingReader(appOpts.Get(flags.FlagHome).(string)),
-		curiummodulekeeper.NewMsgBroadcaster(&app.AccountKeeper, cast.ToString(appOpts.Get(flags.FlagHome)), txConfig, appCodec),
-	)
-
-	faucetModule := faucetmodule.NewAppModule(appCodec, app.FaucetKeeper, app.AccountKeeper, app.BankKeeper)
-
-	app.TaxKeeper = *taxmodulekeeper.NewKeeper(
-		appCodec,
-		keys[taxmoduletypes.StoreKey],
-		keys[taxmoduletypes.MemStoreKey],
-		app.GetSubspace(taxmoduletypes.ModuleName),
-		app.BankKeeper,
-		app.AccountKeeper,
-	)
-	taxModule := taxmodule.NewAppModule(appCodec, app.TaxKeeper, app.AccountKeeper, app.BankKeeper)
-
-	// this line is used by starport scaffolding # stargate/app/keeperDefinition
-
-	// Create static IBC router, add transfer route, then set and seal it
-	ibcRouter := ibcporttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
-	// this line is used by starport scaffolding # ibc/app/router
-	app.IBCKeeper.SetRouter(ibcRouter)
-
-	app.NFTKeeper = *nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey], app.GetSubspace(nfttypes.ModuleName), app.BankKeeper)
-	nftModule := nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper)
+	// clientKeeper := app.IBCKeeper.ClientKeeper
+	// tmLightClientModule := ibctm.NewLightClientModule(appCodec, clientKeeper.GetStoreProvider())
+	// clientKeeper.AddRoute(ibctm.ModuleName, &tmLightClientModule)
 	/****  Module Options ****/
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -604,95 +266,39 @@ func NewCuriumApp(
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 	app.mm = module.NewManager(
-		genutil.NewAppModule(
-			app.AccountKeeper, app.StakingKeeper, app,
-			encodingConfig.TxConfig,
-		),
-		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
-		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
-		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.GetSubspace(banktypes.ModuleName)),
-		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
-		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
-		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)),
-		gov.NewAppModule(appCodec, &app.GovKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())),
-		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper, nil, app.GetSubspace(minttypes.ModuleName)),
-		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(slashingtypes.ModuleName), app.interfaceRegistry),
-		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(distrtypes.ModuleName)),
-		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName)),
-		upgrade.NewAppModule(app.UpgradeKeeper, app.AccountKeeper.AddressCodec()),
-		evidence.NewAppModule(app.EvidenceKeeper),
-		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
-		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
-		ibc.NewAppModule(app.IBCKeeper),
-		params.NewAppModule(app.ParamsKeeper),
-		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		transferModule,
-		&curiumModule,
-		storageModule,
-		faucetModule,
-		taxModule,
-		nftModule,
-		// this line is used by starport scaffolding # stargate/app/appModule
+		appModules(app, appCodec, txConfig, skipGenesisInvariants)...,
 	)
 
+	app.ModuleBasics = newBasicManagerFromManager(app)
+	enabledSignModes := append([]sigtypes.SignMode(nil), authtx.DefaultSignModes...)
+	enabledSignModes = append(enabledSignModes, sigtypes.SignMode_SIGN_MODE_TEXTUAL)
+
+	txConfigOpts := authtx.ConfigOptions{
+		EnabledSignModes:           enabledSignModes,
+		TextualCoinMetadataQueryFn: txmodule.NewBankKeeperCoinMetadataQueryFn(app.BankKeeper),
+	}
+	txConfig, err = authtx.NewTxConfigWithOptions(
+		appCodec,
+		txConfigOpts,
+	)
+	if err != nil {
+		panic(err)
+	}
+	app.txConfig = txConfig
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntrie
 	//s param > 0
-	app.mm.SetOrderBeginBlockers(
+	app.mm.SetOrderPreBlockers(
 		upgradetypes.ModuleName,
-		capabilitytypes.ModuleName,
-		minttypes.ModuleName,
-		distrtypes.ModuleName,
-		slashingtypes.ModuleName,
-		evidencetypes.ModuleName,
-		stakingtypes.ModuleName,
-		ibcexported.ModuleName,
-		feegrant.ModuleName,
-		nfttypes.ModuleName,
-		paramstypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		vestingtypes.ModuleName,
-		consensusparamtypes.ModuleName,
-		govtypes.ModuleName,
-		curiummoduletypes.ModuleName,
-		genutiltypes.ModuleName,
-		authtypes.ModuleName,
-		banktypes.ModuleName,
-		faucetmoduletypes.ModuleName,
-		crisistypes.ModuleName,
-		taxmoduletypes.ModuleName,
-		storagemoduletypes.ModuleName,
-		authz.ModuleName,
+	)
+	app.mm.SetOrderBeginBlockers(
+		orderBeginBlockers()...,
 	)
 
 	app.mm.SetOrderEndBlockers(
-		crisistypes.ModuleName,
-		govtypes.ModuleName,
-		stakingtypes.ModuleName,
-		curiummoduletypes.ModuleName,
-		nfttypes.ModuleName,
-		upgradetypes.ModuleName,
-		ibcexported.ModuleName,
-		minttypes.ModuleName,
-		minttypes.ModuleName,
-		distrtypes.ModuleName,
-		slashingtypes.ModuleName,
-		storagemoduletypes.ModuleName,
-		taxmoduletypes.ModuleName,
-		genutiltypes.ModuleName,
-		authtypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		faucetmoduletypes.ModuleName,
-		banktypes.ModuleName,
-		capabilitytypes.ModuleName,
-		evidencetypes.ModuleName,
-		vestingtypes.ModuleName,
-		consensusparamtypes.ModuleName,
-		feegrant.ModuleName,
-		paramstypes.ModuleName,
-		authz.ModuleName,
+		orderEndBlockers()...,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -701,40 +307,13 @@ func NewCuriumApp(
 	// so that other modules that want to create or claim capabilities afterwards in InitChain
 	// can do so safely.
 
-	genesisModuleOrder := []string{
-		capabilitytypes.ModuleName,
-		authtypes.ModuleName,
-		banktypes.ModuleName,
-		distrtypes.ModuleName,
-		stakingtypes.ModuleName,
-		slashingtypes.ModuleName,
-		govtypes.ModuleName,
-		minttypes.ModuleName,
-		crisistypes.ModuleName,
-		ibcexported.ModuleName,
-		genutiltypes.ModuleName,
-		evidencetypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		nfttypes.ModuleName,
-		curiummoduletypes.ModuleName,
-		storagemoduletypes.ModuleName,
-		faucetmoduletypes.ModuleName,
-		taxmoduletypes.ModuleName,
-
-		paramstypes.ModuleName,
-		feegrant.ModuleName,
-		vestingtypes.ModuleName,
-		consensusparamtypes.ModuleName,
-		upgradetypes.ModuleName,
-		authz.ModuleName,
-	}
 	app.mm.SetOrderInitGenesis(
-		genesisModuleOrder...,
+		orderInitBlockers()...,
 	// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
 	app.mm.SetOrderExportGenesis(
-		genesisModuleOrder...,
+		orderInitBlockers()...,
 	// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -749,10 +328,14 @@ func NewCuriumApp(
 	}
 	reflectionv1.RegisterReflectionServiceServer(app.GRPCQueryRouter(), reflectionSvc)
 
+	app.sm = module.NewSimulationManager(simulationModules(app, appCodec)...)
+
+	app.sm.RegisterStoreDecoders()
+
 	// initialize stores
-	app.MountKVStores(keys)
-	app.MountTransientStores(tkeys)
-	app.MountMemoryStores(memKeys)
+	app.MountKVStores(app.GetKVStoreKey())
+	app.MountTransientStores(app.GetTransientStoreKey())
+	app.MountMemoryStores(app.GetMemoryStoreKey())
 
 	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
@@ -782,8 +365,6 @@ func NewCuriumApp(
 		}
 	}
 
-	app.ScopedIBCKeeper = scopedIBCKeeper
-	app.ScopedTransferKeeper = scopedTransferKeeper
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 
 	overrideModules := map[string]module.AppModuleSimulation{
@@ -803,8 +384,7 @@ func New(
 	loadLatest bool,
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
-	invCheckPeriod uint,
-	encodingConfig curiumparams.EncodingConfig,
+	ipfsOn bool,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
@@ -815,30 +395,10 @@ func New(
 		loadLatest,
 		skipUpgradeHeights,
 		homePath,
-		invCheckPeriod,
-		encodingConfig,
+		ipfsOn,
 		appOpts,
 		baseAppOptions...,
 	)
-}
-
-func startupStorageNode(storageDir string, filter string) (*curiumipfs.StorageIpfsNode, error) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return nil, err
-	}
-	storageDir = strings.ReplaceAll(storageDir, "~", homeDir)
-	os.RemoveAll(storageDir)
-
-	err = storagemodulekeeper.CreateRepoIfNotExist(storageDir, curiumipfs.CreateRepoOptions{
-		Transformer: ipfsConfig.Profiles[filter].Transform,
-	})
-	if err != nil {
-		return nil, err
-	}
-	node, err := storagemodulekeeper.StartStorageNode(storageDir)
-	return node, err
-
 }
 
 // Name returns the name of the App
@@ -871,11 +431,12 @@ func (app *App) LoadHeight(height int64) error {
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
-func (app *App) BlockedAddresses() map[string]bool {
-	modAccAddrs := make(map[string]bool)
-	for acc := range maccPerms {
-		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
-	}
+func (app *App) BlockedAddresses(modAccAddrs map[string]bool) map[string]bool {
+	// remove module accounts that are ALLOWED to received funds
+	delete(modAccAddrs, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+
+	// Remove the ConsumerRewardsPool from the group of blocked recipient addresses in bank
+	// delete(modAccAddrs, authtypes.NewModuleAddress(providertypes.ConsumerRewardsPool).String())
 
 	return modAccAddrs
 }
@@ -883,7 +444,7 @@ func (app *App) BlockedAddresses() map[string]bool {
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
 func (app *App) LegacyAmino() *codec.LegacyAmino {
-	return app.cdc
+	return app.legacyAmino
 }
 
 // AppCodec returns Gaia's app codec.
@@ -902,27 +463,10 @@ func (app *App) InterfaceRegistry() types.InterfaceRegistry {
 // GetKey returns the KVStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *App) GetKey(storeKey string) *storetypes.KVStoreKey {
-	return app.keys[storeKey]
-}
-
-// // GetTKey returns the TransientStoreKey for the provided store key.
-// //
-// // NOTE: This is solely to be used for testing purposes.
-// func (app *App) GetTKey(storeKey string) *storetypes.TransientStoreKey {
-// 	return app.tkeys[storeKey]
+// func (app *App) GetKey(storeKey string) *storetypes.KVStoreKey {
+// 	return keys
 // }
 
-// // GetMemKey returns the MemStoreKey for the provided mem key.
-// //
-// // NOTE: This is solely used for testing purposes.
-// func (app *App) GetMemKey(storeKey string) *storetypes.MemoryStoreKey {
-// 	return app.memKeys[storeKey]
-// }
-
-// GetSubspace returns a param subspace for a given module name.
-//
-// NOTE: This is solely to be used for testing purposes.
 func (app *App) GetSubspace(moduleName string) paramstypes.Subspace {
 	subspace, _ := app.ParamsKeeper.GetSubspace(moduleName)
 	return subspace
@@ -941,7 +485,7 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 
 	// Register legacy and grpc-gateway routes for all modules.
 	// ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
-	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+	app.ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	nodeservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// register app's OpenAPI routes.
 	apiSvr.Router.Handle("/static/openapi.yml", http.FileServer(http.FS(docs.Docs)))
@@ -1024,4 +568,37 @@ func BlockedAddresses() map[string]bool {
 // GetMaccPerms returns a copy of the module account permissions
 func GetMaccPerms() map[string][]string {
 	return maccPerms
+}
+
+// ModuleAccountAddrs returns all the app's module account addresses.
+func (app *App) ModuleAccountAddrs() map[string]bool {
+	modAccAddrs := make(map[string]bool)
+	for acc := range maccPerms {
+		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
+	}
+
+	return modAccAddrs
+}
+
+func (app *App) GetTxConfig() client.TxConfig {
+	return app.txConfig
+}
+
+func (app *App) AutoCliOpts() autocli.AppOptions {
+	modules := make(map[string]appmodule.AppModule, 0)
+	for _, m := range app.mm.Modules {
+		if moduleWithName, ok := m.(module.HasName); ok {
+			moduleName := moduleWithName.Name()
+			if appModule, ok := moduleWithName.(appmodule.AppModule); ok {
+				modules[moduleName] = appModule
+			}
+		}
+	}
+
+	return autocli.AppOptions{
+		Modules:               modules,
+		AddressCodec:          authcodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
+		ValidatorAddressCodec: authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix()),
+		ConsensusAddressCodec: authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
+	}
 }

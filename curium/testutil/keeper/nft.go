@@ -5,6 +5,7 @@ import (
 
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
+	"cosmossdk.io/log"
 	"cosmossdk.io/store"
 	storetypes "cosmossdk.io/store/types"
 	curiumapp "github.com/bluzelle/bluzelle-public/curium/app"
@@ -12,7 +13,6 @@ import (
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	tmdb "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -25,10 +25,10 @@ import (
 
 func NftKeeper(t testing.TB) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.AccountKeeper, sdk.Context) {
 	testAddr := authtypes.NewModuleAddress("").String()
-	storeKey := sdk.NewKVStoreKey(types.StoreKey)
+	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
-	authStoreKey := sdk.NewKVStoreKey(authtypes.StoreKey)
-	bankStoreKey := sdk.NewKVStoreKey(banktypes.StoreKey)
+	authStoreKey := storetypes.NewKVStoreKey(authtypes.StoreKey)
+	bankStoreKey := storetypes.NewKVStoreKey(banktypes.StoreKey)
 
 	db := tmdb.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db)
