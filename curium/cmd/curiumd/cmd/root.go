@@ -16,6 +16,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	confixcmd "cosmossdk.io/tools/confix/cmd"
 	"github.com/bluzelle/bluzelle-public/curium/app"
+	"github.com/bluzelle/bluzelle-public/curium/app/params"
 	tmcfg "github.com/cometbft/cometbft/config"
 	tmcli "github.com/cometbft/cometbft/libs/cli"
 	tmtypes "github.com/cometbft/cometbft/types"
@@ -28,9 +29,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/pruning"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/client/snapshot"
-	"github.com/cosmos/cosmos-sdk/codec"
 	addresscodec "github.com/cosmos/cosmos-sdk/codec/address"
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -42,7 +41,6 @@ import (
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -58,18 +56,6 @@ type Option func(*rootOptions)
 type rootOptions struct {
 	addSubCmds         []*cobra.Command
 	startCmdCustomizer func(*cobra.Command)
-}
-
-func newRootOptions(options ...Option) rootOptions {
-	opts := rootOptions{}
-	opts.apply(options...)
-	return opts
-}
-
-func (s *rootOptions) apply(options ...Option) {
-	for _, o := range options {
-		o(s)
-	}
 }
 
 // AddSubCmd adds sub commands.
@@ -113,6 +99,7 @@ func NewRootCmd() *cobra.Command {
 	initClientCtx := client.Context{}.
 		WithCodec(tempApplication.AppCodec()).
 		WithInterfaceRegistry(tempApplication.InterfaceRegistry()).
+		WithTxConfig(tempApplication.TxConfig()).
 		WithLegacyAmino(tempApplication.LegacyAmino()).
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
@@ -143,7 +130,7 @@ func NewRootCmd() *cobra.Command {
 		},
 	}
 
-	initRootCmd(rootCmd, tempApplication.ModuleBasics, tempApplication.AppCodec(), tempApplication.InterfaceRegistry(), tempApplication.GetTxConfig())
+	initRootCmd(rootCmd, tempApplication.ModuleBasics, tempApplication.GetTxConfig())
 
 	autoCliOpts := enrichAutoCliOpts(tempApplication.AutoCliOpts(), initClientCtx)
 	if err := autoCliOpts.EnhanceRootCommand(rootCmd); err != nil {
@@ -161,11 +148,14 @@ func NewRootCmd() *cobra.Command {
 func initRootCmd(
 	rootCmd *cobra.Command,
 	basicManager module.BasicManager,
-	cdc codec.Codec,
-	interfaceRegistry codectypes.InterfaceRegistry,
 	txConfig client.TxConfig,
 ) {
+	sdk.DefaultBondDenom = "ubnt"
 	cfg := sdk.GetConfig()
+	cfg.SetBech32PrefixForAccount(params.Bech32PrefixAccAddr, params.Bech32PrefixAccPub)
+	cfg.SetBech32PrefixForValidator(params.Bech32PrefixValAddr, params.Bech32PrefixValPub)
+	cfg.SetBech32PrefixForConsensusNode(params.Bech32PrefixConsAddr, params.Bech32PrefixConsPub)
+
 	cfg.Seal()
 
 	ac := appCreator{}
@@ -263,22 +253,6 @@ func txCommand(moduleBasics module.BasicManager) *cobra.Command {
 
 func addModuleInitFlags(startCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(startCmd)
-}
-
-func overwriteFlagDefaults(c *cobra.Command, defaults map[string]string) {
-	set := func(s *pflag.FlagSet, key, val string) {
-		if f := s.Lookup(key); f != nil {
-			f.DefValue = val
-			f.Value.Set(val)
-		}
-	}
-	for key, val := range defaults {
-		set(c.Flags(), key, val)
-		set(c.PersistentFlags(), key, val)
-	}
-	for _, c := range c.Commands() {
-		overwriteFlagDefaults(c, defaults)
-	}
 }
 
 // newApp creates a new Cosmos SDK app
