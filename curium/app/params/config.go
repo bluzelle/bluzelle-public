@@ -19,6 +19,8 @@ const (
 	Bech32PrefixAccAddr = "bluzelle"
 
 	CoinType = 483
+
+	FullFundraiserPath = "m/44'/483'/0'/0/0"
 )
 
 var (

@@ -5,9 +5,6 @@ import (
 	"os"
 	"path/filepath"
 
-	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/bluzelle/bluzelle-public/curium/app"
 	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
 	cmd "github.com/cometbft/cometbft/cmd/cometbft/commands"
@@ -20,9 +17,9 @@ type EmptyAppOptions struct{}
 func (EmptyAppOptions) Get(_ string) interface{} { return nil }
 
 func main() {
-	config := sdk.GetConfig()
-	config.SetCoinType(appTypes.CoinType)
-	config.SetBech32PrefixForAccount("bluzelle", "bluzellepub")
+	// config := sdk.GetConfig()
+	// config.SetCoinType(appTypes.CoinType)
+	// config.SetBech32PrefixForAccount("bluzelle", "bluzellepub")
 
 	rootCmd := curiumcmd.NewRootCmd()
 

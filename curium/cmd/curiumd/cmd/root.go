@@ -74,6 +74,15 @@ func CustomizeStartCmd(h func(startCmd *cobra.Command)) Option {
 
 // NewRootCmd creates a new root command for a Cosmos SDK application
 func NewRootCmd() *cobra.Command {
+
+	sdk.DefaultBondDenom = "ubnt"
+	cfg := sdk.GetConfig()
+	cfg.SetBech32PrefixForAccount(params.Bech32PrefixAccAddr, params.Bech32PrefixAccPub)
+	cfg.SetBech32PrefixForValidator(params.Bech32PrefixValAddr, params.Bech32PrefixValPub)
+	cfg.SetBech32PrefixForConsensusNode(params.Bech32PrefixConsAddr, params.Bech32PrefixConsPub)
+	cfg.SetCoinType(params.CoinType)
+	cfg.SetFullFundraiserPath(params.FullFundraiserPath)
+	// cfg.Seal()
 	initAppOptions := viper.New()
 	tempDir := tempDir()
 	initAppOptions.Set(flags.FlagHome, tempDir)
@@ -150,13 +159,6 @@ func initRootCmd(
 	basicManager module.BasicManager,
 	txConfig client.TxConfig,
 ) {
-	sdk.DefaultBondDenom = "ubnt"
-	cfg := sdk.GetConfig()
-	cfg.SetBech32PrefixForAccount(params.Bech32PrefixAccAddr, params.Bech32PrefixAccPub)
-	cfg.SetBech32PrefixForValidator(params.Bech32PrefixValAddr, params.Bech32PrefixValPub)
-	cfg.SetBech32PrefixForConsensusNode(params.Bech32PrefixConsAddr, params.Bech32PrefixConsPub)
-
-	cfg.Seal()
 
 	ac := appCreator{}
 	rootCmd.AddCommand(
