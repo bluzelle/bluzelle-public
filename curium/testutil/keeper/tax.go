@@ -5,15 +5,18 @@ import (
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/store"
+	"cosmossdk.io/store/metrics"
 	storetypes "cosmossdk.io/store/types"
 	testutil "github.com/bluzelle/bluzelle-public/curium/testutil/simapp"
 	"github.com/bluzelle/bluzelle-public/curium/x/tax"
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/types"
-	tmdb "github.com/cometbft/cometbft-db"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/address"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -29,8 +32,8 @@ func TaxKeeper(t *testing.T) (*keeper.Keeper, sdk.Context) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
-	db := tmdb.NewMemDB()
-	stateStore := store.NewCommitMultiStore(db)
+	db := dbm.NewMemDB()
+	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
 	stateStore.MountStoreWithDB(memStoreKey, storetypes.StoreTypeMemory, nil)
 	require.NoError(t, stateStore.LoadLatestVersion())
@@ -50,7 +53,17 @@ func TaxKeeper(t *testing.T) (*keeper.Keeper, sdk.Context) {
 
 	maccPerms := map[string][]string{}
 	//accKey := app.GetKey(authtypes.StoreKey)
-	accountKeeper := acctypes.NewAccountKeeper(cdc, storeKey, authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(), govAuthAddrStr)
+	bech32Prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
+	ac := address.NewBech32Codec(bech32Prefix)
+	accountKeeper := acctypes.NewAccountKeeper(
+		cdc,
+		runtime.NewKVStoreService(storeKey),
+		authtypes.ProtoBaseAccount,
+		maccPerms,
+		ac,
+		bech32Prefix,
+		govAuthAddrStr,
+	)
 	k := keeper.NewKeeper(
 		cdc,
 		storeKey,
@@ -75,8 +88,8 @@ func GetKeepers(t *testing.T) (*keeper.Keeper, bankKeeper.Keeper, acctypes.Accou
 	storeKey := storetypes.NewKVStoreKey(authtypes.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
-	db := tmdb.NewMemDB()
-	stateStore := store.NewCommitMultiStore(db)
+	db := dbm.NewMemDB()
+	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
 	stateStore.MountStoreWithDB(memStoreKey, storetypes.StoreTypeMemory, nil)
 	require.NoError(t, stateStore.LoadLatestVersion())
@@ -97,7 +110,17 @@ func GetKeepers(t *testing.T) (*keeper.Keeper, bankKeeper.Keeper, acctypes.Accou
 	bankKeeper := app.BankKeeper.(bankKeeper.BaseKeeper)
 	maccPerms := map[string][]string{}
 	//accKey := app.GetKey(authtypes.StoreKey)
-	accountKeeper := acctypes.NewAccountKeeper(cdc, storeKey, authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(), govAuthAddrStr)
+	bech32Prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
+	ac := address.NewBech32Codec(bech32Prefix)
+	accountKeeper := acctypes.NewAccountKeeper(
+		cdc,
+		runtime.NewKVStoreService(storeKey),
+		authtypes.ProtoBaseAccount,
+		maccPerms,
+		ac,
+		bech32Prefix,
+		govAuthAddrStr,
+	)
 
 	//accKey := *app.GetKey(authtypes.StoreKey)
 	//accKey := sdk.NewKVStoreKey(authtypes.StoreKey)

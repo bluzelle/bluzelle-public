@@ -57,7 +57,7 @@ func NewSetUpContextDecorator(gasMeterKeeper *gasmeter.Keeper, bankKeeper bankke
 
 func (sud SetUpContextDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	// all transactions must implement GasTx
-	gasTx, ok := tx.(appTypes.GasTx)
+	gasTx, ok := tx.(sdk.FeeTx)
 	if !ok {
 		// Set a gas meter with limit 0 as to prevent an infinite gas meter attack
 		// during runTx.

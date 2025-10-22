@@ -97,6 +97,10 @@ install: go.sum
 build:
 	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o bin/curiumd ./cmd/curiumd
 
+debug-build:
+	@echo "Building debug version with debug symbols..."
+	GOOS=linux GOARCH=amd64 go build -gcflags "all=-N -l" -tags "$(build_tags)" -ldflags '$(subst -w -s,,$(ldflags))' -o bin/curiumd ./cmd/curiumd
+
 ###############################################################################
 ###                                  Proto                                  ###
 ###############################################################################

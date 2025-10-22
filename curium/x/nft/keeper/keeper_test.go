@@ -67,11 +67,33 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.T().Logf("Owner address: %s", owner.String())
 }
 
+// SetupSubTest creates a fresh context for each sub-test to avoid database conflicts
+func (suite *KeeperTestSuite) SetupSubTest() {
+	// Create a fresh context for each sub-test
+	suite.NFTKeeper, suite.BankKeeper, suite.AccountKeeper, suite.ctx = testkeeper.NftKeeper(suite.T())
+
+	// Re-setup the module account and parameters
+	moduleAcc := suite.AccountKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
+	suite.Require().NotNil(moduleAcc, "NFT module account should exist")
+
+	suite.NFTKeeper.SetParamSet(suite.ctx, types.NewParams(sdk.NewCoin(sdk.DefaultBondDenom, math.NewInt(1_000_000_000))))
+
+	err := suite.BankKeeper.MintCoins(suite.ctx, types.ModuleName, initCoin)
+	suite.NoError(err)
+}
+
 func TestKeeperSuite(t *testing.T) {
 	suite.Run(t, new(KeeperTestSuite))
 }
 
 func (suite *KeeperTestSuite) FundAccount(addr sdk.AccAddress, amount int64) error {
+	// Check if account already exists
+	account := suite.AccountKeeper.GetAccount(suite.ctx, addr)
+	if account == nil {
+		// Create account if it doesn't exist
+		account = suite.AccountKeeper.NewAccountWithAddress(suite.ctx, addr)
+		suite.AccountKeeper.SetAccount(suite.ctx, account)
+	}
 
 	sendAmount := sdk.NewInt64Coin("stake", amount)
 

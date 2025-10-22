@@ -30,7 +30,7 @@ func TestGasMeterKeeper(t *testing.T) {
 		accountKeeper,
 		app.BlockedAddresses(moduleAccountAddresses),
 		govAuthAddrStr,
-		nil,
+		app.Logger(),
 	)
 	_, _, addr := testdata.KeyTestPubAddr()
 	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdkmath.NewInt(2)))

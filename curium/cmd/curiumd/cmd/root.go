@@ -35,7 +35,10 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	"github.com/cosmos/cosmos-sdk/x/auth/tx"
+	authtxconfig "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
@@ -76,13 +79,15 @@ func CustomizeStartCmd(h func(startCmd *cobra.Command)) Option {
 func NewRootCmd() *cobra.Command {
 
 	sdk.DefaultBondDenom = "ubnt"
+
 	cfg := sdk.GetConfig()
 	cfg.SetBech32PrefixForAccount(params.Bech32PrefixAccAddr, params.Bech32PrefixAccPub)
 	cfg.SetBech32PrefixForValidator(params.Bech32PrefixValAddr, params.Bech32PrefixValPub)
 	cfg.SetBech32PrefixForConsensusNode(params.Bech32PrefixConsAddr, params.Bech32PrefixConsPub)
 	cfg.SetCoinType(params.CoinType)
 	cfg.SetFullFundraiserPath(params.FullFundraiserPath)
-	// cfg.Seal()
+	cfg.Seal()
+
 	initAppOptions := viper.New()
 	tempDir := tempDir()
 	initAppOptions.Set(flags.FlagHome, tempDir)
@@ -96,6 +101,7 @@ func NewRootCmd() *cobra.Command {
 		false,
 		initAppOptions,
 	)
+
 	defer func() {
 		if err := tempApplication.Close(); err != nil {
 			panic(err)
@@ -116,10 +122,18 @@ func NewRootCmd() *cobra.Command {
 		WithHomeDir(app.DefaultNodeHome).
 		WithViper("")
 
+	// // Set default keyring backend to test and use new service name to avoid migration issues
+	// initClientCtx.Viper.Set("keyring-backend", "test")
+	// initClientCtx.Viper.Set("keyring-service-name", "curium-v2")
+
 	rootCmd := &cobra.Command{
 		Use:   "curiumd",
 		Short: "Stargate CosmosHub App",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+			cmd.SetOut(cmd.OutOrStdout())
+			cmd.SetErr(cmd.ErrOrStderr())
+
+			initClientCtx = initClientCtx.WithCmdContext(cmd.Context())
 			initClientCtx, err := client.ReadPersistentCommandFlags(initClientCtx, cmd.Flags())
 			if err != nil {
 				return err
@@ -129,12 +143,37 @@ func NewRootCmd() *cobra.Command {
 				return err
 			}
 
+			if !initClientCtx.Offline {
+				txConfigOpts := tx.ConfigOptions{
+					EnabledSignModes:           append(tx.DefaultSignModes, signing.SignMode_SIGN_MODE_TEXTUAL),
+					TextualCoinMetadataQueryFn: authtxconfig.NewGRPCCoinMetadataQueryFn(initClientCtx),
+				}
+				txConfigWithTextual, err := tx.NewTxConfigWithOptions(
+					initClientCtx.Codec,
+					txConfigOpts,
+				)
+				if err != nil {
+					return err
+				}
+				initClientCtx = initClientCtx.WithTxConfig(txConfigWithTextual)
+			}
+
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
 
 			customAppTemplate, customAppConfig := initAppConfig()
 			cfg := tmcfg.DefaultConfig()
+
+			serverCtx := server.GetServerContextFromCmd(cmd)
+			if !serverCtx.Viper.GetBool("opentelemetry.disable") {
+				serverCtx.Config.Instrumentation.Prometheus = true
+				serverCtx.Viper.Set("telemetry.enabled", true)
+				serverCtx.Viper.Set("telemetry.prometheus-retention-time", 60)
+				if err := server.SetCmdServerContext(cmd, serverCtx); err != nil {
+					return fmt.Errorf("could not set cmd server context: %w", err)
+				}
+			}
 			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, cfg)
 		},
 	}

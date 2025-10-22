@@ -7,15 +7,16 @@ import (
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/store"
+	"cosmossdk.io/store/metrics"
 	storetypes "cosmossdk.io/store/types"
 	curiumapp "github.com/bluzelle/bluzelle-public/curium/app"
 	curiumcmd "github.com/bluzelle/bluzelle-public/curium/cmd/curiumd/cmd"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/x/nft/types"
-	tmdb "github.com/cometbft/cometbft-db"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	"github.com/cosmos/cosmos-sdk/codec"
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	dbm "github.com/cosmos/cosmos-db"
+	"github.com/cosmos/cosmos-sdk/codec/address"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	acctypes "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -30,19 +31,19 @@ func NftKeeper(t testing.TB) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.
 	authStoreKey := storetypes.NewKVStoreKey(authtypes.StoreKey)
 	bankStoreKey := storetypes.NewKVStoreKey(banktypes.StoreKey)
 
-	db := tmdb.NewMemDB()
-	stateStore := store.NewCommitMultiStore(db)
+	db := dbm.NewMemDB()
+	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
 	stateStore.MountStoreWithDB(memStoreKey, storetypes.StoreTypeMemory, nil)
 	stateStore.MountStoreWithDB(authStoreKey, storetypes.StoreTypeIAVL, db)
 	stateStore.MountStoreWithDB(bankStoreKey, storetypes.StoreTypeIAVL, db)
 	_ = stateStore.LoadLatestVersion()
 
-	registry := codectypes.NewInterfaceRegistry()
-	registry.RegisterImplementations((*authtypes.AccountI)(nil), &authtypes.BaseAccount{}, &authtypes.ModuleAccount{})
-	cdc := codec.NewProtoCodec(registry)
+	// Create a test app to get proper codec and module basics
+	testApp := curiumapp.Setup(true)
+	cdc := testApp.AppCodec()
 	paramsSubspace := typesparams.NewSubspace(cdc,
-		curiumcmd.MakeEncodingConfig(curiumapp.ModuleBasics).Amino,
+		curiumcmd.MakeEncodingConfig(testApp.ModuleBasics).Amino,
 		storeKey,
 		memStoreKey,
 		types.ModuleName,
@@ -50,7 +51,17 @@ func NftKeeper(t testing.TB) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.
 	maccPerms := map[string][]string{
 		types.ModuleName: {authtypes.Minter, authtypes.Burner},
 	}
-	accountKeeper := acctypes.NewAccountKeeper(cdc, authStoreKey, authtypes.ProtoBaseAccount, maccPerms, sdk.GetConfig().GetBech32AccountAddrPrefix(), testAddr)
+	bech32Prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
+	ac := address.NewBech32Codec(bech32Prefix)
+	accountKeeper := acctypes.NewAccountKeeper(
+		cdc,
+		runtime.NewKVStoreService(authStoreKey),
+		authtypes.ProtoBaseAccount,
+		maccPerms,
+		ac,
+		bech32Prefix,
+		testAddr,
+	)
 
 	maccPermsBool := make(map[string]bool)
 	for k := range maccPerms {
@@ -58,7 +69,12 @@ func NftKeeper(t testing.TB) (*keeper.Keeper, *bankkeeper.BaseKeeper, *acctypes.
 	}
 
 	bankKeeper := bankkeeper.NewBaseKeeper(
-		cdc, bankStoreKey, accountKeeper, maccPermsBool, testAddr,
+		cdc,
+		runtime.NewKVStoreService(bankStoreKey),
+		accountKeeper,
+		maccPermsBool,
+		testAddr,
+		log.NewNopLogger(),
 	)
 
 	k := keeper.NewKeeper(

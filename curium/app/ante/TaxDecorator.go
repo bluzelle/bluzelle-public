@@ -27,17 +27,17 @@ func NewTaxDecorator(accountKeeper acctypes.AccountKeeper, bankKeeper bankkeeper
 }
 
 // FeeTx defines the interface to be implemented by Tx to use the FeeDecorators
-type FeeTx interface {
-	sdk.Tx
-	GetGas() uint64
-	GetFee() sdk.Coins
-	FeePayer() sdk.AccAddress
-}
+// type FeeTx interface {
+// 	sdk.Tx
+// 	GetGas() uint64
+// 	GetFee() sdk.Coins
+// 	FeePayer() sdk.AccAddress
+// }
 
 func (td TaxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	if !simulate && ctx.BlockHeight() > 0 {
 
-		feeTx, ok := tx.(FeeTx)
+		feeTx, ok := tx.(sdk.FeeTx)
 		if !ok {
 			return ctx, errors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
 		}
@@ -57,14 +57,16 @@ func validateTx(ctx sdk.Context, td TaxDecorator, taxPayer sdk.AccAddress, msg s
 	return nil
 }
 
-func handleTx(ctx sdk.Context, td TaxDecorator, tx FeeTx) error {
+func handleTx(ctx sdk.Context, td TaxDecorator, tx sdk.FeeTx) error {
 	msgs := tx.GetMsgs()
+
 	taxPayer := tx.FeePayer()
+	taxPayerAddress := sdk.AccAddress(taxPayer)
 	err := forSendMessagesOnly(msgs, func(msg sdk.Msg) error {
 		if err := validateTx(ctx, td, taxPayer, msg); err != nil {
 			return err
 		}
-		if err := td.taxKeeper.ChargeTransferTax(ctx, taxPayer, msg); err != nil {
+		if err := td.taxKeeper.ChargeTransferTax(ctx, taxPayerAddress, msg); err != nil {
 			return fmt.Errorf("ERROR: Can not charge tax")
 		}
 		return nil

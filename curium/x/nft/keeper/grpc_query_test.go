@@ -224,7 +224,7 @@ func (suite *KeeperTestSuite) TestGRPCMetadata() {
 }
 
 func (suite *KeeperTestSuite) TestGRPCCollection() {
-	// create nfts
+	// create nfts with unique address for this test
 	creator := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address().Bytes())
 
 	// set params for issue fee

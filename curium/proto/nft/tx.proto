@@ -2,6 +2,7 @@ syntax = "proto3";
 package nft;
 
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/msg/v1/msg.proto";
 import "gogoproto/gogo.proto";
 import "nft/nft.proto";
 
@@ -30,6 +31,7 @@ service Msg {
 }
 
 message MsgCreateNFT {
+  option (cosmos.msg.v1.signer) = "sender";
   string sender = 1;
   uint64 coll_id = 2;
   nft.Metadata metadata = 3 [ (gogoproto.nullable) = false ];
@@ -40,6 +42,7 @@ message MsgCreateNFTResponse {
 }
 
 message MsgBurnNFT {
+  option (cosmos.msg.v1.signer) = "sender";
   string sender =1;
   string nft_id = 2;
 }
@@ -49,6 +52,7 @@ message MsgBurnNFTResponse {
 }
 
 message MsgPrintEdition {
+  option (cosmos.msg.v1.signer) = "sender";
   string sender = 1;
   uint64 coll_id = 2;
   uint64 metadata_id = 3;
@@ -60,6 +64,7 @@ message MsgPrintEditionResponse {
 }
 
 message MsgTransferNFT {
+  option (cosmos.msg.v1.signer) = "sender";
   string sender = 1;
   string id = 2;
   string new_owner = 3;
@@ -67,12 +72,14 @@ message MsgTransferNFT {
 message MsgTransferNFTResponse {}
 
 message MsgSignMetadata {
+  option (cosmos.msg.v1.signer) = "sender";
   string sender = 1;
   uint64 metadata_id = 2;
 }
 message MsgSignMetadataResponse {}
 
 message MsgUpdateMetadata {
+  option (cosmos.msg.v1.signer) = "sender";
   string sender = 1;
   uint64 metadata_id = 2;
   // The name of the asset
@@ -90,6 +97,7 @@ message MsgUpdateMetadata {
 message MsgUpdateMetadataResponse {}
 
 message MsgUpdateMetadataAuthority {
+  option (cosmos.msg.v1.signer) = "sender";
   string sender = 1;
   uint64 metadata_id = 2;
   string new_authority = 3;
@@ -97,6 +105,7 @@ message MsgUpdateMetadataAuthority {
 message MsgUpdateMetadataAuthorityResponse {}
 
 message MsgUpdateMintAuthority {
+  option (cosmos.msg.v1.signer) = "sender";
   string sender = 1;
   uint64 metadata_id = 2;
   string new_authority = 3;
@@ -104,6 +113,7 @@ message MsgUpdateMintAuthority {
 message MsgUpdateMintAuthorityResponse {}
 
 message MsgCreateCollection {
+  option (cosmos.msg.v1.signer) = "sender";
   string sender = 1;
   string symbol = 2;
   string name = 3;
@@ -119,6 +129,7 @@ message MsgCreateCollectionResponse {
 
 
 message MsgUpdateCollectionAuthority {
+  option (cosmos.msg.v1.signer) = "sender";
   string sender = 1;
   uint64 collection_id = 2;
   string new_authority = 3;
@@ -126,6 +137,7 @@ message MsgUpdateCollectionAuthority {
 message MsgUpdateCollectionAuthorityResponse {}
 
 message MsgUpdateCollectionUri {
+  option (cosmos.msg.v1.signer) = "sender";
   string sender = 1;
   uint64 collection_id = 2;
   string uri = 3;
@@ -134,6 +146,7 @@ message MsgUpdateCollectionUri {
 message MsgUpdateCollectionUriResponse {}
 
 message MsgUpdateCollectionMutableUri {
+  option (cosmos.msg.v1.signer) = "sender";
   string sender = 1;
   uint64 collection_id = 2;
   string uri = 3;
@@ -142,6 +155,7 @@ message MsgUpdateCollectionMutableUri {
 message MsgUpdateCollectionMutableUriResponse {}
 
 message MsgMultiSendNFT {
+  option (cosmos.msg.v1.signer) = "sender";
   string sender = 1;
   repeated nft.MultiSendNFTOutput multi_send_outputs = 2;
 }

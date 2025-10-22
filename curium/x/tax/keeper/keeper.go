@@ -91,7 +91,7 @@ func (k Keeper) calculateGasTax(ctx sdk.Context, gasFee sdk.Coins) sdk.Coins {
 func (k Keeper) ChargeTransferTax(ctx sdk.Context, taxPayer sdk.AccAddress, msg sdk.Msg) error {
 	taxPayerAcc := k.AccountKeeper.GetAccount(ctx, taxPayer)
 	if taxPayerAcc == nil {
-		return sdkerrors.Wrapf(errors.ErrUnknownAddress, "fee payer address: %s does not exist", taxPayer)
+		return sdkerrors.Wrapf(errors.ErrUnknownAddress, "fee payer address: %s account does not exist", taxPayer)
 	}
 	transferTaxes, err := k.CalculateTransferTax(ctx, taxPayer, msg)
 	if err != nil {

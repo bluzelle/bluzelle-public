@@ -57,7 +57,7 @@ func NewAnteHandlerOptions(t *testing.T) *appTypes.AnteHandlerOptions {
 		app.AccountKeeper,
 		app.BlockedAddresses(moduleAccountAddresses),
 		govAuthAddrStr,
-		nil,
+		app.Logger(),
 	)
 	app.BankKeeper = bankKeeper
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, runtime.NewKVStoreService(keys[feegrant.StoreKey]), app.AccountKeeper)
