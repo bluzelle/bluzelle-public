@@ -1,12 +1,8 @@
 package app
 
 import (
-	storetypes "cosmossdk.io/store/types"
-	upgradetypes "cosmossdk.io/x/upgrade/types"
 	upgrade "github.com/bluzelle/bluzelle-public/curium/app/upgrades/v12"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	consensustypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
-	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 )
 
 // NOTE: This upgrade defines a reference implementation of what an upgrade
@@ -51,21 +47,16 @@ func (app *App) setupUpgradeHandlers(
 	app.UpgradeKeeper.SetUpgradeHandler(upgrade.UpgradeName, upgrade.CreateV12UpgradeHandler(app.mm, configurator))
 }
 
-func (app *App) setupUpgradeStoreLoaders() {
-	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
-	if err != nil {
-		panic("failed to read upgrade info from disk: " + err.Error())
-	}
-	storeUpgrades := &storetypes.StoreUpgrades{
-		Added: []string{
-			crisistypes.ModuleName,
-			consensustypes.ModuleName,
-		},
-	}
-	app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
-}
+// func (app *App) setupUpgradeStoreLoaders() {
+// 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+// 	if err != nil {
+// 		panic("failed to read upgrade info from disk: " + err.Error())
+// 	}
+// 	storeUpgrades := &storetypes.StoreUpgrades{}
+// 	app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
+// }
 
 func (app *App) upgrade(configurator module.Configurator) {
 	app.setupUpgradeHandlers(configurator)
-	app.setupUpgradeStoreLoaders()
+	// app.setupUpgradeStoreLoaders()
 }
