@@ -15,12 +15,10 @@ import (
 	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	curiummoduletypes "github.com/bluzelle/bluzelle-public/curium/x/curium/types"
-	"github.com/bluzelle/bluzelle-public/curium/x/faucet"
 	"github.com/bluzelle/bluzelle-public/curium/x/storage"
 	storagemoduletypes "github.com/bluzelle/bluzelle-public/curium/x/storage/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/tax"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -42,7 +40,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
-	"github.com/spf13/cast"
 
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
@@ -54,8 +51,6 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	curium "github.com/bluzelle/bluzelle-public/curium/x/curium"
 	curiummodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/curium/keeper"
-	faucetmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/faucet/keeper"
-	faucetmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	nftkeeper "github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	storagemodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/storage/keeper"
@@ -136,8 +131,6 @@ type AppKeepers struct {
 
 	StorageKeeper storagemodulekeeper.Keeper
 
-	FaucetKeeper faucetmodulekeeper.Keeper
-
 	TaxKeeper taxmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
@@ -146,7 +139,6 @@ type AppKeepers struct {
 	TransferModule transfer.AppModule
 	CuriumModule   curium.AppModule
 	StorageModule  storage.AppModule
-	FaucetModule   faucet.AppModule
 	TaxModule      tax.AppModule
 	NftModule      nft.AppModule
 }
@@ -396,18 +388,6 @@ func NewAppKeeper(
 		appKeepers.StorageModule = storage.NewAppModule(appCodec, appKeepers.StorageKeeper)
 	}
 
-	appKeepers.FaucetKeeper = *faucetmodulekeeper.NewKeeper(
-		appCodec,
-		keys[faucetmoduletypes.StoreKey],
-		keys[faucetmoduletypes.MemStoreKey],
-		appKeepers.GetSubspace(faucetmoduletypes.ModuleName),
-		appKeepers.BankKeeper,
-		curium.NewKeyRingReader(appOpts.Get(flags.FlagHome).(string)),
-		curiummodulekeeper.NewMsgBroadcaster(&appKeepers.AccountKeeper, cast.ToString(appOpts.Get(flags.FlagHome)), txConfig, appCodec),
-	)
-
-	appKeepers.FaucetModule = faucet.NewAppModule(appCodec, appKeepers.FaucetKeeper, appKeepers.AccountKeeper, appKeepers.BankKeeper)
-
 	appKeepers.TaxKeeper = *taxmodulekeeper.NewKeeper(
 		appCodec,
 		keys[taxmoduletypes.StoreKey],
@@ -459,7 +439,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(minttypes.ModuleName)
 
 	// custom
-	paramsKeeper.Subspace(faucetmoduletypes.ModuleName)
 	paramsKeeper.Subspace(taxmoduletypes.ModuleName)
 	paramsKeeper.Subspace(nfttypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)

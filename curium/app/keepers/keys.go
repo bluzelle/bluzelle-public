@@ -10,7 +10,6 @@ import (
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 
 	curiummoduletypes "github.com/bluzelle/bluzelle-public/curium/x/curium/types"
-	faucetmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	storagemoduletypes "github.com/bluzelle/bluzelle-public/curium/x/storage/types"
 	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
@@ -39,7 +38,6 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		curiummoduletypes.StoreKey,
 		storagemoduletypes.StoreKey,
-		faucetmoduletypes.StoreKey,
 		taxmoduletypes.StoreKey,
 		nfttypes.StoreKey,
 		authzkeeper.StoreKey, icahosttypes.StoreKey,

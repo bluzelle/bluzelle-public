@@ -2,7 +2,6 @@ package app
 
 import (
 	curiummoduletypes "github.com/bluzelle/bluzelle-public/curium/x/curium/types"
-	faucetmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	nftmodule "github.com/bluzelle/bluzelle-public/curium/x/nft"
 	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	storagemoduletypes "github.com/bluzelle/bluzelle-public/curium/x/storage/types"
@@ -65,7 +64,6 @@ var maccPerms = map[string][]string{
 	govtypes.ModuleName:            {authtypes.Burner},
 	ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 	nfttypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
-	faucetmoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 	taxmoduletypes.ModuleName:      nil,
 	// this line is used by starport scaffolding # stargate/app/maccPerms
 }
@@ -102,7 +100,6 @@ func appModules(
 		app.TransferModule,
 		app.CuriumModule,
 		app.StorageModule,
-		app.FaucetModule,
 		app.TaxModule,
 		app.NftModule,
 	}
@@ -180,7 +177,6 @@ func orderBeginBlockers() []string {
 		genutiltypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
-		faucetmoduletypes.ModuleName,
 		crisistypes.ModuleName,
 		taxmoduletypes.ModuleName,
 		storagemoduletypes.ModuleName,
@@ -214,7 +210,6 @@ func orderEndBlockers() []string {
 		genutiltypes.ModuleName,
 		authtypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		faucetmoduletypes.ModuleName,
 		banktypes.ModuleName,
 		capabilitytypes.ModuleName,
 		evidencetypes.ModuleName,
@@ -250,7 +245,6 @@ func orderInitBlockers() []string {
 		nfttypes.ModuleName,
 		curiummoduletypes.ModuleName,
 		storagemoduletypes.ModuleName,
-		faucetmoduletypes.ModuleName,
 		taxmoduletypes.ModuleName,
 
 		paramstypes.ModuleName,
