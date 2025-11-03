@@ -1,8 +1,8 @@
 package keepers
 
 import (
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 
 	storetypes "cosmossdk.io/store/types"
 	evidencetypes "cosmossdk.io/x/evidence/types"
@@ -10,6 +10,7 @@ import (
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 
 	curiummoduletypes "github.com/bluzelle/bluzelle-public/curium/x/curium/types"
+	faucetmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	storagemoduletypes "github.com/bluzelle/bluzelle-public/curium/x/storage/types"
 	taxmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
@@ -25,7 +26,7 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
+	icahosttypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/types"
 )
 
 func (appKeepers *AppKeepers) GenerateKeys() {
@@ -38,6 +39,7 @@ func (appKeepers *AppKeepers) GenerateKeys() {
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		curiummoduletypes.StoreKey,
 		storagemoduletypes.StoreKey,
+		faucetmoduletypes.StoreKey,
 		taxmoduletypes.StoreKey,
 		nfttypes.StoreKey,
 		authzkeeper.StoreKey, icahosttypes.StoreKey,

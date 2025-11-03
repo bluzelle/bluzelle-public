@@ -17,6 +17,10 @@ accounts:
     coins:
       - 10000ubnt
     hd-path: "m/44'/118'/0'/0/0"
+faucet:
+  name: null
+  coins: []
+  host: 0.0.0.0:4500
 client:
   openapi:
     path: docs/static/openapi.yml

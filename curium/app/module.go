@@ -2,6 +2,7 @@ package app
 
 import (
 	curiummoduletypes "github.com/bluzelle/bluzelle-public/curium/x/curium/types"
+	faucetmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	nftmodule "github.com/bluzelle/bluzelle-public/curium/x/nft"
 	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	storagemoduletypes "github.com/bluzelle/bluzelle-public/curium/x/storage/types"
@@ -9,9 +10,9 @@ import (
 
 	"github.com/cosmos/ibc-go/modules/capability"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/v8/modules/core"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/v10/modules/core"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 
 	"cosmossdk.io/x/evidence"
 	evidencetypes "cosmossdk.io/x/evidence/types"
@@ -64,6 +65,7 @@ var maccPerms = map[string][]string{
 	govtypes.ModuleName:            {authtypes.Burner},
 	ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 	nfttypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
+	faucetmoduletypes.ModuleName:   {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 	taxmoduletypes.ModuleName:      nil,
 	// this line is used by starport scaffolding # stargate/app/maccPerms
 }
@@ -100,6 +102,7 @@ func appModules(
 		app.TransferModule,
 		app.CuriumModule,
 		app.StorageModule,
+		app.FaucetModule,
 		app.TaxModule,
 		app.NftModule,
 	}
@@ -147,6 +150,40 @@ func simulationModules(
 }
 
 /*
+orderPreBlockers tells the app's module manager how to set the order of
+PreBlockers, which are run before the block is processed.
+In Cosmos SDK v0.53+, ALL registered modules must be listed here.
+*/
+func orderPreBlockers() []string {
+	return []string{
+		upgradetypes.ModuleName, // Upgrade module should run first
+		capabilitytypes.ModuleName,
+		authtypes.ModuleName,
+		banktypes.ModuleName,
+		distrtypes.ModuleName,
+		stakingtypes.ModuleName,
+		slashingtypes.ModuleName,
+		govtypes.ModuleName,
+		minttypes.ModuleName,
+		crisistypes.ModuleName,
+		ibcexported.ModuleName,
+		genutiltypes.ModuleName,
+		evidencetypes.ModuleName,
+		ibctransfertypes.ModuleName,
+		nfttypes.ModuleName,
+		curiummoduletypes.ModuleName,
+		storagemoduletypes.ModuleName,
+		faucetmoduletypes.ModuleName,
+		taxmoduletypes.ModuleName,
+		paramstypes.ModuleName,
+		feegrant.ModuleName,
+		vestingtypes.ModuleName,
+		consensusparamtypes.ModuleName,
+		authz.ModuleName,
+	}
+}
+
+/*
 orderBeginBlockers tells the app's module manager how to set the order of
 BeginBlockers, which are run at the beginning of every block.
 
@@ -177,6 +214,7 @@ func orderBeginBlockers() []string {
 		genutiltypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
+		faucetmoduletypes.ModuleName,
 		crisistypes.ModuleName,
 		taxmoduletypes.ModuleName,
 		storagemoduletypes.ModuleName,
@@ -210,6 +248,7 @@ func orderEndBlockers() []string {
 		genutiltypes.ModuleName,
 		authtypes.ModuleName,
 		ibctransfertypes.ModuleName,
+		faucetmoduletypes.ModuleName,
 		banktypes.ModuleName,
 		capabilitytypes.ModuleName,
 		evidencetypes.ModuleName,
@@ -245,6 +284,7 @@ func orderInitBlockers() []string {
 		nfttypes.ModuleName,
 		curiummoduletypes.ModuleName,
 		storagemoduletypes.ModuleName,
+		faucetmoduletypes.ModuleName,
 		taxmoduletypes.ModuleName,
 
 		paramstypes.ModuleName,

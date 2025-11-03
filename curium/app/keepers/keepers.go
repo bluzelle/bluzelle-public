@@ -15,10 +15,12 @@ import (
 	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 	curiummoduletypes "github.com/bluzelle/bluzelle-public/curium/x/curium/types"
+	"github.com/bluzelle/bluzelle-public/curium/x/faucet"
 	"github.com/bluzelle/bluzelle-public/curium/x/storage"
 	storagemoduletypes "github.com/bluzelle/bluzelle-public/curium/x/storage/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/tax"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -38,8 +40,10 @@ import (
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
+
+	// packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types" // TODO: Re-enable when upgrading middleware
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
+	"github.com/spf13/cast"
 
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
@@ -51,6 +55,8 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	curium "github.com/bluzelle/bluzelle-public/curium/x/curium"
 	curiummodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/curium/keeper"
+	faucetmodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/faucet/keeper"
+	faucetmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	nftkeeper "github.com/bluzelle/bluzelle-public/curium/x/nft/keeper"
 	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 	storagemodulekeeper "github.com/bluzelle/bluzelle-public/curium/x/storage/keeper"
@@ -67,27 +73,28 @@ import (
 	consensusparamkeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
 	consensusparamtypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 
-	// ica "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts"
-	// icacontrollerkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/keeper"
-	// icacontrollertypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/types"
-	// icahost "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host"
-	// icahostkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/keeper"
-	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
-	// icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
-	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
-	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	// ica "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts"
+	// icacontrollerkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/keeper"
+	// icacontrollertypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/types"
+	// icahost "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host"
+	// icahostkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/keeper"
+	icahosttypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/types"
+	// icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
+	"github.com/cosmos/ibc-go/v10/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+
+	// ibcclienttypes "github.com/cosmos/ibc-go/v10/modules/core/02-client/types" // TODO: Re-enable if needed for client proposals
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
 	"cosmossdk.io/log"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/keeper"
-	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8"
+
+	// packetforwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/keeper" // TODO: Remove or upgrade to v10
+	// ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8" // TODO: Remove or upgrade to v10
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-	ibcclient "github.com/cosmos/ibc-go/v8/modules/core/02-client"
-	ibcporttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
+	ibcporttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
 )
 
 const (
@@ -123,7 +130,7 @@ type AppKeepers struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	PacketForwardKeeper *packetforwardkeeper.Keeper
+	// PacketForwardKeeper *packetforwardkeeper.Keeper // TODO: Re-enable when middleware upgraded to v10
 
 	CuriumKeeper curiummodulekeeper.Keeper
 
@@ -131,14 +138,17 @@ type AppKeepers struct {
 
 	StorageKeeper storagemodulekeeper.Keeper
 
+	FaucetKeeper faucetmodulekeeper.Keeper
+
 	TaxKeeper taxmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
-	HooksICS4Wrapper      ibchooks.ICS4Middleware
+	// HooksICS4Wrapper      ibchooks.ICS4Middleware // TODO: Re-enable when middleware upgraded to v10
 	// Modules
 	TransferModule transfer.AppModule
 	CuriumModule   curium.AppModule
 	StorageModule  storage.AppModule
+	FaucetModule   faucet.AppModule
 	TaxModule      tax.AppModule
 	NftModule      nft.AppModule
 }
@@ -284,11 +294,9 @@ func NewAppKeeper(
 	// Create IBC Keeper
 	appKeepers.IBCKeeper = ibckeeper.NewKeeper(
 		appCodec,
-		keys[ibcexported.StoreKey],
+		runtime.NewKVStoreService(keys[ibcexported.StoreKey]),
 		appKeepers.GetSubspace(ibcexported.ModuleName),
-		appKeepers.StakingKeeper,
 		appKeepers.UpgradeKeeper,
-		scopedIBCKeeper,
 		govAuthAddrStr,
 	)
 
@@ -300,33 +308,36 @@ func NewAppKeeper(
 		appKeepers.AccountKeeper,
 	)
 
-	appKeepers.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
-		appKeepers.IBCKeeper.ChannelKeeper,
-		nil,
-	)
-	appKeepers.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
-		appCodec,
-		keys[packetforwardtypes.StoreKey],
-		appKeepers.TransferKeeper, // Will be zero-value here. Reference is set later on with SetTransferKeeper.
-		appKeepers.IBCKeeper.ChannelKeeper,
-		appKeepers.BankKeeper,
-		appKeepers.HooksICS4Wrapper,
-		govAuthAddrStr,
-	)
 	// Create Transfer Keepers
+	// Note: In v10, TransferKeeper doesn't need PortKeeper or ScopedKeeper, but needs MessageRouter
 	appKeepers.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec,
-		keys[ibctransfertypes.StoreKey],
+		runtime.NewKVStoreService(keys[ibctransfertypes.StoreKey]),
 		appKeepers.GetSubspace(ibctransfertypes.ModuleName),
-		// The ICS4Wrapper is replaced by the PacketForwardKeeper instead of the channel so that sending can be overridden by the middleware
-		appKeepers.PacketForwardKeeper,
-		appKeepers.IBCKeeper.ChannelKeeper,
-		appKeepers.IBCKeeper.PortKeeper,
+		appKeepers.IBCKeeper.ChannelKeeper, // ICS4Wrapper
+		appKeepers.IBCKeeper.ChannelKeeper, // ChannelKeeper
+		bApp.MsgServiceRouter(),            // MessageRouter
 		appKeepers.AccountKeeper,
 		appKeepers.BankKeeper,
-		scopedTransferKeeper,
 		govAuthAddrStr,
 	)
+
+	// TODO: Middleware compatibility issue - v8 middleware expects v8 IBC types but we're using v10
+	// Need to upgrade middleware packages to v10 or create compatibility adapters
+	// Temporarily commented out to fix build errors
+	// appKeepers.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
+	// 	appKeepers.IBCKeeper.ChannelKeeper,
+	// 	nil,
+	// )
+	// appKeepers.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
+	// 	appCodec,
+	// 	keys[packetforwardtypes.StoreKey],
+	// 	appKeepers.TransferKeeper,
+	// 	appKeepers.IBCKeeper.ChannelKeeper,
+	// 	appKeepers.BankKeeper,
+	// 	appKeepers.HooksICS4Wrapper,
+	// 	govAuthAddrStr,
+	// )
 	appKeepers.TransferModule = transfer.NewAppModule(appKeepers.TransferKeeper)
 	transferIBCModule := transfer.NewIBCModule(appKeepers.TransferKeeper)
 
@@ -357,9 +368,8 @@ func NewAppKeeper(
 	// register the proposal types
 	govRouter := govv1beta1.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
-		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(appKeepers.ParamsKeeper)).
-		AddRoute(ibcexported.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper))
+		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(appKeepers.ParamsKeeper))
+	// Note: Client proposal handlers removed in ibc-go v10 - client updates are handled via messages
 	govKeeper.SetLegacyRouter(govRouter)
 	appKeepers.GovKeeper = govKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(),
@@ -387,6 +397,18 @@ func NewAppKeeper(
 		)
 		appKeepers.StorageModule = storage.NewAppModule(appCodec, appKeepers.StorageKeeper)
 	}
+
+	appKeepers.FaucetKeeper = *faucetmodulekeeper.NewKeeper(
+		appCodec,
+		keys[faucetmoduletypes.StoreKey],
+		keys[faucetmoduletypes.MemStoreKey],
+		appKeepers.GetSubspace(faucetmoduletypes.ModuleName),
+		appKeepers.BankKeeper,
+		curium.NewKeyRingReader(appOpts.Get(flags.FlagHome).(string)),
+		curiummodulekeeper.NewMsgBroadcaster(&appKeepers.AccountKeeper, cast.ToString(appOpts.Get(flags.FlagHome)), txConfig, appCodec),
+	)
+
+	appKeepers.FaucetModule = faucet.NewAppModule(appCodec, appKeepers.FaucetKeeper, appKeepers.AccountKeeper, appKeepers.BankKeeper)
 
 	appKeepers.TaxKeeper = *taxmodulekeeper.NewKeeper(
 		appCodec,
@@ -439,6 +461,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(minttypes.ModuleName)
 
 	// custom
+	paramsKeeper.Subspace(faucetmoduletypes.ModuleName)
 	paramsKeeper.Subspace(taxmoduletypes.ModuleName)
 	paramsKeeper.Subspace(nfttypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)

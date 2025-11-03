@@ -13,7 +13,6 @@ import (
 	"cosmossdk.io/core/appmodule"
 	tmlog "cosmossdk.io/log"
 	"cosmossdk.io/x/tx/signing"
-	upgradetypes "cosmossdk.io/x/upgrade/types"
 	appAnte "github.com/bluzelle/bluzelle-public/curium/app/ante"
 	appkeepers "github.com/bluzelle/bluzelle-public/curium/app/keepers"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
@@ -52,6 +51,7 @@ import (
 	"github.com/bluzelle/bluzelle-public/curium/docs"
 
 	storetypes "cosmossdk.io/store/types"
+	faucetmoduletypes "github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
 	nfttypes "github.com/bluzelle/bluzelle-public/curium/x/nft/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
@@ -70,22 +70,22 @@ import (
 	runtimeservices "github.com/cosmos/cosmos-sdk/runtime/services"
 	consensusparamkeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
 
-	// ica "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts"
-	// icacontrollerkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/keeper"
-	// icacontrollertypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/types"
-	// icahost "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host"
-	// icahostkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/keeper"
-	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
-	// icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
+	// ica "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts"
+	// icacontrollerkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/keeper"
+	// icacontrollertypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/types"
+	// icahost "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host"
+	// icahostkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/keeper"
+	icahosttypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/types"
+	// icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
 
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 
 	"github.com/cosmos/cosmos-sdk/server"
 	sigtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	txmodule "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8"
+	// ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8" // TODO: Remove or upgrade to v10
 	// providertypes "github.com/cosmos/interchain-security/v7/x/ccv/provider/types"
 )
 
@@ -181,7 +181,7 @@ type App struct {
 	appkeepers.AppKeepers
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
-	HooksICS4Wrapper      ibchooks.ICS4Middleware
+	// HooksICS4Wrapper      ibchooks.ICS4Middleware // TODO: Re-enable when middleware upgraded to v10
 	// the module manager
 	mm *module.Manager
 
@@ -291,10 +291,10 @@ func NewCuriumApp(
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the
 	// CanWithdrawInvariant invariant.
-	// NOTE: staking module is required if HistoricalEntrie
-	//s param > 0
+	// NOTE: staking module is required if HistoricalEntries param > 0
+	// NOTE: In Cosmos SDK v0.53+, ALL registered modules must be listed in SetOrderPreBlockers
 	app.mm.SetOrderPreBlockers(
-		upgradetypes.ModuleName,
+		orderPreBlockers()...,
 	)
 	app.mm.SetOrderBeginBlockers(
 		orderBeginBlockers()...,
@@ -552,6 +552,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(minttypes.ModuleName)
 
 	// custom
+	paramsKeeper.Subspace(faucetmoduletypes.ModuleName)
 	paramsKeeper.Subspace(nfttypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibcexported.ModuleName)

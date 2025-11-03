@@ -1,0 +1,25 @@
+syntax = "proto3";
+package faucet;
+import "cosmos/msg/v1/msg.proto";
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/bluzelle/bluzelle-public/curium/x/faucet/types";
+
+// Msg defines the Msg service.
+service Msg {
+      rpc FaucetToken(MsgFaucetToken) returns (MsgFaucetTokenResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
+}
+
+message MsgFaucetToken {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string address = 2;
+}
+
+message MsgFaucetTokenResponse {
+  string address = 1;
+}
+
+// this line is used by starport scaffolding # proto/tx/message

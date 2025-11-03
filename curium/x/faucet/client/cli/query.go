@@ -1,0 +1,69 @@
+package cli
+
+import (
+	"context"
+	"fmt"
+
+	// "strings"
+
+	"github.com/spf13/cobra"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/version"
+
+	// sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/bluzelle/bluzelle-public/curium/x/faucet/types"
+)
+
+// GetQueryCmd returns the cli query commands for this module
+func GetQueryCmd(queryRoute string) *cobra.Command {
+	// Group faucet queries under a subcommand
+	cmd := &cobra.Command{
+		Use:                        types.ModuleName,
+		Short:                      fmt.Sprintf("Querying commands for the %s module", types.ModuleName),
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	cmd.AddCommand(CmdQueryParams(), GetCmdQueryMint())
+	flags.AddQueryFlagsToCmd(cmd)
+
+	// this line is used by starport scaffolding # 1
+
+	return cmd
+}
+
+func GetCmdQueryMint() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "faucet-token [addr]",
+		Short:   "will send faucet tokens to the address",
+		Long:    "will send faucet tokens to the address",
+		Example: fmt.Sprintf(`$ %s faucet faucet-token bluzelle15c6g2f3yv7j2xksqsg3pa369yst2dw4kk6fptv`, version.AppName),
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			res, err := queryClient.FaucetToken(context.Background(), &types.QueryFaucetTokenRequest{
+				Address: args[0],
+			})
+
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
