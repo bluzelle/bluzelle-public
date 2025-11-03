@@ -29,11 +29,6 @@ genesis:
     crisis:
       constant_fee:
         denom: ubnt
-    gov:
-      params:
-        min_deposit:
-          - amount: "1000000"
-            denom: ubnt
     mint:
       minter:
         inflation: "0.0"
