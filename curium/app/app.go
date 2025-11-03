@@ -13,7 +13,6 @@ import (
 	"cosmossdk.io/core/appmodule"
 	tmlog "cosmossdk.io/log"
 	"cosmossdk.io/x/tx/signing"
-	upgradetypes "cosmossdk.io/x/upgrade/types"
 	appAnte "github.com/bluzelle/bluzelle-public/curium/app/ante"
 	appkeepers "github.com/bluzelle/bluzelle-public/curium/app/keepers"
 	appTypes "github.com/bluzelle/bluzelle-public/curium/app/types"
@@ -86,7 +85,7 @@ import (
 	sigtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	txmodule "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8"
+	// ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8" // TODO: Remove or upgrade to v10
 	// providertypes "github.com/cosmos/interchain-security/v7/x/ccv/provider/types"
 )
 
@@ -182,7 +181,7 @@ type App struct {
 	appkeepers.AppKeepers
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
-	HooksICS4Wrapper      ibchooks.ICS4Middleware
+	// HooksICS4Wrapper      ibchooks.ICS4Middleware // TODO: Re-enable when middleware upgraded to v10
 	// the module manager
 	mm *module.Manager
 
@@ -292,10 +291,10 @@ func NewCuriumApp(
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the
 	// CanWithdrawInvariant invariant.
-	// NOTE: staking module is required if HistoricalEntrie
-	//s param > 0
+	// NOTE: staking module is required if HistoricalEntries param > 0
+	// NOTE: In Cosmos SDK v0.53+, ALL registered modules must be listed in SetOrderPreBlockers
 	app.mm.SetOrderPreBlockers(
-		upgradetypes.ModuleName,
+		orderPreBlockers()...,
 	)
 	app.mm.SetOrderBeginBlockers(
 		orderBeginBlockers()...,

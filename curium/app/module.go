@@ -150,6 +150,40 @@ func simulationModules(
 }
 
 /*
+orderPreBlockers tells the app's module manager how to set the order of
+PreBlockers, which are run before the block is processed.
+In Cosmos SDK v0.53+, ALL registered modules must be listed here.
+*/
+func orderPreBlockers() []string {
+	return []string{
+		upgradetypes.ModuleName, // Upgrade module should run first
+		capabilitytypes.ModuleName,
+		authtypes.ModuleName,
+		banktypes.ModuleName,
+		distrtypes.ModuleName,
+		stakingtypes.ModuleName,
+		slashingtypes.ModuleName,
+		govtypes.ModuleName,
+		minttypes.ModuleName,
+		crisistypes.ModuleName,
+		ibcexported.ModuleName,
+		genutiltypes.ModuleName,
+		evidencetypes.ModuleName,
+		ibctransfertypes.ModuleName,
+		nfttypes.ModuleName,
+		curiummoduletypes.ModuleName,
+		storagemoduletypes.ModuleName,
+		faucetmoduletypes.ModuleName,
+		taxmoduletypes.ModuleName,
+		paramstypes.ModuleName,
+		feegrant.ModuleName,
+		vestingtypes.ModuleName,
+		consensusparamtypes.ModuleName,
+		authz.ModuleName,
+	}
+}
+
+/*
 orderBeginBlockers tells the app's module manager how to set the order of
 BeginBlockers, which are run at the beginning of every block.
 
