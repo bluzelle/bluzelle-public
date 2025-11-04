@@ -170,7 +170,6 @@ func orderPreBlockers() []string {
 		nfttypes.ModuleName,
 		curiummoduletypes.ModuleName,
 		storagemoduletypes.ModuleName,
-		faucetmoduletypes.ModuleName,
 		taxmoduletypes.ModuleName,
 		paramstypes.ModuleName,
 		feegrant.ModuleName,
