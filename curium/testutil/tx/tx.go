@@ -1,6 +1,8 @@
 package tx
 
 import (
+	"time"
+
 	"github.com/gogo/protobuf/proto"
 
 	sdkerrors "cosmossdk.io/errors"
@@ -31,6 +33,24 @@ type wrapper struct {
 	// authInfoBz represents the protobuf encoding of TxBody. This should be encoding
 	// from the client using TxRaw if the tx was decoded from the wire
 	authInfoBz []byte
+}
+
+// SetTimeoutTimestamp implements client.TxBuilder.
+func (w *wrapper) SetTimeoutTimestamp(timestamp time.Time) {
+}
+
+// SetUnordered implements client.TxBuilder.
+func (w *wrapper) SetUnordered(v bool) {
+}
+
+// GetTimeoutTimeStamp implements signing.Tx.
+func (w *wrapper) GetTimeoutTimeStamp() time.Time {
+	return time.Time{}
+}
+
+// GetUnordered implements signing.Tx.
+func (w *wrapper) GetUnordered() bool {
+	return false
 }
 
 var (
