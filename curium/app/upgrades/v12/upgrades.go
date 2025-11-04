@@ -16,4 +16,4 @@ func CreateV12UpgradeHandler(
 	}
 }
 
-const UpgradeName = "v12.1"
+const UpgradeName = "v12.0"
