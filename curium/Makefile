@@ -1,15 +1,14 @@
 #!/usr/bin/make -f
 
-BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+BRANCH_OR_TAG := $(shell git symbolic-ref --quiet --short HEAD || git describe --tags --exact-matchv)
 COMMIT := $(shell git log -1 --format='%H')
-TAG    := $(shell git describe --tags)
 
 # don't override user values
 ifeq (,$(VERSION))
   # VERSION := $(shell git describe --tags)
-  # if VERSION is empty, then populate it with branch's name and raw commit hash
+  # if VERSION is empty, then populate it with BRANCH_OR_TAG's name and raw commit hash
   # ifeq (,$(VERSION))
-    VERSION := $(BRANCH)-$(COMMIT)-$(TAG)
+    VERSION := $(BRANCH_OR_TAG)-$(COMMIT)
   # endif
 endif
 
@@ -27,7 +26,7 @@ export GO111MODULE = on
 build_tags = netgo
 ifeq ($(LEDGER_ENABLED),true)
   ifeq ($(OS),Windows_NT)
-    GCCEXE = $(shell where gcc.exe 2> NUL)
+    GCCEXE = $(shell where gcc.exe 2> NUL)1
     ifeq ($(GCCEXE),)
       $(error gcc.exe not installed for ledger support, please install or set LEDGER_ENABLED=false)
     else
