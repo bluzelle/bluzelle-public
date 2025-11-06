@@ -55,20 +55,30 @@ export const getCosmosProtoDependencies = () => [
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/evidence/v1beta1/query.proto',
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/evidence/v1beta1/tx.proto',
 
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/gov/v1beta1/gov.proto',
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/gov/v1beta1/query.proto',
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/gov/v1beta1/tx.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.53.4/proto/cosmos/gov/v1beta1/gov.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.53.4/proto/cosmos/gov/v1beta1/query.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.53.4/proto/cosmos/gov/v1beta1/tx.proto',
 
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/vesting/v1beta1/tx.proto',
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/vesting/v1beta1/vesting.proto',
 
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/gov/v1beta1/genesis.proto',
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/gov/v1beta1/gov.proto',
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/gov/v1beta1/query.proto',
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/gov/v1beta1/tx.proto',
+    // 'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.53.4/proto/cosmos/gov/v1beta1/genesis.proto',
+    // 'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.53.4/proto/cosmos/gov/v1beta1/gov.proto',
+    // 'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.53.4/proto/cosmos/gov/v1beta1/query.proto',
+    // 'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.53.4/proto/cosmos/gov/v1beta1/tx.proto',
 
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/upgrade/v1beta1/query.proto',
-    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/upgrade/v1beta1/upgrade.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/refs/tags/v0.53.4/proto/cosmos/gov/module/v1/module.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/refs/tags/v0.53.4/proto/cosmos/gov/v1/gov.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/refs/tags/v0.53.4/proto/cosmos/gov/v1/query.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/refs/tags/v0.53.4/proto/cosmos/gov/v1/tx.proto',
+
+    // 'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/upgrade/v1beta1/query.proto',
+    // 'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/upgrade/v1beta1/upgrade.proto',
+
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.53.4/proto/cosmos/upgrade/module/v1/module.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.53.4/proto/cosmos/upgrade/v1beta1/query.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.53.4/proto/cosmos/upgrade/v1beta1/tx.proto',
+    'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.53.4/proto/cosmos/upgrade/v1beta1/upgrade.proto',
 
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/params/v1beta1/params.proto',
     'https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.47.15/proto/cosmos/params/v1beta1/query.proto',

@@ -5,8 +5,8 @@ import {
   depositToProposal,
   submitCommunityPoolSpendProposal,
   submitParameterChangeProposal,
-  submitSoftwareUpgradeProposal,
-  submitTextProposal,
+  submitSoftwareUpgradeProposalLegacy,
+  submitTextProposalLegacy,
   vote,
   voteWithWeights
 } from './tx';
@@ -50,7 +50,7 @@ describe('gov module, local docker', function () {
       startSwarmWithClient({
           config: govTestSwarmConfig
       })
-        .then(client => submitTextProposal(client.bzSdk, {
+        .then(client => submitTextProposalLegacy(client.bzSdk, {
             title: 'My title',
             description: 'My description',
             proposer: client.auth.address,
@@ -70,7 +70,7 @@ describe('gov module, local docker', function () {
       startSwarmWithClient({
           config: {...govTestSwarmConfig}
       })
-        .then(passThroughAwait(client => submitTextProposal(client.bzSdk, {
+        .then(passThroughAwait(client => submitTextProposalLegacy(client.bzSdk, {
             title: 'My title',
             description: 'My description',
             proposer: client.auth.address,
@@ -105,7 +105,7 @@ describe('gov module, local docker', function () {
         startSwarmWithClient({
             config: {...govTestSwarmConfig}
         })
-        .then(passThroughAwait(client => submitTextProposal(client.bzSdk, {
+        .then(passThroughAwait(client => submitTextProposalLegacy(client.bzSdk, {
             title: 'My title',
             description: 'My description',
             proposer: client.auth.address,
@@ -141,7 +141,7 @@ describe('gov module, local docker', function () {
         startSwarmWithClient({
             config: {...govTestSwarmConfig}
         })
-        .then(passThroughAwait(client => submitTextProposal(client.bzSdk, {
+        .then(passThroughAwait(client => submitTextProposalLegacy(client.bzSdk, {
             title: 'My title',
             description: 'My description',
             proposer: client.auth.address,
@@ -184,7 +184,7 @@ describe('gov module, local docker', function () {
         startSwarmWithClient({
             config: {...govTestSwarmConfig}
         })
-        .then(passThroughAwait(client => submitSoftwareUpgradeProposal(client.bzSdk, {
+        .then(passThroughAwait(client => submitSoftwareUpgradeProposalLegacy(client.bzSdk, {
             title: 'My title',
             description: 'My description',
             proposer: client.auth.address,
@@ -216,7 +216,7 @@ describe('gov module, local docker', function () {
         startSwarmWithClient({
             config: {...govTestSwarmConfig}
         })
-        .then(passThroughAwait(client => submitSoftwareUpgradeProposal(client.bzSdk, {
+        .then(passThroughAwait(client => submitSoftwareUpgradeProposalLegacy(client.bzSdk, {
             title: 'My title',
             description: 'My description',
             proposer: client.auth.address,
@@ -260,7 +260,7 @@ describe('gov module, local docker', function () {
             config: {...govTestSwarmConfig}
         })
         .then(withCtxAwait("supply_before", client => getTotalSupply(client.bzSdk)))
-        .then(passThroughAwait(client => submitSoftwareUpgradeProposal(client.bzSdk, {
+        .then(passThroughAwait(client => submitSoftwareUpgradeProposalLegacy(client.bzSdk, {
             title: 'My title',
             description: 'My description',
             proposer: client.auth.address,
@@ -503,7 +503,7 @@ describe.skip('gov module, local machine', () => {
       url: CURIUM_URL,
       wallet: newLocalWallet(MNEMONIC)
     })
-      .then(passThroughAwait(client => submitTextProposal(client, {
+      .then(passThroughAwait(client => submitTextProposalLegacy(client, {
           title: 'My title',
           description: 'My description',
           proposer: client.address,
@@ -532,7 +532,7 @@ describe.skip('gov module, local machine', () => {
       url: CURIUM_URL,
       wallet: newLocalWallet(MNEMONIC)
     })
-      .then(passThroughAwait(client => submitSoftwareUpgradeProposal(client, {
+      .then(passThroughAwait(client => submitSoftwareUpgradeProposalLegacy(client, {
           title: 'My title',
           description: 'My description',
           proposer: client.address,
@@ -572,7 +572,7 @@ describe('gov votes', function () {
       startSwarmWithClient({
           config: {...govTestSwarmConfig}
       })
-      .then(passThroughAwait(client => submitTextProposal(client.bzSdk, {
+      .then(passThroughAwait(client => submitTextProposalLegacy(client.bzSdk, {
           title: 'My title',
           description: 'My description',
           proposer: client.auth.address,

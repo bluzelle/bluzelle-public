@@ -36,6 +36,7 @@ import { MsgExec, MsgGrant, MsgRevoke } from '../curium/lib/generated/cosmos/aut
 import { MsgCreateVestingAccount } from '../curium/lib/generated/cosmos/vesting/v1beta1/tx';
 import {
   MsgDeposit,
+  MsgExecLegacyContent,
   MsgSubmitProposal,
   MsgVote,
   MsgVoteWeighted
@@ -86,6 +87,7 @@ const registerMessages = (registry: Registry) => {
   registry.register('/cosmos.vesting.v1beta1.MsgCreateVestingAccount', MsgCreateVestingAccount)
   registry.register('/cosmos.gov.v1.MsgSubmitProposal', MsgSubmitProposal)
   registry.register('/cosmos.gov.v1beta1.MsgSubmitProposal', MsgSubmitLegacyProposal)
+  registry.register('/cosmos.gov.v1.MsgExecLegacyContent', MsgExecLegacyContent)
   registry.register('/cosmos.gov.v1.MsgVote', MsgVote)
   registry.register('/cosmos.gov.v1.MsgVoteWeighted', MsgVoteWeighted)
   registry.register('/cosmos.gov.v1.MsgDeposit', MsgDeposit)

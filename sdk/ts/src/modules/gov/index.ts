@@ -1,8 +1,9 @@
 export {
   submitTextProposal,
-  submitSoftwareUpgradeProposal,
+  submitSoftwareUpgradeProposalLegacy,
   submitCommunityPoolSpendProposal,
   submitParameterChangeProposal,
+  // submitProposalFromJson,
   vote,
   voteWithWeights,
   depositToProposal

@@ -1,0 +1,17 @@
+{
+  "title": "Mock Upgrade",
+  "summary": "Proposal to upgrade the Bluzelle network",
+  "description": "Mock upgrade",
+  "messages": [
+    {
+      "@type": "/cosmos.upgrade.v1.MsgSoftwareUpgrade",
+      "authority": "bluzelle10d07y265gmmuvt4z0w9aw880jnsr700j06s8sz",
+      "plan": {
+        "name": "v12.0",
+        "height": 45,
+        "info": "https://github.com/bluzelle/curium/releases/tag/v12.0"
+      }
+    }
+  ],
+  "deposit": "1000000000ubnt"
+}

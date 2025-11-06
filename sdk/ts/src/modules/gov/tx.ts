@@ -1,6 +1,7 @@
 import {BluzelleClient, BluzelleTxResponse, BroadcastOptions, sendTx} from '../../core';
 import {
     MsgDeposit,
+    MsgExecLegacyContent,
     MsgSubmitProposal,
     MsgUpdateParams as GovMsgUpdateParams,
     MsgVote,
@@ -9,6 +10,7 @@ import {
 import {MsgSubmitProposal as MsgSubmitLegacyProposal} from '../../curium/lib/generated/cosmos/gov/v1beta1/tx';
 import {VoteOption} from '../../curium/lib/generated/cosmos/gov/v1/gov';
 import {TextProposal} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import {SoftwareUpgradeProposal} from "cosmjs-types/cosmos/upgrade/v1beta1/upgrade";
 import {encodeSoftwareUpgradeProposal} from '../upgrade';
 import {parseStringToLong} from '../../shared/parse';
 import {
@@ -21,12 +23,46 @@ import {MsgUpdateParams as CrisisMsgUpdateParams} from '../../curium/lib/generat
 import {MsgUpdateParams as SlashingMsgUpdateParams} from '../../curium/lib/generated/cosmos/slashing/v1beta1/tx';
 import {MsgUpdateParams as AuthMsgUpdateParams} from '../../curium/lib/generated/cosmos/auth/v1beta1/tx';
 import {Any} from '../../curium/lib/generated/google/protobuf/any';
+import * as fs from 'fs';
+import * as path from 'path';
+import {Plan} from '../../curium/lib/generated/cosmos/upgrade/v1beta1/upgrade';
+import {parseNumToLong} from '../../shared/parse';
+import Long from 'long';
+
+import {getModuleAccountByName} from "../auth";
+import {Coin} from "../../curium/lib/generated/cosmos/base/v1beta1/coin";
+import {
+    MsgSoftwareUpgrade
+} from '../../curium/lib/generated/cosmos/upgrade/v1beta1/tx';
 
 
 export type BluzelleWeightedVoteOption = {
   option: VoteOption;
   weight: number;
 }
+
+export const submitTextProposalLegacy = (
+    client: BluzelleClient,
+    params: {
+        title: string,
+        description: string,
+        initialDeposit: {amount: number, denom: 'ubnt'}[]
+        proposer: string,
+    },
+    options: BroadcastOptions
+): Promise<BluzelleTxResponse> =>
+    Promise.resolve(sendTx(client, '/cosmos.gov.v1beta1.MsgSubmitProposal', {
+        content: {
+            typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+            value: TextProposal.encode({
+                title: params.title,
+                description: params.description,
+            }).finish()
+        },
+        proposer: params.proposer,
+        initialDeposit: params.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
+    } as MsgSubmitLegacyProposal, options))
+        .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
 export const submitTextProposal = (
   client: BluzelleClient,
@@ -35,24 +71,36 @@ export const submitTextProposal = (
     description: string,
     initialDeposit: {amount: number, denom: 'ubnt'}[]
     proposer: string,
+    authority: string,
+    summary?: string,
+    metadata?: string,
   },
   options: BroadcastOptions
 ): Promise<BluzelleTxResponse> =>
-  Promise.resolve(sendTx(client, '/cosmos.gov.v1beta1.MsgSubmitProposal', {
-    content: {
-      typeUrl: '/cosmos.gov.v1beta1.TextProposal',
-      value: TextProposal.encode({
-        title: params.title,
-        description: params.description,
+  Promise.resolve(sendTx(client, '/cosmos.gov.v1.MsgSubmitProposal', {
+    messages: [{
+      typeUrl: '/cosmos.gov.v1.MsgExecLegacyContent',
+      value: MsgExecLegacyContent.encode({
+        content: {
+          typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+          value: TextProposal.encode({
+            title: params.title,
+            description: params.description,
+          }).finish()
+        },
+        authority: params.authority,
       }).finish()
-    },
+    } as Any],
     proposer: params.proposer,
     initialDeposit: params.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
-  } as MsgSubmitLegacyProposal, options))
+    title: params.title,
+    summary: params.summary || '',
+    metadata: params.metadata || '',
+  } as MsgSubmitProposal, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
 
-export const submitSoftwareUpgradeProposal = (
+export const submitSoftwareUpgradeProposalLegacy = (
   client: BluzelleClient,
   params: {
     title: string,
@@ -81,6 +129,46 @@ export const submitSoftwareUpgradeProposal = (
   } as MsgSubmitLegacyProposal, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
+
+
+
+export const submitSoftwareUpgradeProposal = (
+    client: BluzelleClient,
+    params: {
+        title: string,
+        description: string,
+        initialDeposit: {amount: number, denom: 'ubnt'}[]
+        proposer: string,
+        summary?: string,
+        metadata?: string,
+        plan: {
+            name: string,
+            height: number,
+            info: string,
+        },
+    },
+    options: BroadcastOptions
+): Promise<BluzelleTxResponse> =>
+    getModuleAccountByName(client, "gov")
+        .then(moduleAccount => sendTx(client, '/cosmos.gov.v1.MsgSubmitProposal', {
+        messages: [{
+            typeUrl: '/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade',
+            value: MsgSoftwareUpgrade.encode({
+                authority: moduleAccount?.baseAccount?.address as string,
+                plan:{
+                    name: params.plan.name,
+                    info: params.plan.info,
+                    height: parseNumToLong(params.plan.height)
+                }
+            }).finish()
+        } as Any],
+        proposer: params.proposer,
+        initialDeposit: params.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
+        title: params.title,
+        summary: params.summary || '',
+        metadata: params.metadata || '',
+    } as MsgSubmitProposal, options))
+        .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
 export const submitParameterChangeProposal = (
   client: BluzelleClient,

@@ -1,5 +1,6 @@
 syntax = "proto3";
 package tax;
+import "cosmos/msg/v1/msg.proto";
 
 // this line is used by starport scaffolding # proto/tx/import
 
@@ -14,6 +15,7 @@ service Msg {
 }
 
 message MsgSetGasTaxBp {
+  option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   int64 bp = 2;
 }

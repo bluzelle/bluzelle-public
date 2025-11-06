@@ -1,6 +1,7 @@
 syntax = "proto3";
 package storage;
 import "gogoproto/gogo.proto";
+import "cosmos/msg/v1/msg.proto";
 
 // this line is used by starport scaffolding # proto/tx/import
 
@@ -13,6 +14,7 @@ service Msg {
 }
 
 message MsgPin {
+  option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string cid = 2;
   repeated string addrs = 3 [ (gogoproto.nullable) = false ];
