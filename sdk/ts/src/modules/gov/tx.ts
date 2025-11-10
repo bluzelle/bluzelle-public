@@ -27,7 +27,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import {Plan} from '../../curium/lib/generated/cosmos/upgrade/v1beta1/upgrade';
 import {parseNumToLong} from '../../shared/parse';
-import Long from 'long';
 
 import {getModuleAccountByName} from "../auth";
 import {Coin} from "../../curium/lib/generated/cosmos/base/v1beta1/coin";
