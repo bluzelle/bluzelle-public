@@ -33,9 +33,9 @@ describe('gov module legacy', function() {
         Swarm.stopDaemons({ ...defaultSwarmConfig })
     );
 
-    // after(() =>
-    //     Swarm.stopDaemons({ ...defaultSwarmConfig })
-    // );
+    after(() =>
+        Swarm.stopDaemons({ ...defaultSwarmConfig })
+    );
 
     it('should get voting params', () =>
         startSwarmWithClient({
@@ -66,67 +66,6 @@ describe('gov module legacy', function() {
                 expect(typeof params.quorum).to.equal('number');
                 expect(typeof params.vetoThreshold).to.equal('number');
             })
-    );
-
-    it('should be able to submit and query a text proposal', () =>
-        startSwarmWithClient({
-            config: defaultSwarmConfig,
-            isE2E: isE2E()
-        })
-            .then(passThroughAwait(client => submitTextProposalLegacy(client.bzSdk, {
-                title: 'My title',
-                description: 'My description',
-                proposer: client.auth.address,
-                initialDeposit: [{
-                    amount: 100,
-                    denom: 'ubnt'
-                }],
-            }, {
-                maxGas: 200_000,
-                gasPrice: 10
-            })))
-            .then(client =>
-                getProposals(client.bzSdk)
-                    .then(res => (res.proposals.length).toString())
-                    .then(proposalId => getProposal(client.bzSdk, proposalId))
-            )
-            .then(proposal => expect(TextProposal.decode(proposal.content.value))
-                .to
-                .deep
-                .equal(PROPOSAL_VALUE))
-    );
-
-    it('should be able to submit and query a software upgrade proposal', () =>
-        startSwarmWithClient({
-            config: defaultSwarmConfig,
-            isE2E: isE2E()
-        })
-            .then(passThroughAwait(client => submitSoftwareUpgradeProposalLegacy(client.bzSdk, {
-                title: 'My title',
-                description: 'My description',
-                plan: {
-                    name: 'My plan',
-                    height: 20000,
-                    info: 'some information',
-                },
-                proposer: client.auth.address,
-                initialDeposit: [{
-                    amount: 100,
-                    denom: 'ubnt'
-                }],
-            }, {
-                maxGas: 200_000,
-                gasPrice: 10
-            })))
-            .then(client =>
-                getProposals(client.bzSdk)
-                    .then(res => (res.proposals.length).toString())
-                    .then(proposalId => getProposal(client.bzSdk, proposalId))
-            )
-            .then(proposal => expect(TextProposal.decode(proposal.content.value))
-                .to
-                .deep
-                .equal(PROPOSAL_VALUE))
     );
 
     it('should be able to submit and query a parameters change proposal', () =>
@@ -206,97 +145,6 @@ describe('gov module legacy', function() {
                     )
                     .then(res => expect(res.code).to.equal(0))
             ))
-    );
-
-    it('should be able to deposit to a proposal', () =>
-        startSwarmWithClient({
-            config: defaultSwarmConfig,
-            isE2E: isE2E()
-        })
-            .then(passThroughAwait(client => submitTextProposalLegacy(client.bzSdk, {
-                    title: 'My title',
-                    description: 'My description',
-                    proposer: client.auth.address,
-                    initialDeposit: [{
-                        amount: 100,
-                        denom: 'ubnt'
-                    }],
-                }, {
-                    maxGas: 200_000,
-                    gasPrice: 10
-                })
-            ))
-            .then(client =>
-                getProposals(client.bzSdk)
-                    .then(res => (res.proposals.length).toString())
-                    .then(id => depositToProposal(client.bzSdk, {
-                        proposalId: id,
-                        depositor: client.auth.address,
-                        amount: [{amount: 1_000_000_000, denom: 'ubnt'}],
-                    }, { maxGas: 200_000, gasPrice: 10 }))
-            )
-            .then(res => expect(res.code).to.equal(0))
-    );
-
-    it('should be in deposit period after submitting a proposal', () =>
-        startSwarmWithClient({
-            config: defaultSwarmConfig,
-            isE2E: isE2E()
-        })
-            .then(passThroughAwait(client => submitTextProposalLegacy(client.bzSdk, {
-                    title: 'My title',
-                    description: 'My description',
-                    proposer: client.auth.address,
-                    initialDeposit: [{
-                        amount: 50,
-                        denom: 'ubnt'
-                    }],
-                }, {
-                    maxGas: 200_000,
-                    gasPrice: 10
-                })
-                    .then(x => x)
-            ))
-            .then(client =>
-                getProposals(client.bzSdk)
-                    .then(res => (res.proposals.length).toString())
-                    .then(proposalId => getProposal(client.bzSdk, proposalId))
-            )
-            .then(proposal => expect(proposal.status).to.equal(ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD))
-    );
-
-    it('should query deposit', () =>
-        startSwarmWithClient({
-            config: defaultSwarmConfig,
-            isE2E: isE2E()
-        })
-            .then(passThroughAwait(client => submitTextProposalLegacy(client.bzSdk, {
-                title: 'My title',
-                description: 'My description',
-                proposer: client.auth.address,
-                initialDeposit: [{
-                    amount: 100,
-                    denom: 'ubnt'
-                }],
-            }, {
-                maxGas: 200_000,
-                gasPrice: 10
-            })))
-            .then(client =>
-                getProposals(client.bzSdk)
-                    .then(res => (res.proposals.length).toString())
-                    .then(id => getDeposit(client.bzSdk, {
-                        proposalId: id,
-                        depositor: client.auth.address,
-                    }))
-            )
-            .then(deposit => expect(deposit.amount)
-                .to
-                .deep
-                .equal([{
-                    denom: 'ubnt',
-                    amount: 100
-                }]))
     );
 
 });

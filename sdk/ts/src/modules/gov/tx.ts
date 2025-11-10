@@ -70,32 +70,32 @@ export const submitTextProposal = (
     description: string,
     initialDeposit: {amount: number, denom: 'ubnt'}[]
     proposer: string,
-    authority: string,
     summary?: string,
     metadata?: string,
   },
   options: BroadcastOptions
 ): Promise<BluzelleTxResponse> =>
-  Promise.resolve(sendTx(client, '/cosmos.gov.v1.MsgSubmitProposal', {
-    messages: [{
-      typeUrl: '/cosmos.gov.v1.MsgExecLegacyContent',
-      value: MsgExecLegacyContent.encode({
-        content: {
-          typeUrl: '/cosmos.gov.v1beta1.TextProposal',
-          value: TextProposal.encode({
+    getModuleAccountByName(client, "gov")
+        .then(moduleAccount => sendTx(client, '/cosmos.gov.v1.MsgSubmitProposal', {
+            messages: [{
+                typeUrl: '/cosmos.gov.v1.MsgExecLegacyContent',
+                value: MsgExecLegacyContent.encode({
+                    content: {
+                        typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+                        value: TextProposal.encode({
+                            title: params.title,
+                            description: params.description,
+                        }).finish()
+                    },
+                    authority: moduleAccount?.baseAccount?.address as string,
+                }).finish()
+            } as Any],
+            proposer: params.proposer,
+            initialDeposit: params.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
             title: params.title,
-            description: params.description,
-          }).finish()
-        },
-        authority: params.authority,
-      }).finish()
-    } as Any],
-    proposer: params.proposer,
-    initialDeposit: params.initialDeposit.map(({amount, denom}) => ({amount: amount.toString(), denom})),
-    title: params.title,
-    summary: params.summary || '',
-    metadata: params.metadata || '',
-  } as MsgSubmitProposal, options))
+            summary: params.summary || '',
+            metadata: params.metadata || '',
+        } as MsgSubmitProposal, options))
     .then(res => res ? res as BluzelleTxResponse : {} as BluzelleTxResponse);
 
 
