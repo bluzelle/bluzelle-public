@@ -178,7 +178,7 @@ describe('gov module, local docker', function () {
 
   });
 
-  describe.skip('software upgrade proposal', () => {
+  describe('software upgrade proposal', () => {
 
     it('should be able to vote on and pass a software upgrade proposal', () =>
         startSwarmWithClient({
@@ -489,7 +489,7 @@ describe('gov module, local docker', function () {
 });
 
 
-describe.skip('gov module, local machine', () => {
+describe('gov module, local machine', () => {
 
   // Run a local bluzelle instance
   // Set genesis.app_state.gov.deposit_params.max_deposit_period to "5s" in curium/config.yml

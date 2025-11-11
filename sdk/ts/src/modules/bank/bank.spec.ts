@@ -145,15 +145,6 @@ describe('bank module', function () {
             .then((result) => expect((result as Params).defaultSendEnabled).to.be.equal(true))
     );
 
-  it.skip('getDenomMetadata should return the metadata of the bank module', () =>
-      startSwarmWithClient({
-          config: defaultSwarmConfig,
-          isE2E: isE2E()
-      })
-      .then((ctx) => getDenomMetadata(ctx.bzSdk, 'ubnt'))
-      .then((result) => console.log(result))
-  );
-
   it('balance should be changed after send transaction', () =>
       startSwarmWithClient({
           config: defaultSwarmConfig,
