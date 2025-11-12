@@ -145,7 +145,7 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_GetTaxInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"bluzelle", "curium", "tax", "get_tax_info"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetTaxInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"bluzelle", "curium", "tax", "get_tax_info"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

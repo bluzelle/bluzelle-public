@@ -533,15 +533,15 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_NFTInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"bluzelle", "nft", "nft_info", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_NFTInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"bluzelle", "nft", "nft_info", "id"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_NFTsByOwner_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"bluzelle", "nft", "nfts_by_owner", "owner"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_NFTsByOwner_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"bluzelle", "nft", "nfts_by_owner", "owner"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_Metadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"bluzelle", "nft", "metadata", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Metadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"bluzelle", "nft", "metadata", "id"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_Collection_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"bluzelle", "nft", "collection", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Collection_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"bluzelle", "nft", "collection", "id"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_LastCollectionId_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"bluzelle", "nft", "last-collection-id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LastCollectionId_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"bluzelle", "nft", "last-collection-id"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

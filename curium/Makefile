@@ -156,13 +156,23 @@ proto-gen-protoc:
 		if [ -n "$(GRPC_GATEWAY_DIR)" ]; then \
 			INCLUDE_PATHS="$$INCLUDE_PATHS -I$(GRPC_GATEWAY_DIR)/third_party/googleapis"; \
 		fi; \
+		TEMP_OUTPUT=".proto-temp-$$module"; \
+		mkdir -p $$TEMP_OUTPUT; \
 		protoc $$INCLUDE_PATHS \
-			--gocosmos_out=plugins=grpc,Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:$$OUTPUT_DIR \
-			--grpc-gateway_out=logtostderr=true,allow_colon_final_segments=true:$$OUTPUT_DIR \
+			--gocosmos_out=plugins=grpc,Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:$$TEMP_OUTPUT \
+			--grpc-gateway_out=logtostderr=true,allow_colon_final_segments=true:$$TEMP_OUTPUT \
 			$$PROTO_FILES; \
-		if [ $$? -eq 0 ]; then \
+		PROTOC_EXIT=$$?; \
+		if [ $$PROTOC_EXIT -eq 0 ]; then \
+			echo "Moving generated files to $$OUTPUT_DIR"; \
+			if [ -d "$$TEMP_OUTPUT" ]; then \
+				find $$TEMP_OUTPUT -name "*.pb.go" -type f -exec mv {} $$OUTPUT_DIR/ \; 2>/dev/null || true; \
+				find $$TEMP_OUTPUT -name "*.pb.gw.go" -type f -exec mv {} $$OUTPUT_DIR/ \; 2>/dev/null || true; \
+			fi; \
+			rm -rf $$TEMP_OUTPUT; \
 			echo "Successfully generated proto files for $$module"; \
 		else \
+			rm -rf $$TEMP_OUTPUT; \
 			echo "Error generating proto files for $$module"; \
 			exit 1; \
 		fi; \
