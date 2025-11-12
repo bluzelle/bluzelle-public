@@ -108,7 +108,63 @@ protoVer=v0.7
 protoImageName=tendermintdev/sdk-proto-gen:$(protoVer)
 containerProtoGen=curium-proto-gen-$(protoVer)
 
+# Proto include paths
+COSMOS_SDK_DIR := $(shell go list -m -f '{{.Dir}}' github.com/cosmos/cosmos-sdk)
+GOGOPROTO_DIR := $(shell go list -m -f '{{.Dir}}' github.com/cosmos/gogoproto)
+COSMOS_API_DIR := $(shell go list -m -f '{{.Dir}}' cosmossdk.io/api)
+COSMOS_PROTO_DIR := $(shell go list -m -f '{{.Dir}}' github.com/cosmos/cosmos-proto 2>/dev/null || echo "")
+GRPC_GATEWAY_DIR := $(shell go list -m -f '{{.Dir}}' github.com/grpc-ecosystem/grpc-gateway 2>/dev/null || echo "")
+
+# Get all module names from proto directory
+PROTO_MODULES := $(shell find proto -mindepth 1 -maxdepth 1 -type d -not -name '.*' -exec basename {} \;)
+
 proto-gen:
 	@echo "Generating Protobuf files"
 	@if docker ps -a --format '{{.Names}}' | grep -Eq "^${containerProtoGen}$$"; then docker start -a $(containerProtoGen); else docker run --name $(containerProtoGen) -v $(CURDIR):/workspace --workdir /workspace $(protoImageName) \
 		sh ./scripts/protocgen.sh; fi
+
+proto-gen-protoc:
+	@echo "Generating Protobuf files using protoc"
+	@if [ -z "$(COSMOS_SDK_DIR)" ]; then \
+		echo "Error: cosmos-sdk not found. Run 'go mod download' first."; \
+		exit 1; \
+	fi
+	@for module in $(PROTO_MODULES); do \
+		echo "Generating proto files for module: $$module"; \
+		MODULE_DIR="proto/$$module"; \
+		OUTPUT_DIR="x/$$module/types"; \
+		if [ ! -d "$$MODULE_DIR" ]; then \
+			echo "Warning: Directory $$MODULE_DIR does not exist, skipping..."; \
+			continue; \
+		fi; \
+		mkdir -p $$OUTPUT_DIR; \
+		PROTO_FILES=$$(find $$MODULE_DIR -name "*.proto" -type f); \
+		if [ -z "$$PROTO_FILES" ]; then \
+			echo "Warning: No proto files found in $$MODULE_DIR, skipping..."; \
+			continue; \
+		fi; \
+		INCLUDE_PATHS="-Iproto -I$(COSMOS_SDK_DIR)/proto"; \
+		if [ -n "$(GOGOPROTO_DIR)" ]; then \
+			INCLUDE_PATHS="$$INCLUDE_PATHS -I$(GOGOPROTO_DIR)"; \
+		fi; \
+		if [ -n "$(COSMOS_API_DIR)" ]; then \
+			INCLUDE_PATHS="$$INCLUDE_PATHS -I$(COSMOS_API_DIR)"; \
+		fi; \
+		if [ -n "$(COSMOS_PROTO_DIR)" ]; then \
+			INCLUDE_PATHS="$$INCLUDE_PATHS -I$(COSMOS_PROTO_DIR)/proto"; \
+		fi; \
+		if [ -n "$(GRPC_GATEWAY_DIR)" ]; then \
+			INCLUDE_PATHS="$$INCLUDE_PATHS -I$(GRPC_GATEWAY_DIR)/third_party/googleapis"; \
+		fi; \
+		protoc $$INCLUDE_PATHS \
+			--gocosmos_out=plugins=grpc,Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:$$OUTPUT_DIR \
+			--grpc-gateway_out=logtostderr=true,allow_colon_final_segments=true:$$OUTPUT_DIR \
+			$$PROTO_FILES; \
+		if [ $$? -eq 0 ]; then \
+			echo "Successfully generated proto files for $$module"; \
+		else \
+			echo "Error generating proto files for $$module"; \
+			exit 1; \
+		fi; \
+	done
+	@echo "Proto generation complete!"
