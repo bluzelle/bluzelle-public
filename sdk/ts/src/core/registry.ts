@@ -98,6 +98,7 @@ const registerMessages = (registry: Registry) => {
   registry.register('/cosmos.gov.v1beta1.MsgSubmitProposal', MsgSubmitLegacyProposal)
   registry.register('/cosmos.gov.v1.MsgExecLegacyContent', MsgExecLegacyContent)
   registry.register('/cosmos.gov.v1.MsgVote', MsgVote)
+  registry.register('/cosmos.gov.v1.MsgDeposit', MsgDeposit)
   registry.register('/cosmos.gov.v1.MsgVoteWeighted', MsgVoteWeighted)
   registry.register('/cosmos.feegrant.v1beta1.MsgGrantAllowance', MsgGrantAllowance)
   registry.register('/cosmos.feegrant.v1beta1.MsgRevokeAllowance', MsgRevokeAllowance)

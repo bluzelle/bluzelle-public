@@ -21,7 +21,8 @@ import delay from "delay";
 const TEST_ADDR = "bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj";
 
 
-describe('feegrant', () => {
+describe('feegrant', function() {
+    this.timeout(10_800_000)
 
     beforeEach(() =>
         Swarm.stopDaemons(({...defaultSwarmConfig}))
