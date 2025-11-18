@@ -126,7 +126,7 @@ describe('gov module, local docker', function () {
           proposalId: "1",
           depositor: client.auth.address,
           amount: [{
-            amount: 1_000_000,
+            amount: 100_000_000,
             denom: 'ubnt'
           }]
         }, {
@@ -158,7 +158,7 @@ describe('gov module, local docker', function () {
           proposalId: "1",
           depositor: client.auth.address,
           amount: [{
-            amount: 1_000_000,
+            amount: 100_000_000,
             denom: 'ubnt'
           }]
         }, {

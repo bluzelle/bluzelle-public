@@ -138,7 +138,7 @@ describe('gov module', function() {
                     .then(res => (res.proposals.length).toString())
                     .then(proposalId => getProposal(client.bzSdk, proposalId))
             )
-            .then(proposal => expect(MsgSoftwareUpgrade.decode(proposal.content.value).plan.height.toNumber())
+            .then(proposal => expect(MsgSoftwareUpgrade.decode(proposal.content.value).plan?.height.toNumber())
                 .to
                 .equal(34567))
     );
