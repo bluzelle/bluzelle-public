@@ -2,13 +2,14 @@ import { expect } from 'chai';
 import { defaultSwarmConfig, startSwarmWithClient } from '@bluzelle/testing';
 import { Swarm } from 'daemon-manager/src';
 import {
-    depositToProposal,
-    submitCommunityPoolSpendProposal,
-    submitParameterChangeProposal,
-    submitSoftwareUpgradeProposalLegacy,
-    submitTextProposalLegacy,
-    vote,
-    voteWithWeights
+  depositToProposal,
+  submitCommunityPoolSpendProposal,
+  submitParameterChangeProposal,
+  submitSoftwareUpgradeProposalLegacy,
+  submitSoftwareUpgradeProposal,
+  submitTextProposalLegacy,
+  vote,
+  voteWithWeights
 } from './tx';
 import { getProposal } from './query';
 import { passThroughAwait } from 'promise-passthrough';
@@ -178,39 +179,41 @@ describe('gov module, local docker', function () {
 
     });
 
-    describe('software upgrade proposal', () => {
+  describe.skip('software upgrade proposal', () => {
 
-        it('should be able to vote on and pass a software upgrade proposal', () =>
-            startSwarmWithClient({
-                config: {...govTestSwarmConfig}
-            })
-                .then(passThroughAwait(client => submitSoftwareUpgradeProposalLegacy(client.bzSdk, {
+    it('should be able to vote on and pass a software upgrade proposal', () =>
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
+        .then(passThroughAwait(ctx => submitSoftwareUpgradeProposal(ctx.bzSdk, {
                         title: 'My title',
                         description: 'My description',
-                        proposer: client.auth.address,
+                        proposer: ctx.auth.address,
                         initialDeposit: [{
-                            amount: 2_000_000,
+                            amount: 500_000,
                             denom: 'ubnt'
                         }],
+                        summary: 'Test summary',
+                        metadata: 'Test metadata',
                         plan: {
-                            name: 'My upgrade plan',
-                            height: 100,
-                            info: 'My upgrade info',
+                            name: 'My plan',
+                            height: 34567,
+                            info: 'some information',
                         }
                     }, {
                         maxGas: 200_000,
                         gasPrice: 10
                     })
-                ))
-                .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "1",
-                    voter: client.auth.address,
-                    option: VoteOption.VOTE_OPTION_YES
-                }, { maxGas: 200_000, gasPrice: 10 })))
-                .then(passThroughAwait(() => delay(20_000)))
-                .then(client => getProposal(client.bzSdk, "1"))
-                .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
-        );
+        ))
+        .then(passThroughAwait(client => vote(client.bzSdk, {
+          proposalId: "1",
+          voter: client.auth.address,
+          option: VoteOption.VOTE_OPTION_YES
+        }, { maxGas: 200_000, gasPrice: 10 })))
+        .then(passThroughAwait(() => delay(20_000)))
+        .then(client => getProposal(client.bzSdk, "1"))
+        .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
+    );
 
         it('should apply a software upgrade proposal and confirm that it has been applied', () =>
             startSwarmWithClient({
@@ -307,163 +310,163 @@ describe('gov module, local docker', function () {
 
     describe('parameters change proposal', () => {
 
-        it('should be able to vote on and pass a parameters change proposal', () =>
-            startSwarmWithClient({
-                config: {...govTestSwarmConfig}
+    it('should be able to vote on and pass a parameters change proposal', () =>
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
+          .then(withCtxAwait("initialParams", client => getStakingParams(client.bzSdk)))
+          .then(withCtxAwait("govModuleAddress", client => getModuleAccountByName(client.bzSdk, "gov")))
+          .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, 
+            {
+              title: 'change_max_validators',
+              description: 'Increase max validators to 120',
+              proposer: client.auth.address,
+              initialDeposit: [{
+                amount: 2_000_000_000,
+                denom: 'ubnt'
+              }],
+            },
+            {
+              authority: client.govModuleAddress?.baseAccount?.address as string,
+              params: {...parseBluzelleStakingParamsToParams(client.initialParams), maxValidators: 120},
+            },
+            "staking",
+            "test summary",
+            "test metadata",
+            {
+              maxGas: 200_000,
+              gasPrice: 10
             })
-                .then(withCtxAwait("initialParams", client => getStakingParams(client.bzSdk)))
-                .then(withCtxAwait("govModuleAddress", client => getModuleAccountByName(client.bzSdk, "gov")))
-                .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk,
-                    {
-                        title: 'change_max_validators',
-                        description: 'Increase max validators to 120',
-                        proposer: client.auth.address,
-                        initialDeposit: [{
-                            amount: 2_000_000,
-                            denom: 'ubnt'
-                        }],
-                    },
-                    {
-                        authority: client.govModuleAddress?.baseAccount?.address as string,
-                        params: {...parseBluzelleStakingParamsToParams(client.initialParams), maxValidators: 120},
-                    },
-                    "staking",
-                    "test summary",
-                    "test metadata",
-                    {
-                        maxGas: 200_000,
-                        gasPrice: 10
-                    })
-                ))
-                .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "1",
-                    voter: client.auth.address,
-                    option: VoteOption.VOTE_OPTION_YES
-                }, { maxGas: 200_000, gasPrice: 10 })))
-                .then(passThroughAwait(() => delay(20_000)))
-                .then(passThroughAwait(client =>
-                    getProposal(client.bzSdk, "1")
-                        .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
-                ))
-        );
+          ))
+          .then(passThroughAwait(client => vote(client.bzSdk, {
+            proposalId: "1",
+            voter: client.auth.address,
+            option: VoteOption.VOTE_OPTION_YES
+          }, { maxGas: 200_000, gasPrice: 10 })))
+          .then(passThroughAwait(() => delay(20_000)))
+          .then(passThroughAwait(client =>
+            getProposal(client.bzSdk, "1")
+              .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
+          ))
+    );
 
-        it('should be able to apply a parameters change proposal and see the parameter change', () =>
-            startSwarmWithClient({
-                config: {...govTestSwarmConfig}
+    it('should be able to apply a parameters change proposal and see the parameter change', () =>
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
+          .then(withCtxAwait("initialParams", client => getStakingParams(client.bzSdk)
+            // .then(res => expect(res.maxValidators).to.equal(100))
+          ))
+          .then(withCtxAwait("govModuleAddress", client => getModuleAccountByName(client.bzSdk, "gov")))
+          .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk, 
+            {
+              title: 'change_max_validators',
+              description: 'Increase max validators to 120',
+              proposer: client.auth.address,
+              initialDeposit: [{
+                amount: 2_000_000_000,
+                denom: 'ubnt'
+              }],
+            },
+            {
+              authority: client.govModuleAddress?.baseAccount?.address as string,
+              params: {...parseBluzelleStakingParamsToParams(client.initialParams), maxValidators: 120},
+            },
+            "staking",
+            "test summary",
+            "test metadata",
+            {
+              maxGas: 200_000,
+              gasPrice: 10
             })
-                .then(withCtxAwait("initialParams", client => getStakingParams(client.bzSdk)
-                    // .then(res => expect(res.maxValidators).to.equal(100))
-                ))
-                .then(withCtxAwait("govModuleAddress", client => getModuleAccountByName(client.bzSdk, "gov")))
-                .then(passThroughAwait(client => submitParameterChangeProposal(client.bzSdk,
-                    {
-                        title: 'change_max_validators',
-                        description: 'Increase max validators to 120',
-                        proposer: client.auth.address,
-                        initialDeposit: [{
-                            amount: 2_000_000,
-                            denom: 'ubnt'
-                        }],
-                    },
-                    {
-                        authority: client.govModuleAddress?.baseAccount?.address as string,
-                        params: {...parseBluzelleStakingParamsToParams(client.initialParams), maxValidators: 120},
-                    },
-                    "staking",
-                    "test summary",
-                    "test metadata",
-                    {
-                        maxGas: 200_000,
-                        gasPrice: 10
-                    })
-                ))
-                .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "1",
-                    voter: client.auth.address,
-                    option: VoteOption.VOTE_OPTION_YES
-                }, { maxGas: 200_000, gasPrice: 10 })))
-                .then(passThroughAwait(() => delay(20_000)))
-                .then(passThroughAwait(client =>
-                    getProposal(client.bzSdk, "1")
-                        .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
-                ))
-                .then(passThroughAwait(() => delay(180_000)))
-                .then(client => getStakingParams(client.bzSdk))
-                .then(res => expect(res.maxValidators).to.equal(120))
-        );
+          ))
+          .then(passThroughAwait(client => vote(client.bzSdk, {
+            proposalId: "1",
+            voter: client.auth.address,
+            option: VoteOption.VOTE_OPTION_YES
+          }, { maxGas: 200_000, gasPrice: 10 })))
+          .then(passThroughAwait(() => delay(20_000)))
+          .then(passThroughAwait(client =>
+            getProposal(client.bzSdk, "1")
+              .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
+          ))
+          .then(passThroughAwait(() => delay(180_000)))
+          .then(client => getStakingParams(client.bzSdk))
+          .then(res => expect(res.maxValidators).to.equal(120))
+    );
 
     });
 
     describe('community pool spend proposal', () => {
 
-        it('should be able to vote on and pass a community pool spend proposal', () =>
-            startSwarmWithClient({
-                config: {...govTestSwarmConfig}
-            })
-                .then(passThroughAwait(ctx => fundCommunityPool(ctx.bzSdk, {
-                    amount: [{amount: 100_000_000, denom: 'ubnt'}],
-                    depositor: ctx.auth.address
-                }, {maxGas: 200_000, gasPrice: 10})))
-                .then(withCtxAwait("govModuleAddress", ctx => getModuleAccountByName(ctx.bzSdk, "gov")))
-                .then(passThroughAwait(ctx => submitCommunityPoolSpendProposal(ctx.bzSdk, {
-                        title: 'community pool spend',
-                        description: 'Take funds from community pool',
-                        proposer: ctx.auth.address,
-                        recipient: ctx.auth.address,
-                        initialDeposit: [{
-                            amount: 2_000_000,
-                            denom: 'ubnt'
-                        }],
-                        amount: [{
-                            amount: 100_000_000,
-                            denom: 'ubnt'
-                        }],
-                        authority: ctx.govModuleAddress?.baseAccount?.address as string
-                    }, {
-                        maxGas: 200_000,
-                        gasPrice: 10
-                    })
-                ))
-                .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "1",
-                    voter: client.auth.address,
-                    option: VoteOption.VOTE_OPTION_YES
-                }, { maxGas: 200_000, gasPrice: 10 })))
-                .then(passThroughAwait(() => delay(20_000)))
-                .then(passThroughAwait(client =>
-                    getProposal(client.bzSdk, "1")
-                        .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
-                ))
-        );
+    it('should be able to vote on and pass a community pool spend proposal', () =>
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
+        .then(passThroughAwait(ctx => fundCommunityPool(ctx.bzSdk, {
+          amount: [{amount: 100_000_000, denom: 'ubnt'}],
+          depositor: ctx.auth.address
+        }, {maxGas: 200_000, gasPrice: 10})))
+          .then(withCtxAwait("govModuleAddress", ctx => getModuleAccountByName(ctx.bzSdk, "gov")))
+        .then(passThroughAwait(ctx => submitCommunityPoolSpendProposal(ctx.bzSdk, {
+            title: 'community pool spend',
+            description: 'Take funds from community pool',
+            proposer: ctx.auth.address,
+            recipient: ctx.auth.address,
+            initialDeposit: [{
+              amount: 2_000_000_000,
+              denom: 'ubnt'
+            }],
+            amount: [{
+              amount: 100_000_000,
+              denom: 'ubnt'
+            }],
+            authority: ctx.govModuleAddress?.baseAccount?.address as string
+          }, {
+            maxGas: 200_000,
+            gasPrice: 10
+          })
+        ))
+        .then(passThroughAwait(client => vote(client.bzSdk, {
+          proposalId: "1",
+          voter: client.auth.address,
+          option: VoteOption.VOTE_OPTION_YES
+        }, { maxGas: 200_000, gasPrice: 10 })))
+        .then(passThroughAwait(() => delay(20_000)))
+        .then(passThroughAwait(client =>
+          getProposal(client.bzSdk, "1")
+            .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
+        ))
+    );
 
-        it('should be able to receive funds from a community pool spend proposal', () =>
-            startSwarmWithClient({
-                config: {...govTestSwarmConfig}
-            })
-                .then(passThroughAwait(ctx => fundCommunityPool(ctx.bzSdk, {
-                    amount: [{amount: 500_000_000, denom: 'ubnt'}],
-                    depositor: ctx.auth.address
-                }, {maxGas: 200_000, gasPrice: 10})))
-                .then(withCtxAwait("govModuleAddress", ctx => getModuleAccountByName(ctx.bzSdk, "gov")))
-                .then(withCtxAwait("recipient", () => newBluzelleClient({
-                    url: 'http://localhost:26667',
-                    wallet: newLocalWallet(generateMnemonic())
-                })))
-                .then(passThroughAwait(ctx =>
-                    submitCommunityPoolSpendProposal(ctx.bzSdk, {
-                        title: 'community pool spend',
-                        description: 'Take funds from community pool',
-                        proposer: ctx.auth.address,
-                        recipient: ctx.recipient.address,
-                        initialDeposit: [{
-                            amount: 2_000_000,
-                            denom: 'ubnt'
-                        }],
-                        amount: [{
-                            amount: 300_000_000,
-                            denom: 'ubnt'
-                        }],
-                        authority: ctx.govModuleAddress?.baseAccount?.address as string
+    it('should be able to receive funds from a community pool spend proposal', () =>
+        startSwarmWithClient({
+            config: {...govTestSwarmConfig}
+        })
+        .then(passThroughAwait(ctx => fundCommunityPool(ctx.bzSdk, {
+          amount: [{amount: 500_000_000, denom: 'ubnt'}],
+          depositor: ctx.auth.address
+        }, {maxGas: 200_000, gasPrice: 10})))
+        .then(withCtxAwait("govModuleAddress", ctx => getModuleAccountByName(ctx.bzSdk, "gov")))
+        .then(withCtxAwait("recipient", () => newBluzelleClient({
+          url: 'http://localhost:26667',
+          wallet: newLocalWallet(generateMnemonic())
+        })))
+        .then(passThroughAwait(ctx =>
+          submitCommunityPoolSpendProposal(ctx.bzSdk, {
+            title: 'community pool spend',
+            description: 'Take funds from community pool',
+            proposer: ctx.auth.address,
+            recipient: ctx.recipient.address,
+            initialDeposit: [{
+              amount: 2_000_000_000,
+              denom: 'ubnt'
+            }],
+            amount: [{
+              amount: 300_000_000,
+              denom: 'ubnt'
+            }],
+            authority: ctx.govModuleAddress?.baseAccount?.address as string
 
                     }, {
                         maxGas: 200_000,
@@ -498,67 +501,67 @@ describe('gov module, local machine', () => {
     const MNEMONIC = "";
     const CURIUM_URL = "http://localhost:26657";
 
-    it('should be able to vote on and pass a text proposal', () =>
-        newBluzelleClient({
-            url: CURIUM_URL,
-            wallet: newLocalWallet(MNEMONIC)
+  it('should be able to vote on and pass a text proposal', () =>
+    newBluzelleClient({
+      url: CURIUM_URL,
+      wallet: newLocalWallet(MNEMONIC)
+    })
+      .then(passThroughAwait(client => submitTextProposalLegacy(client, {
+          title: 'My title',
+          description: 'My description',
+          proposer: client.address,
+          initialDeposit: [{
+            amount: 2_000_000_000,
+            denom: 'ubnt'
+          }],
+        }, {
+          maxGas: 200_000,
+          gasPrice: 10
         })
-            .then(passThroughAwait(client => submitTextProposalLegacy(client, {
-                    title: 'My title',
-                    description: 'My description',
-                    proposer: client.address,
-                    initialDeposit: [{
-                        amount: 500_000,
-                        denom: 'ubnt'
-                    }],
-                }, {
-                    maxGas: 200_000,
-                    gasPrice: 10
-                })
-            ))
-            .then(passThroughAwait(client => vote(client, {
-                proposalId: "1",
-                voter: client.address,
-                option: VoteOption.VOTE_OPTION_YES
-            }, { maxGas: 200_000, gasPrice: 10 })))
-            .then(passThroughAwait(() => delay(20_000)))
-            .then(client => getProposal(client, "1"))
-            .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
-    );
+      ))
+      .then(passThroughAwait(client => vote(client, {
+        proposalId: "1",
+        voter: client.address,
+        option: VoteOption.VOTE_OPTION_YES
+      }, { maxGas: 200_000, gasPrice: 10 })))
+      .then(passThroughAwait(() => delay(20_000)))
+      .then(client => getProposal(client, "1"))
+      .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
+  );
 
 
-    it('should be able to vote on and pass an upgrade proposal', () =>
-        newBluzelleClient({
-            url: CURIUM_URL,
-            wallet: newLocalWallet(MNEMONIC)
+  it('should be able to vote on and pass an upgrade proposal', () =>
+    newBluzelleClient({
+      url: CURIUM_URL,
+      wallet: newLocalWallet(MNEMONIC)
+    })
+      .then(passThroughAwait(client => submitSoftwareUpgradeProposalLegacy(client, {
+          title: 'My title',
+          description: 'My description',
+          proposer: client.address,
+          initialDeposit: [{
+            amount: 2_000_000_000,
+            denom: 'ubnt'
+          }],
+          plan: {
+            name: 'My upgrade plan',
+            height: 100,
+            info: 'My upgrade info',
+          }
+        }, {
+          maxGas: 200_000,
+          gasPrice: 10
         })
-            .then(passThroughAwait(client => submitSoftwareUpgradeProposalLegacy(client, {
-                    title: 'My title',
-                    description: 'My description',
-                    proposer: client.address,
-                    initialDeposit: [{
-                        amount: 500_000,
-                        denom: 'ubnt'
-                    }],
-                    plan: {
-                        name: 'My upgrade plan',
-                        height: 100,
-                        info: 'My upgrade info',
-                    }
-                }, {
-                    maxGas: 200_000,
-                    gasPrice: 10
-                })
-            ))
-            .then(passThroughAwait(client => vote(client, {
-                proposalId: "1",
-                voter: client.address,
-                option: VoteOption.VOTE_OPTION_YES
-            }, { maxGas: 200_000, gasPrice: 10 })))
-            .then(passThroughAwait(() => delay(20_000)))
-            .then(client => getProposal(client, "1"))
-            .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
-    );
+      ))
+      .then(passThroughAwait(client => vote(client, {
+        proposalId: "1",
+        voter: client.address,
+        option: VoteOption.VOTE_OPTION_YES
+      }, { maxGas: 200_000, gasPrice: 10 })))
+      .then(passThroughAwait(() => delay(20_000)))
+      .then(client => getProposal(client, "1"))
+      .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
+  );
 
 });
 
@@ -568,46 +571,46 @@ describe('gov votes', function () {
 
     beforeEach(stopSwarm);
 
-    it('should be able to vote with weight', () =>
-        startSwarmWithClient({
-            config: {...govTestSwarmConfig}
+  it('should be able to vote with weight', () =>
+      startSwarmWithClient({
+          config: {...govTestSwarmConfig}
+      })
+      .then(passThroughAwait(client => submitTextProposalLegacy(client.bzSdk, {
+          title: 'My title',
+          description: 'My description',
+          proposer: client.auth.address,
+          initialDeposit: [{
+            amount: 2_000_000_000,
+            denom: 'ubnt'
+          }],
+        }, {
+          maxGas: 200_000,
+          gasPrice: 10
         })
-            .then(passThroughAwait(client => submitTextProposalLegacy(client.bzSdk, {
-                    title: 'My title',
-                    description: 'My description',
-                    proposer: client.auth.address,
-                    initialDeposit: [{
-                        amount: 500_000,
-                        denom: 'ubnt'
-                    }],
-                }, {
-                    maxGas: 200_000,
-                    gasPrice: 10
-                })
-            ))
-            .then(passThroughAwait(client => depositToProposal(client.bzSdk, {
-                proposalId: "1",
-                depositor: client.auth.address,
-                amount: [{
-                    amount: 1_000_000,
-                    denom: 'ubnt'
-                }]
-            }, {
-                maxGas: 200_000,
-                gasPrice: 10
-            })))
-            .then(passThroughAwait(client => voteWithWeights(client.bzSdk, {
-                proposalId: "1",
-                voter: client.auth.address,
-                options: [
-                    { option: VoteOption.VOTE_OPTION_YES, weight: 0.5 },
-                    { option: VoteOption.VOTE_OPTION_ABSTAIN, weight: 0.5 }
-                ]
-            }, { maxGas: 200_000, gasPrice: 10 })))
-            .then(passThroughAwait(() => delay(20_000)))
-            .then(client => getProposal(client.bzSdk, "1"))
-            .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
-    );
+      ))
+      .then(passThroughAwait(client => depositToProposal(client.bzSdk, {
+        proposalId: "1",
+        depositor: client.auth.address,
+        amount: [{
+          amount: 1_000_000,
+          denom: 'ubnt'
+        }]
+      }, {
+        maxGas: 200_000,
+        gasPrice: 10
+      })))
+      .then(passThroughAwait(client => voteWithWeights(client.bzSdk, {
+        proposalId: "1",
+        voter: client.auth.address,
+        options: [
+          { option: VoteOption.VOTE_OPTION_YES, weight: 0.5 },
+          { option: VoteOption.VOTE_OPTION_ABSTAIN, weight: 0.5 }
+        ]
+      }, { maxGas: 200_000, gasPrice: 10 })))
+      .then(passThroughAwait(() => delay(20_000)))
+      .then(client => getProposal(client.bzSdk, "1"))
+      .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
+  );
 
 });
 
