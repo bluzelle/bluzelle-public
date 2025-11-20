@@ -492,7 +492,7 @@ describe('gov module, local docker', function () {
 });
 
 
-describe('gov module, local machine', () => {
+describe.skip('gov module, local machine', () => {
 
     // Run a local bluzelle instance
     // Set genesis.app_state.gov.deposit_params.max_deposit_period to "5s" in curium/config.yml
