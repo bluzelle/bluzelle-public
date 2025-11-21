@@ -59,4 +59,4 @@ export const deepParseLong = (obj: object, paths: string[]): object => {
 };
 
 
-export const scaleTo18 = (num: number) => (BigInt(Math.floor(num)) * BigInt(1e18)).toString();
+export const scaleTo18 = (num: number) => (num * 1e18).toString();
