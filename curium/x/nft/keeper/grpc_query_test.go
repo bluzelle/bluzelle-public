@@ -17,11 +17,8 @@ func (suite *KeeperTestSuite) TestGRPCNFTInfo() {
 		IssuePrice: issuePrice,
 	})
 
-	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator, sdk.Coins{fundAccnt})
-
-	if err != nil {
-		return
-	}
+	err := suite.FundAccount(creator, fundAccnt.Amount.Int64())
+	suite.Require().NoError(err)
 
 	collInfo := suite.CreateCollection(creator, true)
 	nftInfo1 := suite.CreateNFT(creator, collInfo.Id)
@@ -84,17 +81,11 @@ func (suite *KeeperTestSuite) TestGRPCNFTsByOwner() {
 		IssuePrice: issuePrice,
 	})
 
-	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator1, sdk.Coins{fundAccnt.Add(fundAccnt)})
+	err := suite.FundAccount(creator1, fundAccnt.Amount.Add(fundAccnt.Amount).Int64())
+	suite.Require().NoError(err)
 
-	if err != nil {
-		return
-	}
-
-	err = suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator2, sdk.Coins{fundAccnt})
-
-	if err != nil {
-		return
-	}
+	err = suite.FundAccount(creator2, fundAccnt.Amount.Int64())
+	suite.Require().NoError(err)
 
 	collInfo1 := suite.CreateCollection(creator1, true)
 	suite.CreateNFT(creator1, collInfo1.Id)
@@ -166,17 +157,11 @@ func (suite *KeeperTestSuite) TestGRPCMetadata() {
 		IssuePrice: issuePrice,
 	})
 
-	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator1, sdk.Coins{fundAccnt})
+	err := suite.FundAccount(creator1, fundAccnt.Amount.Int64())
+	suite.Require().NoError(err)
 
-	if err != nil {
-		return
-	}
-
-	err = suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator2, sdk.Coins{fundAccnt})
-
-	if err != nil {
-		return
-	}
+	err = suite.FundAccount(creator2, fundAccnt.Amount.Int64())
+	suite.Require().NoError(err)
 
 	collInfo1 := suite.CreateCollection(creator1, true)
 	nftInfo1 := suite.CreateNFT(creator1, collInfo1.Id)
@@ -234,11 +219,8 @@ func (suite *KeeperTestSuite) TestGRPCCollection() {
 		IssuePrice: issuePrice,
 	})
 
-	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator, sdk.Coins{fundAccnt})
-
-	if err != nil {
-		return
-	}
+	err := suite.FundAccount(creator, fundAccnt.Amount.Int64())
+	suite.Require().NoError(err)
 
 	collectionInfo1 := suite.CreateCollection(creator, true)
 	collectionInfo2 := suite.CreateCollection(creator, true)
@@ -300,11 +282,8 @@ func (suite *KeeperTestSuite) TestLastCollectionId() {
 		IssuePrice: issuePrice,
 	})
 
-	err := suite.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, creator, sdk.Coins{fundAccnt})
-
-	if err != nil {
-		return
-	}
+	err := suite.FundAccount(creator, fundAccnt.Amount.Int64())
+	suite.Require().NoError(err)
 
 	collectionInfo1 := suite.CreateCollection(creator, true)
 	collectionInfo2 := suite.CreateCollection(creator, true)

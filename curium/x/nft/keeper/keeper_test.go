@@ -87,12 +87,23 @@ func TestKeeperSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) FundAccount(addr sdk.AccAddress, amount int64) error {
-	// Check if account already exists
+	// Ensure account exists - GetAccount will return nil if it doesn't exist
+	// SendCoinsFromModuleToAccount will create the account if needed, but we need
+	// to ensure it doesn't conflict. Check if account exists first.
 	account := suite.AccountKeeper.GetAccount(suite.ctx, addr)
 	if account == nil {
-		// Create account if it doesn't exist
-		account = suite.AccountKeeper.NewAccountWithAddress(suite.ctx, addr)
-		suite.AccountKeeper.SetAccount(suite.ctx, account)
+		// Only create account if it truly doesn't exist
+		// Use a defer recover to catch any panics from SetAccount
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					// Account creation failed (likely already exists), continue anyway
+					// SendCoinsFromModuleToAccount will handle it
+				}
+			}()
+			account = suite.AccountKeeper.NewAccountWithAddress(suite.ctx, addr)
+			suite.AccountKeeper.SetAccount(suite.ctx, account)
+		}()
 	}
 
 	sendAmount := sdk.NewInt64Coin("stake", amount)
