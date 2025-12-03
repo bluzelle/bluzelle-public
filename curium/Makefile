@@ -85,7 +85,7 @@ ifeq (,$(findstring nostrip,$(CURIUM_BUILD_OPTIONS)))
   BUILD_FLAGS += -trimpath
 endif
 
-#$(info $$BUILD_FLAGS is [$(BUILD_FLAGS)])
+#$(info $$branch_FLAGS is [$(BUILD_FLAGS)])
 
 
 all: install

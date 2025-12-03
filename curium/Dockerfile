@@ -21,7 +21,7 @@ COPY ./ /go/src/github.com/bluzelle/curium
 
 WORKDIR /go/src/github.com/bluzelle/curium
 
-# RUN git checkout $build
+# RUN git checkout $branch
 
 # Temporarily changed to install a specific earlier version of ignite, until curium is upgraded to use the latest version
 #RUN curl https://get.ignite.com/cli! | bash
