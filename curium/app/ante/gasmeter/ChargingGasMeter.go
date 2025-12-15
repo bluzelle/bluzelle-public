@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 
+	"context"
+
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
@@ -101,7 +103,7 @@ func (g *ChargingGasMeter) String() string {
 	return fmt.Sprintf("BluzelleGasMeter:\n  limit: %d\n  consumed: %d", g.limit, g.consumed)
 }
 
-func (g *ChargingGasMeter) Charge(ctx sdk.Context) error {
+func (g *ChargingGasMeter) Charge(ctx context.Context) error {
 	acc := g.accountKeeper.GetAccount(ctx, g.PayerAccount)
 	addr := acc.GetAddress()
 
@@ -123,7 +125,7 @@ func (g *ChargingGasMeter) GetGasPrice() sdk.DecCoins {
 	return g.gasPrice
 }
 
-func DeductFees(ctx sdk.Context, bankKeeper bankkeeper.Keeper, addr sdk.AccAddress, fees sdk.Coins) error {
+func DeductFees(ctx context.Context, bankKeeper bankkeeper.Keeper, addr sdk.AccAddress, fees sdk.Coins) error {
 
 	if !fees.IsValid() {
 		return sdkerrors.Wrapf(ErrInsufficientFee, "invalid fee amount: %s", fees)

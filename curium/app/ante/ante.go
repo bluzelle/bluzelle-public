@@ -37,7 +37,6 @@ func NewAnteHandler(options appTypes.AnteHandlerOptions) (sdk.AnteHandler, error
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, nil), // Fees are handled by SetUpContextDecorator
-		NewChargeGasDecorator(options.GasMeterKeeper),                                                      // Charge gas meter after transaction - must be last
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil

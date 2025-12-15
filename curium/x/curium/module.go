@@ -1,6 +1,7 @@
 package curium
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -168,8 +169,9 @@ func (am AppModule) BeginBlock(_ sdk.Context) {}
 
 // EndBlock executes all ABCI EndBlock logic respective to the capability module. It
 // returns no validator updates.
-func (am AppModule) EndBlock(ctx sdk.Context) []abci.ValidatorUpdate {
-
+// This method implements the legacy module.AppModule interface.
+// In Cosmos SDK v0.53+, the module manager should automatically adapt this to the new interface.
+func (am AppModule) EndBlock(ctx context.Context) error {
 	errors := am.keeper.GasMeterKeeper.ChargeAll(ctx)
 
 	if len(errors) > 0 {
@@ -177,5 +179,5 @@ func (am AppModule) EndBlock(ctx sdk.Context) []abci.ValidatorUpdate {
 	}
 
 	am.keeper.GasMeterKeeper.ClearAll()
-	return []abci.ValidatorUpdate{}
+	return nil
 }

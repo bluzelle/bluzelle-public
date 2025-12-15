@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	"context"
+
 	"github.com/bluzelle/bluzelle-public/curium/app/ante/gasmeter"
 
 	"cosmossdk.io/log"
@@ -10,7 +12,6 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	"github.com/bluzelle/bluzelle-public/curium/x/curium/types"
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type (
@@ -36,6 +37,6 @@ func NewKeeper(
 	}
 }
 
-func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+func (k Keeper) Logger(ctx context.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }

@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	"context"
+
 	sdkerrors "cosmossdk.io/errors"
 	taxTypes "github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -44,11 +46,11 @@ func NewKeeper(
 	}
 }
 
-func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+func (k Keeper) Logger(ctx context.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", taxTypes.ModuleName))
 }
 
-func (k Keeper) GetKVStore(ctx sdk.Context) storetypes.KVStore {
+func (k Keeper) GetKVStore(ctx context.Context) storetypes.KVStore {
 	return ctx.KVStore(k.storeKey)
 }
 
@@ -56,7 +58,7 @@ func (k Keeper) GetCodec() codec.BinaryCodec {
 	return k.cdc
 }
 
-func (k Keeper) GetTaxInfoKeep(ctx sdk.Context) (taxTypes.GenesisState, error) {
+func (k Keeper) GetTaxInfoKeep(ctx context.Context) (taxTypes.GenesisState, error) {
 	store := k.GetKVStore(ctx)
 	var info taxTypes.GenesisState
 	bz := store.Get([]byte(taxTypes.KeyTaxInfo))
@@ -64,7 +66,7 @@ func (k Keeper) GetTaxInfoKeep(ctx sdk.Context) (taxTypes.GenesisState, error) {
 	return info, err
 }
 
-func (k Keeper) SetTaxInfoKeep(ctx sdk.Context, info *taxTypes.GenesisState) error {
+func (k Keeper) SetTaxInfoKeep(ctx context.Context, info *taxTypes.GenesisState) error {
 	store := k.GetKVStore(ctx)
 
 	bz, err := info.Marshal()
@@ -75,12 +77,12 @@ func (k Keeper) SetTaxInfoKeep(ctx sdk.Context, info *taxTypes.GenesisState) err
 	return err
 }
 
-func (k Keeper) ChargeGasTax(ctx sdk.Context, taxPayer sdk.AccAddress, gasFee sdk.Coins) error {
+func (k Keeper) ChargeGasTax(ctx context.Context, taxPayer sdk.AccAddress, gasFee sdk.Coins) error {
 	gasTaxes := k.calculateGasTax(ctx, gasFee)
 	return k.chargeTax(ctx, taxPayer, gasTaxes)
 }
 
-func (k Keeper) calculateGasTax(ctx sdk.Context, gasFee sdk.Coins) sdk.Coins {
+func (k Keeper) calculateGasTax(ctx context.Context, gasFee sdk.Coins) sdk.Coins {
 	info, err := k.GetTaxInfoKeep(ctx)
 	if err != nil {
 		return sdk.NewCoins(sdk.NewInt64Coin(taxTypes.Denom, 0))
@@ -88,7 +90,7 @@ func (k Keeper) calculateGasTax(ctx sdk.Context, gasFee sdk.Coins) sdk.Coins {
 	return sdk.NewCoins(sdk.NewInt64Coin(taxTypes.Denom, gasFee.AmountOf(taxTypes.Denom).Int64()*info.GasTaxBp/10000))
 }
 
-func (k Keeper) ChargeTransferTax(ctx sdk.Context, taxPayer sdk.AccAddress, msg sdk.Msg) error {
+func (k Keeper) ChargeTransferTax(ctx context.Context, taxPayer sdk.AccAddress, msg sdk.Msg) error {
 	taxPayerAcc := k.AccountKeeper.GetAccount(ctx, taxPayer)
 	if taxPayerAcc == nil {
 		return sdkerrors.Wrapf(errors.ErrUnknownAddress, "fee payer address: %s account does not exist", taxPayer)
@@ -100,7 +102,7 @@ func (k Keeper) ChargeTransferTax(ctx sdk.Context, taxPayer sdk.AccAddress, msg 
 	return k.chargeTax(ctx, taxPayer, transferTaxes)
 }
 
-func (k Keeper) CalculateTransferTax(ctx sdk.Context, taxPayer sdk.AccAddress, msg sdk.Msg) (sdk.Coins, error) {
+func (k Keeper) CalculateTransferTax(ctx context.Context, taxPayer sdk.AccAddress, msg sdk.Msg) (sdk.Coins, error) {
 	info, err := k.GetTaxInfoKeep(ctx)
 	if err != nil {
 		return sdk.NewCoins(sdk.NewInt64Coin(taxTypes.Denom, 0)), err
@@ -132,7 +134,7 @@ func (k Keeper) CalculateTransferTax(ctx sdk.Context, taxPayer sdk.AccAddress, m
 	return transferTaxes, nil
 }
 
-func (k Keeper) chargeTax(ctx sdk.Context, taxPayer sdk.AccAddress, taxes sdk.Coins) error {
+func (k Keeper) chargeTax(ctx context.Context, taxPayer sdk.AccAddress, taxes sdk.Coins) error {
 	if !taxes.IsZero() {
 		info, err := k.GetTaxInfoKeep(ctx)
 		if err != nil {
