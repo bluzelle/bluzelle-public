@@ -1,7 +1,7 @@
 package gasmeter
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"context"
 )
 
 type Keeper struct {
@@ -14,7 +14,7 @@ func NewGasMeterKeeper() *Keeper {
 	}
 }
 
-func (gk *Keeper) ChargeAll(ctx sdk.Context) []error {
+func (gk *Keeper) ChargeAll(ctx context.Context) []error {
 	errors := make([]error, 0)
 	for _, gasMeter := range gk.gasMeters {
 		gm := *gasMeter

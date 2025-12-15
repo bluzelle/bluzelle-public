@@ -47,11 +47,13 @@ func NewKeeper(
 }
 
 func (k Keeper) Logger(ctx context.Context) log.Logger {
-	return ctx.Logger().With("module", fmt.Sprintf("x/%s", taxTypes.ModuleName))
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	return sdkCtx.Logger().With("module", fmt.Sprintf("x/%s", taxTypes.ModuleName))
 }
 
 func (k Keeper) GetKVStore(ctx context.Context) storetypes.KVStore {
-	return ctx.KVStore(k.storeKey)
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	return sdkCtx.KVStore(k.storeKey)
 }
 
 func (k Keeper) GetCodec() codec.BinaryCodec {
