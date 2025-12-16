@@ -353,7 +353,7 @@ const swarmConfig = (): SwarmConfig => ({
     genesisTokenBalance: 500_000_000,
     monikerBase: 'test',
     chainId: 'my-chain',
-    minGasPrice: 0.000000002,
+    minGasPrice: 0.002,
     targetBranch: process.env.BRANCH || 'devel',
     environment: Environment.DEVEL,
     swarmType: SwarmTypes.Docker,
