@@ -10,11 +10,11 @@ import (
 )
 
 func (k msgServer) SetGasTaxBp(goCtx context.Context, msg *types.MsgSetGasTaxBp) (*types.MsgSetGasTaxBpResponse, error) {
-	if !isAdmin(msg.Creator) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if !k.isAdmin(goCtx, msg.Creator) {
 		return nil, errors.Wrap(sdkerrors.ErrInvalidAddress, "permission denied")
 	}
-
-	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	info, err := k.GetTaxInfoKeep(ctx)
 	if err != nil {

@@ -1,6 +1,7 @@
 package gasmeter_test
 
 import (
+	"context"
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
@@ -19,6 +20,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type mockCuriumKeeper struct {
+	adminAddress string
+}
+
+func (m *mockCuriumKeeper) GetAdminAddress(ctx context.Context) string {
+	return m.adminAddress
+}
+
 func TestGasMeterKeeper(t *testing.T) {
 	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
 	govAuthAddrStr := govAuthAddr.String()
@@ -35,6 +44,9 @@ func TestGasMeterKeeper(t *testing.T) {
 	_, _, addr := testdata.KeyTestPubAddr()
 	decCoins := sdk.NewDecCoins().Add(sdk.NewDecCoin(global.Denom, sdkmath.NewInt(2)))
 
+	// Create a mock curium keeper for testing
+	curiumKeeper := &mockCuriumKeeper{adminAddress: "bluzelle1t95s6zzf58y6nsny9uhdap6ej7ddkga9c4htd6"}
+
 	taxKeeper := *taxmodulekeeper.NewKeeper(
 		app.AppCodec(),
 		app.GetKey(taxmoduletypes.StoreKey),
@@ -42,6 +54,7 @@ func TestGasMeterKeeper(t *testing.T) {
 		app.GetSubspace(taxmoduletypes.ModuleName),
 		bankKeeper,
 		accountKeeper,
+		curiumKeeper,
 	)
 
 	t.Run("NewGasMeterKeeper should return a new gas meter keeper", func(t *testing.T) {

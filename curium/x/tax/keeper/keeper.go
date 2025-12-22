@@ -26,6 +26,7 @@ type Keeper struct {
 	paramstore    paramTypes.Subspace
 	BankKeeper    bankKeeper.Keeper
 	AccountKeeper acctypes.AccountKeeper
+	CuriumKeeper  taxTypes.CuriumKeeper
 }
 
 func NewKeeper(
@@ -35,6 +36,7 @@ func NewKeeper(
 	ps paramTypes.Subspace,
 	bankKeeper bankKeeper.Keeper,
 	accountKeeper acctypes.AccountKeeper,
+	curiumKeeper taxTypes.CuriumKeeper,
 ) *Keeper {
 	return &Keeper{
 		cdc:           cdc,
@@ -43,6 +45,7 @@ func NewKeeper(
 		paramstore:    ps,
 		BankKeeper:    bankKeeper,
 		AccountKeeper: accountKeeper,
+		CuriumKeeper:  curiumKeeper,
 	}
 }
 

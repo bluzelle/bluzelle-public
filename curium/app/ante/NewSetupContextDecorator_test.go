@@ -1,6 +1,7 @@
 package ante_test
 
 import (
+	"context"
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
@@ -24,6 +25,14 @@ import (
 	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/stretchr/testify/require"
 )
+
+type mockCuriumKeeper struct {
+	adminAddress string
+}
+
+func (m *mockCuriumKeeper) GetAdminAddress(ctx context.Context) string {
+	return m.adminAddress
+}
 
 func TestNewSetupContextDecorator(t *testing.T) {
 	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)
@@ -56,13 +65,16 @@ func TestNewSetupContextDecorator(t *testing.T) {
 			storeKey,
 			memStoreKey,
 			"TaxParams")
+		// Create a mock curium keeper for testing
+		curiumKeeper := &mockCuriumKeeper{adminAddress: "bluzelle1t95s6zzf58y6nsny9uhdap6ej7ddkga9c4htd6"}
 		taxKeeper := taxmodulekeeper.NewKeeper(
 			app.AppCodec(),
 			storeKey,
 			memStoreKey,
 			paramsSubspace,
 			bankKeeper,
-			accountKeeper)
+			accountKeeper,
+			curiumKeeper)
 		setUpContextDecorator := ante.NewSetUpContextDecorator(gasMeterKeeper, bankKeeper, accountKeeper, *taxKeeper, minGasPriceCoins)
 		require.NotNil(t, setUpContextDecorator)
 	})
@@ -111,13 +123,16 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				app.Logger(),
 			)
 
+			// Create a mock curium keeper for testing
+			curiumKeeper := &mockCuriumKeeper{adminAddress: "bluzelle1t95s6zzf58y6nsny9uhdap6ej7ddkga9c4htd6"}
 			taxKeeper := *taxmodulekeeper.NewKeeper(
 				app.AppCodec(),
 				app.GetKey(taxmoduletypes.StoreKey),
 				app.GetKey(taxmoduletypes.MemStoreKey),
 				app.GetSubspace(taxmoduletypes.ModuleName),
 				bankKeeper,
-				accountKeeper)
+				accountKeeper,
+				curiumKeeper)
 
 			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(global.Denom, 20))
 			txBuilder.SetFeeAmount(feeAmount)
@@ -197,13 +212,16 @@ func TestNewSetupContextDecorator(t *testing.T) {
 				storeKey,
 				memStoreKey,
 				"TaxParams")
+			// Create a mock curium keeper for testing
+			curiumKeeper := &mockCuriumKeeper{adminAddress: "bluzelle1t95s6zzf58y6nsny9uhdap6ej7ddkga9c4htd6"}
 			taxKeeper := taxmodulekeeper.NewKeeper(
 				app.AppCodec(),
 				storeKey,
 				memStoreKey,
 				paramsSubspace,
 				bankKeeper,
-				accountKeeper)
+				accountKeeper,
+				curiumKeeper)
 			setUpContextDecorator := ante.NewSetUpContextDecorator(gasMeterKeeper, bankKeeper, accountKeeper, *taxKeeper, minGasPriceCoins)
 
 			feeAmount := sdk.NewCoins(sdk.NewInt64Coin(global.Denom, 20))

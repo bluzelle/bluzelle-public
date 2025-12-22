@@ -17,3 +17,8 @@ type BankKeeper interface {
 	SpendableCoins(ctx context.Context, addr sdk.AccAddress) sdk.Coins
 	// Methods imported from bank should be defined here
 }
+
+// CuriumKeeper defines the expected curium keeper interface
+type CuriumKeeper interface {
+	GetAdminAddress(ctx context.Context) string
+}

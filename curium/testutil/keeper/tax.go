@@ -64,6 +64,9 @@ func TaxKeeper(t *testing.T) (*keeper.Keeper, sdk.Context) {
 		bech32Prefix,
 		govAuthAddrStr,
 	)
+
+	// Create a curium keeper for testing
+	curiumK, _ := CuriumKeeper(t)
 	k := keeper.NewKeeper(
 		cdc,
 		storeKey,
@@ -71,6 +74,7 @@ func TaxKeeper(t *testing.T) (*keeper.Keeper, sdk.Context) {
 		paramsSubspace,
 		bankKeeper,
 		accountKeeper,
+		curiumK,
 	)
 
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
@@ -128,6 +132,8 @@ func GetKeepers(t *testing.T) (*keeper.Keeper, bankKeeper.Keeper, acctypes.Accou
 	//	authtypes.ProtoBaseAccount, simapp.GetMaccPerms())
 	//stateStore.MountStoreWithDB(accKey, sdk.StoreTypeIAVL, db)
 
+	// Create a curium keeper for testing
+	curiumK, _ := CuriumKeeper(t)
 	k := keeper.NewKeeper(
 		cdc,
 		storeKey,
@@ -135,6 +141,7 @@ func GetKeepers(t *testing.T) (*keeper.Keeper, bankKeeper.Keeper, acctypes.Accou
 		paramsSubspace,
 		bankKeeper,
 		accountKeeper,
+		curiumK,
 	)
 
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())

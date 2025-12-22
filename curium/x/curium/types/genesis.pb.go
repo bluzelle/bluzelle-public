@@ -5,10 +5,11 @@ package types
 
 import (
 	fmt "fmt"
-	proto "github.com/cosmos/gogoproto/proto"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+
+	proto "github.com/cosmos/gogoproto/proto"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -24,6 +25,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // GenesisState defines the curium module's genesis state.
 type GenesisState struct {
+	AdminAddress string `protobuf:"bytes,1,opt,name=admin_address,json=adminAddress,proto3" json:"admin_address,omitempty"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }
@@ -58,6 +60,13 @@ func (m *GenesisState) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_GenesisState proto.InternalMessageInfo
+
+func (m *GenesisState) GetAdminAddress() string {
+	if m != nil {
+		return m.AdminAddress
+	}
+	return ""
+}
 
 func init() {
 	proto.RegisterType((*GenesisState)(nil), "curium.GenesisState")
@@ -98,6 +107,13 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.AdminAddress) > 0 {
+		i -= len(m.AdminAddress)
+		copy(dAtA[i:], m.AdminAddress)
+		i = encodeVarintGenesis(dAtA, i, uint64(len(m.AdminAddress)))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -118,6 +134,10 @@ func (m *GenesisState) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = len(m.AdminAddress)
+	if l > 0 {
+		n += 1 + l + sovGenesis(uint64(l))
+	}
 	return n
 }
 
@@ -156,6 +176,38 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: GenesisState: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdminAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AdminAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipGenesis(dAtA[iNdEx:])

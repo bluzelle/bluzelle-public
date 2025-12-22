@@ -1,7 +1,8 @@
 package keeper
 
 import (
-	"github.com/bluzelle/bluzelle-public/curium/app/types/global"
+	"context"
+
 	"github.com/bluzelle/bluzelle-public/curium/x/tax/types"
 )
 
@@ -17,6 +18,7 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = msgServer{}
 
-func isAdmin(creator string) bool {
-	return creator == global.AdminAddress
+func (k msgServer) isAdmin(ctx context.Context, creator string) bool {
+	adminAddress := k.CuriumKeeper.GetAdminAddress(ctx)
+	return creator == adminAddress
 }

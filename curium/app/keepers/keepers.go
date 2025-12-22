@@ -417,6 +417,7 @@ func NewAppKeeper(
 		appKeepers.GetSubspace(taxmoduletypes.ModuleName),
 		appKeepers.BankKeeper,
 		appKeepers.AccountKeeper,
+		appKeepers.CuriumKeeper,
 	)
 	appKeepers.TaxModule = tax.NewAppModule(appCodec, appKeepers.TaxKeeper, appKeepers.AccountKeeper, appKeepers.BankKeeper)
 
