@@ -1,7 +1,6 @@
 package gasmeter_test
 
 import (
-	"context"
 	"math"
 	"testing"
 
@@ -20,14 +19,6 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/stretchr/testify/require"
 )
-
-type mockCuriumKeeper struct {
-	adminAddress string
-}
-
-func (m *mockCuriumKeeper) GetAdminAddress(ctx context.Context) string {
-	return m.adminAddress
-}
 
 func TestChargingGasMeterWhiteBox(t *testing.T) {
 	govAuthAddr := authtypes.NewModuleAddress(govtypes.ModuleName)

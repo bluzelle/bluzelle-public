@@ -47,12 +47,13 @@ func (app *App) setupUpgradeHandlers(
 		transferSubspace.WithKeyTable(keyTable)
 	}
 
-	app.UpgradeKeeper.SetUpgradeHandler(upgrade.UpgradeName, upgrade.CreateV12UpgradeHandler(app.mm, configurator))
+	app.UpgradeKeeper.SetUpgradeHandler(upgrade.UpgradeName, upgrade.CreateV12UpgradeHandler(app.mm, configurator, &app.CuriumKeeper))
 }
 
 func (app *App) setupUpgradeStoreLoaders() {
-	// No store upgrades needed for v0.47 to v0.50 migration
-	// Crisis and consensus stores already exist from previous upgrades
+	// No store upgrades needed for v12.0 migration
+	// AdminAddress is a new key in the existing curium module store (schema change)
+	// The upgrade handler initializes AdminAddress, so no store loader is required
 }
 
 func (app *App) upgrade(configurator module.Configurator) {
