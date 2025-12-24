@@ -1,6 +1,7 @@
 
 syntax = "proto3";
 package curium;
+import "cosmos/msg/v1/msg.proto";
 
 // this line is used by starport scaffolding # proto/tx/import
 
@@ -8,7 +9,17 @@ option go_package = "github.com/bluzelle/bluzelle-public/curium/x/curium/types";
 
 // Msg defines the Msg service.
 service Msg {
+  rpc ChangeAdmin(MsgChangeAdmin) returns (MsgChangeAdminResponse);
     // this line is used by starport scaffolding # proto/tx/rpc
+}
+
+message MsgChangeAdmin {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string new_admin = 2;
+}
+
+message MsgChangeAdminResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message
