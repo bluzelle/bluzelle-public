@@ -27,7 +27,7 @@ describe('sending transactions', function () {
     after(() =>
         Swarm.stopDaemons({...defaultSwarmConfig})
     );
-
+    const MIN_GAS_PRICE = 0.0001
     it('should have a withTransaction that can bundle messages', () => {
         return startSwarmWithClient({
             config: {...defaultSwarmConfig},
@@ -97,7 +97,7 @@ describe('sending transactions', function () {
             config: {...defaultSwarmConfig},
             isE2E: isE2E()
         })
-            .then(({bzSdk}) => pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {gasPrice: defaultSwarmConfig.minGasPrice, maxGas: 200000, mode: 'sync'}))
+            .then(({bzSdk}) => pinCid(bzSdk, {cid: 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'}, {gasPrice: MIN_GAS_PRICE, maxGas: 200000, mode: 'sync'}))
             .then(x =>
                 {throw x}
             )
