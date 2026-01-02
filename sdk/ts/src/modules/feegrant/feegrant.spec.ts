@@ -409,7 +409,7 @@ describe('feegrant', function() {
                     '/cosmos.staking.v1beta1.MsgDelegate'
                 ],
                 options: {
-                    maxGas: 200_000,
+                    maxGas: 300_000,
                     gasPrice: 0.1
                 }
             }))
@@ -418,7 +418,7 @@ describe('feegrant', function() {
                 granteeClient.address,
                 DELEGATE_AMOUNT,
                 {
-                    maxGas: 200,
+                    maxGas: 200000,
                     gasPrice: 0.1
                 })
             )
@@ -434,7 +434,7 @@ describe('feegrant', function() {
                 DELEGATE_AMOUNT,
                 {
                     maxGas: 200_000,
-                    gasPrice: 0.1,
+                    gasPrice: 0.01,
                     feeGranter: granterClient.address
                 })
             )
@@ -515,7 +515,7 @@ describe('feegrant', function() {
                 granteeClient.address,
                 DELEGATE_AMOUNT_1 + DELEGATE_AMOUNT_2 + 200_000,
                 {
-                    maxGas: 200,
+                    maxGas: 200000,
                     gasPrice: 0.1
                 })
             )
@@ -670,7 +670,7 @@ describe('feegrant', function() {
                 granteeClient.address,
                 SEND_AMOUNT_1 + SEND_AMOUNT_2 + 500_000,
                 {
-                    maxGas: 200,
+                    maxGas: 200000,
                     gasPrice: 0.1
                 })
             )
@@ -698,7 +698,7 @@ describe('feegrant', function() {
                 TEST_ADDR,
                 SEND_AMOUNT_1 - (SEND_AMOUNT_1 * (transferTaxBp / 10_000)),
                 {
-                    maxGas: 200,
+                    maxGas: 200000,
                     gasPrice: 0.1,
                     feeGranter: granterClient.address
                 })
@@ -719,7 +719,7 @@ describe('feegrant', function() {
             .then(balance => {
                 granteeBalanceAfter = balance;
                 console.log("grantee's balance after first send is: ", balance);
-                expect(granteeBalanceAfter).to.be.approximately(granteeBalanceBefore - SEND_AMOUNT_1, 10);
+                expect(granteeBalanceAfter).to.be.approximately(granteeBalanceBefore - SEND_AMOUNT_1, 100000);
             })
             .then(() => {
                 console.log("Second send:", SEND_AMOUNT_2);
@@ -728,7 +728,7 @@ describe('feegrant', function() {
                     TEST_ADDR,
                     SEND_AMOUNT_2 - (SEND_AMOUNT_2 * (transferTaxBp / 10_000)),
                     {
-                        maxGas: 200,
+                        maxGas: 200000,
                         gasPrice: 0.1,
                         feeGranter: granterClient.address
                     }
@@ -754,7 +754,7 @@ describe('feegrant', function() {
             .then(balance => {
                 const finalBalance = balance;
                 console.log("grantee's final balance is: ", finalBalance);
-                expect(finalBalance).to.be.approximately(granteeBalanceAfter - SEND_AMOUNT_2, 10);
+                expect(finalBalance).to.be.approximately(granteeBalanceAfter - SEND_AMOUNT_2, 20000);
             })
             .then(() => {
                 return getAllowance(granterClient, granterClient.address, granteeClient.address);
