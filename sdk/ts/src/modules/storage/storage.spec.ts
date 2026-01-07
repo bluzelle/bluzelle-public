@@ -10,7 +10,7 @@ import {getTx} from "../../core";
 import { startSwarmWithClient, stopSwarm } from "@bluzelle/testing/src/swarmUtils";
 import { isE2E } from "@bluzelle/testing/src/e2eUtils";
 
-import * as FormData from "form-data";
+import FormData from "form-data";
 import axios from "axios";
 const uploadToIpfs = async (contentObj: any) => {
     const form = new FormData()
