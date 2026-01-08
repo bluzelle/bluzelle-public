@@ -1,0 +1,15 @@
+syntax = "proto3";
+package nft;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/bluzelle/bluzelle-public/curium/x/nft/types";
+option (gogoproto.goproto_getters_all) = false;
+
+// NFTTransferAuthorization allows the grantee to transfer a specific NFT
+// on behalf of the granter's account.
+message NFTTransferAuthorization {
+  // nft_id specifies the ID of the NFT that can be transferred
+  string nft_id = 1;
+}
+

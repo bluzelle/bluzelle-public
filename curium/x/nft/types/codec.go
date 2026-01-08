@@ -6,6 +6,7 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
+	authztypes "github.com/cosmos/cosmos-sdk/x/authz"
 )
 
 var (
@@ -40,6 +41,11 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgUpdateMintAuthority{},
 		&MsgCreateCollection{},
 		&MsgUpdateCollectionAuthority{},
+	)
+
+	// Register NFTTransferAuthorization as an authz Authorization type
+	registry.RegisterImplementations((*authztypes.Authorization)(nil),
+		&NFTTransferAuthorization{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
