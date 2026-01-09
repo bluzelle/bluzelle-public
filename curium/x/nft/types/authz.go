@@ -1,6 +1,8 @@
 package types
 
 import (
+	"context"
+
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/errors"
@@ -22,7 +24,7 @@ func (a NFTTransferAuthorization) MsgTypeURL() string {
 }
 
 // Accept implements Authorization.Accept
-func (a NFTTransferAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authztypes.AcceptResponse, error) {
+func (a NFTTransferAuthorization) Accept(ctx context.Context, msg sdk.Msg) (authztypes.AcceptResponse, error) {
 	transferMsg, ok := msg.(*MsgTransferNFT)
 	if !ok {
 		return authztypes.AcceptResponse{}, sdkerrors.Wrapf(
