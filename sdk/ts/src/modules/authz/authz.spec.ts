@@ -499,6 +499,268 @@ describe('authz module', function () {
       });
   });
 
+  it(' NFTTransferAuthorization should be successfully created and executed for specific NFT.', () => {
+    const testMetadata: any = {
+      id: parseNumToLong(1),
+      name: 'TMPMeta',
+      uri: 'https://tmp.com',
+      sellerFeeBasisPoints: 100,
+      primarySaleHappened: false,
+      isMutable: true,
+      creators: [{
+        address: testGranter,
+        verified: true,
+        share: 10,
+      }],
+      metadataAuthority: testGranter,
+      mintAuthority: testGranter,
+      masterEdition: {
+        supply: parseNumToLong(100_000),
+        maxSupply: parseNumToLong(1_000_000)
+      }
+    };
+    return createCollection(client, {
+      sender: client.address,
+      name: 'Temp',
+      symbol: 'TMP',
+      uri: 'http://temp.com',
+      isMutable: true,
+      updateAuthority: client.address
+    }, {
+      maxGas: 100000000,
+      gasPrice: 0.002
+    })
+      .then(() => createNft(client, {
+        collId: 1,
+        metadata: testMetadata
+      }, {
+        maxGas: 100000000,
+        gasPrice: 0.002
+      }))
+      .then(() => getNftByOwner(eClient, testGranter))
+      .then((nftInfo: any) => createCtx('authorizedNftId', () => {
+        const nft = nftInfo.nfts.pop();
+        return nft?.collId.toString() + ':' + nft?.metadataId.toString() + ':' + nft?.seq.toString();
+      }))
+      .then(passThroughAwait((ctx) => grantAuthorization(client, testGranter, testGrantee, {
+        grantType: GrantType.NFT_TRANSFER,
+        nftId: ctx.authorizedNftId,
+        expiration
+      }, {
+        maxGas: 100000000,
+        gasPrice: 0.002
+      })))
+      .then((ctx) => queryAuthorizations(client, {
+        granter: testGranter,
+        grantee: testGrantee,
+        msg: MsgType.TRANSFER_NFT
+      })
+        .then((res: BluzelleQueryGrantsResponse) => {
+          expect(res.grants[0]?.authorization.typeUrl)
+            .to
+            .equal('/nft.NFTTransferAuthorization');
+          return ctx;
+        }))
+      .then(passThroughAwait((ctx) => executeAuthorization(eClient, testGrantee, [{
+        msgType: MsgType.TRANSFER_NFT,
+        params: {
+          sender: testGranter,
+          id: ctx.authorizedNftId,
+          newOwner: testGrantee
+        }
+      }], {
+        maxGas: 100000000,
+        gasPrice: 0.002
+      })))
+      .then((ctx) => getNftInfo(eClient, ctx.authorizedNftId))
+      .then((nftInfo: any) => {
+        expect(nftInfo.nft?.owner)
+          .to
+          .equal(testGrantee);
+      });
+  });
+
+  it(' NFTTransferAuthorization should be deleted after use (one-time use).', () => {
+    const testMetadata: any = {
+      id: parseNumToLong(1),
+      name: 'TMPMeta',
+      uri: 'https://tmp.com',
+      sellerFeeBasisPoints: 100,
+      primarySaleHappened: false,
+      isMutable: true,
+      creators: [{
+        address: testGranter,
+        verified: true,
+        share: 10,
+      }],
+      metadataAuthority: testGranter,
+      mintAuthority: testGranter,
+      masterEdition: {
+        supply: parseNumToLong(100_000),
+        maxSupply: parseNumToLong(1_000_000)
+      }
+    };
+    return createCollection(client, {
+      sender: client.address,
+      name: 'Temp',
+      symbol: 'TMP',
+      uri: 'http://temp.com',
+      isMutable: true,
+      updateAuthority: client.address
+    }, {
+      maxGas: 100000000,
+      gasPrice: 0.002
+    })
+      .then(() => createNft(client, {
+        collId: 1,
+        metadata: testMetadata
+      }, {
+        maxGas: 100000000,
+        gasPrice: 0.002
+      }))
+      .then(() => getNftByOwner(eClient, testGranter))
+      .then((nftInfo: any) => createCtx('authorizedNftId', () => {
+        const nft = nftInfo.nfts.pop();
+        return nft?.collId.toString() + ':' + nft?.metadataId.toString() + ':' + nft?.seq.toString();
+      }))
+      .then(passThroughAwait((ctx) => grantAuthorization(client, testGranter, testGrantee, {
+        grantType: GrantType.NFT_TRANSFER,
+        nftId: ctx.authorizedNftId,
+        expiration
+      }, {
+        maxGas: 100000000,
+        gasPrice: 0.002
+      })))
+      .then((ctx) => queryAuthorizations(client, {
+        granter: testGranter,
+        grantee: testGrantee,
+        msg: MsgType.TRANSFER_NFT
+      })
+        .then((res: BluzelleQueryGrantsResponse) => {
+          expect(res.grants.length).to.be.greaterThan(0);
+          expect(res.grants[0]?.authorization.typeUrl)
+            .to
+            .equal('/nft.NFTTransferAuthorization');
+          return ctx;
+        }))
+      .then(passThroughAwait((ctx) => executeAuthorization(eClient, testGrantee, [{
+        msgType: MsgType.TRANSFER_NFT,
+        params: {
+          sender: testGranter,
+          id: ctx.authorizedNftId,
+          newOwner: testGrantee
+        }
+      }], {
+        maxGas: 100000000,
+        gasPrice: 0.002
+      })))
+      .then((ctx) => queryAuthorizations(client, {
+        granter: testGranter,
+        grantee: testGrantee,
+        msg: MsgType.TRANSFER_NFT
+      })
+        .then((res: BluzelleQueryGrantsResponse) => {
+          // Authorization should be deleted after use (one-time use)
+          const nftTransferAuth = res.grants.find(g => g.authorization.typeUrl === '/nft.NFTTransferAuthorization');
+          expect(nftTransferAuth).to.be.undefined;
+          return ctx;
+        }))
+      .then((ctx) => getNftInfo(eClient, ctx.authorizedNftId))
+      .then((nftInfo: any) => {
+        expect(nftInfo.nft?.owner)
+          .to
+          .equal(testGrantee);
+      });
+  });
+
+  it(' NFTTransferAuthorization should fail when trying to transfer a different NFT.', () => {
+    const testMetadata: any = {
+      id: parseNumToLong(1),
+      name: 'TMPMeta',
+      uri: 'https://tmp.com',
+      sellerFeeBasisPoints: 100,
+      primarySaleHappened: false,
+      isMutable: true,
+      creators: [{
+        address: testGranter,
+        verified: true,
+        share: 10,
+      }],
+      metadataAuthority: testGranter,
+      mintAuthority: testGranter,
+      masterEdition: {
+        supply: parseNumToLong(100_000),
+        maxSupply: parseNumToLong(1_000_000)
+      }
+    };
+    return createCollection(client, {
+      sender: client.address,
+      name: 'Temp',
+      symbol: 'TMP',
+      uri: 'http://temp.com',
+      isMutable: true,
+      updateAuthority: client.address
+    }, {
+      maxGas: 100000000,
+      gasPrice: 0.002
+    })
+      .then(() => createNft(client, {
+        collId: 1,
+        metadata: testMetadata
+      }, {
+        maxGas: 100000000,
+        gasPrice: 0.002
+      }))
+      .then(() => createNft(client, {
+        collId: 1,
+        metadata: testMetadata
+      }, {
+        maxGas: 100000000,
+        gasPrice: 0.002
+      }))
+      .then(() => getNftByOwner(eClient, testGranter))
+      .then((nftInfo: any) => createCtx('nftIds', () => {
+        const nfts = nftInfo.nfts.slice(-2); // Get last 2 NFTs
+        return {
+          authorizedNftId: nfts[0]?.collId.toString() + ':' + nfts[0]?.metadataId.toString() + ':' + nfts[0]?.seq.toString(),
+          differentNftId: nfts[1]?.collId.toString() + ':' + nfts[1]?.metadataId.toString() + ':' + nfts[1]?.seq.toString()
+        };
+      }))
+      .then(passThroughAwait((ctx) => grantAuthorization(client, testGranter, testGrantee, {
+        grantType: GrantType.NFT_TRANSFER,
+        nftId: ctx.nftIds.authorizedNftId,
+        expiration
+      }, {
+        maxGas: 100000000,
+        gasPrice: 0.002
+      })))
+      .then((ctx) => executeAuthorization(eClient, testGrantee, [{
+        msgType: MsgType.TRANSFER_NFT,
+        params: {
+          sender: testGranter,
+          id: ctx.nftIds.differentNftId, // Try to transfer a different NFT
+          newOwner: testGrantee
+        }
+      }], {
+        maxGas: 100000000,
+        gasPrice: 0.002
+      })
+        .then(() => {
+          expect(true).to.be.false; // Should not succeed
+        })
+        .catch((err: any) => {
+          expect(err.message || err.rawLog || JSON.stringify(err)).to.contain('unauthorized');
+          return ctx;
+        }))
+      .then((ctx) => getNftInfo(eClient, ctx.nftIds.differentNftId))
+      .then((nftInfo: any) => {
+        // NFT should still be owned by granter (transfer should have failed)
+        expect(nftInfo.nft?.owner)
+          .to
+          .equal(testGranter);
+      });
+  });
+
   it(' updateMetadataAuthority authorization should be successfully created and executed.', () => {
     const testMetadata: any = {
       id: parseNumToLong(1),

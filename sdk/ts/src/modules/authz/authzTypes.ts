@@ -34,6 +34,11 @@ import {SendAuthorization} from "../../curium/lib/generated/cosmos/bank/v1beta1/
 import {StakeAuthorization} from "../../curium/lib/generated/cosmos/staking/v1beta1/authz";
 import {Coin} from "../../curium/lib/generated/cosmos/base/v1beta1/coin";
 
+// NFTTransferAuthorization interface (will be replaced by generated type when available)
+export interface NFTTransferAuthorization {
+    nftId: string;
+}
+
 export const enum MsgType {
     // crisis
     VERIFY_INVARIANT,
@@ -195,6 +200,7 @@ export const enum GrantType {
     GENERIC,
     SEND,
     STAKE,
+    NFT_TRANSFER,
 }
 
 type GrantTypeToGrantUrlMap = {
@@ -204,7 +210,8 @@ type GrantTypeToGrantUrlMap = {
 export const grantMapping: GrantTypeToGrantUrlMap = {
     [GrantType.GENERIC]: "/cosmos.authz.v1beta1.GenericAuthorization",
     [GrantType.SEND]: "/cosmos.bank.v1beta1.SendAuthorization",
-    [GrantType.STAKE]: "/cosmos.staking.v1beta1.StakeAuthorization"
+    [GrantType.STAKE]: "/cosmos.staking.v1beta1.StakeAuthorization",
+    [GrantType.NFT_TRANSFER]: "/nft.NFTTransferAuthorization"
 }
 
 type BaseGrantParam = {
@@ -217,23 +224,61 @@ type BaseGrantParam = {
 type GenericGrantParam = BaseGrantParam[GrantType.GENERIC] & { msgType: MsgType }
 type SendGrantParam = BaseGrantParam[GrantType.SEND] & { spendLimit: Coin[], allowList: string[] }
 type StakeGrantParam = BaseGrantParam[GrantType.STAKE] & { stakeAuthorization: StakeAuthorization }
+type NFTTransferGrantParam = BaseGrantParam[GrantType.NFT_TRANSFER] & { nftId: string }
 
-export type GrantParam = GenericGrantParam | SendGrantParam | StakeGrantParam
+export type GrantParam = GenericGrantParam | SendGrantParam | StakeGrantParam | NFTTransferGrantParam
 
 type GrantTypeToGrantParamMap = {
     [GrantType.GENERIC]: GenericGrantParam,
     [GrantType.SEND]: SendGrantParam,
-    [GrantType.STAKE]: StakeGrantParam
+    [GrantType.STAKE]: StakeGrantParam,
+    [GrantType.NFT_TRANSFER]: NFTTransferGrantParam
 }
 
 type GrantTypeToEncodeFnMap = {
     [T in GrantType]: (grant: GrantTypeToGrantParamMap[T]) => Uint8Array;
 }
 
+// Helper function to encode varint (for string length)
+function encodeVarint(value: number): Uint8Array {
+    const bytes: number[] = [];
+    while (value > 0x7f) {
+        bytes.push((value & 0x7f) | 0x80);
+        value >>>= 7;
+    }
+    bytes.push(value & 0x7f);
+    return new Uint8Array(bytes);
+}
+
+// Helper function to encode NFTTransferAuthorization manually (until generated type is available)
+function encodeNFTTransferAuthorization(auth: NFTTransferAuthorization): Uint8Array {
+    // Protobuf encoding for NFTTransferAuthorization
+    // Field 1 (nft_id): string (wire type 2 = length-delimited)
+    const nftIdBytes = new TextEncoder().encode(auth.nftId);
+    const lengthVarint = encodeVarint(nftIdBytes.length);
+    
+    // Tag: field 1, wire type 2
+    const tag = encodeVarint((1 << 3) | 2);
+    
+    // Total size: tag + length varint + data
+    const totalSize = tag.length + lengthVarint.length + nftIdBytes.length;
+    const result = new Uint8Array(totalSize);
+    let offset = 0;
+    
+    result.set(tag, offset);
+    offset += tag.length;
+    result.set(lengthVarint, offset);
+    offset += lengthVarint.length;
+    result.set(nftIdBytes, offset);
+    
+    return result;
+}
+
 export const grantTypeToEncodeFnMap: GrantTypeToEncodeFnMap = {
     [GrantType.GENERIC]: (params: GenericGrantParam) => GenericAuthorization.encode({msg: msgMapping[params.msgType]}).finish(),
     [GrantType.SEND]: (params: SendGrantParam) => SendAuthorization.encode({spendLimit: params.spendLimit, allowList: params.allowList}).finish(),
     [GrantType.STAKE]: (params: StakeGrantParam) => StakeAuthorization.encode(params.stakeAuthorization).finish(),
+    [GrantType.NFT_TRANSFER]: (params: NFTTransferGrantParam) => encodeNFTTransferAuthorization({nftId: params.nftId}),
 }
 
 export type EncodeFn<T extends GrantParam> = (grantParam: T) => Uint8Array;
