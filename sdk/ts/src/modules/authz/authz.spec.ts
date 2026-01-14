@@ -734,7 +734,7 @@ describe('authz module', function () {
         maxGas: 100000000,
         gasPrice: 0.002
       })))
-      .then((ctx) => executeAuthorization(eClient, testGrantee, [{
+      .then(passThroughAwait((ctx) => executeAuthorization(eClient, testGrantee, [{
         msgType: MsgType.TRANSFER_NFT,
         params: {
           sender: testGranter,
@@ -747,11 +747,12 @@ describe('authz module', function () {
       })
         .then(() => {
           expect(true).to.be.false; // Should not succeed
+          return ctx;
         })
         .catch((err: any) => {
           expect(err.message || err.rawLog || JSON.stringify(err)).to.contain('unauthorized');
           return ctx;
-        }))
+        })))
       .then((ctx) => getNftInfo(eClient, ctx.nftIds.differentNftId))
       .then((nftInfo: any) => {
         // NFT should still be owned by granter (transfer should have failed)
