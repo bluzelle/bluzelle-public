@@ -66,7 +66,7 @@ func (a NFTTransferAuthorization) Accept(ctx context.Context, msg sdk.Msg) (auth
 	}
 
 	// This is a one-time use authorization - delete after use
-	return authztypes.AcceptResponse{Delete: true, Updated: nil}, nil
+	return authztypes.AcceptResponse{Delete: true, Updated: nil, Accept: true}, nil
 }
 
 // ValidateBasic implements Authorization.ValidateBasic
