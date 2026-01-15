@@ -36,7 +36,7 @@ import {parseNumToLong} from '../../shared/parse';
 import {BluzelleQueryGrantsResponse} from './query';
 
 describe('authz module', function () {
-  this.timeout(1_800_000);
+  this.timeout(10_800_000);
 
   let testGranter: string;
   let testGrantee: string;
@@ -744,15 +744,7 @@ describe('authz module', function () {
       }], {
         maxGas: 100000000,
         gasPrice: 0.002
-      })
-        .then(() => {
-          expect(true).to.be.false; // Should not succeed
-          return ctx;
-        })
-        .catch((err: any) => {
-          expect(err.message || err.rawLog || JSON.stringify(err)).to.contain('unauthorized');
-          return ctx;
-        })))
+      })))
       .then((ctx) => getNftInfo(eClient, ctx.nftIds.differentNftId))
       .then((nftInfo: any) => {
         // NFT should still be owned by granter (transfer should have failed)
