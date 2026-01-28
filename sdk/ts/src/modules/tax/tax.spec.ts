@@ -151,4 +151,103 @@ describe('tax module', function () {
 
     });
 
+    describe('hacked admin address attempts', () => {
+        // These tests ensure that a hacked address (not the real admin) cannot perform admin functions
+
+        it("hacked address should fail to set gas tax bp", function() {
+            isE2E() && this.skip();
+            return startSwarmWithClient({
+                isE2E: isE2E()
+            })
+                .then(withCtxAwait('hacked_mnemonic', () => Promise.resolve(bip39.generateMnemonic(256))))
+                .then(withCtxAwait('hacked_client', ctx =>
+                    newBluzelleClient({
+                        url: 'localhost:26667',
+                        wallet: newLocalWallet(ctx.hacked_mnemonic)
+                    })
+                ))
+                .then(passThroughAwait(ctx => faucetToken(ctx.hacked_client, ctx.hacked_client.address)))
+                .then(withCtxAwait("bp_before", ctx => getTaxInfo(ctx.hacked_client)))
+                .then(passThroughAwait(ctx => setGasTaxBp(ctx.hacked_client, Number(ctx.bp_before.gasTaxBp) + 1, {
+                    maxGas: MAX_GAS,
+                    gasPrice: GAS_PRICE,
+                    mode: 'sync'
+                }).catch(err => ({error: err.message}))))
+                .then(withCtxAwait("bp_after", ctx => getTaxInfo(ctx.hacked_client)))
+                .then(ctx => {
+                    // Should either have an error or the value should not have changed
+                    if (ctx.error) {
+                        expect(ctx.error).to.include('permission denied');
+                    } else {
+                        expect(Number(ctx.bp_after.gasTaxBp)).equal(Number(ctx.bp_before.gasTaxBp));
+                    }
+                })
+        });
+
+        it("hacked address should fail to set transfer tax bp", function() {
+            isE2E() && this.skip();
+            return startSwarmWithClient({
+                isE2E: isE2E()
+            })
+                .then(withCtxAwait('hacked_mnemonic', () => Promise.resolve(bip39.generateMnemonic(256))))
+                .then(withCtxAwait('hacked_client', ctx =>
+                    newBluzelleClient({
+                        url: 'localhost:26667',
+                        wallet: newLocalWallet(ctx.hacked_mnemonic)
+                    })
+                ))
+                .then(passThroughAwait(ctx => faucetToken(ctx.hacked_client, ctx.hacked_client.address)))
+                .then(withCtxAwait("bp_before", ctx => getTaxInfo(ctx.hacked_client)))
+                .then(passThroughAwait(ctx => setTransferTaxBp(ctx.hacked_client, Number(ctx.bp_before.transferTaxBp) + 1, {
+                    maxGas: MAX_GAS,
+                    gasPrice: GAS_PRICE,
+                    mode: 'sync'
+                }).catch(err => ({error: err.message}))))
+                .then(withCtxAwait("bp_after", ctx => getTaxInfo(ctx.hacked_client)))
+                .then(ctx => {
+                    // Should either have an error or the value should not have changed
+                    if (ctx.error) {
+                        expect(ctx.error).to.include('permission denied');
+                    } else {
+                        expect(Number(ctx.bp_after.transferTaxBp)).equal(Number(ctx.bp_before.transferTaxBp));
+                    }
+                })
+        });
+
+        it("hacked address should fail to set tax collector", function() {
+            isE2E() && this.skip();
+            return startSwarmWithClient({
+                isE2E: isE2E()
+            })
+                .then(withCtxAwait('hacked_mnemonic', () => Promise.resolve(bip39.generateMnemonic(256))))
+                .then(withCtxAwait('hacked_client', ctx =>
+                    newBluzelleClient({
+                        url: 'localhost:26667',
+                        wallet: newLocalWallet(ctx.hacked_mnemonic)
+                    })
+                ))
+                .then(passThroughAwait(ctx => faucetToken(ctx.hacked_client, ctx.hacked_client.address)))
+                .then(withCtxAwait("taxInfo_before", ctx => getTaxInfo(ctx.hacked_client)))
+                .then(passThroughAwait(ctx => {
+                    const newCollector = ctx.hacked_client.address;
+                    return setTaxCollector(ctx.hacked_client, newCollector, {
+                        maxGas: MAX_GAS,
+                        gasPrice: GAS_PRICE,
+                        mode: 'sync'
+                    }).catch(err => ({error: err.message}));
+                }))
+                .then(withCtxAwait("taxInfo_after", ctx => getTaxInfo(ctx.hacked_client)))
+                .then(ctx => {
+                    // Should either have an error or the tax collector should not have changed
+                    if (ctx.error) {
+                        expect(ctx.error).to.include('permission denied');
+                    } else {
+                        expect(ctx.taxInfo_after.taxCollector).not.equal(ctx.hacked_client.address);
+                        expect(ctx.taxInfo_after.taxCollector).equal(ctx.taxInfo_before.taxCollector);
+                    }
+                })
+        });
+
+    });
+
 });

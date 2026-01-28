@@ -1,0 +1,3 @@
+export {
+    getAdminAddress
+} from './query';

@@ -7,6 +7,7 @@ export * from './core';
 export * from './modules/bank';
 export * from './modules/faucet';
 export * from './modules/tax';
+export * from './modules/curium';
 export * from './modules/staking';
 export * from './modules/distribution';
 export * from './modules/nft';

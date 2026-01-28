@@ -7,6 +7,7 @@ import {QueryClientImpl as BankQueryClientImpl} from "../curium/lib/generated/co
 import {QueryClientImpl as FaucetQueryClientImpl} from '../curium/lib/generated/faucet/query'
 import {BluzelleWallet} from "../wallets/BluzelleWallet";
 import {QueryClientImpl as TaxQueryClientImpl} from '../curium/lib/generated/tax/query';
+import {QueryClientImpl as CuriumQueryClientImpl} from '../curium/lib/generated/curium/query';
 import {QueryClientImpl as StakingQueryClientImpl} from "../curium/lib/generated/cosmos/staking/v1beta1/query";
 import {QueryClientImpl as DistributionQueryClientImpl} from "../curium/lib/generated/cosmos/distribution/v1beta1/query";
 import {QueryClientImpl as NftQueryClientImpl} from "../curium/lib/generated/nft/query";
@@ -27,6 +28,7 @@ type QueryClientImpl = {
   bank: BankQueryClientImpl;
   faucet: FaucetQueryClientImpl;
   tax: TaxQueryClientImpl;
+  curium: CuriumQueryClientImpl;
   staking: StakingQueryClientImpl;
   distribution: DistributionQueryClientImpl;
   tx: ServiceClientImpl;
@@ -77,6 +79,7 @@ const getRpcClient = (url: string): Promise<QueryClientImpl> =>
       bank: new BankQueryClientImpl(rpcClient),
       faucet: new FaucetQueryClientImpl(rpcClient),
       tax: new TaxQueryClientImpl(rpcClient),
+      curium: new CuriumQueryClientImpl(rpcClient),
       staking: new StakingQueryClientImpl(rpcClient),
       distribution: new DistributionQueryClientImpl(rpcClient),
       tx: new ServiceClientImpl(rpcClient),
