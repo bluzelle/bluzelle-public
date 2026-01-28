@@ -129,7 +129,41 @@ proto-gen-protoc:
 		echo "Error: cosmos-sdk not found. Run 'go mod download' first."; \
 		exit 1; \
 	fi
-	@for module in $(PROTO_MODULES); do \
+	@echo "Ensuring protoc plugins are available..."
+	@mkdir -p $(CURDIR)/bin
+	@if [ ! -f "$(CURDIR)/bin/protoc-gen-gocosmos" ]; then \
+		if [ -f "$(shell go env GOPATH)/bin/protoc-gen-gocosmos" ]; then \
+			echo "Linking protoc-gen-gocosmos from GOPATH..."; \
+			ln -sf "$(shell go env GOPATH)/bin/protoc-gen-gocosmos" $(CURDIR)/bin/protoc-gen-gocosmos; \
+		else \
+			echo "Building protoc-gen-gocosmos..."; \
+			go build -o $(CURDIR)/bin/protoc-gen-gocosmos github.com/cosmos/gogoproto/protoc-gen-gocosmos || \
+			(echo "Error: Failed to build protoc-gen-gocosmos. Please install it manually:"; \
+			 echo "  go install github.com/cosmos/gogoproto/protoc-gen-gocosmos@latest"; \
+			 exit 1); \
+		fi; \
+	fi
+	@if [ ! -f "$(CURDIR)/bin/protoc-gen-grpc-gateway" ]; then \
+		if [ -f "$(shell go env GOPATH)/bin/protoc-gen-grpc-gateway" ]; then \
+			echo "Linking protoc-gen-grpc-gateway from GOPATH..."; \
+			ln -sf "$(shell go env GOPATH)/bin/protoc-gen-grpc-gateway" $(CURDIR)/bin/protoc-gen-grpc-gateway; \
+		else \
+			echo "Building protoc-gen-grpc-gateway..."; \
+			TMP_CACHE=$$(mktemp -d); \
+			GOMODCACHE=$$TMP_CACHE GOTMPDIR=/tmp go build -o $(CURDIR)/bin/protoc-gen-grpc-gateway github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway 2>/dev/null; \
+			BUILD_EXIT=$$?; \
+			rm -rf $$TMP_CACHE; \
+			if [ $$BUILD_EXIT -ne 0 ]; then \
+				echo "Error: Failed to build protoc-gen-grpc-gateway."; \
+				echo "Please install it manually:"; \
+				echo "  go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v1.16.0"; \
+				echo "Or fix Go module cache permissions (currently owned by root)."; \
+				exit 1; \
+			fi; \
+		fi; \
+	fi
+	@export PATH="$(CURDIR)/bin:$$PATH:$(shell go env GOPATH)/bin"; \
+	for module in $(PROTO_MODULES); do \
 		echo "Generating proto files for module: $$module"; \
 		MODULE_DIR="proto/$$module"; \
 		OUTPUT_DIR="x/$$module/types"; \
@@ -158,7 +192,7 @@ proto-gen-protoc:
 		fi; \
 		TEMP_OUTPUT=".proto-temp-$$module"; \
 		mkdir -p $$TEMP_OUTPUT; \
-		protoc $$INCLUDE_PATHS \
+		PATH="$(CURDIR)/bin:$$PATH:$(shell go env GOPATH)/bin" protoc $$INCLUDE_PATHS \
 			--gocosmos_out=plugins=grpc,Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:$$TEMP_OUTPUT \
 			--grpc-gateway_out=logtostderr=true,allow_colon_final_segments=true:$$TEMP_OUTPUT \
 			$$PROTO_FILES; \

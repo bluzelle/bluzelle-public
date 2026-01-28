@@ -19,6 +19,6 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 var _ types.MsgServer = msgServer{}
 
 func (k msgServer) isAdmin(ctx context.Context, creator string) bool {
-	adminAddress := k.CuriumKeeper.GetAdminAddress(ctx)
+	adminAddress := k.CuriumKeeper.GetAdminAddressString(ctx)
 	return creator == adminAddress
 }

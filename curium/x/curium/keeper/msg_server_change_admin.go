@@ -14,7 +14,7 @@ func (k msgServer) ChangeAdmin(goCtx context.Context, msg *types.MsgChangeAdmin)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get the current admin address
-	currentAdmin := k.GetAdminAddress(ctx)
+	currentAdmin := k.GetAdminAddressString(goCtx)
 	if currentAdmin == "" {
 		return nil, errors.Wrap(sdkerrors.ErrInvalidRequest, "admin address not set")
 	}

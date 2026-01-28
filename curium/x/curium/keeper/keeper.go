@@ -43,8 +43,8 @@ func (k Keeper) Logger(ctx context.Context) log.Logger {
 	return sdkCtx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-// GetAdminAddress returns the admin address from the store
-func (k Keeper) GetAdminAddress(ctx context.Context) string {
+// getAdminAddressFromStore returns the admin address from the store (internal helper)
+func (k Keeper) getAdminAddressFromStore(ctx context.Context) string {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	store := sdkCtx.KVStore(k.storeKey)
 	bz := store.Get([]byte(types.AdminAddressKey))
@@ -52,6 +52,12 @@ func (k Keeper) GetAdminAddress(ctx context.Context) string {
 		return ""
 	}
 	return string(bz)
+}
+
+// GetAdminAddressString returns the admin address from the store as a string
+// This method satisfies the CuriumKeeper interface expected by other modules (e.g., tax module)
+func (k Keeper) GetAdminAddressString(ctx context.Context) string {
+	return k.getAdminAddressFromStore(ctx)
 }
 
 // SetAdminAddress sets the admin address in the store

@@ -18,7 +18,13 @@ func (k Keeper) GetAdminAddress(goCtx context.Context, req *types.QueryGetAdminA
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	adminAddress := k.GetAdminAddress(ctx)
+	// Access the store directly to get the admin address
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get([]byte(types.AdminAddressKey))
+	adminAddress := ""
+	if bz != nil {
+		adminAddress = string(bz)
+	}
 
 	return &types.QueryGetAdminAddressResponse{
 		AdminAddress: adminAddress,

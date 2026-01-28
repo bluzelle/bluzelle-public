@@ -20,7 +20,7 @@ func CreateV12UpgradeHandler(
 
 		// Initialize AdminAddress if it's not already set
 		// This is the first upgrade where AdminAddress store variable is created in the curium module
-		adminAddress := curiumKeeper.GetAdminAddress(ctx)
+		adminAddress := curiumKeeper.GetAdminAddressString(ctx)
 		if adminAddress == "" {
 			curiumKeeper.SetAdminAddress(ctx, global.AdminAddress)
 			sdkCtx.Logger().Info("Initialized AdminAddress in curium module", "address", global.AdminAddress)

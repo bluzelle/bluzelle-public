@@ -30,7 +30,7 @@ type mockCuriumKeeper struct {
 	adminAddress string
 }
 
-func (m *mockCuriumKeeper) GetAdminAddress(ctx context.Context) string {
+func (m *mockCuriumKeeper) GetAdminAddressString(ctx context.Context) string {
 	return m.adminAddress
 }
 

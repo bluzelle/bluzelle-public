@@ -20,5 +20,5 @@ type BankKeeper interface {
 
 // CuriumKeeper defines the expected curium keeper interface
 type CuriumKeeper interface {
-	GetAdminAddress(ctx context.Context) string
+	GetAdminAddressString(ctx context.Context) string
 }
