@@ -88,7 +88,7 @@ describe('gov module', function() {
                     description: 'My description',
                     proposer: client.auth.address,
                     initialDeposit: [{
-                        amount: 100000,
+                        amount: 10000000,
                         denom: 'ubnt'
                     }],
                     summary: 'Test summary',
@@ -97,16 +97,21 @@ describe('gov module', function() {
                     maxGas: 200_000,
                     gasPrice: 10
                 })
+                .then((res) => 
+                    console.log(res))
             ))
             .then(client =>
                 getProposals(client.bzSdk)
                     .then(res => (res.proposals.length).toString())
                     .then(proposalId => getProposal(client.bzSdk, proposalId))
             )
-            .then(proposal => expect(TextProposal.decode(proposal.content.value))
+.then(proposal =>{ 
+    var tempVal = TextProposal.decode(proposal.content.value)
+    return expect(tempVal)
                 .to
                 .deep
-                .equal(PROPOSAL_VALUE))
+                .equal(PROPOSAL_VALUE)
+            })
     );
 
     it('should be able to submit and query a software upgrade proposal', () =>
@@ -119,7 +124,7 @@ describe('gov module', function() {
                 description: 'My description',
                 proposer: ctx.auth.address,
                 initialDeposit: [{
-                    amount: 500_000,
+                    amount: 10000000,
                     denom: 'ubnt'
                 }],
                 summary: 'Test summary',
@@ -202,7 +207,7 @@ describe('gov module', function() {
                                 description: 'My description',
                                 recipient: recipient.address,
                                 amount: [{
-                                    amount: 10_000_000,
+                                    amount: 10000000,
                                     denom: `ubnt`
                                 }],
                                 proposer: client.auth.address,
@@ -232,7 +237,7 @@ describe('gov module', function() {
                     description: 'My description',
                     proposer: ctx.auth.address,
                     initialDeposit: [{
-                        amount: 100000,
+                        amount: 10000000,
                         denom: 'ubnt'
                     }],
                     summary: 'Test summary',
@@ -264,7 +269,7 @@ describe('gov module', function() {
                     description: 'My description',
                     proposer: ctx.auth.address,
                     initialDeposit: [{
-                        amount: 100000,
+                        amount: 10000000,
                         denom: 'ubnt'
                     }],
                     summary: 'Test summary',
@@ -292,7 +297,7 @@ describe('gov module', function() {
                     description: 'My description',
                     proposer: ctx.auth.address,
                     initialDeposit: [{
-                        amount: 100000,
+                        amount: 10000000,
                         denom: 'ubnt'
                     }],
                     summary: 'Test summary',
@@ -315,7 +320,7 @@ describe('gov module', function() {
                 .deep
                 .equal([{
                     denom: 'ubnt',
-                    amount: 100000
+                    amount: 10000000
                 }]))
     );
 
