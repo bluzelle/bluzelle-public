@@ -132,7 +132,7 @@ describe('gov module legacy', function() {
                                 }],
                                 proposer: client.auth.address,
                                 initialDeposit: [{
-                                    amount: 3_000_000,
+                                    amount: 2_000_000_000,
                                     denom: `ubnt`
                                 }],
                                 authority: client.govModuleAddress?.baseAccount?.address as string
