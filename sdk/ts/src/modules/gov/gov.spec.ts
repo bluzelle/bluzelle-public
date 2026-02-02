@@ -271,7 +271,7 @@ describe('gov module', function() {
                     description: 'My description',
                     proposer: ctx.auth.address,
                     initialDeposit: [{
-                        amount: 10000000,
+                        amount: 100000,
                         denom: 'ubnt'
                     }],
                     summary: 'Test summary',
