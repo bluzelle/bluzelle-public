@@ -271,7 +271,7 @@ describe('gov module', function() {
                     description: 'My description',
                     proposer: ctx.auth.address,
                     initialDeposit: [{
-                        amount: 100000,
+                        amount: 10000000,
                         denom: 'ubnt'
                     }],
                     summary: 'Test summary',
@@ -279,14 +279,17 @@ describe('gov module', function() {
                 }, {
                     maxGas: 200_000,
                     gasPrice: 10
-                })
+                }).then ((res) => 
+                    console.log(res))
             ))
             .then(client =>
                 getProposals(client.bzSdk)
                     .then(res => (res.proposals.length).toString())
                     .then(proposalId => getProposal(client.bzSdk, proposalId))
             )
-            .then(proposal => expect(proposal.status).to.equal(ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD))
+            .then(proposal => 
+                expect(proposal.status).to.equal(ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD)
+            )
     );
 
     it('should query deposit', () =>
