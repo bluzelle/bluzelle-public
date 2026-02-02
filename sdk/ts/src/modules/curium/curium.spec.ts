@@ -20,11 +20,11 @@ describe('curium module', function () {
 
     describe('getAdminAddress', () => {
         it("should get the admin address", function() {
-            isE2E() && this.skip();
             return startSwarmWithClient({
                 isE2E: isE2E()
             })
-                .then(withCtxAwait("adminAddress", ctx => getAdminAddress(ctx.bzSdk)))
+                .then(withCtxAwait("adminAddress", ctx => 
+                    getAdminAddress(ctx.bzSdk)))
                 .then(ctx => {
                     expect(ctx.adminAddress.adminAddress).to.be.a('string');
                     expect(ctx.adminAddress.adminAddress).to.not.be.empty;

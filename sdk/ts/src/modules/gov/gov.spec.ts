@@ -212,7 +212,7 @@ describe('gov module', function() {
                                 }],
                                 proposer: client.auth.address,
                                 initialDeposit: [{
-                                    amount: 3_000_000,
+                                    amount: 10000000,
                                     denom: `ubnt`
                                 }],
                                 authority: client.govModuleAddress?.baseAccount?.address as string
@@ -223,7 +223,9 @@ describe('gov module', function() {
                         }
 
                     )
-                    .then(res => expect(res.code).to.equal(0))
+                    .then(res => 
+                        expect(res.code).to.equal(0)
+                    )
             ))
     );
 
