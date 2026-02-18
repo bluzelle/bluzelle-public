@@ -9,7 +9,7 @@ build:
 accounts:
   - name: vuser
     coins:
-      - 20000000000ubnt
+      - 200000000000ubnt
       - 500000000000000uelt
       - 500000000000000ug4
     hd-path: "m/44'/118'/0'/0/0"
@@ -32,7 +32,7 @@ genesis:
     gov:
       params:
         min_deposit:
-          - amount: "100000000"
+          - amount: "40000000"
             denom: ubnt
         voting_period: "10s"
         expedited_voting_period: "5s"
@@ -54,7 +54,7 @@ genesis:
       transferTaxBp: 1
 validators:
   - name: vuser
-    bonded: 100000000ubnt
+    bonded: 10000000000ubnt
     app:
       api:
         enable: true

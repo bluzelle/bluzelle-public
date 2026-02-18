@@ -512,7 +512,7 @@ describe('gov module, local docker', function () {
                     description: 'My description',
                     proposer: ctx.auth.address,
                     initialDeposit: [{
-                        amount: 10000000,
+                        amount: 100000000,
                         denom: 'ubnt'
                     }],
                     summary: 'Test summary',
@@ -658,13 +658,13 @@ describe('gov module, local docker', function () {
                     }
                 )))
                 .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "1",
+                    proposalId: "4",
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
                 .then(passThroughAwait(() => delay(20_000)))
                 .then(passThroughAwait(client =>
-                    getProposal(client.bzSdk, "1")
+                    getProposal(client.bzSdk, "4")
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
                 ))
         );
@@ -699,13 +699,13 @@ describe('gov module, local docker', function () {
                     }
                 )))
                 .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "1",
+                    proposalId: "4",
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
                 .then(passThroughAwait(() => delay(20_000)))
                 .then(passThroughAwait(client =>
-                    getProposal(client.bzSdk, "1")
+                    getProposal(client.bzSdk, "4")
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
                 ))
                 .then(passThroughAwait(() => delay(180_000)))
