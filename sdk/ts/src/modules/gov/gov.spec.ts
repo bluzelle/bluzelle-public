@@ -49,6 +49,18 @@ const PROPOSAL_VALUE: TextProposal = {
 
 const getConfigPath = () => path.join(__dirname, 'config.yml');
 
+const getLatestProposalId = (client: any): Promise<string> =>
+    getProposals(client)
+        .then(res => {
+            const ids = res.proposals
+                .map(p => Number(p.proposalId))
+                .filter(n => Number.isFinite(n));
+            if (!ids.length) {
+                throw new Error('No proposals found');
+            }
+            return Math.max(...ids).toString();
+        });
+
 export const govTestSwarmConfig: SwarmConfig = {
     denom: 'bnt',
     otherTokens: ['500000000000000uelt', '500000000000000ug4'],
@@ -410,12 +422,13 @@ describe('gov module, local docker', function () {
                     maxGas: 200_000,
                     gasPrice: 10
                 })))
+                .then(withCtxAwait("proposalId", client => getLatestProposalId(client.bzSdk)))
                 .then(passThroughAwait(client =>
-                    getProposal(client.bzSdk, "1")
+                    getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_DEPOSIT_PERIOD'))
                 ))
                 .then(client => depositToProposal(client.bzSdk, {
-                    proposalId: "1",
+                    proposalId: client.proposalId,
                     depositor: client.auth.address,
                     amount: [{
                         amount: 1_000_000,
@@ -444,12 +457,13 @@ describe('gov module, local docker', function () {
                     maxGas: 200_000,
                     gasPrice: 10
                 })))
+                .then(withCtxAwait("proposalId", client => getLatestProposalId(client.bzSdk)))
                 .then(passThroughAwait(client =>
-                    getProposal(client.bzSdk, "1")
+                    getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_DEPOSIT_PERIOD'))
                 ))
                 .then(passThroughAwait(client => depositToProposal(client.bzSdk, {
-                    proposalId: "1",
+                    proposalId: client.proposalId,
                     depositor: client.auth.address,
                     amount: [{
                         amount: 100_000_000,
@@ -459,7 +473,7 @@ describe('gov module, local docker', function () {
                     maxGas: 200_000,
                     gasPrice: 10
                 })))
-                .then(client => getProposal(client.bzSdk, "1"))
+                .then(client => getProposal(client.bzSdk, client.proposalId))
                 .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_VOTING_PERIOD'))
         );
 
@@ -479,8 +493,9 @@ describe('gov module, local docker', function () {
                     maxGas: 200_000,
                     gasPrice: 10
                 })))
+                .then(withCtxAwait("proposalId", client => getLatestProposalId(client.bzSdk)))
                 .then(passThroughAwait(client => depositToProposal(client.bzSdk, {
-                    proposalId: "1",
+                    proposalId: client.proposalId,
                     depositor: client.auth.address,
                     amount: [{
                         amount: 100_000_000,
@@ -491,12 +506,12 @@ describe('gov module, local docker', function () {
                     gasPrice: 10
                 })))
                 .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "1",
+                    proposalId: client.proposalId,
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
                 .then(passThroughAwait(() => delay(20_000)))
-                .then(client => getProposal(client.bzSdk, "1"))
+                .then(client => getProposal(client.bzSdk, client.proposalId))
                 .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
         );
     });
@@ -526,13 +541,14 @@ describe('gov module, local docker', function () {
                     maxGas: 200_000,
                     gasPrice: 10
                 })))
+                .then(withCtxAwait("proposalId", client => getLatestProposalId(client.bzSdk)))
                 .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "1",
+                    proposalId: client.proposalId,
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
                 .then(passThroughAwait(() => delay(20_000)))
-                .then(client => getProposal(client.bzSdk, "1"))
+                .then(client => getProposal(client.bzSdk, client.proposalId))
                 .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
         );
 
@@ -558,8 +574,9 @@ describe('gov module, local docker', function () {
                     maxGas: 200_000,
                     gasPrice: 10
                 })))
+                .then(withCtxAwait("proposalId", client => getLatestProposalId(client.bzSdk)))
                 .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "1",
+                    proposalId: client.proposalId,
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
@@ -571,7 +588,7 @@ describe('gov module, local docker', function () {
                 }))
                 .then(passThroughAwait(() => delay(20_000)))
                 .then(passThroughAwait(client =>
-                    getProposal(client.bzSdk, "1")
+                    getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
                 ))
                 .then(passThroughAwait(() => delay(120_000)))
@@ -601,8 +618,9 @@ describe('gov module, local docker', function () {
                     maxGas: 200_000,
                     gasPrice: 10
                 })))
+                .then(withCtxAwait("proposalId", client => getLatestProposalId(client.bzSdk)))
                 .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "1",
+                    proposalId: client.proposalId,
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
@@ -614,7 +632,7 @@ describe('gov module, local docker', function () {
                 }))
                 .then(passThroughAwait(() => delay(20_000)))
                 .then(passThroughAwait(client =>
-                    getProposal(client.bzSdk, "1")
+                    getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
                 ))
                 .then(passThroughAwait(() => delay(120_000)))
@@ -657,14 +675,18 @@ describe('gov module, local docker', function () {
                         gasPrice: 10
                     }
                 )))
+                .then(withCtxAwait("proposalId", client =>
+                    getProposals(client.bzSdk)
+                        .then(res => Math.max(...res.proposals.map(p => Number(p.proposalId))).toString())
+                ))
                 .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "4",
+                    proposalId: client.proposalId,
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
                 .then(passThroughAwait(() => delay(20_000)))
                 .then(passThroughAwait(client =>
-                    getProposal(client.bzSdk, "4")
+                    getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
                 ))
         );
@@ -698,14 +720,18 @@ describe('gov module, local docker', function () {
                         gasPrice: 10
                     }
                 )))
+                .then(withCtxAwait("proposalId", client =>
+                    getProposals(client.bzSdk)
+                        .then(res => Math.max(...res.proposals.map(p => Number(p.proposalId))).toString())
+                ))
                 .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "4",
+                    proposalId: client.proposalId,
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
                 .then(passThroughAwait(() => delay(20_000)))
                 .then(passThroughAwait(client =>
-                    getProposal(client.bzSdk, "4")
+                    getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
                 ))
                 .then(passThroughAwait(() => delay(180_000)))
@@ -742,14 +768,15 @@ describe('gov module, local docker', function () {
                     maxGas: 200_000,
                     gasPrice: 10
                 })))
+                .then(withCtxAwait("proposalId", client => getLatestProposalId(client.bzSdk)))
                 .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "1",
+                    proposalId: client.proposalId,
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
                 .then(passThroughAwait(() => delay(20_000)))
                 .then(passThroughAwait(client =>
-                    getProposal(client.bzSdk, "1")
+                    getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
                 ))
         );
@@ -787,14 +814,15 @@ describe('gov module, local docker', function () {
                         gasPrice: 10
                     })
                 ))
+                .then(withCtxAwait("proposalId", ctx => getLatestProposalId(ctx.bzSdk)))
                 .then(passThroughAwait(client => vote(client.bzSdk, {
-                    proposalId: "1",
+                    proposalId: client.proposalId,
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
                 .then(passThroughAwait(() => delay(20_000)))
                 .then(passThroughAwait(client =>
-                    getProposal(client.bzSdk, "1")
+                    getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
                 ))
                 .then(ctx => getAccountBalance(ctx.bzSdk, ctx.recipient.address))
@@ -824,13 +852,14 @@ describe.skip('gov module, local machine', () => {
                 maxGas: 200_000,
                 gasPrice: 10
             })))
+            .then(withCtxAwait("proposalId", client => getLatestProposalId(client)))
             .then(passThroughAwait(client => vote(client, {
-                proposalId: "1",
+                proposalId: client.proposalId,
                 voter: client.address,
                 option: VoteOption.VOTE_OPTION_YES
             }, { maxGas: 200_000, gasPrice: 10 })))
             .then(passThroughAwait(() => delay(20_000)))
-            .then(client => getProposal(client, "1"))
+            .then(client => getProposal(client, client.proposalId))
             .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
     );
 
@@ -856,13 +885,14 @@ describe.skip('gov module, local machine', () => {
                 maxGas: 200_000,
                 gasPrice: 10
             })))
+            .then(withCtxAwait("proposalId", client => getLatestProposalId(client)))
             .then(passThroughAwait(client => vote(client, {
-                proposalId: "1",
+                proposalId: client.proposalId,
                 voter: client.address,
                 option: VoteOption.VOTE_OPTION_YES
             }, { maxGas: 200_000, gasPrice: 10 })))
             .then(passThroughAwait(() => delay(20_000)))
-            .then(client => getProposal(client, "1"))
+            .then(client => getProposal(client, client.proposalId))
             .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
     );
 });
@@ -888,8 +918,9 @@ describe('gov votes', function () {
                 maxGas: 200_000,
                 gasPrice: 10
             })))
+            .then(withCtxAwait("proposalId", client => getLatestProposalId(client.bzSdk)))
             .then(passThroughAwait(client => depositToProposal(client.bzSdk, {
-                proposalId: "1",
+                proposalId: client.proposalId,
                 depositor: client.auth.address,
                 amount: [{
                     amount: 1_000_000,
@@ -900,7 +931,7 @@ describe('gov votes', function () {
                 gasPrice: 10
             })))
             .then(passThroughAwait(client => voteWithWeights(client.bzSdk, {
-                proposalId: "1",
+                proposalId: client.proposalId,
                 voter: client.auth.address,
                 options: [
                     { option: VoteOption.VOTE_OPTION_YES, weight: 0.5 },
@@ -908,7 +939,7 @@ describe('gov votes', function () {
                 ]
             }, { maxGas: 200_000, gasPrice: 10 })))
             .then(passThroughAwait(() => delay(20_000)))
-            .then(client => getProposal(client.bzSdk, "1"))
+            .then(client => getProposal(client.bzSdk, client.proposalId))
             .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
     );
 });
