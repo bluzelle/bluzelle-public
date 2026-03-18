@@ -2,7 +2,7 @@ import {generateContent} from "@bluzelle/testing/src/fileUtils";
 import {passThroughAwait} from "promise-passthrough";
 import { withCtxAwait} from "@scottburch/with-context";
 import {expect} from "chai";
-import delay from "delay";
+import { delayWithLog } from '../../utils/delayWithLog';
 import {defaultSwarmConfig} from "@bluzelle/testing";
 import {hasContent} from "./query";
 import {pinCid} from "./tx";
@@ -53,13 +53,13 @@ describe('storage module', function () {
           isE2E: isE2E()
         })
         .then(withCtxAwait('addResult', ()=> uploadToIpfs(generateContent(0.01))))
-        .then(passThroughAwait(()=> delay(20_000)))
+        .then(passThroughAwait(()=> delayWithLog(20_000, 'wait for the pinned IPFS content to be indexed before checking hasContent=true')))
         .then(passThroughAwait((ctx) =>
             pinCid(ctx.bzSdk, { cid: ctx.addResult.path }, { maxGas: 200000, gasPrice: 0.002, mode: 'sync' })
             // .then(() => console.log)
           )
         )
-        .then(passThroughAwait(()=> delay(20_000)))
+        .then(passThroughAwait(()=> delayWithLog(20_000, 'wait after pinning so hasContent reflects the newly pinned CID')))
         .then(ctx => 
             hasContent(ctx.bzSdk, ctx.addResult.path)
         )
@@ -72,7 +72,7 @@ describe('storage module', function () {
           isE2E: isE2E()
         })
         .then(withCtxAwait('addResult', ()=> uploadToIpfs(generateContent(0.01))))
-        .then(passThroughAwait(()=> delay(20_000)))
+        .then(passThroughAwait(()=> delayWithLog(20_000, 'wait for the network to settle before checking hasContent=false (content not pinned)')))
         .then(ctx => 
             hasContent(ctx.bzSdk, ctx.addResult.path)
         )
@@ -92,7 +92,7 @@ describe('storage module', function () {
                     mode: 'sync'
                 })
         ))
-        .then(passThroughAwait(() => delay(6_000)))
+        .then(passThroughAwait(() => delayWithLog(6_000, 'wait briefly after pinning a V1 CID before checking hasContent')))
         .then(ctx => hasContent(ctx.bzSdk, 'bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi'))
         .then(resp => expect(resp).to.be.true)
     );
@@ -111,7 +111,7 @@ describe('storage module', function () {
                     mode: 'sync'
                 })
         ))
-        .then(passThroughAwait(() => delay(6_000)))
+        .then(passThroughAwait(() => delayWithLog(6_000, 'wait briefly after pinning to allow hasContent to become queryable for V0/V1 comparison')))
         .then(ctx => hasContent(ctx.bzSdk, 'QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR'))
         .then(resp => expect(resp).to.be.true)
     );
@@ -130,7 +130,7 @@ describe('storage module', function () {
                     mode: 'sync'
                 })
         ))
-            .then(passThroughAwait(() => delay(12_000)))
+            .then(passThroughAwait(() => delayWithLog(12_000, 'wait long enough for hasContent to settle before checking V0/V1 other-direction')))
             .then(ctx => loadCID().then(CID => 
                 hasContent(ctx.bzSdk, CID.parse('bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi').toV0().toString())
             ))

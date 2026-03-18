@@ -38,7 +38,7 @@ import { getAppliedPlan } from '../upgrade/query';
 import { getAccountBalance, getTotalSupply } from '../bank/query';
 import { stopSwarm } from '@bluzelle/testing/src/swarmUtils';
 import { VoteOption } from '../../curium/lib/generated/cosmos/gov/v1/gov';
-import delay from 'delay';
+import { delayWithLog } from '../../utils/delayWithLog';
 import { Environment, SwarmTypes, DaemonConfig, SwarmConfig } from 'daemon-manager/src/SwarmConfig';
 import { times } from 'lodash';
 
@@ -510,7 +510,7 @@ describe('gov module, local docker', function () {
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
-                .then(passThroughAwait(() => delay(20_000)))
+                .then(passThroughAwait(() => delayWithLog(20_000, 'wait for governance proposal status to update after voting')))
                 .then(client => getProposal(client.bzSdk, client.proposalId))
                 .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
         );
@@ -547,7 +547,7 @@ describe('gov module, local docker', function () {
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
-                .then(passThroughAwait(() => delay(20_000)))
+                .then(passThroughAwait(() => delayWithLog(20_000, 'wait for governance proposal status to update after voting')))
                 .then(client => getProposal(client.bzSdk, client.proposalId))
                 .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
         );
@@ -586,12 +586,12 @@ describe('gov module, local docker', function () {
                     getContainerId('a.validator')
                         .then(id => copyToContainer(id, path.join(__dirname, './plans/do_nothing'), '/root/.curium/cosmovisor/upgrades'));
                 }))
-                .then(passThroughAwait(() => delay(20_000)))
+                .then(passThroughAwait(() => delayWithLog(20_000, 'wait for governance proposal status to update after voting')))
                 .then(passThroughAwait(client =>
                     getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
                 ))
-                .then(passThroughAwait(() => delay(120_000)))
+                .then(passThroughAwait(() => delayWithLog(120_000, 'wait for software upgrade / gov plan application to complete before querying applied plan')))
                 .then(client => getAppliedPlan(client.bzSdk, "do_nothing"))
                 .then(plan => expect(plan.height).to.equal(25))
         );
@@ -630,12 +630,12 @@ describe('gov module, local docker', function () {
                     getContainerId('a.validator')
                         .then(id => copyToContainer(id, path.join(__dirname, './plans/double_supply'), '/root/.curium/cosmovisor/upgrades'));
                 }))
-                .then(passThroughAwait(() => delay(20_000)))
+                .then(passThroughAwait(() => delayWithLog(20_000, 'wait for governance proposal status to update after voting')))
                 .then(passThroughAwait(client =>
                     getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
                 ))
-                .then(passThroughAwait(() => delay(120_000)))
+                .then(passThroughAwait(() => delayWithLog(120_000, 'wait for software upgrade / gov plan application to complete before querying applied plan')))
                 .then(passThroughAwait(client =>
                     getAppliedPlan(client.bzSdk, "double_supply")
                         .then(plan => expect(plan.height).to.equal(25))
@@ -684,7 +684,7 @@ describe('gov module, local docker', function () {
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
-                .then(passThroughAwait(() => delay(20_000)))
+                .then(passThroughAwait(() => delayWithLog(20_000, 'wait for governance proposal status to update after voting before querying proposal state')))
                 .then(passThroughAwait(client =>
                     getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
@@ -729,12 +729,12 @@ describe('gov module, local docker', function () {
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
-                .then(passThroughAwait(() => delay(20_000)))
+                .then(passThroughAwait(() => delayWithLog(20_000, 'wait for governance proposal status to update after voting')))
                 .then(passThroughAwait(client =>
                     getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
                 ))
-                .then(passThroughAwait(() => delay(180_000)))
+                .then(passThroughAwait(() => delayWithLog(180_000, 'wait for parameters change to apply on-chain before querying updated staking params')))
                 .then(client => getStakingParams(client.bzSdk))
                 .then(res => expect(res.maxValidators).to.equal(120))
         );
@@ -774,7 +774,7 @@ describe('gov module, local docker', function () {
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
-                .then(passThroughAwait(() => delay(20_000)))
+                .then(passThroughAwait(() => delayWithLog(20_000, 'wait for community pool spend proposal status to update after voting before querying proposal state')))
                 .then(passThroughAwait(client =>
                     getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
@@ -820,7 +820,7 @@ describe('gov module, local docker', function () {
                     voter: client.auth.address,
                     option: VoteOption.VOTE_OPTION_YES
                 }, { maxGas: 200_000, gasPrice: 10 })))
-                .then(passThroughAwait(() => delay(20_000)))
+                .then(passThroughAwait(() => delayWithLog(20_000, 'wait for community pool spend proposal status to update after voting before querying proposal state')))
                 .then(passThroughAwait(client =>
                     getProposal(client.bzSdk, client.proposalId)
                         .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
@@ -858,7 +858,7 @@ describe.skip('gov module, local machine', () => {
                 voter: client.address,
                 option: VoteOption.VOTE_OPTION_YES
             }, { maxGas: 200_000, gasPrice: 10 })))
-            .then(passThroughAwait(() => delay(20_000)))
+            .then(passThroughAwait(() => delayWithLog(20_000, 'wait for governance proposal status to update after voting before querying proposal state')))
             .then(client => getProposal(client, client.proposalId))
             .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
     );
@@ -891,7 +891,7 @@ describe.skip('gov module, local machine', () => {
                 voter: client.address,
                 option: VoteOption.VOTE_OPTION_YES
             }, { maxGas: 200_000, gasPrice: 10 })))
-            .then(passThroughAwait(() => delay(20_000)))
+            .then(passThroughAwait(() => delayWithLog(20_000, 'wait for governance proposal status to update after voting before querying proposal state')))
             .then(client => getProposal(client, client.proposalId))
             .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
     );
@@ -938,7 +938,7 @@ describe('gov votes', function () {
                     { option: VoteOption.VOTE_OPTION_ABSTAIN, weight: 0.5 }
                 ]
             }, { maxGas: 200_000, gasPrice: 10 })))
-            .then(passThroughAwait(() => delay(20_000)))
+            .then(passThroughAwait(() => delayWithLog(20_000, 'wait for governance proposal status to update after weighted voting before querying proposal state')))
             .then(client => getProposal(client.bzSdk, client.proposalId))
             .then(proposal => expect(proposal.statusLabel).to.equal('PROPOSAL_STATUS_PASSED'))
     );
