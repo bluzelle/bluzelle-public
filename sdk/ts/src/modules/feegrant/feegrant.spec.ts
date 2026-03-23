@@ -15,7 +15,7 @@ import {withCtxAwait} from "@scottburch/with-context";
 import * as bip39 from 'bip39';
 import {getAccountBalance, getTaxInfo, newLocalWallet, send} from "../../index";
 import {delegate, getDelegation} from "../staking";
-import delay from "delay";
+import { delayWithLog } from "../../utils/delayWithLog";
 
 
 const TEST_ADDR = "bluzelle1ahtwerncxwadjzntry5n7pzypzwt220hu2ghfj";
@@ -547,7 +547,7 @@ describe('feegrant', function() {
                     }
                 );
             })
-            .then(() => delay(3000))
+            .then(() => delayWithLog(3000, 'wait 3s after first delegation for allowance to be indexed'))
             .then(() => getAllowance(granterClient, granterClient.address, granteeClient.address))
             .then(allowance => {
                 const remainingAmount = allowance.allowance.periodCanSpend?.[0]?.amount || 0;
@@ -576,7 +576,7 @@ describe('feegrant', function() {
                 )
                     .then(() => allowanceAfterFirst);
             })
-            .then((allowanceAfterFirst) => delay(3000).then(() => allowanceAfterFirst))
+            .then((allowanceAfterFirst) => delayWithLog(3000, 'wait 3s after second delegation for allowance to be indexed').then(() => allowanceAfterFirst))
             .then((allowanceAfterFirst) => getAllowance(granterClient, granterClient.address, granteeClient.address)
                 .then(allowance => ({ allowance, allowanceAfterFirst })))
             .then(({ allowance, allowanceAfterFirst }) => {
@@ -703,7 +703,7 @@ describe('feegrant', function() {
                     feeGranter: granterClient.address
                 })
             )
-            .then(() => delay(3000))
+            .then(() => delayWithLog(3000, 'wait 3s after first transfer for periodic allowance to be updated'))
             .then(() => getAllowance(granterClient, granterClient.address, granteeClient.address))
             .then(allowance => {
                 periodCanSpendAfterFirst = allowance.allowance.periodCanSpend?.[0]?.amount || 0;
@@ -734,7 +734,7 @@ describe('feegrant', function() {
                     }
                 );
             })
-            .then(() => delay(3000))
+            .then(() => delayWithLog(3000, 'wait 3s after second transfer for periodic allowance to be updated'))
             .then(() => getAllowance(granterClient, granterClient.address, granteeClient.address))
             .then(allowance => {
                 periodCanSpendAfterSecond = allowance.allowance.periodCanSpend?.[0]?.amount || 0;

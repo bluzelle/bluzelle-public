@@ -5,7 +5,7 @@ import {Some} from "monet";
 import BIP32Factory, {BIP32Interface} from 'bip32';
 import * as ecc from 'tiny-secp256k1';
 import {bech32} from "bech32"
-import delay from "delay";
+import { delayWithLog } from "../../utils/delayWithLog";
 import {getAccountBalance} from "../bank";
 
 const defaultHdPath = "m/44'/483'/0'/0/0";
@@ -46,6 +46,6 @@ export function waitUntilFunded(client: BluzelleClient, address: string): Promis
     function waitForFaucet(startBalance: number): Promise<unknown> {
         return getAccountBalance(client, address)
             .then(passThroughAwait(balance => console.log('waiting for funds...', balance)))
-            .then(balance => balance === startBalance && delay(1000).then(() => waitForFaucet(startBalance)))
+            .then(balance => balance === startBalance && delayWithLog(1000, 'wait 1s for faucet funds to be reflected').then(() => waitForFaucet(startBalance)))
     }
 }

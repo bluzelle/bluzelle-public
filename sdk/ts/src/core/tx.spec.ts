@@ -8,7 +8,7 @@ import {Swarm} from "daemon-manager/src";
 import {BluzelleClient, newBluzelleClient} from "./sdk";
 import {newLocalWallet} from "../wallets/localWallet";
 import {generateMnemonic} from "../utils/generateMnemonic";
-import delay from "delay";
+import { delayWithLog } from "../utils/delayWithLog";
 import {pinCid} from "../modules/storage";
 import {getAccountBalance, send} from "../modules/bank";
 import {faucetToken} from "../modules/faucet";
@@ -88,7 +88,7 @@ describe('sending transactions', function () {
             .then(() => getTx(client, hash))
             .catch(passThroughAwait(err => expect(err.message).to.include('not found')))
             .then(passThroughAwait(() => console.log("waiting for 6 seconds")))
-            .then(passThroughAwait(() => delay(6_000)))
+            .then(passThroughAwait(() => delayWithLog(6_000, 'wait 6s for transaction to be queryable')))
             .then(() => getTx(client, hash))
     });
 
