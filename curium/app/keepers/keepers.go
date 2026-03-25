@@ -386,13 +386,17 @@ func NewAppKeeper(
 	appKeepers.CuriumModule = curium.NewAppModule(appCodec, &appKeepers.CuriumKeeper)
 
 	if ipfsOn {
-		storageNode, _ := startupStorageNode()
+		storageNode, storageDir, err := startupStorageNode(appOpts)
+		if err != nil {
+			logger.Error("failed to start embedded IPFS storage node", "err", err)
+			os.Exit(1)
+		}
 
 		appKeepers.StorageKeeper = *storagemodulekeeper.NewKeeper(
 			appCodec,
 			keys[storagemoduletypes.StoreKey],
 			keys[storagemoduletypes.MemStoreKey],
-			DefaultStorageDir,
+			storageDir,
 			storageNode,
 		)
 		appKeepers.StorageModule = storage.NewAppModule(appCodec, appKeepers.StorageKeeper)
@@ -486,13 +490,28 @@ func (r *DefaultFeemarketDenomResolver) ExtraDenoms(_ sdk.Context) ([]string, er
 	return []string{}, nil
 }
 
-func startupStorageNode() (*curiumipfs.StorageIpfsNode, error) {
+func startupStorageNode(appOpts servertypes.AppOptions) (*curiumipfs.StorageIpfsNode, string, error) {
 
 	storageDir := DefaultStorageDir
 	filter := DefaultFilter
+	logLevel := "info"
+
+	if configuredStorageDir := strings.TrimSpace(cast.ToString(appOpts.Get("storage-dir"))); configuredStorageDir != "" {
+		storageDir = configuredStorageDir
+	}
+	if configuredFilter := strings.TrimSpace(cast.ToString(appOpts.Get("filter"))); configuredFilter != "" {
+		filter = configuredFilter
+	}
+	// cometbft config.toml key
+	if configuredLogLevel := strings.TrimSpace(cast.ToString(appOpts.Get("log_level"))); configuredLogLevel != "" {
+		logLevel = configuredLogLevel
+	}
+
+	curiumipfs.ConfigureStorageLogging(logLevel)
+
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	storageDir = strings.ReplaceAll(storageDir, "~", homeDir)
 	os.RemoveAll(storageDir)
@@ -501,9 +520,9 @@ func startupStorageNode() (*curiumipfs.StorageIpfsNode, error) {
 		Transformer: ipfsConfig.Profiles[filter].Transform,
 	})
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	node, err := storagemodulekeeper.StartStorageNode(storageDir)
-	return node, err
+	return node, storageDir, err
 
 }

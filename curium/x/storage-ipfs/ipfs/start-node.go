@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/bluzelle/ipfs-kubo/commands"
@@ -26,6 +28,25 @@ import (
 )
 
 var setupRun = false
+
+// ConfigureStorageLogging aligns embedded IPFS logging with curiumd's log directive.
+//
+// Kubo (and friends) use github.com/ipfs/go-log which is configured via env vars.
+// Setting these before node construction ensures IPFS/libp2p subsystems inherit it.
+func ConfigureStorageLogging(curiumdDirective string) {
+	directive := strings.TrimSpace(curiumdDirective)
+	if directive == "" {
+		directive = "info"
+	}
+
+	// Apply to IPFS internal loggers.
+	_ = os.Setenv("GOLOG_LOG_LEVEL", directive)
+	// Keep output readable when running in a terminal.
+	_ = os.Setenv("GOLOG_LOG_FMT", "color")
+
+	// Keep stdlib logger aligned for log.Printf usage in this package.
+	log.SetOutput(os.Stderr)
+}
 
 func setupPlugins(externalPluginsPath string) error {
 	if setupRun == true {
