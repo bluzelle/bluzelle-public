@@ -132,7 +132,39 @@ func SpawnStorageIpfsNode(ctx context.Context, repoPath string) (*StorageIpfsNod
 		return nil, err
 	}
 
+	// Some tests use repo fixtures that include a config file but omit datastore directories.
+	// Kubo expects these to exist (or it will fail writing blocks).
+	for _, dir := range []string{
+		repoPath,
+		filepath.Join(repoPath, "blocks"),
+		filepath.Join(repoPath, "blocks", ".temp"),
+		filepath.Join(repoPath, "datastore"),
+		filepath.Join(repoPath, "keystore"),
+	} {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return nil, err
+		}
+	}
+
+	// flatfs requires a SHARDING file in the blocks directory. Some repo fixtures omit it.
+	// Default to the standard next-to-last/2 sharding used by kubo repo init.
+	shardingPath := filepath.Join(repoPath, "blocks", "SHARDING")
+	if _, err := os.Stat(shardingPath); err != nil {
+		if os.IsNotExist(err) {
+			if err := os.WriteFile(shardingPath, []byte("/repo/flatfs/shard/v1/next-to-last/2\n"), 0o644); err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, err
+		}
+	}
+
 	ipfsRepo, err := fsrepo.Open(repoPath)
+	if err != nil {
+		return nil, err
+	}
+
+	repoConfig, err := ipfsRepo.Config()
 	if err != nil {
 		return nil, err
 	}
@@ -147,33 +179,15 @@ func SpawnStorageIpfsNode(ctx context.Context, repoPath string) (*StorageIpfsNod
 		return nil, err
 	}
 
-	bootstrapNodes := []string{
-		// IPFS Bootstrapper nodes.
-		"/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN",
-		"/dnsaddr/bootstrap.libp2p.io/p2p/QmQCU2EcMqAqQPR2i9bChDtGNJchTbq5TbXJJ16u19uLTa",
-		"/dnsaddr/bootstrap.libp2p.io/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb",
-		"/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt",
-
-		// IPFS Cluster Pinning nodes
-		"/ip4/138.201.67.219/tcp/4001/p2p/QmUd6zHcbkbcs7SMxwLs48qZVX3vpcM8errYS7xEczwRMA",
-		"/ip4/138.201.67.219/udp/4001/quic/p2p/QmUd6zHcbkbcs7SMxwLs48qZVX3vpcM8errYS7xEczwRMA",
-		"/ip4/138.201.67.220/tcp/4001/p2p/QmNSYxZAiJHeLdkBg38roksAR9So7Y5eojks1yjEcUtZ7i",
-		"/ip4/138.201.67.220/udp/4001/quic/p2p/QmNSYxZAiJHeLdkBg38roksAR9So7Y5eojks1yjEcUtZ7i",
-		"/ip4/138.201.68.74/tcp/4001/p2p/QmdnXwLrC8p1ueiq2Qya8joNvk3TVVDAut7PrikmZwubtR",
-		"/ip4/138.201.68.74/udp/4001/quic/p2p/QmdnXwLrC8p1ueiq2Qya8joNvk3TVVDAut7PrikmZwubtR",
-		"/ip4/94.130.135.167/tcp/4001/p2p/QmUEMvxS2e7iDrereVYc5SWPauXPyNwxcy9BXZrC1QTcHE",
-		"/ip4/94.130.135.167/udp/4001/quic/p2p/QmUEMvxS2e7iDrereVYc5SWPauXPyNwxcy9BXZrC1QTcHE",
-
-		// You can add more nodes here, for example, another IPFS node you might have running locally, mine was:
-		// "/ip4/127.0.0.1/tcp/4010/p2p/QmZp2fhDLxjYue2RiUvLwT9MWdnbDxam32qYFnGmxZDh5L",
-		// "/ip4/127.0.0.1/udp/4010/quic/p2p/QmZp2fhDLxjYue2RiUvLwT9MWdnbDxam32qYFnGmxZDh5L",
-		"/ip4/52.204.207.70/tcp/4001/p2p/12D3KooWCp6VFUtssr9JiJGCamzNmctDYPjVEicAW1EpY2aDNhnr",
-	}
-
 	go func() {
-		err := connectToPeers(ctx, api, bootstrapNodes)
-		if err != nil {
-			log.Printf("failed connect to peers: %s", err)
+		bootstrapPeers := append([]string(nil), repoConfig.Bootstrap...)
+		if len(bootstrapPeers) == 0 {
+			log.Printf("ipfs bootstrap list is empty; skipping auto-connect")
+			return
+		}
+
+		if err := connectToPeers(ctx, api, bootstrapPeers); err != nil {
+			log.Printf("failed connect to bootstrap peers: %s", err)
 		}
 	}()
 
